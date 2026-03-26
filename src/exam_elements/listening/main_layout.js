@@ -51,10 +51,19 @@ const AudioControl = ({ examId, currentPart, colorTheme, isReviewMode }) => {
         fetch(audioUrl, {
           headers: {
             'Authorization': `Bearer ${token}`
-          }
+          },
+          redirect: 'follow'
         })
           .then(response => {
             if (response.ok) {
+              // Check if response is JSON (R2 URL) or binary (legacy blob)
+              const contentType = response.headers.get('content-type') || '';
+              if (contentType.includes('application/json')) {
+                return response.json().then(data => {
+                  // Backend returned R2 URL, fetch audio directly from R2
+                  return fetch(data.audio_url || data.url).then(r => r.blob());
+                });
+              }
               return response.blob();
             }
             throw new Error('Failed to fetch audio');
