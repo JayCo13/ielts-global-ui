@@ -1,0 +1,3 @@
+const API_BASE = process.env.REACT_APP_API_URL || 'https://api.thiieltstrenmay.com';
+
+export default API_BASE;

@@ -1,0 +1,26 @@
+{
+  "short_name": "thiieltstrenmay",
+  "name": "thiieltstrenmay.com - Luyện thi IELTS trực tuyến",
+  "icons": [
+    {
+      "src": "img/logo48.png",
+      "type": "image/png",
+      "sizes": "48x48"
+    },
+    {
+      "src": "img/logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "img/logo384.png",
+      "type": "image/png",
+      "sizes": "384x384"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#4CAF50",
+  "background_color": "#ffffff",
+  "description": "Cải thiện điểm IELTS của bạn với các bài kiểm tra được thiết kế với giao diện giống giao diện thi thật 100%"
+}
