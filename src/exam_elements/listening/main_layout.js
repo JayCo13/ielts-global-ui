@@ -922,44 +922,28 @@ const MainLayout = () => {
 
   useEffect(() => {
     const resolveAudioUrl = async () => {
-      const token = localStorage.getItem('token');
-      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-
-      try {
-        if (isForecastSession && currentPart) {
-          // Forecast: fetch individual part
-          const response = await fetch(`${API_BASE}/student/exam/${examId}/audio-part/${currentPart}`, { headers });
+      if (isForecastSession && currentPart) {
+        // Forecast: need to resolve R2 URL from backend
+        const token = localStorage.getItem('token');
+        try {
+          const response = await fetch(`${API_BASE}/student/exam/${examId}/audio-part/${currentPart}`, {
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+          });
           if (!response.ok) throw new Error('Failed to fetch audio');
           const contentType = response.headers.get('content-type') || '';
           if (contentType.includes('application/json')) {
             const data = await response.json();
-            setAudioUrl(data.audio_url); // R2 CDN URL
+            setAudioUrl(data.audio_url);
           } else {
-            // Legacy: blob response
             const blob = await response.blob();
             setAudioUrl(URL.createObjectURL(blob));
           }
-        } else {
-          // Full test: fetch combined audio info
-          const response = await fetch(`${API_BASE}/student/exam/${examId}/audio`, { headers });
-          if (!response.ok) throw new Error('Failed to fetch audio');
-          const contentType = response.headers.get('content-type') || '';
-          if (contentType.includes('application/json')) {
-            const data = await response.json();
-            if (data.type === 'r2_urls' && data.parts && data.parts.length > 0) {
-              // Use first part URL; AudioControl handles per-part playback
-              setAudioUrl(data.parts[0].audio_url);
-              // Store all part URLs for sequential playback
-              window.__r2AudioParts = data.parts;
-            }
-          } else {
-            // Legacy: blob response
-            const blob = await response.blob();
-            setAudioUrl(URL.createObjectURL(blob));
-          }
+        } catch (error) {
+          console.error('Error resolving audio URL:', error);
         }
-      } catch (error) {
-        console.error('Error resolving audio URL:', error);
+      } else {
+        // Full test: backend combines and streams audio directly
+        setAudioUrl(`${API_BASE}/student/exam/${examId}/audio`);
       }
     };
 
