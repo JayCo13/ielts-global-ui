@@ -921,12 +921,50 @@ const MainLayout = () => {
   }, [examId, isForecastSession, currentPart]);
 
   useEffect(() => {
-    if (examId) {
-      if (isForecastSession && currentPart) {
-        setAudioUrl(`${API_BASE}/student/exam/${examId}/audio-part/${currentPart}`);
-      } else {
-        setAudioUrl(`${API_BASE}/student/exam/${examId}/audio`);
+    const resolveAudioUrl = async () => {
+      const token = localStorage.getItem('token');
+      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+      try {
+        if (isForecastSession && currentPart) {
+          // Forecast: fetch individual part
+          const response = await fetch(`${API_BASE}/student/exam/${examId}/audio-part/${currentPart}`, { headers });
+          if (!response.ok) throw new Error('Failed to fetch audio');
+          const contentType = response.headers.get('content-type') || '';
+          if (contentType.includes('application/json')) {
+            const data = await response.json();
+            setAudioUrl(data.audio_url); // R2 CDN URL
+          } else {
+            // Legacy: blob response
+            const blob = await response.blob();
+            setAudioUrl(URL.createObjectURL(blob));
+          }
+        } else {
+          // Full test: fetch combined audio info
+          const response = await fetch(`${API_BASE}/student/exam/${examId}/audio`, { headers });
+          if (!response.ok) throw new Error('Failed to fetch audio');
+          const contentType = response.headers.get('content-type') || '';
+          if (contentType.includes('application/json')) {
+            const data = await response.json();
+            if (data.type === 'r2_urls' && data.parts && data.parts.length > 0) {
+              // Use first part URL; AudioControl handles per-part playback
+              setAudioUrl(data.parts[0].audio_url);
+              // Store all part URLs for sequential playback
+              window.__r2AudioParts = data.parts;
+            }
+          } else {
+            // Legacy: blob response
+            const blob = await response.blob();
+            setAudioUrl(URL.createObjectURL(blob));
+          }
+        }
+      } catch (error) {
+        console.error('Error resolving audio URL:', error);
       }
+    };
+
+    if (examId) {
+      resolveAudioUrl();
     }
 
     const fetchExamData = async () => {
@@ -1339,28 +1377,10 @@ const MainLayout = () => {
   // Effect to handle audioUrl changes
   useEffect(() => {
     if (!audioRef.current || !audioUrl) return;
-    const token = localStorage.getItem('token');
-    if (isForecastSession) {
-      audioRef.current.src = '';
-      fetch(audioUrl, {
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-      })
-        .then(response => {
-          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-          return response.blob();
-        })
-        .then(blob => {
-          const objectUrl = URL.createObjectURL(blob);
-          audioRef.current.src = objectUrl;
-          audioRef.current.load();
-        })
-        .catch(error => {
-          console.error('Error fetching audio (forecast):', error);
-        });
-    } else {
-      audioRef.current.src = audioUrl;
-      audioRef.current.load();
-    }
+
+    // audioUrl is already resolved to a playable URL (R2 CDN or blob objectURL)
+    audioRef.current.src = audioUrl;
+    audioRef.current.load();
   }, [audioUrl, isForecastSession]);
   const handleStartAudio = async () => {
     if (!audioRef.current || isStartLoading) return;
