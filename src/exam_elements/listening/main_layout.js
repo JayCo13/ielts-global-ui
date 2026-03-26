@@ -1386,27 +1386,12 @@ const MainLayout = () => {
     if (!audioRef.current || isStartLoading) return;
     setIsStartLoading(true);
     try {
-      if (isForecastSession) {
-        if (!audioRef.current.src || !audioRef.current.src.startsWith('blob:')) {
-          const token = localStorage.getItem('token');
-          if (audioUrl) {
-            const response = await fetch(audioUrl, {
-              headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-            });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const blob = await response.blob();
-            const objectUrl = URL.createObjectURL(blob);
-            audioRef.current.src = objectUrl;
-          }
-        }
-      } else {
-        if (!audioRef.current.src) {
-          audioRef.current.src = audioUrl;
-        }
+      // audioUrl is already resolved to a playable URL (R2 CDN or blob objectURL)
+      if (audioUrl && !audioRef.current.src) {
+        audioRef.current.src = audioUrl;
+        audioRef.current.load();
       }
       
-      // Let the browser's preload="auto" do its job.
-      // Calling load() here aborts the ongoing buffering connection, which causes massive TTFB spikes with Cloudflare and long loading times on clicking "Start".
       await audioRef.current.play();
       setIsAudioStarted(true);
       setIsAudioPlaying(true);
