@@ -407,7 +407,7 @@ const HomePage = () => {
                     Check list các VIP members
                     <span className="relative inline-block">
                       <span className="absolute -inset-1 w-full h-full"></span>
-                      <span className="relative text-[#0096b1]">trúng tủ tại thiieltstrenmay.com</span>
+                      <span className="relative text-[#0096b1]">trúng tủ tại ieltscomputertest.com</span>
                     </span>
                   </h1>
                   <div className="space-y-4 bg-gradient-to-r from-white via-[#f8f9fa] to-white p-6 rounded-xl shadow-lg border border-[#e9ecef] hover:shadow-xl transition-all duration-300">
@@ -417,7 +417,7 @@ const HomePage = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                         </svg>
                       </div>
-                      <p className="text-gray-600">Khi là thành viên VIP của thiieltstrenmay.com, bạn sẽ được "thử lửa" với những bộ đề có layout được thiết kế giống đề thi thật.</p>
+                      <p className="text-gray-600">Khi là thành viên VIP của ieltscomputertest.com, bạn sẽ được "thử lửa" với những bộ đề có layout được thiết kế giống đề thi thật.</p>
                     </div>
                     <div className="flex items-start gap-4 group hover:transform hover:translate-x-2 transition-all duration-300">
                       <div className="flex-shrink-0 w-12 h-12 bg-[#eb7e37]/10 rounded-full flex items-center justify-center group-hover:bg-[#eb7e37]/20 transition-colors duration-300">
@@ -441,7 +441,7 @@ const HomePage = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                         </svg>
                       </div>
-                      <p className="text-gray-600">Rất nhiều thành viên VIP đã tự tin hơn hẳn và chinh phục điểm số cao sau thời gian "luyện công" tại thiieltstrenmay.com đấy.</p>
+                      <p className="text-gray-600">Rất nhiều thành viên VIP đã tự tin hơn hẳn và chinh phục điểm số cao sau thời gian "luyện công" tại ieltscomputertest.com đấy.</p>
                     </div>
 
                     <div className="flex items-start gap-4 group hover:transform hover:translate-x-2 transition-all duration-300">
@@ -482,7 +482,7 @@ const HomePage = () => {
                 >
                   <Card className="relative overflow-hidden h-[300px] border border-white/20">
                     <img src="/img/hp-img1.jpg" alt="Student 1" className="w-full h-full object-cover" />
-                    <p className="absolute bottom-0 left-0 right-0 p-4 text-white text-sm italic bg-black/50 backdrop-blur-sm">"Nhờ luyện thi đều đặn trên thiieltstrenmay.com, mình không còn bị bỡ ngỡ khi bước vào phòng thi thật – mọi thứ quen thuộc như đã làm rồi vậy!"</p>
+                    <p className="absolute bottom-0 left-0 right-0 p-4 text-white text-sm italic bg-black/50 backdrop-blur-sm">"Nhờ luyện thi đều đặn trên ieltscomputertest.com, mình không còn bị bỡ ngỡ khi bước vào phòng thi thật – mọi thứ quen thuộc như đã làm rồi vậy!"</p>
                   </Card>
                   <Card className="relative overflow-hidden h-[300px] border border-white/20">
                     <img src="/img/hp-img2.jpg" alt="Student 2" className="w-full h-full object-cover" />
@@ -490,7 +490,7 @@ const HomePage = () => {
                   </Card>
                   <Card className="relative overflow-hidden h-[300px] border border-white/20">
                     <img src="/img/hp-img3.jpg" alt="Student 3" className="w-full h-full object-cover" />
-                    <p className="absolute bottom-0 left-0 right-0 p-4 text-white text-sm italic bg-black/50 backdrop-blur-sm">"Thi xong mới thấy: học trên thiieltstrenmay.com là quyết định sáng suốt nhất mùa hè này 🤯 Giao diện y chang thi thật, làm riết thuộc bài luôn!"</p>
+                    <p className="absolute bottom-0 left-0 right-0 p-4 text-white text-sm italic bg-black/50 backdrop-blur-sm">"Thi xong mới thấy: học trên ieltscomputertest.com là quyết định sáng suốt nhất mùa hè này 🤯 Giao diện y chang thi thật, làm riết thuộc bài luôn!"</p>
                   </Card>
                 </CircularGallery>
               </div>

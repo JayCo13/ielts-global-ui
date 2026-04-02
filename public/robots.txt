@@ -57,4 +57,4 @@ Disallow: /*admin*
 Disallow: /*manage*
 
 # Sitemap
-Sitemap: https://thiieltstrenmay.com/sitemap.xml
+Sitemap: https://ieltscomputertest.com/sitemap.xml

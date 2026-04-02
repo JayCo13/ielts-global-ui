@@ -345,7 +345,7 @@ const VIPPackages = () => {
                         variants={item}
                         className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#34d399] to-[#10b981]"
                     >
-                        Gói VIP thiieltstrenmay.com
+                        Gói VIP ieltscomputertest.com
                     </motion.h1>
                     <motion.p
                         variants={item}

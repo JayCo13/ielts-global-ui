@@ -31,7 +31,7 @@ const PaymentPolicy = () => {
             <div className="px-4 sm:px-6 pb-4">
               <h1 className="text-4xl sm:text-3xl text-center font-bold text-gray-900 mb-2">Chính sách thanh toán</h1>
               <p className="text-gray-500 text-sm">
-                Áp dụng cho website thương mại điện tử bán hàng: thiieltstrenmay.com
+                Áp dụng cho website thương mại điện tử bán hàng: ieltscomputertest.com
               </p>
               <p className="text-gray-500 text-sm">
                 Cập nhật lần cuối: {new Date().toLocaleDateString('vi-VN')}
@@ -41,7 +41,7 @@ const PaymentPolicy = () => {
             {/* Full width content */}
             <div className="w-full px-4 sm:px-6 pb-6">
               <p className="text-gray-700 mb-6">
-                <span className="font-bold">thiieltstrenmay.com</span> cung cấp các phương thức thanh toán thuận tiện và an toàn
+                <span className="font-bold">ieltscomputertest.com</span> cung cấp các phương thức thanh toán thuận tiện và an toàn
                 để đảm bảo trải nghiệm mua sắm tốt nhất cho khách hàng.
               </p>
 

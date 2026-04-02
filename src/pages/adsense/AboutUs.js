@@ -41,7 +41,7 @@ const AboutUs = () => {
             <div className="w-full md:w-3/4">
               <div className="space-y-8">
                 <p className="text-gray-700">
-                  <span className="font-bold text-[#e67e22]">thiieltstrenmay.com</span> được thành lập với sứ mệnh cung cấp nền tảng luyện thi IELTS trên máy chuyên nghiệp
+                  <span className="font-bold text-[#e67e22]">ieltscomputertest.com</span> được thành lập với sứ mệnh cung cấp nền tảng luyện thi IELTS trên máy chuyên nghiệp
                   với đề thi gốc và giao diện chuẩn quốc tế. Chúng tôi cam kết mang đến trải nghiệm học tập hiệu quả,
                   giúp người học tiếp cận với các bài thi IELTS một cách thuận tiện và đạt kết quả cao nhất.
                 </p>
@@ -76,7 +76,7 @@ const AboutUs = () => {
               <blockquote className="italic text-2xl md:text-3xl text-gray-700 mb-4">
                 "Master the computer-based IELTS, where every practice sharpens your skill and brings your dream score within reach."
               </blockquote>
-              <p className="text-gray-500">- thiieltstrenmay.com team</p>
+              <p className="text-gray-500">- ieltscomputertest.com team</p>
             </div>
             <div className="w-full md:w-1/2 flex justify-center">
               <img
@@ -95,7 +95,7 @@ const AboutUs = () => {
           <div className="mb-24">
             <h2 className="text-2xl font-semibold text-gray-900 mb-6">Đội ngũ của chúng tôi</h2>
             <p className="text-gray-700 mb-6">
-              thiieltstrenmay.com quy tụ đội ngũ chuyên gia giàu kinh nghiệm trong lĩnh vực giảng dạy IELTS và
+              ieltscomputertest.com quy tụ đội ngũ chuyên gia giàu kinh nghiệm trong lĩnh vực giảng dạy IELTS và
               phát triển công nghệ. Chúng tôi không ngừng nghiên cứu và cập nhật để mang đến những
               giải pháp học tập hiệu quả nhất cho người học.
             </p>

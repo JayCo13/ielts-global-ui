@@ -21,7 +21,7 @@ const Permission = () => {
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="text-center">
             <div className="mb-8">
-              <h3 className="text-2xl font-bold mb-4">© 2025 thiieltstrenmay.com</h3>
+              <h3 className="text-2xl font-bold mb-4">© 2025 ieltscomputertest.com</h3>
               <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto rounded-full"></div>
             </div>
             

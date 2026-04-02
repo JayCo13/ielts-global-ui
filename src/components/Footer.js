@@ -225,7 +225,7 @@ const Footer = () => {
                 {/* Bottom Copyright and legal links */}
                 <div className="justify-center items-center text-gray-500 text-md">
                     <div className="order-2 md:order-1 text-center mb-4 md:mb-0">
-                        <p>Copyright © 2025 thiieltstrenmay.com. All rights reserved</p>
+                        <p>Copyright © 2025 ieltscomputertest.com. All rights reserved</p>
                     </div>
                 </div>
             </div>

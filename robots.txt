@@ -5,8 +5,8 @@ Allow: /
 # Admin routes
 Disallow: /admin/
 Disallow: /login/admin
-Disallow: /admin/thiieltstrenmay.com/
-Disallow: /admin/thiieltstrenmay.com/*
+Disallow: /admin/ieltscomputertest.com/
+Disallow: /admin/ieltscomputertest.com/*
 Disallow: /manage_student
 Disallow: /manage_test
 Disallow: /create_student
@@ -35,4 +35,4 @@ Disallow: /vip-confirmation
 Disallow: /my-vip-package
 
 # Sitemap
-Sitemap: https://thiieltstrenmay.com/sitemap.xml
+Sitemap: https://ieltscomputertest.com/sitemap.xml

@@ -39,7 +39,7 @@ const PrivacyPolicy = () => {
               {/* Left content column */}
               <div className="w-full lg:w-7/12 px-4 sm:px-6 pb-6">
                 <p className="text-gray-700 mb-6">
-                  <span className="font-bold">thiieltstrenmay.com</span> cam kết bảo vệ quyền riêng tư và thông tin cá nhân của người dùng. 
+                  <span className="font-bold">ieltscomputertest.com</span> cam kết bảo vệ quyền riêng tư và thông tin cá nhân của người dùng. 
                   Chính sách này áp dụng cho website thương mại điện tử bán hàng và giải thích cách chúng tôi thu thập, sử dụng và bảo vệ thông tin của bạn.
                 </p>
                 
@@ -73,7 +73,7 @@ const PrivacyPolicy = () => {
                 <div className="mb-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-3">4. Những người hoặc tổ chức có thể được tiếp cận với thông tin</h2>
                   <ul className="space-y-2 text-gray-700">
-                    <li>• Nhân viên quản lý đơn hàng và bộ phận chăm sóc khách hàng của thiieltstrenmay.com</li>
+                    <li>• Nhân viên quản lý đơn hàng và bộ phận chăm sóc khách hàng của ieltscomputertest.com</li>
                     <li>• Cơ quan nhà nước có thẩm quyền khi có yêu cầu theo quy định pháp luật</li>
                     <li>• Tuyệt đối không bán, trao đổi, chia sẻ thông tin cá nhân của khách hàng cho bên thứ ba ngoài mục đích phục vụ giao dịch</li>
                   </ul>
@@ -98,7 +98,7 @@ const PrivacyPolicy = () => {
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-3">5. Địa chỉ của đơn vị thu thập và quản lý thông tin</h2>
                 <ul className="space-y-2 text-gray-700">
-                  <li><strong>Chủ sở hữu website:</strong> thiieltstrenmay.com</li>
+                  <li><strong>Chủ sở hữu website:</strong> ieltscomputertest.com</li>
                   <li><strong>Email:</strong> <a href="mailto:thiieltstrenmay@gmail.com" className="text-blue-500 hover:underline">thiieltstrenmay@gmail.com</a></li>
                   <li><strong>Hotline:</strong> <a href="tel:0964996195" className="text-blue-500 hover:underline">0964996195</a></li>
                 </ul>
@@ -124,7 +124,7 @@ const PrivacyPolicy = () => {
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-3">8. Cam kết bảo mật</h2>
                 <ul className="space-y-2 text-gray-700">
-                  <li>• thiieltstrenmay.com cam kết bảo mật tuyệt đối thông tin cá nhân của khách hàng theo chính sách này</li>
+                  <li>• ieltscomputertest.com cam kết bảo mật tuyệt đối thông tin cá nhân của khách hàng theo chính sách này</li>
                   <li>• Mọi giao dịch thanh toán được thực hiện qua ngân hàng đều tuân thủ tiêu chuẩn bảo mật của đối tác thanh toán và quy định pháp luật hiện hành</li>
                 </ul>
               </div>

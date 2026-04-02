@@ -3,15 +3,297 @@ import { Link } from 'react-router-dom';
 import EditProfile from './EditProfile';
 import ExamHistory from './ExamHistory';
 import Navbar from './Navbar';
-import { User, Edit, History, ChevronLeft, ChevronRight, BarChart, Headphones, PenTool, ArrowLeft, ArrowRight } from 'lucide-react';
+import { User, Edit, History, ChevronLeft, ChevronRight, BarChart, Headphones, PenTool, ArrowLeft, ArrowRight, Lock, Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
 import API_BASE from '../config/api';
+
+const ChangePassword = () => {
+  const [formData, setFormData] = useState({
+    current_password: '',
+    new_password: '',
+    confirm_password: ''
+  });
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
+  const [passwordStrength, setPasswordStrength] = useState(0);
+
+  // Clear message after 5 seconds
+  useEffect(() => {
+    if (message.text) {
+      const timer = setTimeout(() => setMessage({ type: '', text: '' }), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  // Calculate password strength
+  useEffect(() => {
+    const pwd = formData.new_password;
+    let strength = 0;
+    if (pwd.length >= 6) strength++;
+    if (pwd.length >= 8) strength++;
+    if (/[A-Z]/.test(pwd)) strength++;
+    if (/[0-9]/.test(pwd)) strength++;
+    if (/[^A-Za-z0-9]/.test(pwd)) strength++;
+    setPasswordStrength(strength);
+  }, [formData.new_password]);
+
+  const getStrengthLabel = () => {
+    if (formData.new_password.length === 0) return '';
+    if (passwordStrength <= 1) return 'Yếu';
+    if (passwordStrength <= 2) return 'Trung bình';
+    if (passwordStrength <= 3) return 'Khá';
+    return 'Mạnh';
+  };
+
+  const getStrengthColor = () => {
+    if (passwordStrength <= 1) return 'bg-red-500';
+    if (passwordStrength <= 2) return 'bg-yellow-500';
+    if (passwordStrength <= 3) return 'bg-blue-500';
+    return 'bg-green-500';
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage({ type: '', text: '' });
+
+    // Client-side validation
+    if (formData.new_password.length < 6) {
+      setMessage({ type: 'error', text: 'Mật khẩu mới phải có ít nhất 6 ký tự' });
+      return;
+    }
+
+    if (formData.new_password !== formData.confirm_password) {
+      setMessage({ type: 'error', text: 'Mật khẩu xác nhận không khớp' });
+      return;
+    }
+
+    if (formData.current_password === formData.new_password) {
+      setMessage({ type: 'error', text: 'Mật khẩu mới phải khác mật khẩu hiện tại' });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(`${API_BASE}/auth/change-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage({ type: 'success', text: data.message || 'Đổi mật khẩu thành công!' });
+        setFormData({ current_password: '', new_password: '', confirm_password: '' });
+      } else {
+        setMessage({ type: 'error', text: data.detail || 'Đổi mật khẩu thất bại' });
+      }
+    } catch (error) {
+      console.error('Error changing password:', error);
+      setMessage({ type: 'error', text: 'Đã xảy ra lỗi. Vui lòng thử lại sau.' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const togglePasswordVisibility = (field) => {
+    setShowPasswords(prev => ({ ...prev, [field]: !prev[field] }));
+  };
+
+  return (
+    <div className="flex-1 p-6">
+      <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-sm p-8">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-full bg-[#0096b1]/10 flex items-center justify-center">
+            <Lock className="w-5 h-5 text-[#0096b1]" />
+          </div>
+          <h2 className="text-2xl font-bold">Đổi Mật Khẩu</h2>
+        </div>
+
+        {message.text && (
+          <div className={`mb-6 p-4 rounded-lg flex items-center gap-3 ${
+            message.type === 'success' 
+              ? 'bg-green-50 text-green-800 border border-green-200' 
+              : 'bg-red-50 text-red-800 border border-red-200'
+          }`}>
+            {message.type === 'success' 
+              ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> 
+              : <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            }
+            <span className="text-sm font-medium">{message.text}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Current Password */}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-gray-700">
+              Mật khẩu hiện tại <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <input
+                type={showPasswords.current ? 'text' : 'password'}
+                value={formData.current_password}
+                onChange={(e) => setFormData({ ...formData, current_password: e.target.value })}
+                className="w-full px-4 py-2.5 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0096b1]/30 focus:border-[#0096b1] transition-all outline-none"
+                placeholder="Nhập mật khẩu hiện tại"
+                required
+                disabled={isSubmitting}
+              />
+              <button
+                type="button"
+                onClick={() => togglePasswordVisibility('current')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                {showPasswords.current ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+
+          {/* New Password */}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-gray-700">
+              Mật khẩu mới <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <input
+                type={showPasswords.new ? 'text' : 'password'}
+                value={formData.new_password}
+                onChange={(e) => setFormData({ ...formData, new_password: e.target.value })}
+                className="w-full px-4 py-2.5 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0096b1]/30 focus:border-[#0096b1] transition-all outline-none"
+                placeholder="Nhập mật khẩu mới (ít nhất 6 ký tự)"
+                required
+                minLength={6}
+                disabled={isSubmitting}
+              />
+              <button
+                type="button"
+                onClick={() => togglePasswordVisibility('new')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                {showPasswords.new ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
+            
+            {/* Password Strength Indicator */}
+            {formData.new_password.length > 0 && (
+              <div className="space-y-1">
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((level) => (
+                    <div
+                      key={level}
+                      className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
+                        level <= passwordStrength ? getStrengthColor() : 'bg-gray-200'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <p className={`text-xs ${
+                  passwordStrength <= 1 ? 'text-red-500' : 
+                  passwordStrength <= 2 ? 'text-yellow-600' : 
+                  passwordStrength <= 3 ? 'text-blue-600' : 'text-green-600'
+                }`}>
+                  Độ mạnh: {getStrengthLabel()}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Confirm New Password */}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-gray-700">
+              Xác nhận mật khẩu mới <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <input
+                type={showPasswords.confirm ? 'text' : 'password'}
+                value={formData.confirm_password}
+                onChange={(e) => setFormData({ ...formData, confirm_password: e.target.value })}
+                className={`w-full px-4 py-2.5 pr-12 border rounded-lg focus:ring-2 focus:ring-[#0096b1]/30 focus:border-[#0096b1] transition-all outline-none ${
+                  formData.confirm_password && formData.new_password !== formData.confirm_password
+                    ? 'border-red-300 bg-red-50/50'
+                    : formData.confirm_password && formData.new_password === formData.confirm_password
+                      ? 'border-green-300 bg-green-50/50' 
+                      : 'border-gray-300'
+                }`}
+                placeholder="Nhập lại mật khẩu mới"
+                required
+                disabled={isSubmitting}
+              />
+              <button
+                type="button"
+                onClick={() => togglePasswordVisibility('confirm')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                {showPasswords.confirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
+            {formData.confirm_password && formData.new_password !== formData.confirm_password && (
+              <p className="text-xs text-red-500 flex items-center gap-1">
+                <AlertCircle className="w-3.5 h-3.5" /> Mật khẩu xác nhận không khớp
+              </p>
+            )}
+            {formData.confirm_password && formData.new_password === formData.confirm_password && (
+              <p className="text-xs text-green-600 flex items-center gap-1">
+                <CheckCircle className="w-3.5 h-3.5" /> Mật khẩu khớp
+              </p>
+            )}
+          </div>
+
+          {/* Tips */}
+          <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600 space-y-1">
+            <p className="font-medium text-gray-700 mb-2">💡 Gợi ý tạo mật khẩu mạnh:</p>
+            <ul className="list-disc list-inside space-y-0.5 text-xs">
+              <li>Ít nhất 8 ký tự</li>
+              <li>Kết hợp chữ hoa và chữ thường</li>
+              <li>Có chứa số</li>
+              <li>Có ký tự đặc biệt (@, #, $, ...)</li>
+            </ul>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting || !formData.current_password || !formData.new_password || !formData.confirm_password}
+            className={`w-full py-2.5 px-4 rounded-lg text-white font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+              isSubmitting || !formData.current_password || !formData.new_password || !formData.confirm_password
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-[#0096b1] hover:bg-[#007a93] active:scale-[0.98] shadow-sm hover:shadow-md'
+            }`}
+          >
+            {isSubmitting ? (
+              <>
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Đang xử lý...
+              </>
+            ) : (
+              <>
+                <Lock className="w-4 h-4" />
+                Đổi Mật Khẩu
+              </>
+            )}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 const ProfilePage = () => {
   // Add accountStatus state
   const [profileData, setProfileData] = useState(null);
   const [testStats, setTestStats] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeView, setActiveView] = useState('profile'); // 'profile', 'edit', 'history'
+  const [activeView, setActiveView] = useState('profile'); // 'profile', 'edit', 'history', 'password'
   const [menuCollapsed, setMenuCollapsed] = useState(false);
   const [statsSection, setStatsSection] = useState(0); // 0 for overview, 1 for detailed stats
   const [imageTimestamp, setImageTimestamp] = useState(Date.now());
@@ -98,6 +380,8 @@ const ProfilePage = () => {
         return <EditProfile onProfileUpdate={fetchData} />;
       case 'history':
         return <ExamHistory />;
+      case 'password':
+        return <ChangePassword />;
       default:
         return (
           <div className="flex-1">
@@ -344,37 +628,6 @@ const ProfilePage = () => {
     }
   };
 
-  // Add this function to handle account activation
-  const handleActivateAccount = async () => {
-    try {
-      const response = await fetch(`${API_BASE}/student/activate-account`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setAccountStatus(data);
-      }
-    } catch (error) {
-      console.error('Error activating account:', error);
-    }
-  };
-
-  // Then in the UI, add this below the status badges:
-  {localStorage.getItem('role') === 'student' && 
-   accountStatus && 
-   accountStatus.is_active === 'inactive' && (
-    <button
-      onClick={handleActivateAccount}
-      className="ml-2 text-xs px-2 py-1 bg-[#0096b1] text-white rounded-md hover:bg-[#0096b1] transition-colors"
-    >
-      Kích hoạt
-    </button>
-  )}
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col">
       <Navbar />
@@ -413,6 +666,16 @@ const ProfilePage = () => {
                 >
                   <Edit className="w-5 h-5 min-w-5" />
                   {!menuCollapsed && <span>Chỉnh sửa hồ sơ</span>}
+                </div>
+                <div 
+                  className={`flex items-center gap-3 p-2 cursor-pointer rounded-lg hover:bg-gray-50 ${
+                    activeView === 'password' ? 'text-[#0096b1] bg-[#0096b1]-50' : 'text-gray-600'
+                  }`}
+                  onClick={() => setActiveView('password')}
+                  title={menuCollapsed ? "Đổi mật khẩu" : ""}
+                >
+                  <Lock className="w-5 h-5 min-w-5" />
+                  {!menuCollapsed && <span>Đổi mật khẩu</span>}
                 </div>
               </nav>
             </div>

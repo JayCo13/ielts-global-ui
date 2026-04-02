@@ -50,7 +50,7 @@ const ExplanationModal = ({ isOpen, onClose, title, description }) => {
 
           <div className='flex flex-col items-center'>
             <h2 className="text-2xl font-bold text-center text-blue-600">Giải thích - {title}</h2>
-            <span className="text-center mt-1 text-sm text-gray-500">-- Bản quyền lời giải thuộc về thiieltstrenmay.com --</span>
+            <span className="text-center mt-1 text-sm text-gray-500">-- Bản quyền lời giải thuộc về ieltscomputertest.com --</span>
 
             {/* Search form */}
             <form onSubmit={handleSearch} className="w-full max-w-md mt-4 flex gap-2">

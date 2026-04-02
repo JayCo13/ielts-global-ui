@@ -504,7 +504,7 @@ const ResultReview = () => {
                 </button>
                 <div className='flex flex-col items-center'>
                   <h2 className="text-2xl font-bold text-center text-blue-600"> Giải thích - {testDescription.title}</h2>
-                  <span className="text-center mt-1 text-sm text-gray-500">-- Bản quyền lời giải thuộc về thiieltstrenmay.com --</span>
+                  <span className="text-center mt-1 text-sm text-gray-500">-- Bản quyền lời giải thuộc về ieltscomputertest.com --</span>
                 </div>
                 <div className="prose max-w-none mt-6">
                   <p className="text-gray-600 whitespace-pre-wrap">{testDescription.description}</p>

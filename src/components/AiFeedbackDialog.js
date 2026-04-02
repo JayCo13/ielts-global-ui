@@ -373,7 +373,7 @@ const AIFeedbackDialog = ({ isOpen, onClose, result, loading, setSelectedPart, s
                   bounce: 0.4 
                 }}
               >
-                Kết quả đánh giá bài viết từ thiieltstrenmay.com AI
+                Kết quả đánh giá bài viết từ ieltscomputertest.com AI
               </motion.h1>
               
                 <motion.button

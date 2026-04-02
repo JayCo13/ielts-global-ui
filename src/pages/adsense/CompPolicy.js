@@ -30,7 +30,7 @@ const CompPolicy = () => {
             <div className="px-4 sm:px-6 pb-4">
               <h1 className="text-4xl sm:text-3xl text-center font-bold text-gray-900 mb-2">Điều kiện giao dịch chung</h1>
               <p className="text-gray-500 text-sm">
-                Áp dụng cho website thương mại điện tử bán hàng: thiieltstrenmay.com
+                Áp dụng cho website thương mại điện tử bán hàng: ieltscomputertest.com
               </p>
               <p className="text-gray-500 text-sm">
                 Cập nhật lần cuối: {new Date().toLocaleDateString('vi-VN')}
@@ -41,7 +41,7 @@ const CompPolicy = () => {
             <div className="w-full px-4 sm:px-6 pb-6">
               <p className="text-gray-700 mb-6">
                 Điều kiện giao dịch chung này quy định các điều khoản và điều kiện áp dụng cho việc mua bán sản phẩm/dịch vụ 
-                trên website <span className="font-bold">thiieltstrenmay.com</span>.
+                trên website <span className="font-bold">ieltscomputertest.com</span>.
               </p>
               
               {/* Section 1: Phạm vi cung cấp dịch vụ */}

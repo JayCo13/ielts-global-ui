@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Homepage - Main landing page for IELTS training -->
   <url>
-    <loc>https://thiieltstrenmay.com/</loc>
+    <loc>https://ieltscomputertest.com/</loc>
     <lastmod>2024-12-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -10,25 +10,25 @@
   
   <!-- IELTS Test Lists - High priority for SEO keywords -->
   <url>
-    <loc>https://thiieltstrenmay.com/listening_list</loc>
+    <loc>https://ieltscomputertest.com/listening_list</loc>
     <lastmod>2024-12-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
   </url>
   <url>
-    <loc>https://thiieltstrenmay.com/speaking_list</loc>
+    <loc>https://ieltscomputertest.com/speaking_list</loc>
     <lastmod>2024-12-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
   </url>
   <url>
-    <loc>https://thiieltstrenmay.com/writing_list</loc>
+    <loc>https://ieltscomputertest.com/writing_list</loc>
     <lastmod>2024-12-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
   </url>
   <url>
-    <loc>https://thiieltstrenmay.com/reading_list</loc>
+    <loc>https://ieltscomputertest.com/reading_list</loc>
     <lastmod>2024-12-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
@@ -36,7 +36,7 @@
   
   <!-- VIP Packages - Important for conversion -->
   <url>
-    <loc>https://thiieltstrenmay.com/vip-packages</loc>
+    <loc>https://ieltscomputertest.com/vip-packages</loc>
     <lastmod>2024-12-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -44,13 +44,13 @@
   
   <!-- About and Information Pages -->
   <url>
-    <loc>https://thiieltstrenmay.com/about</loc>
+    <loc>https://ieltscomputertest.com/about</loc>
     <lastmod>2024-12-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://thiieltstrenmay.com/achievements</loc>
+    <loc>https://ieltscomputertest.com/achievements</loc>
     <lastmod>2024-12-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -58,25 +58,25 @@
   
   <!-- Authentication Pages -->
   <url>
-    <loc>https://thiieltstrenmay.com/login</loc>
+    <loc>https://ieltscomputertest.com/login</loc>
     <lastmod>2024-12-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://thiieltstrenmay.com/register</loc>
+    <loc>https://ieltscomputertest.com/register</loc>
     <lastmod>2024-12-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://thiieltstrenmay.com/forgot-password</loc>
+    <loc>https://ieltscomputertest.com/forgot-password</loc>
     <lastmod>2024-12-20</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://thiieltstrenmay.com/reset-password</loc>
+    <loc>https://ieltscomputertest.com/reset-password</loc>
     <lastmod>2024-12-20</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
@@ -84,31 +84,31 @@
   
   <!-- Policy Pages -->
   <url>
-    <loc>https://thiieltstrenmay.com/privacy-policy</loc>
+    <loc>https://ieltscomputertest.com/privacy-policy</loc>
     <lastmod>2024-12-20</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://thiieltstrenmay.com/payment-policy</loc>
+    <loc>https://ieltscomputertest.com/payment-policy</loc>
     <lastmod>2024-12-20</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://thiieltstrenmay.com/comp-policy</loc>
+    <loc>https://ieltscomputertest.com/comp-policy</loc>
     <lastmod>2024-12-20</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://thiieltstrenmay.com/deli-policy</loc>
+    <loc>https://ieltscomputertest.com/deli-policy</loc>
     <lastmod>2024-12-20</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://thiieltstrenmay.com/permission</loc>
+    <loc>https://ieltscomputertest.com/permission</loc>
     <lastmod>2024-12-20</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>

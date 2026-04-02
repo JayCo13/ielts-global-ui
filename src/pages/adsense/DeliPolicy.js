@@ -30,7 +30,7 @@ const DeliPolicy = () => {
             <div className="px-4 sm:px-6 pb-4">
               <h1 className="text-4xl sm:text-3xl text-center font-bold text-gray-900 mb-2">Chính sách vận chuyển và giao nhận</h1>
               <p className="text-gray-500 text-sm">
-                Áp dụng cho website thương mại điện tử bán hàng: thiieltstrenmay.com
+                Áp dụng cho website thương mại điện tử bán hàng: ieltscomputertest.com
               </p>
               <p className="text-gray-500 text-sm">
                 Cập nhật lần cuối: {new Date().toLocaleDateString('vi-VN')}
@@ -41,7 +41,7 @@ const DeliPolicy = () => {
             <div className="w-full px-4 sm:px-6 pb-6">
               <p className="text-gray-700 mb-6">
                 Chính sách vận chuyển và giao nhận này quy định các điều khoản về việc giao hàng và cung cấp dịch vụ 
-                trên website <span className="font-bold">thiieltstrenmay.com</span>.
+                trên website <span className="font-bold">ieltscomputertest.com</span>.
               </p>
               
               {/* Section 1: Phương thức giao hàng/cung ứng dịch vụ */}
