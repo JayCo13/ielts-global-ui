@@ -6,7 +6,7 @@ import Navbar from './Navbar';
 import { User, Edit, History, ChevronLeft, ChevronRight, BarChart, Headphones, PenTool, ArrowLeft, ArrowRight, Lock, Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
 import API_BASE from '../config/api';
 
-const ChangePassword = () => {
+const ChangePassword = ({ isGoogleAccount = false }) => {
   const [formData, setFormData] = useState({
     current_password: '',
     new_password: '',
@@ -71,7 +71,7 @@ const ChangePassword = () => {
       return;
     }
 
-    if (formData.current_password === formData.new_password) {
+    if (!isGoogleAccount && formData.current_password && formData.current_password === formData.new_password) {
       setMessage({ type: 'error', text: 'Mật khẩu mới phải khác mật khẩu hiện tại' });
       return;
     }
@@ -84,7 +84,10 @@ const ChangePassword = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(isGoogleAccount 
+          ? { new_password: formData.new_password, confirm_password: formData.confirm_password }
+          : formData
+        )
       });
 
       const data = await response.json();
@@ -114,7 +117,7 @@ const ChangePassword = () => {
           <div className="w-10 h-10 rounded-full bg-[#0096b1]/10 flex items-center justify-center">
             <Lock className="w-5 h-5 text-[#0096b1]" />
           </div>
-          <h2 className="text-2xl font-bold">Đổi Mật Khẩu</h2>
+          <h2 className="text-2xl font-bold">{isGoogleAccount ? 'Đặt Mật Khẩu' : 'Đổi Mật Khẩu'}</h2>
         </div>
 
         {message.text && (
@@ -132,30 +135,47 @@ const ChangePassword = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Current Password */}
-          <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-gray-700">
-              Mật khẩu hiện tại <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <input
-                type={showPasswords.current ? 'text' : 'password'}
-                value={formData.current_password}
-                onChange={(e) => setFormData({ ...formData, current_password: e.target.value })}
-                className="w-full px-4 py-2.5 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0096b1]/30 focus:border-[#0096b1] transition-all outline-none"
-                placeholder="Nhập mật khẩu hiện tại"
-                required
-                disabled={isSubmitting}
-              />
-              <button
-                type="button"
-                onClick={() => togglePasswordVisibility('current')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                {showPasswords.current ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-              </button>
+          {/* Google Account Notice */}
+          {isGoogleAccount && (
+            <div className="p-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-sm flex items-start gap-3">
+              <svg className="w-5 h-5 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+              <div>
+                <p className="font-medium">Tài khoản đăng nhập bằng Google</p>
+                <p className="text-xs mt-1 text-blue-600">Bạn có thể đặt mật khẩu để đăng nhập bằng email/mật khẩu ngoài Google.</p>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Current Password - only show for non-Google accounts */}
+          {!isGoogleAccount && (
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-gray-700">
+                Mật khẩu hiện tại <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type={showPasswords.current ? 'text' : 'password'}
+                  value={formData.current_password}
+                  onChange={(e) => setFormData({ ...formData, current_password: e.target.value })}
+                  className="w-full px-4 py-2.5 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0096b1]/30 focus:border-[#0096b1] transition-all outline-none"
+                  placeholder="Nhập mật khẩu hiện tại"
+                  required
+                  disabled={isSubmitting}
+                />
+                <button
+                  type="button"
+                  onClick={() => togglePasswordVisibility('current')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showPasswords.current ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* New Password */}
           <div className="space-y-1.5">
@@ -260,9 +280,9 @@ const ChangePassword = () => {
 
           <button
             type="submit"
-            disabled={isSubmitting || !formData.current_password || !formData.new_password || !formData.confirm_password}
+            disabled={isSubmitting || (!isGoogleAccount && !formData.current_password) || !formData.new_password || !formData.confirm_password}
             className={`w-full py-2.5 px-4 rounded-lg text-white font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
-              isSubmitting || !formData.current_password || !formData.new_password || !formData.confirm_password
+              isSubmitting || (!isGoogleAccount && !formData.current_password) || !formData.new_password || !formData.confirm_password
                 ? 'bg-gray-300 cursor-not-allowed'
                 : 'bg-[#0096b1] hover:bg-[#007a93] active:scale-[0.98] shadow-sm hover:shadow-md'
             }`}
@@ -278,7 +298,7 @@ const ChangePassword = () => {
             ) : (
               <>
                 <Lock className="w-4 h-4" />
-                Đổi Mật Khẩu
+                {isGoogleAccount ? 'Đặt Mật Khẩu' : 'Đổi Mật Khẩu'}
               </>
             )}
           </button>
@@ -381,7 +401,7 @@ const ProfilePage = () => {
       case 'history':
         return <ExamHistory />;
       case 'password':
-        return <ChangePassword />;
+        return <ChangePassword isGoogleAccount={profileData?.is_google_account} />;
       default:
         return (
           <div className="flex-1">
