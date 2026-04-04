@@ -25,15 +25,15 @@ const AboutUs = () => {
           className="mb-12"
         >
           {/* Header Section */}
-          <h1 className="text-5xl md:text-6xl font-bold text-center mb-16">Về chúng tôi.</h1>
+          <h1 className="text-5xl md:text-6xl font-bold text-center mb-16">About Us.</h1>
 
           {/* About Section with Sidebar */}
           <div className="flex flex-col md:flex-row gap-8 mb-24">
             {/* Sidebar Navigation - Static now */}
             <div className="w-full md:w-1/4">
               <ul className="space-y-4 sticky top-24">
-                <li className="font-semibold text-black">Chúng tôi.</li>
-                <li className="text-gray-500">Đội ngũ</li>
+                <li className="font-semibold text-black">Who We Are.</li>
+                <li className="text-gray-500">Our Team</li>
               </ul>
             </div>
 
@@ -41,16 +41,13 @@ const AboutUs = () => {
             <div className="w-full md:w-3/4">
               <div className="space-y-8">
                 <p className="text-gray-700">
-                  <span className="font-bold text-[#e67e22]">ieltscomputertest.com</span> được thành lập với sứ mệnh cung cấp nền tảng luyện thi IELTS trên máy chuyên nghiệp
-                  với đề thi gốc và giao diện chuẩn quốc tế. Chúng tôi cam kết mang đến trải nghiệm học tập hiệu quả,
-                  giúp người học tiếp cận với các bài thi IELTS một cách thuận tiện và đạt kết quả cao nhất.
+                  <span className="font-bold text-[#e67e22]">ieltscomputertest.com</span> was founded with the mission of providing a professional computer-based IELTS preparation platform featuring authentic test materials and an international-standard interface. We are committed to delivering an effective learning experience, enabling learners to access IELTS practice tests conveniently and achieve their highest possible scores.
+
                 </p>
 
                 <p className="text-gray-700">
-                  Với phương châm "niềm tin đúng chỗ - bứt phá tương lai", chúng tôi không ngừng cải tiến và phát triển
-                  hệ thống, tích hợp công nghệ AI tiên tiến vào quá trình học tập. Đội ngũ chuyên gia IELTS 8.0+ của chúng tôi
-                  luôn đồng hành cùng người học, cung cấp những tài liệu chất lượng và phương pháp học tập hiệu quả,
-                  giúp học viên tự tin chinh phục mọi kỳ thi IELTS.
+                  With the motto “Right trust – Breakthrough future”, we continuously improve and develop our system, integrating advanced AI technology into the learning process. Our team of IELTS experts with scores of 8.0+ is always ready to support learners by providing high-quality materials and effective study methods, helping them confidently conquer any IELTS exam.
+
                 </p>
               </div>
             </div>
@@ -93,18 +90,16 @@ const AboutUs = () => {
 
           {/* Team Section */}
           <div className="mb-24">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6">Đội ngũ của chúng tôi</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-6">Our Team</h2>
             <p className="text-gray-700 mb-6">
-              ieltscomputertest.com quy tụ đội ngũ chuyên gia giàu kinh nghiệm trong lĩnh vực giảng dạy IELTS và
-              phát triển công nghệ. Chúng tôi không ngừng nghiên cứu và cập nhật để mang đến những
-              giải pháp học tập hiệu quả nhất cho người học.
+              Ieltscomputertest.com brings together a team of experienced professionals in IELTS teaching and technology development. We continuously research and update our platform to provide the most effective learning solutions for our users.
             </p>
 
             <ul className="list-disc list-inside space-y-3 text-gray-700">
-              <li>Đội ngũ giảng viên có chứng chỉ IELTS 8.0+ và kinh nghiệm giảng dạy nhiều năm</li>
-              <li>Các chuyên gia AI và công nghệ giáo dục hàng đầu</li>
-              <li>Nhóm phát triển nội dung chuyên sâu về IELTS</li>
-              <li>Đội ngũ hỗ trợ kỹ thuật và chăm sóc khách hàng 24/7</li>
+              <li>IELTS instructors with 8.0+ certification and years of teaching experience</li>
+              <li>Leading experts in AI and educational technology</li>
+              <li>Specialized IELTS content development team </li>
+              <li>24/7 technical support and customer service team</li>
             </ul>
           </div>
 

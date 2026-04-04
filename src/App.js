@@ -38,6 +38,7 @@ import PrivacyPolicy from './pages/adsense/PrivacyPolicy';
 import PaymentPolicy from './pages/adsense/PaymentPolicy';
 import CompPolicy from './pages/adsense/CompPolicy';
 import DeliPolicy from './pages/adsense/DeliPolicy';
+import RefundPolicy from './pages/adsense/RefundPolicy';
 import Permission from './pages/adsense/Permission';
 import NotFoundPage from './pages/NotFoundPage';
 import NewWords from './components/NewWords';
@@ -80,6 +81,7 @@ function App() {
           <Route path="/payment-policy" element={<PaymentPolicy />} />
           <Route path="/comp-policy" element={<CompPolicy />} />
           <Route path="/deli-policy" element={<DeliPolicy />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/permission" element={<Permission />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-cancel" element={<PaymentCancel />} />

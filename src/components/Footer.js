@@ -151,7 +151,11 @@ const Footer = () => {
                                     </Link></li>
                                     <li><Link to="/deli-policy" className="text-gray-600 text-md hover:text-[#8b5cf6] transition-colors duration-300 flex items-center gap-1.5">
                                         <span className="w-1 h-1 rounded-full bg-gray-400 inline-block"></span>
-                                        Shipping Policy
+                                        Delivery Policy
+                                    </Link></li>
+                                    <li><Link to="/refund-policy" className="text-gray-600 text-md hover:text-[#8b5cf6] transition-colors duration-300 flex items-center gap-1.5">
+                                        <span className="w-1 h-1 rounded-full bg-gray-400 inline-block"></span>
+                                        Refund Policy
                                     </Link></li>
                                 </ul>
                             </motion.div>

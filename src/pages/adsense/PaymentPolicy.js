@@ -2,8 +2,7 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
-import { ArrowLeft, CreditCard, Smartphone } from 'lucide-react'; // Import icons
-import { Player } from '@lottiefiles/react-lottie-player'; // Import Player from @lottiefiles/react-lottie-player
+import { CreditCard } from 'lucide-react';
 
 const PaymentPolicy = () => {
   const fadeIn = {
@@ -29,102 +28,100 @@ const PaymentPolicy = () => {
           <div className="w-full max-w-7xl mx-auto p-4 sm:p-6">
             {/* Header */}
             <div className="px-4 sm:px-6 pb-4">
-              <h1 className="text-4xl sm:text-3xl text-center font-bold text-gray-900 mb-2">Chính sách thanh toán</h1>
+              <h1 className="text-4xl sm:text-3xl text-center font-bold text-gray-900 mb-2">Payment Policy</h1>
               <p className="text-gray-500 text-sm">
-                Áp dụng cho website thương mại điện tử bán hàng: ieltscomputertest.com
+                Applicable to the e-commerce website: ieltscomputertest.com
               </p>
               <p className="text-gray-500 text-sm">
-                Cập nhật lần cuối: {new Date().toLocaleDateString('vi-VN')}
+                Last updated: April 2, 2026
               </p>
             </div>
 
             {/* Full width content */}
             <div className="w-full px-4 sm:px-6 pb-6">
               <p className="text-gray-700 mb-6">
-                <span className="font-bold">ieltscomputertest.com</span> cung cấp các phương thức thanh toán thuận tiện và an toàn
-                để đảm bảo trải nghiệm mua sắm tốt nhất cho khách hàng.
+                <span className="font-bold">ieltscomputertest.com</span> provides convenient and secure payment methods
+                to ensure the best shopping experience for our customers.
               </p>
 
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
                   <CreditCard className="mr-2 h-5 w-5 text-blue-600" />
-                  1. Hình thức thanh toán áp dụng
+                  1. Accepted Payment Methods
                 </h2>
                 <p className="text-gray-700 mb-4">
-                  Hiện tại, chúng tôi chỉ hỗ trợ thanh toán bằng hình thức chuyển khoản ngân hàng.
-                  Khách hàng vui lòng thực hiện chuyển khoản theo thông tin sau:
+                  Currently, we only support payment via <strong>PayPal</strong>.
                 </p>
 
-                {/* Bank Transfer Section */}
+                {/* PayPal Section */}
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                  <h3 className="font-semibold text-blue-900 mb-2">Chuyển khoản ngân hàng</h3>
-                  <div className="space-y-1 text-gray-700">
-                    <p><span className="font-medium">Ngân hàng:</span> Ngân hàng Vietcombank</p>
-                    <p><span className="font-medium">Số tài khoản:</span> 0281000531756</p>
-                    <p><span className="font-medium">Chủ tài khoản:</span>Ho kinh doanh thiieltstrenmay</p>
-                    <p><span className="font-medium">Nội dung chuyển khoản:</span> [Mã giao dịch tạo bởi web]</p>
-                  </div>
-                </div>
-
-                {/* MoMo Section */}
-                <div className="bg-pink-50 border border-pink-200 rounded-lg p-4">
-                  <h3 className="font-semibold text-pink-900 mb-2 flex items-center">
-                    <Smartphone className="mr-2 h-4 w-4" />
-                    MoMo
+                  <h3 className="font-semibold text-blue-900 mb-2 flex items-center">
+                    <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal" className="h-5 mr-2" />
+                    PayPal
                   </h3>
-                  <div className="space-y-1 text-gray-700">
-                    <p><span className="font-medium">Số tài khoản:</span> 1063266050</p>
-                    <p><span className="font-medium">Chủ tài khoản:</span> Ho kinh doanh thiieltstrenmay</p>
-                    <p><span className="font-medium">Nội dung chuyển khoản:</span> [Mã giao dịch tạo bởi web]</p>
-                  </div>
+                  <p className="text-gray-700 text-sm">
+                    Secure international payment via PayPal. Supports credit/debit cards and PayPal balance.
+                  </p>
                 </div>
               </div>
 
               <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">2. Quy trình thanh toán</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">2. Payment Process</h2>
                 <div className="space-y-3">
                   <div className="flex items-start">
                     <div className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium mr-3 mt-0.5">
                       1
                     </div>
-                    <p className="text-gray-700">Khách hàng lựa chọn sản phẩm và đặt hàng trên website.</p>
+                    <div>
+                      <p className="text-gray-900 font-medium">Select Product</p>
+                      <p className="text-gray-700 text-sm">Customers choose products and place an order on the website.</p>
+                    </div>
                   </div>
                   <div className="flex items-start">
                     <div className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium mr-3 mt-0.5">
                       2
                     </div>
-                    <p className="text-gray-700">Hệ thống gửi xác nhận đơn hàng kèm thông tin chuyển khoản.</p>
+                    <div>
+                      <p className="text-gray-900 font-medium">Order Confirmation</p>
+                      <p className="text-gray-700 text-sm">The system sends an order confirmation along with payment details.</p>
+                    </div>
                   </div>
                   <div className="flex items-start">
                     <div className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium mr-3 mt-0.5">
                       3
                     </div>
-                    <p className="text-gray-700">Khách hàng thực hiện chuyển khoản theo đúng thông tin trên.</p>
+                    <div>
+                      <p className="text-gray-900 font-medium">Make Payment</p>
+                      <p className="text-gray-700 text-sm">Customers complete the payment according to the provided instructions.</p>
+                    </div>
                   </div>
                   <div className="flex items-start">
                     <div className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium mr-3 mt-0.5">
                       4
                     </div>
-                    <p className="text-gray-700">Sau khi nhận được thanh toán, chúng tôi sẽ xác nhận qua hệ thống/điện thoại và tiến hành cung cấp sản phẩm.</p>
+                    <div>
+                      <p className="text-gray-900 font-medium">Receive Product</p>
+                      <p className="text-gray-700 text-sm">After receiving the payment, we will confirm via the system/phone and proceed to provide access to the purchased product.</p>
+                    </div>
                   </div>
                 </div>
               </div>
 
               <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">3. Lưu ý quan trọng</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">3. Important Notes</h2>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <ul className="space-y-2 text-gray-700">
                     <li className="flex items-start">
                       <span className="text-yellow-600 mr-2">⚠️</span>
-                      Khách hàng vui lòng giữ lại biên lai/chứng từ chuyển khoản để đối chiếu khi cần.
+                      Customers are advised to keep their payment receipt/transaction proof for verification if needed.
                     </li>
                     <li className="flex items-start">
                       <span className="text-yellow-600 mr-2">⚠️</span>
-                      Đơn hàng chỉ được coi là hoàn tất sau khi chúng tôi nhận được thanh toán đầy đủ.
+                      An order is considered complete only after full payment has been received.
                     </li>
                     <li className="flex items-start">
                       <span className="text-yellow-600 mr-2">⚠️</span>
-                      Nếu sau 24 giờ kể từ khi đặt hàng mà chưa nhận được thanh toán, đơn hàng có thể bị hủy tự động.
+                      If payment is not received within 24 hours after placing the order, the order may be automatically canceled.
                     </li>
                   </ul>
                 </div>
@@ -132,11 +129,11 @@ const PaymentPolicy = () => {
 
               <div className="mt-8 p-4 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-600">
-                  Nếu bạn có bất kỳ câu hỏi nào về phương thức thanh toán, vui lòng liên hệ với chúng tôi qua:
+                  If you have any questions regarding payment methods, please contact us via:
                 </p>
                 <div className="mt-2 space-y-1 text-sm text-gray-700">
-                  <p><span className="font-medium">Email:</span> thiieltstrenmay@gmail.com</p>
-                  <p><span className="font-medium">Điện thoại:</span> 1063266050</p>
+                  <p><span className="font-medium">Email:</span> ieltscomputertestglobal@gmail.com</p>
+                  <p><span className="font-medium">WhatsApp:</span> +84 964 996 195</p>
                 </div>
               </div>
             </div>

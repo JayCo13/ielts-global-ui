@@ -187,7 +187,7 @@ const Speaking_Fe = () => {
                         value={sortOrder}
                         onChange={(e) => setSortOrder(e.target.value)}
                     >
-                        <option value="alphabet">Theo Alphabet</option>
+                        <option value="alphabet">By Alphabet</option>
                         <option value="latest">Newest</option>
                         <option value="oldest">Oldest</option>
                     </select>

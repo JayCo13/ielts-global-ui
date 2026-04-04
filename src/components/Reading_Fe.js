@@ -373,7 +373,7 @@ const Reading_Fe = () => {
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
           >
-            <option value="alphabet">Theo Alphabet</option>
+            <option value="alphabet">By Alphabet</option>
             {(isVIP || userRole === 'student') && (
               <>
                 <option value="latest">Newest</option>
@@ -544,7 +544,7 @@ const Reading_Fe = () => {
             <ChevronLeft className="w-5 h-5" strokeWidth={3} />
           </button>
           <span className="text-gray-600 font-bold">
-            Trang {currentPage} / {totalPages}
+            Page {currentPage} of {totalPages}
           </span>
           <button
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}

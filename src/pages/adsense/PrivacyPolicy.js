@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
-import { ArrowLeft } from 'lucide-react'; // Import arrow icon for back button
-import { Player } from '@lottiefiles/react-lottie-player'; // Import Player from @lottiefiles/react-lottie-player
+import { ArrowLeft } from 'lucide-react';
+import { Player } from '@lottiefiles/react-lottie-player';
 
 const PrivacyPolicy = () => {
   const fadeIn = {
@@ -29,9 +29,9 @@ const PrivacyPolicy = () => {
           <div className="w-full max-w-7xl mx-auto p-4 sm:p-6">                      
             {/* Header */}
             <div className="px-4 sm:px-6 pb-4">
-              <h1 className="text-4xl sm:text-3xl text-center font-bold text-gray-900 mb-2">Chính sách bảo mật</h1>
+              <h1 className="text-4xl sm:text-3xl text-center font-bold text-gray-900 mb-2">Privacy Policy</h1>
               <p className="text-gray-500 text-sm">
-                Cập nhật lần cuối: {new Date().toLocaleDateString('vi-VN')}
+                Last updated: April 2, 2026
               </p>
             </div>
             
@@ -39,48 +39,48 @@ const PrivacyPolicy = () => {
               {/* Left content column */}
               <div className="w-full lg:w-7/12 px-4 sm:px-6 pb-6">
                 <p className="text-gray-700 mb-6">
-                  <span className="font-bold">ieltscomputertest.com</span> cam kết bảo vệ quyền riêng tư và thông tin cá nhân của người dùng. 
-                  Chính sách này áp dụng cho website thương mại điện tử bán hàng và giải thích cách chúng tôi thu thập, sử dụng và bảo vệ thông tin của bạn.
+                  <span className="font-bold">ieltscomputertest.com</span> is committed to protecting the privacy and personal information of our users. 
+                  This policy applies to our e-commerce website and explains how we collect, use, and safeguard your information.
                 </p>
                 
                 <div className="mb-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-3">1. Mục đích thu thập thông tin cá nhân</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-3">1. Purpose of Collecting Personal Information</h2>
                   <ul className="space-y-2 text-gray-700">
-                    <li>• Xử lý đơn hàng, cung cấp sản phẩm/dịch vụ cho khách hàng</li>
-                    <li>• Liên hệ, hỗ trợ khách hàng trong quá trình sử dụng dịch vụ</li>
-                    <li>• Cập nhật thông tin về sản phẩm, khuyến mãi (nếu khách hàng đồng ý)</li>
+                    <li>• To process orders and provide products/services to customers</li>
+                    <li>• To contact and support customers during service usage</li>
+                    <li>• To provide updates on products and promotions (with customer consent)</li>
                   </ul>
                 </div>
                 
                 <div className="mb-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-3">2. Phạm vi sử dụng thông tin</h2>
-                  <p className="text-gray-700 mb-2">Thông tin cá nhân của khách hàng chỉ được sử dụng trong các hoạt động sau:</p>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-3">2. Scope of Information Usage</h2>
+                  <p className="text-gray-700 mb-2">Customer personal information is used only for the following purposes:</p>
                   <ul className="space-y-2 text-gray-700">
-                    <li>• Quản lý tài khoản, đơn hàng</li>
-                    <li>• Giao nhận sản phẩm số qua email hoặc tài khoản học trực tuyến</li>
-                    <li>• Liên hệ xác minh thông tin giao dịch, xử lý khiếu nại</li>
+                    <li>• Managing accounts and orders</li>
+                    <li>• Delivering digital products via email or online learning accounts</li>
+                    <li>• Verifying transaction information and handling complaints</li>
                   </ul>
                 </div>
                 
                 <div className="mb-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-3">3. Thời gian lưu trữ thông tin</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-3">3. Data Retention Period</h2>
                   <ul className="space-y-2 text-gray-700">
-                    <li>• Thông tin cá nhân được lưu trữ trong hệ thống của chúng tôi cho đến khi khách hàng yêu cầu hủy bỏ</li>
-                    <li>• Trường hợp khách hàng không yêu cầu, thông tin sẽ được lưu trữ tối đa 05 năm kể từ lần giao dịch cuối cùng</li>
+                    <li>• Personal information is stored in our system until the customer requests deletion</li>
+                    <li>• If no request is made, data will be stored for a maximum of 5 years from the last transaction</li>
                   </ul>
                 </div>
                 
                 <div className="mb-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-3">4. Những người hoặc tổ chức có thể được tiếp cận với thông tin</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-3">4. Entities That May Access the Information</h2>
                   <ul className="space-y-2 text-gray-700">
-                    <li>• Nhân viên quản lý đơn hàng và bộ phận chăm sóc khách hàng của ieltscomputertest.com</li>
-                    <li>• Cơ quan nhà nước có thẩm quyền khi có yêu cầu theo quy định pháp luật</li>
-                    <li>• Tuyệt đối không bán, trao đổi, chia sẻ thông tin cá nhân của khách hàng cho bên thứ ba ngoài mục đích phục vụ giao dịch</li>
+                    <li>• Order management staff and customer service team of ieltscomputertest.com</li>
+                    <li>• Competent state authorities upon legal request</li>
+                    <li>• We strictly do not sell, exchange, or share customer personal information with third parties beyond the scope necessary for transaction processing</li>
                   </ul>
                 </div>
               </div>
               
-              {/* Right illustration column - Replace with Player component */}
+              {/* Right illustration column */}
               <div className="w-full lg:w-5/12 p-4 sm:p-6 flex items-center justify-center">
                 <Player 
                   autoplay 
@@ -96,45 +96,45 @@ const PrivacyPolicy = () => {
             {/* Additional sections */}
             <div className="px-4 sm:px-6 pb-6">
               <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">5. Địa chỉ của đơn vị thu thập và quản lý thông tin</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">5. Information Controller Details</h2>
                 <ul className="space-y-2 text-gray-700">
-                  <li><strong>Chủ sở hữu website:</strong> ieltscomputertest.com</li>
-                  <li><strong>Email:</strong> <a href="mailto:thiieltstrenmay@gmail.com" className="text-blue-500 hover:underline">thiieltstrenmay@gmail.com</a></li>
-                  <li><strong>Hotline:</strong> <a href="tel:0964996195" className="text-blue-500 hover:underline">0964996195</a></li>
+                  <li><strong>Website owner:</strong> ieltscomputertest.com</li>
+                  <li><strong>Email:</strong> <a href="mailto:ieltscomputertestglobal@gmail.com" className="text-blue-500 hover:underline">ieltscomputertestglobal@gmail.com</a></li>
+                  <li><strong>WhatsApp:</strong> <a href="https://wa.me/84964996195" className="text-blue-500 hover:underline">+84 964 996 195</a></li>
                 </ul>
               </div>
               
               <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">6. Quyền của khách hàng đối với dữ liệu cá nhân</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">6. Customer Rights Regarding Personal Data</h2>
                 <ul className="space-y-2 text-gray-700">
-                  <li>• Khách hàng có quyền kiểm tra, cập nhật, chỉnh sửa hoặc yêu cầu hủy bỏ thông tin cá nhân của mình bất kỳ lúc nào</li>
-                  <li>• Khách hàng có thể gửi yêu cầu qua email: <a href="mailto:thiieltstrenmay@gmail.com" className="text-blue-500 hover:underline">thiieltstrenmay@gmail.com</a></li>
-                  <li>• Hoặc hotline: <a href="tel:0964996195" className="text-blue-500 hover:underline">0964996195</a></li>
+                  <li>• Customers have the right to review, update, modify, or request deletion of their personal data at any time</li>
+                  <li>• Requests can be sent via email: <a href="mailto:ieltscomputertestglobal@gmail.com" className="text-blue-500 hover:underline">ieltscomputertestglobal@gmail.com</a></li>
+                  <li>• Or via WhatsApp: <a href="https://wa.me/84964996195" className="text-blue-500 hover:underline">+84 964 996 195</a></li>
                 </ul>
               </div>
               
               <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">7. Cơ chế tiếp nhận và giải quyết khiếu nại</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">7. Complaint Handling Mechanism</h2>
                 <ul className="space-y-2 text-gray-700">
-                  <li>• Nếu khách hàng phát hiện thông tin cá nhân bị sử dụng sai mục đích/phạm vi, vui lòng liên hệ ngay với chúng tôi</li>
-                  <li>• Chúng tôi cam kết phản hồi và giải quyết trong vòng 07 ngày làm việc kể từ khi tiếp nhận khiếu nại</li>
+                  <li>• If customers detect misuse of their personal information, please contact us immediately</li>
+                  <li>• We are committed to responding and resolving complaints within 7 working days from the date of receipt</li>
                 </ul>
               </div>
               
               <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">8. Cam kết bảo mật</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">8. Data Protection Commitment</h2>
                 <ul className="space-y-2 text-gray-700">
-                  <li>• ieltscomputertest.com cam kết bảo mật tuyệt đối thông tin cá nhân của khách hàng theo chính sách này</li>
-                  <li>• Mọi giao dịch thanh toán được thực hiện qua ngân hàng đều tuân thủ tiêu chuẩn bảo mật của đối tác thanh toán và quy định pháp luật hiện hành</li>
+                  <li>• ieltscomputertest.com is committed to strictly safeguarding customer personal information in accordance with this policy</li>
+                  <li>• All payment transactions conducted via banking systems comply with the security standards of payment partners and applicable legal regulations</li>
                 </ul>
               </div>
               
               <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">Quảng cáo và Google AdSense</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">Advertising and Google AdSense</h2>
                 <p className="text-gray-700">
-                  Chúng tôi sử dụng Google AdSense để hiển thị quảng cáo. Google AdSense sử dụng cookie 
-                  để hiển thị quảng cáo phù hợp với người dùng. Bạn có thể tìm hiểu thêm về cách Google 
-                  sử dụng dữ liệu tại: <a href="https://policies.google.com/technologies/ads" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">Google Ads Policy</a>
+                  We use Google AdSense to display advertisements. Google AdSense uses cookies 
+                  to deliver ads that are relevant to users. You can learn more about how Google 
+                  uses data in its advertising products via the <a href="https://policies.google.com/technologies/ads" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">Google Ads Policy</a>.
                 </p>
               </div>
             </div>
