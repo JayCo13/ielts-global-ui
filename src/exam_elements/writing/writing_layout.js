@@ -248,7 +248,7 @@ const WritingLayout = () => {
         }, 2000);
       } else if (response.status === 409) {
         const errorData = await response.json();
-        setLogoutMessage(errorData.detail || 'Tài khoản của bạn đã được đăng nhập từ thiết bị khác.');
+        setLogoutMessage(errorData.detail || 'Your account has been logged in from another device.');
         setShowForceLogoutDialog(true);
         let countdown = 40;
         setLogoutCountdown(countdown);
@@ -394,7 +394,7 @@ const WritingLayout = () => {
             className={`p-1 rounded inline-flex items-center gap-2 ${!task?.sample_essay ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-200'}`}
             title={task?.sample_essay ? 'View Sample Writing' : 'No sample available'}
           >
-            <span className="text-sm inline-flex items-center gap-2">Xem gợi ý
+            <span className="text-sm inline-flex items-center gap-2">View Sample
               <FileText className={`w-5 h-5 ${colorTheme !== 'black-on-white' ? 'text-white' : 'text-gray-600'}`} />
             </span>
           </button>

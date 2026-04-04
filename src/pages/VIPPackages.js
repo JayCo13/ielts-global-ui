@@ -291,7 +291,7 @@ const VIPPackages = () => {
                     : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
                     }`}
             >
-                Tiếp theo
+                Next
             </button>
         </div>
     );
@@ -322,7 +322,7 @@ const VIPPackages = () => {
                             Home
                         </Link>
                         <ChevronRight size={16} className="text-gray-400" />
-                        <span className="text-gray-900 font-medium">Gói VIP</span>
+                        <span className="text-gray-900 font-medium">VIP Packages</span>
                     </nav>
                 </div>
             </motion.div>

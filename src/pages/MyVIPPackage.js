@@ -185,7 +185,7 @@ const MyVIPPackage = () => {
                             </div>
                             <div>
                                 <p className="text-sm text-gray-500">Remaining</p>
-                                <p className="text-2xl font-bold text-blue-600">{vipStats.remainingDays || 0} ngày</p>
+                                <p className="text-2xl font-bold text-blue-600">{vipStats.remainingDays || 0} Days</p>
                             </div>
                         </div>
                     </div>
@@ -237,8 +237,8 @@ const MyVIPPackage = () => {
                 <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 mb-8 shadow-lg">
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div className="text-white text-center sm:text-left">
-                            <h3 className="font-semibold text-lg">Muốn gia hạn hoặc nâng cấp?</h3>
-                            <p className="text-indigo-200 text-sm">Thêm thời gian VIP ngay - Tự động cộng dồn vào gói hiện tại</p>
+                            <h3 className="font-semibold text-lg">Want to renew or upgrade?</h3>
+                            <p className="text-indigo-200 text-sm">Add VIP time now - Automatically accumulates with current package</p>
                         </div>
                         <div className="flex flex-wrap gap-2 justify-center">
                             <Link to="/vip-packages?type=all" className="px-4 py-2 bg-white text-indigo-600 rounded-lg font-medium hover:bg-indigo-50 transition-colors text-sm">
@@ -268,7 +268,7 @@ const MyVIPPackage = () => {
                 <div className="space-y-1">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                         <Layers className="w-5 h-5 text-indigo-600" />
-                        Lịch sử gói VIP ({filteredSubscriptions.length} gói)
+                        VIP Packages History ({filteredSubscriptions.length} packages)
                     </h3>
 
                     {filteredSubscriptions.length > 0 ? (
@@ -346,14 +346,14 @@ const MyVIPPackage = () => {
                             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <Star className="w-8 h-8 text-gray-400" />
                             </div>
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">Chưa có gói VIP nào</h3>
-                            <p className="text-gray-500 mb-6">Register gói VIP để truy cập đầy đủ nội dung học tập</p>
+                            <h3 className="text-xl font-semibold text-gray-900 mb-2">No VIP Packages</h3>
+                            <p className="text-gray-500 mb-6">Register for a VIP package to access full learning content</p>
                             <Link
                                 to="/vip-packages"
                                 className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg shadow-indigo-200"
                             >
                                 <Star className="w-5 h-5 mr-2" />
-                                Xem các gói VIP
+                                View VIP Packages
                             </Link>
                         </div>
                     )}

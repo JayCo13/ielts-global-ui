@@ -36,7 +36,7 @@ const DictationAdmin = () => {
                 setUnits(data);
             }
         } catch (error) {
-            toast.error('Không thể tải danh sách bài');
+            toast.error('Failed to load units');
         } finally {
             setLoading(false);
         }
@@ -53,7 +53,7 @@ const DictationAdmin = () => {
                 setWordsPage(1);
             }
         } catch (error) {
-            toast.error('Không thể tải từ vựng');
+            toast.error('Failed to load words');
         }
     }, []);
 
@@ -69,7 +69,7 @@ const DictationAdmin = () => {
 
     const handleCreateUnit = async () => {
         if (!unitName.trim()) {
-            toast.error('Vui lòng nhập tên bài');
+            toast.error('Please enter unit name');
             return;
         }
 
@@ -84,22 +84,22 @@ const DictationAdmin = () => {
             });
 
             if (res.ok) {
-                toast.success('Tạo bài thành công');
+                toast.success('Created unit successfully');
                 setShowUnitForm(false);
                 setUnitName('');
                 setUnitDescription('');
                 fetchUnits();
             } else {
-                toast.error('Không thể tạo bài');
+                toast.error('Failed to create unit');
             }
         } catch (error) {
-            toast.error('Lỗi kết nối');
+            toast.error('Failed to create unit');
         }
     };
 
     const handleUpdateUnit = async () => {
         if (!unitName.trim()) {
-            toast.error('Vui lòng nhập tên bài');
+            toast.error('Please enter unit name');
             return;
         }
 
@@ -114,21 +114,21 @@ const DictationAdmin = () => {
             });
 
             if (res.ok) {
-                toast.success('Cập nhật thành công');
+                toast.success('Updated unit successfully');
                 setEditingUnit(null);
                 setUnitName('');
                 setUnitDescription('');
                 fetchUnits();
             } else {
-                toast.error('Không thể cập nhật');
+                toast.error('Failed to update unit');
             }
         } catch (error) {
-            toast.error('Lỗi kết nối');
+            toast.error('Failed to update unit');
         }
     };
 
     const handleDeleteUnit = async (unitId) => {
-        if (!window.confirm('Bạn có chắc muốn xóa bài này?')) return;
+        if (!window.confirm('Are you sure you want to delete this unit?')) return;
 
         try {
             const res = await fetch(`${API_BASE}/admin/dictation/units/${unitId}`, {
@@ -137,24 +137,24 @@ const DictationAdmin = () => {
             });
 
             if (res.ok) {
-                toast.success('Đã xóa bài');
+                toast.success('Deleted unit successfully');
                 if (selectedUnit?.unit_id === unitId) {
                     setSelectedUnit(null);
                     setUnitWords([]);
                 }
                 fetchUnits();
             } else {
-                toast.error('Không thể xóa');
+                toast.error('Failed to delete unit');
             }
         } catch (error) {
-            toast.error('Lỗi kết nối');
+            toast.error('Failed to delete unit');
         }
     };
 
     const handleAddWords = async () => {
         const wordsToAdd = wordInputs.filter(w => w.trim());
         if (wordsToAdd.length === 0) {
-            toast.error('Vui lòng nhập ít nhất 1 từ');
+            toast.error('Please enter at least 1 word');
             return;
         }
 
@@ -170,15 +170,15 @@ const DictationAdmin = () => {
             });
 
             if (res.ok) {
-                toast.success(`Đã thêm ${wordsToAdd.length} từ`);
+                toast.success(`Added ${wordsToAdd.length} words successfully`);
                 setWordInputs(Array(5).fill(''));
                 fetchUnitWords(selectedUnit.unit_id);
                 fetchUnits();
             } else {
-                toast.error('Không thể thêm từ');
+                toast.error('Failed to add words');
             }
         } catch (error) {
-            toast.error('Lỗi kết nối');
+            toast.error('Failed to add words');
         } finally {
             setSaving(false);
         }
@@ -192,14 +192,14 @@ const DictationAdmin = () => {
             });
 
             if (res.ok) {
-                toast.success('Đã xóa từ');
+                toast.success('Deleted word successfully');
                 fetchUnitWords(selectedUnit.unit_id);
                 fetchUnits();
             } else {
-                toast.error('Không thể xóa');
+                toast.error('Failed to delete word');
             }
         } catch (error) {
-            toast.error('Lỗi kết nối');
+            toast.error('Failed to delete word');
         }
     };
 
@@ -215,12 +215,12 @@ const DictationAdmin = () => {
             });
 
             if (res.ok) {
-                toast.success(!currentValue ? 'Đánh dấu quan trọng' : 'Bỏ đánh dấu');
+                toast.success(!currentValue ? 'Marked as important' : 'Unmarked as important');
                 fetchUnitWords(selectedUnit.unit_id);
                 fetchUnits();
             }
         } catch (error) {
-            toast.error('Lỗi kết nối');
+            toast.error('Failed to update word');
         }
     };
 
@@ -251,17 +251,17 @@ const DictationAdmin = () => {
                         className="flex items-center gap-2 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors"
                     >
                         <PlusCircle className="w-5 h-5" />
-                        Tạo bài mới
+                        Create New Unit
                     </button>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-6">
                     {/* Units List */}
                     <div className="md:col-span-1 bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-                        <h2 className="text-lg font-semibold text-gray-800 mb-4">Danh sách bài</h2>
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4">List of Units</h2>
 
                         {units.length === 0 ? (
-                            <p className="text-gray-500 text-center py-8">Chưa có bài nào</p>
+                            <p className="text-gray-500 text-center py-8">No units found</p>
                         ) : (
                             <div className="space-y-2">
                                 {units.map(unit => (
@@ -277,7 +277,7 @@ const DictationAdmin = () => {
                                             <div>
                                                 <h3 className="font-medium text-gray-900">{unit.name}</h3>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-sm text-gray-500">{unit.word_count} từ</span>
+                                                    <span className="text-sm text-gray-500">{unit.word_count} words</span>
                                                     {unit.important_count > 0 && (
                                                         <span className="flex items-center gap-1 text-xs text-amber-600">
                                                             <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
@@ -327,7 +327,7 @@ const DictationAdmin = () => {
                                 {/* Existing Words */}
                                 {unitWords.length > 0 && (
                                     <div className="mb-6">
-                                        <h3 className="text-sm font-medium text-gray-700 mb-3">Từ đã thêm ({unitWords.length})</h3>
+                                        <h3 className="text-sm font-medium text-gray-700 mb-3">Words added ({unitWords.length})</h3>
                                         <div className="flex flex-wrap gap-2">
                                             {unitWords.map(word => (
                                                 <span
@@ -343,7 +343,7 @@ const DictationAdmin = () => {
                                                             ? 'text-amber-500 hover:text-amber-600'
                                                             : 'text-gray-300 hover:text-amber-400'
                                                             }`}
-                                                        title={word.is_important ? 'Bỏ đánh dấu quan trọng' : 'Đánh dấu quan trọng'}
+                                                        title={word.is_important ? 'Unmark as important' : 'Mark as important'}
                                                     >
                                                         <Star className={`w-3.5 h-3.5 ${word.is_important ? 'fill-amber-400' : ''}`} />
                                                     </button>
@@ -362,7 +362,7 @@ const DictationAdmin = () => {
 
                                 {/* Word Input Fields */}
                                 <div className="mb-4">
-                                    <h3 className="text-sm font-medium text-gray-700 mb-3">Thêm từ mới</h3>
+                                    <h3 className="text-sm font-medium text-gray-700 mb-3">Add new words</h3>
                                     <div className="grid gap-3">
                                         {currentPageInputs.map((value, idx) => {
                                             const actualIdx = (wordsPage - 1) * WORDS_PER_PAGE + idx;
@@ -395,7 +395,7 @@ const DictationAdmin = () => {
                                             <ChevronLeft className="w-4 h-4" />
                                         </button>
                                         <span className="text-sm text-gray-600">
-                                            Trang {wordsPage} / {totalWordsPages}
+                                            Page {wordsPage} / {totalWordsPages}
                                         </span>
                                         <button
                                             onClick={() => setWordsPage(p => Math.min(totalWordsPages, p + 1))}
@@ -419,14 +419,14 @@ const DictationAdmin = () => {
                                         ) : (
                                             <Save className="w-4 h-4 inline mr-2" />
                                         )}
-                                        Lưu từ
+                                        Save Words
                                     </button>
                                 </div>
                             </>
                         ) : (
                             <div className="flex flex-col items-center justify-center py-16 text-gray-500">
                                 <BookOpen className="w-12 h-12 mb-4 opacity-50" />
-                                <p>Chọn một bài để thêm từ vựng</p>
+                                <p>Select a unit to add words</p>
                             </div>
                         )}
                     </div>
@@ -440,7 +440,7 @@ const DictationAdmin = () => {
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-xl p-6 w-full max-w-md">
                         <h3 className="text-lg font-semibold mb-4">
-                            {editingUnit ? 'Chỉnh sửa bài' : 'Tạo bài mới'}
+                            {editingUnit ? 'Edit Unit' : 'Create New Unit'}
                         </h3>
                         <div className="space-y-4">
                             <input
@@ -453,7 +453,7 @@ const DictationAdmin = () => {
                             <textarea
                                 value={unitDescription}
                                 onChange={(e) => setUnitDescription(e.target.value)}
-                                placeholder="Mô tả (tùy chọn)"
+                                placeholder="Description (optional)"
                                 rows={3}
                                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none resize-none"
                             />
@@ -468,13 +468,13 @@ const DictationAdmin = () => {
                                 }}
                                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                             >
-                                Hủy
+                                Cancel
                             </button>
                             <button
                                 onClick={editingUnit ? handleUpdateUnit : handleCreateUnit}
                                 className="flex-1 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700"
                             >
-                                {editingUnit ? 'Cập nhật' : 'Tạo bài'}
+                                {editingUnit ? 'Update' : 'Create Unit'}
                             </button>
                         </div>
                     </div>

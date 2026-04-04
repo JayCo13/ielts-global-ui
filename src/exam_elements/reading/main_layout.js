@@ -517,7 +517,7 @@ const MainLayout = () => {
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         animation: fadeIn 0.3s ease;
       `;
-      toast.textContent = 'Tránh copy đề chỉ được phép chọn 1000 ký tự 1 lần';
+      toast.textContent = 'To prevent copying, you can only select up to 1000 characters at a time';
       document.body.appendChild(toast);
 
       setTimeout(() => {
@@ -631,7 +631,7 @@ const MainLayout = () => {
       });
 
       if (response.ok) {
-        toast.success(`"${vocabMenu.selectedText}" đã được thêm vào từ vựng mới, xem lại ở mục Vocabulary -> New Words!`);
+        toast.success(`"${vocabMenu.selectedText}" has been added to your vocabulary. Review it in Vocabulary -> New Words!`);
       } else {
         toast.error('Failed to save word');
       }
@@ -1191,7 +1191,7 @@ const MainLayout = () => {
       } else if (response.status === 409) {
         // Handle multi-device detection
         const errorData = await response.json();
-        setLogoutMessage(errorData.detail || 'Phát hiện đăng nhập trên nhiều thiết bị! • Hệ thống phát hiện tài khoản của bạn đã được đăng nhập trên nhiều thiết bị. • Nếu bạn đã đăng nhập trên thiết bị hoặc trình duyệt khác trước đó, hãy bấm "Submit" thử trước khi làm bài để hệ thống tự động đăng xuất thiết bị cũ, giúp tránh gặp sự cố tương tự.');
+        setLogoutMessage(errorData.detail || 'Multiple device login detected! Your account has been logged in on multiple devices. If you previously logged in on another device or browser, try clicking "Submit" before starting the test to automatically log out the old device and avoid similar issues.');
         setShowForceLogoutDialog(true);
 
         // Start countdown timer
@@ -1915,15 +1915,15 @@ const MainLayout = () => {
                   </svg>
                 )}
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">Kết quả làm lại câu sai</h2>
-              <p className="text-gray-500 mt-1">Kết quả này không ảnh hưởng đến lịch sử bài thi</p>
+              <h2 className="text-2xl font-bold text-gray-900">Retake Results</h2>
+              <p className="text-gray-500 mt-1">These results do not affect your exam history</p>
             </div>
             <div className="bg-gray-50 rounded-lg p-6 mb-6">
               <div className="text-center">
                 <div className="text-4xl font-bold text-orange-600">
                   {retakeScore.correct}/{retakeScore.total}
                 </div>
-                <div className="text-sm text-gray-500 mt-1">câu trả lời đúng</div>
+                <div className="text-sm text-gray-500 mt-1">correct answers</div>
               </div>
             </div>
             {retakeScore.details.length > 0 && (
@@ -1931,10 +1931,10 @@ const MainLayout = () => {
                 <table className="w-full text-sm">
                   <thead className="bg-gray-100">
                     <tr>
-                      <th className="px-3 py-2 text-left">Câu</th>
-                      <th className="px-3 py-2 text-left">Câu trả lời</th>
-                      <th className="px-3 py-2 text-left">Đáp án</th>
-                      <th className="px-3 py-2 text-center">KQ</th>
+                      <th className="px-3 py-2 text-left">Q#</th>
+                      <th className="px-3 py-2 text-left">Your Answer</th>
+                      <th className="px-3 py-2 text-left">Correct Answer</th>
+                      <th className="px-3 py-2 text-center">Result</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1969,7 +1969,7 @@ const MainLayout = () => {
                 }}
                 className="flex-1 px-4 py-3 border border-orange-300 text-orange-600 rounded-lg hover:bg-orange-50 transition-colors font-semibold"
               >
-                Thử lại
+                Retry
               </button>
               <button
                 onClick={() => {
@@ -1986,7 +1986,7 @@ const MainLayout = () => {
                 }}
                 className="flex-1 px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold"
               >
-                Quay về xem lại bài
+                Back to Review
               </button>
             </div>
           </div>
@@ -2018,15 +2018,15 @@ const MainLayout = () => {
               <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
-              <span className="font-semibold">Chế độ làm lại câu sai</span>
+              <span className="font-semibold">Retake Incorrect Answers Mode</span>
               <span className="mx-2">—</span>
-              <span className="text-orange-100">{incorrectQuestions.length} câu cần làm lại • Kết quả không ảnh hưởng lịch sử</span>
+              <span className="text-orange-100">{incorrectQuestions.length} questions to redo • Results won't affect history</span>
             </div>
             <button
               onClick={handleSubmitExam}
               className="bg-white text-orange-600 px-4 py-1 rounded-lg font-semibold hover:bg-orange-50 transition-colors text-sm"
             >
-              Nộp bài làm lại
+              Submit Retake
             </button>
           </div>
         )}
@@ -2132,7 +2132,7 @@ const MainLayout = () => {
               </button>
               {/* Tooltip */}
               <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-64 text-center pointer-events-none z-50">
-                Khi mở từ điển, bạn có thể tra cứu bằng cách quét chọn bất kỳ từ nào.
+                When the dictionary is open, you can look up any word by selecting it.
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-gray-900"></div>
               </div>
             </div>
@@ -3550,7 +3550,7 @@ const MainLayout = () => {
                     onClick={handleSubmitExam}
                     className="px-6 py-4 rounded-lg text-lg font-bold bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 transition-colors shadow-lg"
                   >
-                    Nộp bài làm lại
+                    Submit Retake
                   </button>
                 )}
                 {location.state?.fromResultReview && !isRetakeIncorrectMode && (
@@ -3576,7 +3576,7 @@ const MainLayout = () => {
                             .map(a => a.question_number + offset);
 
                           if (incorrectQuestions.length === 0) {
-                            alert('Tất cả câu hỏi đều đúng! Không có câu sai để làm lại.');
+                            alert('All questions are correct! No incorrect answers to retake.');
                             return;
                           }
                           navigate('/reading_test_room', {
@@ -3598,7 +3598,7 @@ const MainLayout = () => {
                         }}
                         className="px-6 py-4 rounded-lg text-lg font-bold transition-colors bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600"
                       >
-                        Làm lại câu sai
+                        Retake Incorrect
                       </button>
                       <button
                         onClick={() => setShowClearDataDialog(true)}
@@ -3610,7 +3610,7 @@ const MainLayout = () => {
                               : 'bg-red-500 text-black hover:bg-red-600'
                           }`}
                       >
-                        Dừng xem lại
+                        Stop Review
                       </button>
                     </div>
                   </div>
@@ -3631,8 +3631,8 @@ const MainLayout = () => {
         open={showExitAlert}
         onClose={handleCancelExit}
         onConfirm={handleConfirmExit}
-        title="Cảnh báo hành động thoát bài thi"
-        message="Nếu bạn thoát bài thi trong quá trình làm bài, bài thi sẽ được nộp tự động."
+        title="Warning: Leaving the exam"
+        message="If you leave during the exam, your answers will be submitted automatically."
       />
       <AlertForm
         open={showClearDataDialog}
@@ -3641,12 +3641,12 @@ const MainLayout = () => {
           clearExamData();
           setShowClearDataDialog(false);
         }}
-        title="Xác nhận dừng xem lại"
-        message="Lưu ý: Sau khi dừng xem lại, bài thi sẽ được lưu trữ xem lại ở lịch sử bài thi"
+        title="Confirm stop review"
+        message="Note: After stopping the review, the exam will be saved for later review in exam history."
       />
       <ConfirmDialog
         isOpen={showRetakeDialog}
-        message="Bạn có chắc chắn muốn làm lại bài thi này? Bài thi sẽ được lưu trữ xem lại ở lịch sử bài thi."
+        message="Are you sure you want to retake this exam? The exam will be saved for review in exam history."
         onConfirm={handleRetakeConfirm}
         onCancel={() => setShowRetakeDialog(false)}
       />
@@ -3662,7 +3662,7 @@ const MainLayout = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
                 <h3 className={`text-lg font-bold ${colorTheme === 'black-on-white' ? 'text-gray-800' : 'text-white'}`}>
-                  Giải thích chi tiết
+                  Detailed Explanation
                 </h3>
               </div>
               <button
@@ -3740,7 +3740,7 @@ const MainLayout = () => {
                 onClick={closeExplanationDialog}
                 className="px-5 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-md hover:shadow-lg font-medium"
               >
-                Đóng
+                Close
               </button>
             </div>
           </div>

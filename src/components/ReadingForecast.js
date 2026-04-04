@@ -143,7 +143,7 @@ const ReadingForecast = () => {
         </nav>
         <div className="inline-flex items-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg text-sm">
           <Star className="w-5 h-5 text-yellow-500" fill="currentColor" />
-          <span className="text-gray-700">= Bài thi được khuyến nghị</span>
+          <span className="text-gray-700">= Recommended Test</span>
         </div>
       </div>
 
@@ -183,7 +183,7 @@ const ReadingForecast = () => {
                   )}
                   <div className="flex items-start justify-between gap-3 pr-6">
                     <h3 className="text-lg font-semibold text-gray-800">
-                      <span className="text-[#0096b1] font-medium mr-2">Test gốc:</span>
+                      <span className="text-[#0096b1] font-medium mr-2">Original Test:</span>
                       <span className="truncate max-w-[70%] inline-block align-bottom" title={it.exam_title}>{it.exam_title}</span>
                     </h3>
                     {(() => {
@@ -282,7 +282,7 @@ const ReadingForecast = () => {
                       }}
                       className={`mt-4 w-full py-2 rounded text-white ${it.attempts_count > 0 ? 'bg-orange-600 hover:bg-orange-700' : 'bg-[#0096b1] hover:bg-[#00839a]'}`}
                     >
-                      {it.attempts_count > 0 ? 'Retake' : 'Làm bài'}
+                      {it.attempts_count > 0 ? 'Retake' : 'Start'}
                     </button>
                   )}
                 </div>
@@ -297,7 +297,7 @@ const ReadingForecast = () => {
                 <ChevronLeft className="w-5 h-5" strokeWidth={3} />
               </button>
               <span className="text-gray-600 font-bold">
-                Trang {currentPage} / {totalPages}
+                Page {currentPage} / {totalPages}
               </span>
               <button
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}

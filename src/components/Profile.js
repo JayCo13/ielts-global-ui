@@ -84,7 +84,7 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(isGoogleAccount 
+        body: JSON.stringify(isGoogleAccount
           ? { new_password: formData.new_password, confirm_password: formData.confirm_password }
           : formData
         )
@@ -121,13 +121,12 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
         </div>
 
         {message.text && (
-          <div className={`mb-6 p-4 rounded-lg flex items-center gap-3 ${
-            message.type === 'success' 
-              ? 'bg-green-50 text-green-800 border border-green-200' 
-              : 'bg-red-50 text-red-800 border border-red-200'
-          }`}>
-            {message.type === 'success' 
-              ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> 
+          <div className={`mb-6 p-4 rounded-lg flex items-center gap-3 ${message.type === 'success'
+            ? 'bg-green-50 text-green-800 border border-green-200'
+            : 'bg-red-50 text-red-800 border border-red-200'
+            }`}>
+            {message.type === 'success'
+              ? <CheckCircle className="w-5 h-5 flex-shrink-0" />
               : <AlertCircle className="w-5 h-5 flex-shrink-0" />
             }
             <span className="text-sm font-medium">{message.text}</span>
@@ -139,9 +138,9 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
           {isGoogleAccount && (
             <div className="p-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-sm flex items-start gap-3">
               <svg className="w-5 h-5 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="12" y1="16" x2="12" y2="12"/>
-                <line x1="12" y1="8" x2="12.01" y2="8"/>
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
               </svg>
               <div>
                 <p className="font-medium">Logged in with Google</p>
@@ -201,7 +200,7 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
                 {showPasswords.new ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
-            
+
             {/* Password Strength Indicator */}
             {formData.new_password.length > 0 && (
               <div className="space-y-1">
@@ -209,17 +208,15 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
                   {[1, 2, 3, 4, 5].map((level) => (
                     <div
                       key={level}
-                      className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
-                        level <= passwordStrength ? getStrengthColor() : 'bg-gray-200'
-                      }`}
+                      className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${level <= passwordStrength ? getStrengthColor() : 'bg-gray-200'
+                        }`}
                     />
                   ))}
                 </div>
-                <p className={`text-xs ${
-                  passwordStrength <= 1 ? 'text-red-500' : 
-                  passwordStrength <= 2 ? 'text-yellow-600' : 
-                  passwordStrength <= 3 ? 'text-blue-600' : 'text-green-600'
-                }`}>
+                <p className={`text-xs ${passwordStrength <= 1 ? 'text-red-500' :
+                  passwordStrength <= 2 ? 'text-yellow-600' :
+                    passwordStrength <= 3 ? 'text-blue-600' : 'text-green-600'
+                  }`}>
                   Strength: {getStrengthLabel()}
                 </p>
               </div>
@@ -236,13 +233,12 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
                 type={showPasswords.confirm ? 'text' : 'password'}
                 value={formData.confirm_password}
                 onChange={(e) => setFormData({ ...formData, confirm_password: e.target.value })}
-                className={`w-full px-4 py-2.5 pr-12 border rounded-lg focus:ring-2 focus:ring-[#0096b1]/30 focus:border-[#0096b1] transition-all outline-none ${
-                  formData.confirm_password && formData.new_password !== formData.confirm_password
-                    ? 'border-red-300 bg-red-50/50'
-                    : formData.confirm_password && formData.new_password === formData.confirm_password
-                      ? 'border-green-300 bg-green-50/50' 
-                      : 'border-gray-300'
-                }`}
+                className={`w-full px-4 py-2.5 pr-12 border rounded-lg focus:ring-2 focus:ring-[#0096b1]/30 focus:border-[#0096b1] transition-all outline-none ${formData.confirm_password && formData.new_password !== formData.confirm_password
+                  ? 'border-red-300 bg-red-50/50'
+                  : formData.confirm_password && formData.new_password === formData.confirm_password
+                    ? 'border-green-300 bg-green-50/50'
+                    : 'border-gray-300'
+                  }`}
                 placeholder="Re-enter new password"
                 required
                 disabled={isSubmitting}
@@ -281,11 +277,10 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
           <button
             type="submit"
             disabled={isSubmitting || (!isGoogleAccount && !formData.current_password) || !formData.new_password || !formData.confirm_password}
-            className={`w-full py-2.5 px-4 rounded-lg text-white font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
-              isSubmitting || (!isGoogleAccount && !formData.current_password) || !formData.new_password || !formData.confirm_password
-                ? 'bg-gray-300 cursor-not-allowed'
-                : 'bg-[#0096b1] hover:bg-[#007a93] active:scale-[0.98] shadow-sm hover:shadow-md'
-            }`}
+            className={`w-full py-2.5 px-4 rounded-lg text-white font-medium transition-all duration-200 flex items-center justify-center gap-2 ${isSubmitting || (!isGoogleAccount && !formData.current_password) || !formData.new_password || !formData.confirm_password
+              ? 'bg-gray-300 cursor-not-allowed'
+              : 'bg-[#0096b1] hover:bg-[#007a93] active:scale-[0.98] shadow-sm hover:shadow-md'
+              }`}
           >
             {isSubmitting ? (
               <>
@@ -336,7 +331,7 @@ const ProfilePage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
+
       // Fetch account status for students
       if (localStorage.getItem('role') === 'student') {
         const accountResponse = await fetch(`${API_BASE}/account-status`, {
@@ -344,7 +339,7 @@ const ProfilePage = () => {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-        
+
         if (accountResponse.ok) {
           const accountData = await accountResponse.json();
           setAccountStatus(accountData);
@@ -419,7 +414,7 @@ const ProfilePage = () => {
                   <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                     Active
                   </div>
-                  
+
                   {localStorage.getItem('role') === 'student' && accountStatus && (
                     <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                       {accountStatus.is_active ? (
@@ -451,32 +446,30 @@ const ProfilePage = () => {
                   {statsSection === 0 ? "Statistics Overview" : "Detailed Statistics"}
                 </h2>
                 <div className="flex gap-2">
-                  <button 
+                  <button
                     onClick={() => setStatsSection(0)}
-                    className={`px-3 py-1 rounded-lg text-sm ${
-                      statsSection === 0 
-                        ? 'bg-[#0096b1] text-white' 
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
+                    className={`px-3 py-1 rounded-lg text-sm ${statsSection === 0
+                      ? 'bg-[#0096b1] text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
                   >
                     Overview
                   </button>
-                  <button 
+                  <button
                     onClick={() => setStatsSection(1)}
-                    className={`px-3 py-1 rounded-lg text-sm ${
-                      statsSection === 1 
-                        ? 'bg-[#0096b1] text-white' 
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
+                    className={`px-3 py-1 rounded-lg text-sm ${statsSection === 1
+                      ? 'bg-[#0096b1] text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
                   >
-                    Chi tiết
+                    View Details
                   </button>
                 </div>
               </div>
 
               {/* Navigation arrows */}
               {statsSection === 0 && (
-                <button 
+                <button
                   onClick={() => setStatsSection(1)}
                   className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 z-10"
                   aria-label="View detailed statistics"
@@ -484,9 +477,9 @@ const ProfilePage = () => {
                   <ArrowRight className="w-5 h-5 text-gray-600" />
                 </button>
               )}
-              
+
               {statsSection === 1 && (
-                <button 
+                <button
                   onClick={() => setStatsSection(0)}
                   className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 z-10"
                   aria-label="Back to overview"
@@ -496,9 +489,8 @@ const ProfilePage = () => {
               )}
 
               {/* Section 1: Overview Statistics */}
-              <div className={`transition-all duration-300 w-full ${
-                statsSection === 0 ? 'block' : 'hidden'
-              }`}>
+              <div className={`transition-all duration-300 w-full ${statsSection === 0 ? 'block' : 'hidden'
+                }`}>
                 <div className="grid grid-cols-3 gap-6 mb-8">
                   <div className="bg-gray-50 rounded-xl p-6">
                     <h3 className="text-gray-500 text-sm font-medium mb-2">Total Tests</h3>
@@ -519,7 +511,7 @@ const ProfilePage = () => {
                     <div className="flex items-center justify-between mb-4">
                       <h2 className="text-xl font-semibold">Latest Test</h2>
                     </div>
-                    
+
                     <div className="bg-gray-50 rounded-lg p-4 mb-4">
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                         <div>
@@ -531,18 +523,18 @@ const ProfilePage = () => {
                           })}</p>
                         </div>
                         <div className="text-right">
-                        <span className="text-2xl font-bold text-[#0096b1]">{testStats.latest_test.total_score}</span>
-                        <span className="text-sm text-gray-500 ml-1">Score</span>
-                      </div>
+                          <span className="text-2xl font-bold text-[#0096b1]">{testStats.latest_test.total_score}</span>
+                          <span className="text-sm text-gray-500 ml-1">Score</span>
+                        </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex justify-end">
-                      <Link 
+                      <Link
                         to={`/exam-result/${testStats.latest_test.result_id}`}
                         className="text-sm text-[#0096b1] hover:text-[#0096b1] font-medium inline-flex items-center"
                       >
-                        Xem chi tiết
+                        View Details
                         <ChevronRight className="w-4 h-4 ml-1" />
                       </Link>
                     </div>
@@ -551,16 +543,15 @@ const ProfilePage = () => {
               </div>
 
               {/* Section 2: Detailed Statistics */}
-              <div className={`transition-all duration-300 w-full ${
-                statsSection === 1 ? 'block' : 'hidden'
-              }`}>
+              <div className={`transition-all duration-300 w-full ${statsSection === 1 ? 'block' : 'hidden'
+                }`}>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <div className="flex items-center gap-2 mb-4">
                       <Headphones className="w-5 h-5 text-[#0096b1]" />
                       <h2 className="text-xl font-semibold">Listening Statistics</h2>
                     </div>
-                    
+
                     {testStats?.listening_statistics?.exams_completed > 0 ? (
                       <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
@@ -573,7 +564,7 @@ const ProfilePage = () => {
                             <p className="text-xl font-bold text-gray-900">{testStats.listening_statistics.average_score}</p>
                           </div>
                         </div>
-                        
+
                         {testStats.listening_statistics.exams.length > 0 && (
                           <div>
                             <h3 className="text-sm font-medium text-gray-700 mb-2">Recent Tests</h3>
@@ -595,13 +586,13 @@ const ProfilePage = () => {
                       <p className="text-gray-500 text-center py-4">No completed listening tests</p>
                     )}
                   </div>
-                  
+
                   <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <div className="flex items-center gap-2 mb-4">
                       <PenTool className="w-5 h-5 text-[#0096b1]" />
                       <h2 className="text-xl font-semibold">Writing Statistics</h2>
                     </div>
-                    
+
                     {testStats?.writing_statistics?.tests_attempted > 0 ? (
                       <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
@@ -614,7 +605,7 @@ const ProfilePage = () => {
                             <p className="text-xl font-bold text-gray-900">{testStats.writing_statistics.tasks_completed}</p>
                           </div>
                         </div>
-                        
+
                         {testStats.writing_statistics.tests.length > 0 && (
                           <div>
                             <h3 className="text-sm font-medium text-gray-700 mb-2">Recent Tests</h3>
@@ -625,9 +616,8 @@ const ProfilePage = () => {
                                   <p className="text-xs text-gray-500">{new Date(test.latest_update).toLocaleDateString('en-US')}</p>
                                 </div>
                                 <div className="text-right">
-                                  <span className={`text-xs px-2 py-1 rounded-full ${
-                                    test.is_completed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                                  }`}>
+                                  <span className={`text-xs px-2 py-1 rounded-full ${test.is_completed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                    }`}>
                                     {test.is_completed ? 'Hoàn thành' : `${test.parts_completed}/${test.total_parts}`}
                                   </span>
                                 </div>
@@ -656,46 +646,43 @@ const ProfilePage = () => {
           <div className="flex gap-6">
             <div className={`${menuCollapsed ? 'w-16' : 'w-64'} border-r border-gray-100 pr-6 transition-all duration-300`}>
               <div className="flex items-center justify-center gap-2 mb-8 relative">
-                {!menuCollapsed && <span className="font-medium font-bold">Hồ sơ học viên</span>}
-                <button 
-                  onClick={() => setMenuCollapsed(!menuCollapsed)} 
+                {!menuCollapsed && <span className="font-medium font-bold">Profile</span>}
+                <button
+                  onClick={() => setMenuCollapsed(!menuCollapsed)}
                   className="absolute right-0 p-1 hover:bg-gray-100 rounded-full font-bold"
-                  aria-label={menuCollapsed ? "Mở rộng menu" : "Thu gọn menu"}
+                  aria-label={menuCollapsed ? "Expand menu" : "Collapse menu"}
                 >
                   {menuCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
                 </button>
               </div>
-              <hr/>
+              <hr />
               <nav className="space-y-4 mt-3">
-                <div 
-                  className={`flex items-center gap-3 p-2 cursor-pointer rounded-lg hover:bg-gray-50 ${
-                    activeView === 'profile' ? 'text-[#0096b1] bg-[#0096b1]-50' : 'text-gray-600'
-                  }`}
+                <div
+                  className={`flex items-center gap-3 p-2 cursor-pointer rounded-lg hover:bg-gray-50 ${activeView === 'profile' ? 'text-[#0096b1] bg-[#0096b1]-50' : 'text-gray-600'
+                    }`}
                   onClick={() => setActiveView('profile')}
                   title={menuCollapsed ? "Overview hồ sơ" : ""}
                 >
                   <User className="w-5 h-5 min-w-5" />
-                  {!menuCollapsed && <span>Overview hồ sơ</span>}
+                  {!menuCollapsed && <span>Overview</span>}
                 </div>
-                <div 
-                  className={`flex items-center gap-3 p-2 cursor-pointer rounded-lg hover:bg-gray-50 ${
-                    activeView === 'edit' ? 'text-[#0096b1] bg-[#0096b1]-50' : 'text-gray-600'
-                  }`}
+                <div
+                  className={`flex items-center gap-3 p-2 cursor-pointer rounded-lg hover:bg-gray-50 ${activeView === 'edit' ? 'text-[#0096b1] bg-[#0096b1]-50' : 'text-gray-600'
+                    }`}
                   onClick={() => setActiveView('edit')}
-                  title={menuCollapsed ? "Chỉnh sửa hồ sơ" : ""}
+                  title={menuCollapsed ? "Edit Profile" : ""}
                 >
                   <Edit className="w-5 h-5 min-w-5" />
-                  {!menuCollapsed && <span>Chỉnh sửa hồ sơ</span>}
+                  {!menuCollapsed && <span>Edit Profile</span>}
                 </div>
-                <div 
-                  className={`flex items-center gap-3 p-2 cursor-pointer rounded-lg hover:bg-gray-50 ${
-                    activeView === 'password' ? 'text-[#0096b1] bg-[#0096b1]-50' : 'text-gray-600'
-                  }`}
+                <div
+                  className={`flex items-center gap-3 p-2 cursor-pointer rounded-lg hover:bg-gray-50 ${activeView === 'password' ? 'text-[#0096b1] bg-[#0096b1]-50' : 'text-gray-600'
+                    }`}
                   onClick={() => setActiveView('password')}
-                  title={menuCollapsed ? "Đổi mật khẩu" : ""}
+                  title={menuCollapsed ? "Change Password" : ""}
                 >
                   <Lock className="w-5 h-5 min-w-5" />
-                  {!menuCollapsed && <span>Đổi mật khẩu</span>}
+                  {!menuCollapsed && <span>Change Password</span>}
                 </div>
               </nav>
             </div>

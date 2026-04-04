@@ -467,100 +467,71 @@ const ExamHistory = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
         {/* VIP Access Control Overlay */}
         {shouldShowOverlay && (
-          <div className="fixed inset-0 bg-gradient-to-br from-slate-900/90 via-blue-900/85 to-indigo-900/90 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 lg:p-8">
-            {/* Animated background elements */}
-            <div className="absolute inset-0 overflow-hidden">
-              <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-              <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl animate-pulse delay-500"></div>
-            </div>
-
-            {/* Main content container */}
-            <div className="relative w-full max-w-lg mx-auto">
-              {/* Glass morphism card */}
-              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl">
-                {/* Icon section with enhanced animation */}
-                <div className="text-center mb-8">
-                  <div className="relative inline-block">
-                    {/* Outer glow ring */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full blur-xl opacity-30 animate-pulse scale-150"></div>
-                    {/* Inner ring */}
-                    <div className="relative bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-sm rounded-full p-6 border border-white/30">
-                      <Lock className="w-12 h-12 sm:w-16 sm:h-16 text-white mx-auto animate-bounce" />
-                    </div>
-                    {/* Floating particles */}
-                    <div className="absolute -top-2 -right-2 w-3 h-3 bg-cyan-400 rounded-full animate-ping"></div>
-                    <div className="absolute -bottom-2 -left-2 w-2 h-2 bg-blue-400 rounded-full animate-ping delay-300"></div>
+          <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-fade-in-up">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-[#002855] to-[#014182] p-6 text-center relative overflow-hidden">
+                <div className="relative z-10">
+                  <div className="bg-white/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-md border border-white/20">
+                    <Lock className="w-8 h-8 text-white" />
                   </div>
+                  <h2 className="text-2xl font-bold text-white mb-2">VIP Feature</h2>
+                  <p className="text-blue-100 text-sm">Unlock your full potential</p>
                 </div>
-
-                {/* Content section */}
-                <div className="text-center space-y-6">
-                  {/* Title with gradient text */}
-                  <div className="space-y-2">
-                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white via-cyan-100 to-blue-100 bg-clip-text text-transparent leading-tight">
-                      VIP Feature
-                    </h2>
-                    <div className="w-16 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full mx-auto"></div>
-                  </div>
-
-                  {/* Description */}
-                  <p className="text-base sm:text-lg text-white/90 leading-relaxed px-2">
-                    Detailed exam history is only available for VIP members.
-                    <span className="block mt-2 text-cyan-200 font-medium">
-                      Upgrade now to access all features!
-                    </span>
-                  </p>
-
-                  {/* Feature highlights */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-white/80 bg-white/5 rounded-2xl p-4 border border-white/10">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
-                      <span>Detailed History</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                      <span>Result Analysis</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
-                      <span>Progress Tracking</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                      <span>Advanced Reports</span>
-                    </div>
-                  </div>
-
-                  {/* Action buttons */}
-                  <div className="space-y-4 pt-2">
-                    <Link
-                      to="/vip-packages"
-                      className="group relative w-full inline-flex items-center justify-center px-6 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-2xl hover:from-cyan-400 hover:to-blue-500 transition-all duration-300 shadow-lg hover:shadow-cyan-500/25 hover:scale-105 transform"
-                    >
-                      <span className="relative z-10 flex items-center gap-2">
-                        View VIP Plans
-                        <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
-                      </span>
-                      {/* Button glow effect */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-blue-700 rounded-2xl blur opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
-                    </Link>
-
-                    <button
-                      onClick={() => navigate('/reading_list')}
-                      className="w-full text-white/80 hover:text-white font-medium py-3 px-4 rounded-xl hover:bg-white/10 transition-all duration-200 border border-white/20 hover:border-white/30"
-                    >
-                      Back to exam list
-                    </button>
-                  </div>
+                {/* Decorative background shapes */}
+                <div className="absolute inset-0 z-0 opacity-20">
+                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-white rounded-full blur-2xl"></div>
+                    <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-teal-400 rounded-full blur-2xl"></div>
                 </div>
               </div>
 
-              {/* Bottom decorative elements */}
-              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2">
-                <div className="w-2 h-2 bg-cyan-400/50 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-blue-400/50 rounded-full animate-bounce delay-100"></div>
-                <div className="w-2 h-2 bg-indigo-400/50 rounded-full animate-bounce delay-200"></div>
+              {/* Body */}
+              <div className="p-6 text-center space-y-6">
+                <p className="text-gray-600 text-base leading-relaxed">
+                  Detailed exam history is only available for VIP members.
+                  <span className="block mt-2 font-medium text-[#002855]">
+                    Upgrade now to access all features!
+                  </span>
+                </p>
+
+                {/* Features List */}
+                <div className="bg-gray-50 rounded-xl p-4 text-sm text-gray-700 text-left grid gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-4 h-4 text-[#002855]" />
+                    </div>
+                    <span>Detailed test history & answers</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
+                      <BarChart2 className="w-4 h-4 text-teal-700" />
+                    </div>
+                    <span>In-depth score analysis & trends</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                      <Target className="w-4 h-4 text-purple-700" />
+                    </div>
+                    <span>Personalized progress tracking</span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="space-y-3 pt-2">
+                  <Link
+                    to="/vip-packages"
+                    className="w-full flex items-center justify-center px-6 py-3.5 bg-gradient-to-r from-[#0096b1] to-[#007a90] text-white font-semibold rounded-xl hover:from-[#007a90] hover:to-[#005f70] transition-colors duration-300 shadow-md hover:shadow-lg"
+                  >
+                    View VIP Plans
+                    <ChevronRight className="w-5 h-5 ml-1" />
+                  </Link>
+                  <button
+                    onClick={() => navigate('/reading_list')}
+                    className="w-full text-gray-500 hover:text-gray-800 font-medium py-3 px-4 rounded-xl hover:bg-gray-50 transition-colors duration-200"
+                  >
+                    Back to exam list
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -769,7 +740,7 @@ const ExamHistory = () => {
                   Exam History is for VIP Only
                 </h3>
                 <p className="text-gray-600 mb-6 max-w-md mx-auto leading-relaxed">
-                  Nâng cấp lên VIP để xem lại tất cả các completed exams, theo dõi tiến độ học tập và phân tích results chi tiết.
+                  Upgrade to VIP to review all completed exams, track your learning progress, and analyze detailed results.
                 </p>
                 <div className="space-y-3">
                   <Link

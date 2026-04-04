@@ -962,7 +962,7 @@ const ListeningTest = ({
                       onSearchClick(globalQNum);
                     }}
                     className="p-1 rounded hover:bg-blue-100 transition-colors cursor-pointer"
-                    title="Xem vị trí trong transcript"
+                    title="View in transcript"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -979,7 +979,7 @@ const ListeningTest = ({
                       onExplainClick(globalQNum);
                     }}
                     className="p-1 rounded hover:bg-purple-100 transition-colors cursor-pointer"
-                    title="Xem giải thích"
+                    title="View explanation"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1363,7 +1363,7 @@ const ListeningTest = ({
 
             <p className="mb-2">
               <strong>{q.number}</strong> {q.text}
-              {isLockedRetake && <span className="ml-2 text-green-600 text-sm font-medium">✓ Đúng</span>}
+              {isLockedRetake && <span className="ml-2 text-green-600 text-sm font-medium">✓ Correct</span>}
               {hardQuestions && hardQuestions[q.number] && (
                 <span className="inline-block ml-1">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-red-500 inline" viewBox="0 0 20 20" fill="currentColor">
@@ -1378,7 +1378,7 @@ const ListeningTest = ({
                     <button
                       onClick={() => onSearchClick(parseInt(q.number))}
                       className="p-1 rounded hover:bg-blue-100 transition-colors"
-                      title="Xem vị trí trong transcript"
+                      title="View in transcript"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -1389,7 +1389,7 @@ const ListeningTest = ({
                     <button
                       onClick={() => onExplainClick(parseInt(q.number))}
                       className="p-1 rounded hover:bg-purple-100 transition-colors"
-                      title="Xem giải thích"
+                      title="View explanation"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1504,7 +1504,7 @@ const ListeningTest = ({
                         <button
                           onClick={() => onSearchClick(qNum)}
                           className="p-1 rounded hover:bg-blue-100 transition-colors"
-                          title="Xem vị trí trong transcript"
+                          title="View in transcript"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -1515,7 +1515,7 @@ const ListeningTest = ({
                         <button
                           onClick={() => onExplainClick(qNum)}
                           className="p-1 rounded hover:bg-purple-100 transition-colors"
-                          title="Xem giải thích"
+                          title="View explanation"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1623,7 +1623,7 @@ const ListeningTest = ({
                     />
                     <label htmlFor={`checkbox_${s.startNum}_${optionValue}`} className={`ml-2 ${isLockedOption ? 'text-green-700 font-medium' : checkboxTextClass || ''}`}>
                       {option}
-                      {isLockedOption && <span className="ml-1 text-green-500 text-xs">✓ Đúng</span>}
+                      {isLockedOption && <span className="ml-1 text-green-500 text-xs">✓ Correct</span>}
                     </label>
                   </div>
                 );
@@ -1680,7 +1680,7 @@ const ListeningTest = ({
                                 <button
                                   onClick={() => onSearchClick(parseInt(questionNum))}
                                   className="p-1 rounded hover:bg-blue-100 transition-colors"
-                                  title="Xem vị trí trong transcript"
+                                  title="View in transcript"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -1691,7 +1691,7 @@ const ListeningTest = ({
                                 <button
                                   onClick={() => onExplainClick(parseInt(questionNum))}
                                   className="p-1 rounded hover:bg-purple-100 transition-colors"
-                                  title="Xem giải thích"
+                                  title="View explanation"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1897,7 +1897,7 @@ const ListeningTest = ({
                             <button
                               onClick={() => onSearchClick(questionNum)}
                               className="p-1 rounded hover:bg-blue-100 transition-colors"
-                              title="Xem vị trí trong transcript"
+                              title="View in transcript"
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -1908,7 +1908,7 @@ const ListeningTest = ({
                             <button
                               onClick={() => onExplainClick(questionNum)}
                               className="p-1 rounded hover:bg-purple-100 transition-colors"
-                              title="Xem giải thích"
+                              title="View explanation"
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -2091,7 +2091,7 @@ const ListeningTest = ({
                             onSearchClick(globalQNum);
                           }}
                           className="p-1 rounded hover:bg-blue-100 transition-colors cursor-pointer"
-                          title="Xem vị trí trong transcript"
+                          title="View in transcript"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -2108,7 +2108,7 @@ const ListeningTest = ({
                             onExplainClick(globalQNum);
                           }}
                           className="p-1 rounded hover:bg-purple-100 transition-colors cursor-pointer"
-                          title="Xem giải thích"
+                          title="View explanation"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
