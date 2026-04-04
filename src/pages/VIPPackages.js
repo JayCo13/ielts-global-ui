@@ -236,7 +236,7 @@ const VIPPackages = () => {
                             onClick={() => handlePurchase(pkg.package_id)}
                             className={`px-8 py-3 bg-gradient-to-r ${style.gradient} text-white rounded-full font-medium hover:opacity-90 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50 focus:outline-none`}
                         >
-                            Register ngay
+                            Register Now
                         </button>
                     </div>
                 </div>

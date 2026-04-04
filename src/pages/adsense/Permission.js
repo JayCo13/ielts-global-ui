@@ -21,28 +21,28 @@ const Permission = () => {
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="text-center">
             <div className="mb-8">
-              <h3 className="text-2xl font-bold mb-4">© 2025 ieltscomputertest.com</h3>
+              <h3 className="text-2xl font-bold mb-4">© 2026 ieltscomputertest.com</h3>
               <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto rounded-full"></div>
             </div>
-            
+
             <div className="bg-gray-800/50 rounded-2xl p-8 backdrop-blur-sm border border-gray-700">
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 text-sm">
                 <div className="space-y-2">
                   <h4 className="font-semibold text-blue-400 mb-3">Business Information</h4>
                   <p className="text-gray-300">
                     <span className="font-medium">Owner:</span><br />
-                    Nguyễn Thị Mai Anh
+                    Lê Tiết An
                   </p>
                 </div>
-                
+
                 <div className="space-y-2">
                   <h4 className="font-semibold text-green-400 mb-3">Tax ID</h4>
                   <p className="text-gray-300">
-                    <span className="font-medium">Personal Tax ID:</span><br />
-                    030195007851
+                    <span className="font-medium">Tax Identification Number:</span><br />
+                    072091003266
                   </p>
                 </div>
-                
+
                 <div className="space-y-2">
                   <h4 className="font-semibold text-purple-400 mb-3">Contact</h4>
                   <p className="text-gray-300">
@@ -58,7 +58,7 @@ const Permission = () => {
                     </a>
                   </p>
                 </div>
-                
+
                 <div className="space-y-2">
                   <h4 className="font-semibold text-orange-400 mb-3">Industry</h4>
                   <p className="text-gray-300 text-xs leading-relaxed">
@@ -66,7 +66,7 @@ const Permission = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="mt-8 pt-6 border-t border-gray-600">
                 <p className="text-xs text-gray-400 leading-relaxed max-w-4xl mx-auto">
                   Not classified as a conditional business under the Investment Law.

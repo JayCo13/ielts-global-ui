@@ -10,7 +10,7 @@ const Achievements = () => {
     const [selectedCertificate, setSelectedCertificate] = useState(null);
     const [images, setImages] = useState([]);
     const [centerText, setCenterText] = useState('ieltscomputertest.com');
-    const [sloganText] = useState('niềm tin đúng chỗ - bứt phá tương lai');
+    const [sloganText] = useState('Right trust – Breakthrough future');
     const [currentSlide, setCurrentSlide] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategory, setFilterCategory] = useState('all');
@@ -309,10 +309,10 @@ const Achievements = () => {
                                 {/* Main heading with modern typography */}
                                 <div className="text-center mb-8">
                                     <h2 className="inline-block text-3xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#2b5356] to-[#2b5356]/80 mb-2">
-                                        Danh sách <span className="font-serif italic bg-clip-text text-transparent bg-gradient-to-r from-[#eb7e37] to-[#f59e0b]">"trúng tủ"</span>
+                                        High <span className="font-serif italic bg-clip-text text-transparent bg-gradient-to-r from-[#eb7e37] to-[#f59e0b]">"Hit Rate"</span>
                                     </h2>
                                     <h3 className="text-2xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#2b5356]/80 to-[#2b5356] mb-6">
-                                        của các tài khoản VIP
+                                        VIP Members' Results
                                     </h3>
                                     <div className="w-24 h-1 bg-gradient-to-r from-[#2b5356] via-[#eb7e37] to-[#2b5356] mx-auto rounded-full"></div>
                                 </div>
@@ -320,7 +320,7 @@ const Achievements = () => {
                                 {/* Call to action with modern button */}
                                 <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
                                     <p className="text-[#2b5356] text-lg font-medium">
-                                        Bạn có muốn nằm trong danh sách <span className="font-serif italic text-[#eb7e37] font-bold">"trúng tủ"?</span>
+                                        Want to be on the <span className="font-serif italic text-[#eb7e37] font-bold">"High Hit Rate" list?</span>
                                     </p>
                                     <a
                                         href="/vip-packages?type=all"
@@ -328,7 +328,7 @@ const Achievements = () => {
                                     >
                                         <span className="absolute h-full w-full bg-gradient-to-br from-[#2b5356] via-[#eb7e37] to-[#f59e0b] group-hover:from-[#eb7e37] group-hover:via-[#f59e0b] group-hover:to-[#2b5356] transition-all duration-500"></span>
                                         <span className="relative flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#2b5356] transition-all duration-200 group-hover:bg-opacity-0 group-hover:text-white">
-                                            Đăng ký ngay
+                                            Register Now
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                             </svg>
@@ -362,7 +362,7 @@ const Achievements = () => {
                             ))
                         ) : (
                             <div className="col-span-full py-12 text-center text-gray-500">
-                                <p>Chưa có dữ liệu...</p>
+                                <p>No data available yet...</p>
                             </div>
                         )}
                     </div>

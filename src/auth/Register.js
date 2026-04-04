@@ -59,7 +59,7 @@ const Register = () => {
     }
 
     // Check for blocked email
-    if (formData.email.trim() === 'thiieltstrenmay@gmail.com') {
+    if (formData.email.trim() === 'ieltscomputertestglobal@gmail.com') {
       setErrors(prev => ({ ...prev, email: 'Your actions are being monitored, please stop immediately' }));
       setIsEmailValid(false);
       return;
@@ -82,7 +82,7 @@ const Register = () => {
       const data = await response.json();
 
       if (response.ok) {
-        if (data.valid && formData.email.trim() !== 'thiieltstrenmay@gmail.com') {
+        if (data.valid && formData.email.trim() !== 'ieltscomputertestglobal@gmail.com') {
           setIsEmailValid(true);
         } else {
           setErrors(prev => ({
@@ -198,7 +198,7 @@ const Register = () => {
 
   // Get the strength label
   const getStrengthLabel = () => {
-    if (passwordStrength < 30) return 'Yếu';
+    if (passwordStrength < 30) return 'Weak';
     if (passwordStrength < 60) return 'Average';
     if (passwordStrength < 80) return 'Strong';
     if (passwordStrength === 100) return 'Very Strong';
@@ -223,7 +223,7 @@ const Register = () => {
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
       isValid = false;
-    } else if (formData.email.trim() === 'thiieltstrenmay@gmail.com') {
+    } else if (formData.email.trim() === 'ieltscomputertestglobal@gmail.com') {
       newErrors.email = 'This account is blocked';
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -417,7 +417,7 @@ const Register = () => {
             </svg>
           </div>
           <h2 className="text-2xl font-bold text-lime-600 mb-2">Register Success!</h2>
-          <p className="text-gray-600 mb-4">Your account has been created successfully. Chuyển hướng đếto login page...</p>
+          <p className="text-gray-600 mb-4">Your account has been created successfully. Redirecting to login page...</p>
           <div className="w-full h-20 flex items-center justify-center">
             <div className="w-full max-w-xs">
               <Lottie

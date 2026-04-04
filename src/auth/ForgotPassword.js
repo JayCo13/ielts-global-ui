@@ -28,7 +28,7 @@ const ForgotPassword = () => {
       setErrors(prev => ({ ...prev, email: 'Please enter your email' }));
       return;
     }
-     if (email.trim() === 'thiieltstrenmay@gmail.com') {
+     if (email.trim() === 'ieltscomputertestglobal@gmail.com') {
       setErrors(prev => ({ ...prev, email: 'Your actions are being monitored, please stop immediately' }));
       return;
     }

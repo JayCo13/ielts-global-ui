@@ -159,8 +159,8 @@ const Navbar = () => {
                             key={item.path}
                             to={item.path}
                             className={`relative px-5 py-2.5 rounded-lg text-lg font-bold transition-all duration-200 ${isActive(item.path)
-                                ? 'text-[#aea091] bg-[#ffffff]/10'
-                                : 'text-[#aea091] hover:text-[#b4904a]/700 hover:bg-[#b4904a]/10'
+                                ? (isScrolled ? 'text-white bg-white/10 border border-white/20 shadow-sm' : 'text-white bg-[#ffffff]/10')
+                                : 'text-[#aea091] hover:bg-white/10 hover:text-white'
                                 }`}
                         >
                             {item.name}
@@ -182,9 +182,18 @@ const Navbar = () => {
                         onMouseLeave={() => setIsReadingOpen(false)}
                     >
                         <button
-                            className={`px-5 py-2.5 rounded-lg text-lg font-bold text-[#aea091] hover:bg-white/10 transition-all duration-200 ${isActive('/reading_list') ? 'bg-white/50' : ''}`}
+                            className={`relative px-5 py-2.5 rounded-lg text-lg font-bold transition-all duration-200 ${isActive('/reading_list') || isActive('/reading_forecast') ? (isScrolled ? 'text-white bg-white/10 border border-white/20 shadow-sm' : 'text-white bg-[#ffffff]/10') : 'text-[#aea091] hover:bg-white/10 hover:text-white'}`}
                         >
                             Reading
+                            {(isActive('/reading_list') || isActive('/reading_forecast')) && (
+                                <motion.span
+                                    layoutId="navbar-indicator"
+                                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#b4904a] mx-4"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.3 }}
+                                />
+                            )}
                         </button>
                         <AnimatePresence>
                             {isReadingOpen && (
@@ -220,9 +229,18 @@ const Navbar = () => {
                         onMouseLeave={() => setIsListeningOpen(false)}
                     >
                         <button
-                            className={`px-5 py-2.5 rounded-lg text-lg font-bold text-[#aea091] hover:bg-white/10 transition-all duration-200 ${isActive('/listening_list') ? 'bg-white/50' : ''}`}
+                            className={`relative px-5 py-2.5 rounded-lg text-lg font-bold transition-all duration-200 ${isActive('/listening_list') || isActive('/listening_forecast') ? (isScrolled ? 'text-white bg-white/10 border border-white/20 shadow-sm' : 'text-white bg-[#ffffff]/10') : 'text-[#aea091] hover:bg-white/10 hover:text-white'}`}
                         >
                             Listening
+                            {(isActive('/listening_list') || isActive('/listening_forecast')) && (
+                                <motion.span
+                                    layoutId="navbar-indicator"
+                                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#b4904a] mx-4"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.3 }}
+                                />
+                            )}
                         </button>
                         <AnimatePresence>
                             {isListeningOpen && (
@@ -258,9 +276,18 @@ const Navbar = () => {
                         onMouseLeave={() => setIsWritingOpen(false)}
                     >
                         <button
-                            className={`px-5 py-2.5 rounded-lg text-lg font-bold text-[#aea091] hover:bg-white/10 transition-all duration-200 ${isActive('/writing_list') ? 'bg-white/50' : ''}`}
+                            className={`relative px-5 py-2.5 rounded-lg text-lg font-bold transition-all duration-200 ${isActive('/writing_list') || isActive('/writing_forecast') ? (isScrolled ? 'text-white bg-white/10 border border-white/20 shadow-sm' : 'text-white bg-[#ffffff]/10') : 'text-[#aea091] hover:bg-white/10 hover:text-white'}`}
                         >
                             Writing
+                            {(isActive('/writing_list') || isActive('/writing_forecast')) && (
+                                <motion.span
+                                    layoutId="navbar-indicator"
+                                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#b4904a] mx-4"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.3 }}
+                                />
+                            )}
                         </button>
                         <AnimatePresence>
                             {isWritingOpen && (
@@ -292,9 +319,18 @@ const Navbar = () => {
 
                     <Link
                         to="/speaking_list?part=part1"
-                        className={`px-5 py-2.5 rounded-lg text-lg font-bold text-[#aea091] hover:bg-white/10 transition-all duration-200 ${isActive('/speaking_list') ? 'bg-white/50' : ''}`}
+                        className={`relative px-5 py-2.5 rounded-lg text-lg font-bold transition-all duration-200 ${isActive('/speaking_list') ? (isScrolled ? 'text-white bg-white/10 border border-white/20 shadow-sm' : 'text-white bg-[#ffffff]/10') : 'text-[#aea091] hover:bg-white/10 hover:text-white'}`}
                     >
                         Speaking
+                        {isActive('/speaking_list') && (
+                            <motion.span
+                                layoutId="navbar-indicator"
+                                className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#b4904a] mx-4"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.3 }}
+                            />
+                        )}
                     </Link>
 
                     <div
@@ -303,9 +339,18 @@ const Navbar = () => {
                         onMouseLeave={() => setIsVocabularyOpen(false)}
                     >
                         <button
-                            className={`px-5 py-2.5 rounded-lg text-lg font-bold text-[#aea091] hover:bg-white/10 transition-all duration-200 ${isActive('/dictation') || isActive('/new-vocabulary') ? 'bg-white/50' : ''}`}
+                            className={`relative px-5 py-2.5 rounded-lg text-lg font-bold transition-all duration-200 ${isActive('/dictation') || isActive('/new-vocabulary') ? (isScrolled ? 'text-white bg-white/10 border border-white/20 shadow-sm' : 'text-white bg-[#ffffff]/10') : 'text-[#aea091] hover:bg-white/10 hover:text-white'}`}
                         >
                             Vocabulary
+                            {(isActive('/dictation') || isActive('/new-vocabulary')) && (
+                                <motion.span
+                                    layoutId="navbar-indicator"
+                                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#b4904a] mx-4"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.3 }}
+                                />
+                            )}
                         </button>
                         <AnimatePresence>
                             {isVocabularyOpen && (

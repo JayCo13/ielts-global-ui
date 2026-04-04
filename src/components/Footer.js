@@ -173,7 +173,7 @@ const Footer = () => {
                                     <span className="absolute -bottom-1 left-0 w-1/2 h-0.5 bg-gradient-to-r from-blue-100 to-blue-500"></span>
                                 </h3>
                                 <ul className="space-y-3">
-                                    <li><a href="mailto:thiieltstrenmay@gmail.com" className="text-gray-600 hover:text-blue-500 transition-colors duration-300 flex items-center lg:items-start xl:items-center gap-2">
+                                    <li><a href="mailto:ieltscomputertestglobal@gmail.com" className="text-gray-600 hover:text-blue-500 transition-colors duration-300 flex items-center lg:items-start xl:items-center gap-2">
                                         <div className="rounded-full text-gray-500 hover:text-blue-500 transition-colors duration-300 flex-shrink-0">
                                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>

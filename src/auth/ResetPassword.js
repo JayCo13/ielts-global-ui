@@ -31,7 +31,7 @@ const PasswordStrengthMeter = ({ password }) => {
   const getLabel = () => {
     switch (strength) {
       case 0: return 'Password not entered';
-      case 1: return 'Yếu';
+      case 1: return 'Weak';
       case 2: return 'Average';
       case 3: return 'Quite strong';
       case 4: return 'Strong';
@@ -93,7 +93,7 @@ const ResetPassword = () => {
         return;
       }
 
-      if (email === 'thiieltstrenmay@gmail.com') {
+      if (email === 'ieltscomputertestglobal@gmail.com') {
         setErrors(prev => ({ ...prev, token: 'Your actions are being monitored, please stop immediately' }));
         setTokenVerificationInProgress(false);
         return;
