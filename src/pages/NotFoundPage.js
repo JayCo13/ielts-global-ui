@@ -81,10 +81,10 @@ const NotFoundPage = () => {
             className="mt-6 space-y-4"
           >
             <h2 className="text-2xl font-semibold text-gray-800">
-              Không tìm thấy trang
+              Page Not Found
             </h2>
             <p className="text-gray-600">
-              Trang bạn đang tìm kiếm không tồn tại hoặc đã được xoá.
+              The page you are looking for does not exist or has been removed.
             </p>
           </motion.div>
 
@@ -99,7 +99,7 @@ const NotFoundPage = () => {
               className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-lime-500 to-green-500 text-white rounded-xl hover:from-lime-600 hover:to-green-600 transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               <Home className="w-5 h-5 mr-2" />
-              Về Trang Chủ
+              Back to Home
             </Link>
           </motion.div>
         </motion.div>

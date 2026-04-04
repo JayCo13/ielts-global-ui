@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { ChevronRight, Home, Shield, ShieldCheck, Lock, Loader2, AlertCircle, Crown } from 'lucide-react';
+import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
+import { ChevronRight, Home, Shield, Lock, AlertCircle, Crown, CheckCircle } from 'lucide-react';
 import { checkTokenExpiration, logout } from '../utils/authUtils';
 import API_BASE from '../config/api';
 
 const Payment = () => {
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [cooldown, setCooldown] = useState(0);
-    const isPaymentInProgress = React.useRef(false);
-
     const [error, setError] = useState(null);
+    const [paypalOrderId, setPaypalOrderId] = useState(null);
+    const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+    const [isCapturing, setIsCapturing] = useState(false);
+    const [paymentComplete, setPaymentComplete] = useState(false);
+
     const location = useLocation();
     const navigate = useNavigate();
     const { packageId, package: selectedPackage } = location.state || {};
@@ -29,7 +31,7 @@ const Payment = () => {
             logout();
             navigate('/login', {
                 state: {
-                    message: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
+                    message: 'Session expired. Please login again.',
                     redirectFrom: 'payment'
                 }
             });
@@ -42,31 +44,15 @@ const Payment = () => {
         validateTokenAndRedirect();
     }, []);
 
-    // Cooldown timer
-    useEffect(() => {
-        if (cooldown <= 0) return;
-        const timer = setInterval(() => {
-            setCooldown(prev => {
-                if (prev <= 1) { clearInterval(timer); return 0; }
-                return prev - 1;
-            });
-        }, 1000);
-        return () => clearInterval(timer);
-    }, [cooldown]);
-
-    const handlePayment = async () => {
+    // Create PayPal order via backend
+    const createOrder = async () => {
         if (!validateTokenAndRedirect()) return;
-        if (isPaymentInProgress.current || cooldown > 0) return; // Synchronous lock — blocks rapid clicks
-
-        isPaymentInProgress.current = true;
-        setIsSubmitting(true);
+        setIsCreatingOrder(true);
         setError(null);
 
         try {
             const token = localStorage.getItem('token');
-            if (!token) {
-                throw new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-            }
+            if (!token) throw new Error('Session expired. Please login again.');
 
             const response = await fetch(`${API_BASE}/customer/vip/packages/${packageId}/purchase`, {
                 method: 'POST',
@@ -76,43 +62,96 @@ const Payment = () => {
                 }
             });
 
-            const responseData = await response.json();
+            const data = await response.json();
 
             if (!response.ok) {
                 if (response.status === 401) {
                     logout();
                     navigate('/login', {
-                        state: {
-                            message: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
-                            redirectFrom: 'payment'
-                        }
+                        state: { message: 'Session expired. Please login again.', redirectFrom: 'payment' }
                     });
                     return;
-                } else if (response.status === 429) {
-                    throw new Error(responseData.detail || 'Bạn đã tạo quá nhiều yêu cầu. Vui lòng thử lại sau.');
-                } else {
-                    throw new Error(responseData.detail || 'Thanh toán thất bại. Vui lòng thử lại.');
                 }
+                throw new Error(data.detail || 'Failed to create payment. Please try again.');
             }
 
-            // Redirect to PayOS checkout page — keep button disabled
-            if (responseData.checkoutUrl) {
-                setCooldown(5);
-                window.location.href = responseData.checkoutUrl;
-                return; // Don't reset isSubmitting — we're navigating away
-            } else {
-                throw new Error('Không nhận được liên kết thanh toán.');
-            }
+            setPaypalOrderId(data.paypal_order_id);
+            return data.paypal_order_id;
+
         } catch (err) {
-            console.error('Payment error:', err);
+            console.error('Create order error:', err);
             setError(err.message);
-            isPaymentInProgress.current = false;
-            setIsSubmitting(false);
-            setCooldown(5);
+            throw err;
+        } finally {
+            setIsCreatingOrder(false);
         }
     };
 
+    // Capture payment after PayPal approval
+    const onApprove = async (data) => {
+        setIsCapturing(true);
+        setError(null);
+
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_BASE}/customer/vip/packages/${packageId}/capture`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    paypal_order_id: data.orderID
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.detail || 'Payment capture failed.');
+            }
+
+            if (result.status === 'completed') {
+                setPaymentComplete(true);
+                // Redirect to success page after short delay
+                setTimeout(() => {
+                    navigate('/payment-success', { state: { fromPayment: true } });
+                }, 2000);
+            } else {
+                setError(`Payment status: ${result.status}. Please contact support.`);
+            }
+        } catch (err) {
+            console.error('Capture error:', err);
+            setError(err.message);
+        } finally {
+            setIsCapturing(false);
+        }
+    };
+
+    const onError = (err) => {
+        console.error('PayPal error:', err);
+        setError('Payment failed. Please try again or contact support.');
+    };
+
+    const onCancel = () => {
+        setError('Payment cancelled. You can try again whenever you\'re ready.');
+    };
+
     if (!selectedPackage) return null;
+
+    const paypalClientId = process.env.REACT_APP_PAYPAL_CLIENT_ID;
+
+    if (!paypalClientId) {
+        return (
+            <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center">
+                <div className="text-center p-8 bg-red-50 rounded-2xl border border-red-200 max-w-md">
+                    <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                    <h2 className="text-xl font-bold text-red-800 mb-2">Payment Not Configured</h2>
+                    <p className="text-red-600">PayPal is not configured yet. Please contact support.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -122,14 +161,14 @@ const Payment = () => {
                     <nav className="flex items-center space-x-2 text-sm">
                         <Link to="/" className="text-gray-500 hover:text-lime-600 transition-colors">
                             <Home size={16} className="inline mr-1" />
-                            Trang chủ
+                            Home
                         </Link>
                         <ChevronRight size={16} className="text-gray-400" />
                         <Link to="/my-vip-package" className="text-gray-500 hover:text-lime-600 transition-colors">
-                            Gói VIP
+                            VIP Plans
                         </Link>
                         <ChevronRight size={16} className="text-gray-400" />
-                        <span className="text-lime-600 font-medium">Thanh toán</span>
+                        <span className="text-lime-600 font-medium">Payment</span>
                     </nav>
                 </div>
             </div>
@@ -143,8 +182,8 @@ const Payment = () => {
                                 <Crown className="w-6 h-6 text-white" />
                             </div>
                             <div>
-                                <h2 className="text-xl font-bold text-white">Xác nhận thanh toán</h2>
-                                <p className="text-white/80 text-sm">Bạn đang mua gói VIP</p>
+                                <h2 className="text-xl font-bold text-white">Confirm Payment</h2>
+                                <p className="text-white/80 text-sm">You are purchasing a VIP plan</p>
                             </div>
                         </div>
                     </div>
@@ -153,7 +192,7 @@ const Payment = () => {
                             <div>
                                 <h3 className="text-lg font-bold text-gray-900">{selectedPackage.name}</h3>
                                 <p className="text-sm text-gray-500 mt-1">
-                                    Thời hạn: {selectedPackage.duration_months} tháng
+                                    Duration: {selectedPackage.duration_months} month{selectedPackage.duration_months > 1 ? 's' : ''}
                                 </p>
                                 {selectedPackage.description && (
                                     <p className="text-sm text-gray-600 mt-2">{selectedPackage.description}</p>
@@ -161,38 +200,40 @@ const Payment = () => {
                             </div>
                             <div className="text-right">
                                 <div className="text-2xl font-extrabold text-lime-600">
-                                    {new Intl.NumberFormat('vi-VN', {
-                                        style: 'currency',
-                                        currency: 'VND',
-                                        maximumFractionDigits: 0
-                                    }).format(selectedPackage.price)}
+                                    ${Number(selectedPackage.price).toFixed(2)}
                                 </div>
+                                <p className="text-xs text-gray-400 mt-1">USD</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Payment Steps */}
-                <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 mb-6">
-                    <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <Lock className="w-5 h-5 text-lime-600" />
-                        Quy trình thanh toán
-                    </h3>
-                    <div className="space-y-4">
-                        {[
-                            { step: 1, text: 'Nhấn "Thanh toán ngay" bên dưới' },
-                            { step: 2, text: 'Quét mã QR hoặc chuyển khoản (khuyến khích quét QR để nhanh hơn)' },
-                            { step: 3, text: 'Tài khoản VIP sẽ được kích hoạt tự động sau khi thanh toán thành công' },
-                        ].map(({ step, text }) => (
-                            <div key={step} className="flex items-center gap-4">
-                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-lime-100 text-lime-700 flex items-center justify-center font-bold text-sm">
-                                    {step}
-                                </div>
-                                <p className="text-sm text-gray-700">{text}</p>
-                            </div>
-                        ))}
+                {/* Payment Success Banner */}
+                {paymentComplete && (
+                    <div className="mb-6 p-5 rounded-2xl bg-green-50 border border-green-200 text-green-800 flex items-center gap-4">
+                        <div className="bg-green-100 rounded-full p-2">
+                            <CheckCircle className="w-6 h-6 text-green-600" />
+                        </div>
+                        <div>
+                            <p className="font-bold text-lg">Payment Successful!</p>
+                            <p className="text-sm text-green-600">Your VIP plan has been activated. Redirecting...</p>
+                        </div>
                     </div>
-                </div>
+                )}
+
+                {/* Capture Loading */}
+                {isCapturing && (
+                    <div className="mb-6 p-5 rounded-2xl bg-blue-50 border border-blue-200 text-blue-800 flex items-center gap-4">
+                        <svg className="animate-spin h-6 w-6 text-blue-600" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        <div>
+                            <p className="font-bold">Processing payment...</p>
+                            <p className="text-sm text-blue-600">Please wait while we confirm your payment.</p>
+                        </div>
+                    </div>
+                )}
 
                 {/* Error Display */}
                 {error && (
@@ -202,43 +243,46 @@ const Payment = () => {
                     </div>
                 )}
 
-                {/* Payment Button */}
-                <button
-                    onClick={handlePayment}
-                    disabled={isSubmitting || cooldown > 0}
-                    className={`w-full py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2
-                        ${(isSubmitting || cooldown > 0)
-                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                            : 'bg-gradient-to-r from-lime-500 to-emerald-500 text-white hover:from-lime-600 hover:to-emerald-600 shadow-lg hover:shadow-xl active:scale-[0.98]'
-                        }`}
-                >
-                    {isSubmitting ? (
-                        <>
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                            Đang tạo liên kết thanh toán...
-                        </>
-                    ) : cooldown > 0 ? (
-                        <>
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                            Vui lòng chờ {cooldown}s
-                        </>
-                    ) : (
-                        <>
-                            <Shield className="w-5 h-5" />
-                            Thanh toán ngay — {new Intl.NumberFormat('vi-VN', {
-                                style: 'currency',
-                                currency: 'VND',
-                                maximumFractionDigits: 0
-                            }).format(selectedPackage.price)}
-                        </>
-                    )}
-                </button>
+                {/* PayPal Buttons */}
+                {!paymentComplete && (
+                    <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 mb-6">
+                        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <Shield className="w-5 h-5 text-lime-600" />
+                            Choose Payment Method
+                        </h3>
+
+                        <PayPalScriptProvider options={{
+                            "client-id": paypalClientId,
+                            currency: "USD",
+                            intent: "capture",
+                        }}>
+                            <PayPalButtons
+                                style={{
+                                    layout: "vertical",
+                                    color: "gold",
+                                    shape: "rect",
+                                    label: "pay",
+                                    height: 50,
+                                }}
+                                disabled={isCreatingOrder || isCapturing}
+                                createOrder={createOrder}
+                                onApprove={onApprove}
+                                onError={onError}
+                                onCancel={onCancel}
+                            />
+                        </PayPalScriptProvider>
+
+                        <p className="text-xs text-gray-400 text-center mt-4">
+                            Pay securely with PayPal or Credit/Debit Card
+                        </p>
+                    </div>
+                )}
 
                 {/* Footer */}
                 <div className="mt-6 flex justify-center">
                     <div className="flex items-center gap-2 text-xs text-gray-500">
                         <Lock className="w-4 h-4 text-lime-600" />
-                        <span>Bảo mật bởi PayOS • SSL Encrypted</span>
+                        <span>Secured by PayPal • SSL Encrypted</span>
                     </div>
                 </div>
             </div>

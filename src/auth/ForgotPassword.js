@@ -25,15 +25,15 @@ const ForgotPassword = () => {
     
     // Validate email
     if (!email.trim()) {
-      setErrors(prev => ({ ...prev, email: 'Vui lòng nhập email của bạn' }));
+      setErrors(prev => ({ ...prev, email: 'Please enter your email' }));
       return;
     }
      if (email.trim() === 'thiieltstrenmay@gmail.com') {
-      setErrors(prev => ({ ...prev, email: 'Hành động quấy rối của bạn đang bị giám sát, vui lòng dừng lại ngay lập tức' }));
+      setErrors(prev => ({ ...prev, email: 'Your actions are being monitored, please stop immediately' }));
       return;
     }
     if (!validateEmail(email)) {
-      setErrors(prev => ({ ...prev, email: 'Email không đúng định dạng' }));
+      setErrors(prev => ({ ...prev, email: 'Invalid email format' }));
       return;
     }
     
@@ -67,13 +67,13 @@ const ForgotPassword = () => {
       } else {
         setErrors(prev => ({ 
           ...prev, 
-          general: data.detail || 'Không thể gửi yêu cầu đặt lại mật khẩu. Vui lòng thử lại sau.' 
+          general: data.detail || 'Could not send password reset request. Please try again later.' 
         }));
       }
     } catch (error) {
       setErrors(prev => ({ 
         ...prev, 
-        general: 'Lỗi kết nối. Vui lòng thử lại sau.' 
+        general: 'Connection error. Please try again later.' 
       }));
     } finally {
       setLoading(false);
@@ -107,7 +107,7 @@ const ForgotPassword = () => {
           <div className="md:w-1/2 p-8">
             <div className="space-y-8">
               <div>
-                <h1 className="text-2xl font-bold text-lime-500 mb-6 text-center">Quên mật khẩu</h1>
+                <h1 className="text-2xl font-bold text-lime-500 mb-6 text-center">Forgot password</h1>
                 
                 {requestSent ? (
                   <motion.div 
@@ -118,35 +118,35 @@ const ForgotPassword = () => {
                     <svg className="w-12 h-12 text-green-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                     </svg>
-                    <h3 className="font-bold text-lg mb-2">Kiểm tra email của bạn</h3>
+                    <h3 className="font-bold text-lg mb-2">Check your email</h3>
                     <p className="mb-4">
-                      Chúng tôi đã gửi hướng dẫn đặt lại mật khẩu đến <strong>{email}</strong>. 
-                      Vui lòng kiểm tra hộp thư đến và thư rác của bạn.
+                      We sent password reset instructions to <strong>{email}</strong>. 
+                      Please check your inbox and spam folder.
                     </p>
                     
                     {countdown > 0 ? (
                       <p className="text-sm text-gray-600">
-                        Bạn có thể gửi lại yêu cầu sau {countdown} giây
+                        You can resend the request in {countdown} seconds
                       </p>
                     ) : (
                       <button
                         onClick={handleTryAgain}
                         className="text-lime-600 hover:text-lime-700 font-medium"
                       >
-                        Thử lại với email khác
+                        Try another email
                       </button>
                     )}
                     
                     <div className="mt-6 border-t border-green-100 pt-4">
                       <Link to="/login" className="text-lime-500 hover:text-lime-600 font-medium">
-                        Quay lại trang đăng nhập
+                        Back to login page
                       </Link>
                     </div>
                   </motion.div>
                 ) : (
                   <>
                     <p className="text-gray-600 mb-6">
-                      Nhập địa chỉ email bạn đã dùng để đăng ký tài khoản và chúng tôi sẽ gửi cho bạn một liên kết để đặt lại mật khẩu.
+                      Enter your registered email and we will send a password reset link.
                     </p>
                     
                     {errors.general && (
@@ -168,7 +168,7 @@ const ForgotPassword = () => {
                             setEmail(e.target.value);
                             if (errors.email) setErrors(prev => ({ ...prev, email: '' }));
                           }}
-                          placeholder="Nhập email của bạn"
+                          placeholder="Enter your email"
                           className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500 outline-none transition-all ${
                             errors.email ? 'border-red-500' : 'border-gray-300'
                           }`}
@@ -196,14 +196,14 @@ const ForgotPassword = () => {
                               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            Đang xử lý...
+                            Processing...
                           </span>
-                        ) : 'Gửi liên kết đặt lại mật khẩu'}
+                        ) : 'Send reset link'}
                       </button>
                       
                       <div className="text-center mt-4">
                         <Link to="/login" className="text-lime-500 hover:text-lime-600 font-medium">
-                          Quay lại trang đăng nhập
+                          Back to login page
                         </Link>
                       </div>
                     </form>

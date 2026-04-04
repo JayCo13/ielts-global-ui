@@ -55,7 +55,7 @@ const StudentDictation = () => {
                 setUnits(data);
             }
         } catch (error) {
-            toast.error('Không thể tải danh sách bài');
+            toast.error('Cannot load lesson list');
         } finally {
             setLoading(false);
         }
@@ -71,7 +71,7 @@ const StudentDictation = () => {
                 setUnitWords(data.words);
             }
         } catch (error) {
-            toast.error('Không thể tải từ vựng');
+            toast.error('Cannot load vocabulary');
         }
     }, []);
 
@@ -355,10 +355,10 @@ const StudentDictation = () => {
                         )
                     }));
                 }
-                toast.success(newValue ? 'Đánh dấu quan trọng' : 'Bỏ đánh dấu');
+                toast.success(newValue ? 'Mark as important' : 'Unmark important');
             }
         } catch (error) {
-            toast.error('Lỗi kết nối');
+            toast.error('Connection error');
         }
     };
 
@@ -384,15 +384,15 @@ const StudentDictation = () => {
             <main className="flex-1 max-w-5xl mx-auto px-4 py-8 w-full">
                 {mode === 'select' && (
                     <>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Luyện nghe chép chính tả</h1>
-                        <p className="text-gray-600 mb-4">Chọn một bài để bắt đầu luyện tập</p>
+                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Dictation Practice</h1>
+                        <p className="text-gray-600 mb-4">Choose a lesson to practice</p>
 
                         {/* Search bar */}
                         <div className="relative mb-6">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Tìm kiếm bài luyện tập..."
+                                placeholder="Search lessons..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:border-cyan-500 bg-white text-gray-700"
@@ -402,7 +402,7 @@ const StudentDictation = () => {
                         {units.length === 0 ? (
                             <div className="text-center py-16">
                                 <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                                <p className="text-gray-500">Chưa có bài luyện tập nào</p>
+                                <p className="text-gray-500">No lessons yet</p>
                             </div>
                         ) : (
                             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -436,7 +436,7 @@ const StudentDictation = () => {
                                             )}
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-3">
-                                                    <span className="text-sm text-gray-500">{unit.word_count} từ</span>
+                                                    <span className="text-sm text-gray-500">{unit.word_count} words</span>
                                                     {unit.important_count > 0 && (
                                                         <span className="flex items-center gap-1 text-sm text-amber-600">
                                                             <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
@@ -445,7 +445,7 @@ const StudentDictation = () => {
                                                     )}
                                                 </div>
                                                 <span className="text-sm text-cyan-600 font-medium group-hover:underline">
-                                                    Bắt đầu →
+                                                    Start →
                                                 </span>
                                             </div>
                                         </div>
@@ -463,13 +463,13 @@ const StudentDictation = () => {
                                 {selectedUnit?.name}
                             </h2>
                             <p className="text-gray-500 font-medium bg-gray-100 px-3 py-1 rounded-full text-sm">
-                                {dictationWords.length} từ • Từ {currentWordIndex + 1}/{dictationWords.length}
+                                {dictationWords.length} words • Word {currentWordIndex + 1}/{dictationWords.length}
                             </p>
                             <button
                                 onClick={closeDictationMode}
                                 className="absolute right-0 top-0 px-4 py-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm font-medium"
                             >
-                                Thoát
+                                Exit
                             </button>
                         </div>
 
@@ -483,7 +483,7 @@ const StudentDictation = () => {
                                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                         }`}
                                 >
-                                    Tất cả ({unitWords.length})
+                                    All ({unitWords.length})
                                 </button>
                                 <button
                                     onClick={() => setFilterMode('important')}
@@ -494,7 +494,7 @@ const StudentDictation = () => {
                                         }`}
                                 >
                                     <Star className="w-4 h-4" />
-                                    Quan trọng ({unitWords.filter(w => w.is_important).length})
+                                    Important ({unitWords.filter(w => w.is_important).length})
                                 </button>
                             </div>
                         )}
@@ -503,7 +503,7 @@ const StudentDictation = () => {
                         {dictationStatus === 'idle' && dictationWords.length > 0 && (
                             <div className="mb-6">
                                 <h3 className="text-sm font-medium text-gray-700 mb-3">
-                                    Bấm vào từ để xem nghĩa • Bấm ⭐ để đánh dấu quan trọng:
+                                    Click a word to see meaning • Click ⭐ to mark important:
                                 </h3>
                                 <div className="flex flex-wrap gap-2 mb-4">
                                     {dictationWords.slice((reviewPage - 1) * REVIEW_ITEMS_PER_PAGE, reviewPage * REVIEW_ITEMS_PER_PAGE).map(word => (
@@ -523,7 +523,7 @@ const StudentDictation = () => {
                                                     ? 'text-amber-500 hover:text-amber-600'
                                                     : 'text-gray-400 hover:text-amber-500'
                                                     }`}
-                                                title={word.is_important ? 'Bỏ đánh dấu' : 'Đánh dấu quan trọng'}
+                                                title={word.is_important ? 'Unmark important' : 'Mark as important'}
                                             >
                                                 <Star className={`w-3.5 h-3.5 ${word.is_important ? 'fill-amber-400' : ''}`} />
                                             </button>
@@ -571,14 +571,14 @@ const StudentDictation = () => {
                                     className="flex items-center gap-2 px-4 py-2 bg-cyan-50 border border-cyan-200 text-cyan-700 rounded-xl hover:bg-cyan-100 transition-colors mb-3 font-medium text-sm"
                                 >
                                     <Settings className="w-4 h-4" />
-                                    Cài đặt giọng nói & tốc độ
+                                    Voice & Speed Settings
                                     <span className="ml-1 px-2 py-0.5 bg-cyan-600 text-white text-xs font-bold rounded-full">{speechRate}x</span>
                                 </button>
                                 {showSettings && (
                                     <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-4">
                                         {/* Voice Selection */}
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Giọng đọc</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Voice</label>
                                             <select
                                                 value={selectedVoiceURI}
                                                 onChange={(e) => setSelectedVoiceURI(e.target.value)}
@@ -594,7 +594,7 @@ const StudentDictation = () => {
                                         {/* Speed Slider */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Tốc độ: <span className="text-cyan-600 font-bold">{speechRate}x</span>
+                                                Speed: <span className="text-cyan-600 font-bold">{speechRate}x</span>
                                             </label>
                                             <input
                                                 type="range"
@@ -606,8 +606,8 @@ const StudentDictation = () => {
                                                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-cyan-600"
                                             />
                                             <div className="flex justify-between text-xs text-gray-400 mt-1">
-                                                <span>Chậm (0.5x)</span>
-                                                <span>Bình thường (1.0x)</span>
+                                                <span>Slow (0.5x)</span>
+                                                <span>Normal (1.0x)</span>
                                                 <span>Nhanh (2.0x)</span>
                                             </div>
                                         </div>
@@ -625,7 +625,7 @@ const StudentDictation = () => {
                                             className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                                         >
                                             <Volume2 className="w-4 h-4" />
-                                            Nghe thử
+                                            Test audio
                                         </button>
                                     </div>
                                 )}
@@ -640,7 +640,7 @@ const StudentDictation = () => {
                                     className="flex items-center gap-2 px-6 py-3 bg-cyan-600 text-white rounded-xl hover:bg-cyan-700 transition-colors font-semibold"
                                 >
                                     <Play className="w-5 h-5" />
-                                    Bắt đầu
+                                    Start
                                 </button>
                             )}
                             {(dictationStatus === 'playing' || dictationStatus === 'finished') && (
@@ -650,14 +650,14 @@ const StudentDictation = () => {
                                         className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                                     >
                                         <Volume2 className="w-4 h-4" />
-                                        Nghe lại
+                                        Listen again
                                     </button>
                                     <button
                                         onClick={submitDictation}
                                         className="flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
                                     >
                                         <CheckCircle className="w-4 h-4" />
-                                        Nộp bài
+                                        Submit
                                     </button>
                                 </>
                             )}
@@ -669,7 +669,7 @@ const StudentDictation = () => {
                                 <div className="flex items-center gap-3">
                                     <div className="w-3 h-3 bg-cyan-500 rounded-full animate-pulse" />
                                     <span className="text-cyan-700 font-medium">
-                                        Đang phát từ {currentWordIndex + 1}...
+                                        Playing word {currentWordIndex + 1}...
                                     </span>
                                 </div>
                             </div>
@@ -678,7 +678,7 @@ const StudentDictation = () => {
                         {dictationStatus === 'finished' && (
                             <div className="mb-6 p-4 bg-green-50 rounded-xl border border-green-200">
                                 <p className="text-green-700 font-medium">
-                                    Đã phát hết! Kiểm tra lại và nộp bài khi sẵn sàng.
+                                    Finished playing! Check your answers and submit when ready.
                                 </p>
                             </div>
                         )}
@@ -694,7 +694,7 @@ const StudentDictation = () => {
                                             type="text"
                                             value={userAnswers[word.word_id] || ''}
                                             onChange={(e) => handleAnswerChange(word.word_id, e.target.value)}
-                                            placeholder="Nhập từ nghe được..."
+                                            placeholder="Type what you hear..."
                                             className={`flex-1 px-4 py-3 border rounded-lg outline-none transition-all ${currentWordIndex === idx && dictationStatus === 'playing'
                                                 ? 'border-cyan-500 ring-2 ring-cyan-200 bg-cyan-50'
                                                 : 'border-gray-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200'
@@ -711,12 +711,12 @@ const StudentDictation = () => {
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
                         {/* Header */}
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-bold text-gray-900">Kết quả</h2>
+                            <h2 className="text-xl font-bold text-gray-900">Results</h2>
                             <button
                                 onClick={closeDictationMode}
                                 className="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors"
                             >
-                                Quay lại
+                                Back
                             </button>
                         </div>
 
@@ -724,11 +724,11 @@ const StudentDictation = () => {
                         <div className="grid grid-cols-3 gap-4 mb-8">
                             <div className="bg-gray-50 rounded-xl p-4 text-center">
                                 <p className="text-3xl font-bold text-gray-900">{results.total}</p>
-                                <p className="text-sm text-gray-500">Tổng số</p>
+                                <p className="text-sm text-gray-500">Total</p>
                             </div>
                             <div className="bg-green-50 rounded-xl p-4 text-center">
                                 <p className="text-3xl font-bold text-green-600">{results.correct}</p>
-                                <p className="text-sm text-green-600">Đúng</p>
+                                <p className="text-sm text-green-600">Correct</p>
                             </div>
                             <div className="bg-red-50 rounded-xl p-4 text-center">
                                 <p className="text-3xl font-bold text-red-600">{results.incorrect}</p>
@@ -758,7 +758,7 @@ const StudentDictation = () => {
                                         </p>
                                         {!item.isCorrect && (
                                             <p className="text-sm text-gray-500">
-                                                Bạn nhập: <span className="text-red-600">{item.userAnswer || '(bỏ trống)'}</span>
+                                                You typed: <span className="text-red-600">{item.userAnswer || '(blank)'}</span>
                                             </p>
                                         )}
                                     </div>
@@ -768,7 +768,7 @@ const StudentDictation = () => {
                                             ? 'text-amber-500 bg-amber-50 hover:bg-amber-100'
                                             : 'text-gray-400 hover:text-amber-500 hover:bg-amber-50'
                                             }`}
-                                        title={item.is_important ? 'Bỏ đánh dấu quan trọng' : 'Đánh dấu quan trọng'}
+                                        title={item.is_important ? 'Unmark important' : 'Mark as important'}
                                     >
                                         <Star className={`w-5 h-5 ${item.is_important ? 'fill-amber-400' : ''}`} />
                                     </button>
@@ -806,7 +806,7 @@ const StudentDictation = () => {
                                 className="flex items-center gap-2 px-6 py-3 bg-cyan-600 text-white rounded-xl hover:bg-cyan-700 transition-colors font-semibold"
                             >
                                 <RotateCcw className="w-4 h-4" />
-                                Làm lại
+                                Retake
                             </button>
                         </div>
                     </div>

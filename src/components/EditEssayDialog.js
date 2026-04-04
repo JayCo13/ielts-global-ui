@@ -118,7 +118,7 @@ const EditEssayDialog = ({ isOpen, onClose, taskId, partNumber }) => {
           <h2 className="flex-1 text-xl font-semibold text-center">
             {taskId && typeof taskId === 'object' && taskId.rewritten_essay ? (
               <div className="flex flex-col items-center">
-                <span>Chỉnh sửa - Phiên bản 8+</span>
+                <span>Edit - 8+ Version</span>
               </div>
             ) : (
               <span>Edit Part {partNumber} - {testTitle}</span>
@@ -130,7 +130,7 @@ const EditEssayDialog = ({ isOpen, onClose, taskId, partNumber }) => {
         {taskId && typeof taskId === 'object' && taskId.rewritten_essay && (
           <div className="bg-lime-50 border-b border-lime-100 px-4 py-4 m-2">
             <p className="text-sm text-lime-700 text-center">
-              Đây là phiên bản 8+ của bài luận dựa trên cấu trúc bài của bạn được gợi ý bằng AI. Bạn có thể chỉnh sửa thêm trước khi lưu.
+              This is an 8+ version of the essay based on your structure, suggested by AI. You can edit further before saving.
             </p>
           </div>
         )}

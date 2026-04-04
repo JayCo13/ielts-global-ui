@@ -152,20 +152,20 @@ const Writing_Fe = () => {
     const isVipOrStudent = isVIP || role === 'student';
     if (isVipOrStudent) {
       if (counters[dateKey].total >= 6) {
-        setAiResult({ error: 'Bạn đã vượt quá giới hạn đánh giá AI trong ngày (6).' });
+        setAiResult({ error: 'You have exceeded the daily AI evaluation limit (6).' });
         setAiDialogOpen(true);
         return;
       }
     } else {
       if (counters[dateKey].full >= 1) {
-        setAiResult({ error: 'Tài khoản thường chỉ được đánh giá 1 bài full mỗi ngày.' });
+        setAiResult({ error: 'Standard accounts can only evaluate 1 full test per day.' });
         setAiDialogOpen(true);
         return;
       }
     }
 
     if (aiRemaining <= 0) {
-      setAiResult({ error: 'Bạn đã hết số lượt đánh giá AI trong ngày.' });
+      setAiResult({ error: 'You are out of daily AI evaluations.' });
       setAiDialogOpen(true);
       return;
     }
@@ -388,8 +388,8 @@ const Writing_Fe = () => {
       onChange={(e) => setSortOrder(e.target.value)}
     >
       <option value="alphabet">Theo Alphabet</option>
-      <option value="latest">Mới nhất</option>
-      <option value="oldest">Cũ nhất</option>
+      <option value="latest">Newest</option>
+      <option value="oldest">Oldest</option>
     </select>
   </div>
 
@@ -418,7 +418,7 @@ const Writing_Fe = () => {
           </div>
 
           <div className="mt-4 text-sm text-gray-500 max-w-xs text-center">
-            Đang tải các bài kiểm tra IELTS Writing. Vui lòng đợi trong giây lát...
+            Loading IELTS Writing tests. Please wait...
           </div>
         </div>
       </div>
@@ -481,7 +481,7 @@ const Writing_Fe = () => {
           ) : (
             <Play className="w-4 h-4" />
           )}
-          <span>{test.is_completed ? 'Làm lại' : 'Bắt đầu'}</span>
+          <span>{test.is_completed ? 'Retake' : 'Start'}</span>
         </button>
       </div>
     </div>
@@ -501,8 +501,8 @@ const Writing_Fe = () => {
             </ol>
           </nav>
           <div className="text-sm font-semibold text-red-700 mt-5">
-            <p>* Nâng cấp VIP Listening và Reading để mở khóa thêm 6 lượt chấm điểm AI Writing miễn phí mỗi ngày. *</p>
-            <p>* Số lượt chấm điểm bằng AI miễn phí còn lại trong ngày: {aiRemaining} *</p>
+            <p>* Upgrade to VIP Listening and Reading to unlock 6 more free AI Writing evaluations per day. *</p>
+            <p>* Free AI evaluations remaining today: {aiRemaining} *</p>
           </div>
         </div>
       </div>
@@ -527,8 +527,8 @@ const Writing_Fe = () => {
             <option value="alphabet">Theo Alphabet</option>
             {(isVIP || localStorage.getItem('role') === 'student') && (
               <>
-                <option value="latest">Mới nhất</option>
-                <option value="oldest">Cũ nhất</option>
+                <option value="latest">Newest</option>
+                <option value="oldest">Oldest</option>
               </>
             )}
           </select>

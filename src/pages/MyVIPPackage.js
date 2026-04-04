@@ -22,7 +22,7 @@ const MyVIPPackage = () => {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.detail || 'Không thể tải thông tin gói VIP');
+                throw new Error(data.detail || 'Cannot load VIP package info');
             }
 
             setSubscriptions(data);
@@ -79,31 +79,31 @@ const MyVIPPackage = () => {
         active: {
             color: 'text-emerald-700',
             bgColor: 'bg-emerald-50 border border-emerald-200',
-            label: 'Đang hoạt động',
+            label: 'Active',
             icon: <Star className="w-4 h-4" fill="currentColor" />
         },
         completed: {
             color: 'text-emerald-700',
             bgColor: 'bg-emerald-50 border border-emerald-200',
-            label: 'Đã thanh toán',
+            label: 'Paid',
             icon: <CreditCard className="w-4 h-4" />
         },
         expired: {
             color: 'text-gray-500',
             bgColor: 'bg-gray-50 border border-gray-200',
-            label: 'Đã hết hạn',
+            label: 'Expired',
             icon: <Clock className="w-4 h-4" />
         },
         pending: {
             color: 'text-amber-700',
             bgColor: 'bg-amber-50 border border-amber-200',
-            label: 'Đang xử lý',
+            label: 'Processing',
             icon: <Clock className="w-4 h-4" />
         },
         reject: {
             color: 'text-rose-700',
             bgColor: 'bg-rose-50 border border-rose-200',
-            label: 'Đã hủy',
+            label: 'Canceled',
             icon: <CreditCard className="w-4 h-4" />
         }
     };
@@ -132,10 +132,10 @@ const MyVIPPackage = () => {
                     <nav className="flex items-center space-x-2 text-sm">
                         <Link to="/" className="text-gray-500 hover:text-indigo-600 flex items-center transition-colors">
                             <Home size={16} className="mr-1" />
-                            Trang chủ
+                            Home
                         </Link>
                         <ChevronRight size={16} className="text-gray-400" />
-                        <span className="text-gray-900 font-medium">Gói VIP của tôi</span>
+                        <span className="text-gray-900 font-medium">My VIP Packages</span>
                     </nav>
                 </div>
             </div>
@@ -146,9 +146,9 @@ const MyVIPPackage = () => {
                     <div className="inline-flex items-center justify-center p-3 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl mb-4 shadow-lg">
                         <Star className="w-8 h-8 text-white" fill="white" />
                     </div>
-                    <h1 className="text-4xl font-bold text-gray-900 mb-2">Gói VIP của tôi</h1>
+                    <h1 className="text-4xl font-bold text-gray-900 mb-2">My VIP Packages</h1>
                     <p className="text-gray-600 max-w-xl mx-auto">
-                        Quản lý và theo dõi các gói VIP bạn đã mua
+                        Manage and track your purchased VIP packages
                     </p>
                 </div>
 
@@ -160,7 +160,7 @@ const MyVIPPackage = () => {
                                 <Layers className="w-5 h-5 text-indigo-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Tổng số gói</p>
+                                <p className="text-sm text-gray-500">Total packages</p>
                                 <p className="text-2xl font-bold text-gray-900">{filteredSubscriptions.length}</p>
                             </div>
                         </div>
@@ -172,7 +172,7 @@ const MyVIPPackage = () => {
                                 <TrendingUp className="w-5 h-5 text-emerald-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Đang hoạt động</p>
+                                <p className="text-sm text-gray-500">Active</p>
                                 <p className="text-2xl font-bold text-emerald-600">{activeCount}</p>
                             </div>
                         </div>
@@ -184,7 +184,7 @@ const MyVIPPackage = () => {
                                 <Calendar className="w-5 h-5 text-blue-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Còn lại</p>
+                                <p className="text-sm text-gray-500">Remaining</p>
                                 <p className="text-2xl font-bold text-blue-600">{vipStats.remainingDays || 0} ngày</p>
                             </div>
                         </div>
@@ -196,7 +196,7 @@ const MyVIPPackage = () => {
                                 <Clock className="w-5 h-5 text-purple-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Hết hạn</p>
+                                <p className="text-sm text-gray-500">Expired</p>
                                 <p className="text-lg font-bold text-gray-900">
                                     {vipStats.lastEnd ? formatDate(vipStats.lastEnd) : 'N/A'}
                                 </p>
@@ -211,7 +211,7 @@ const MyVIPPackage = () => {
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="font-semibold text-gray-900 flex items-center gap-2">
                                 <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                                Timeline VIP của bạn
+                                Your VIP Timeline
                             </h3>
                             <span className="text-sm text-gray-500">
                                 {vipStats.usedDays} / {vipStats.totalDays} ngày
@@ -226,7 +226,7 @@ const MyVIPPackage = () => {
                             </div>
                             <div className="flex justify-between mt-2 text-xs text-gray-500">
                                 <span>{formatDate(vipStats.firstStart)}</span>
-                                <span className="text-indigo-600 font-medium">Hôm nay</span>
+                                <span className="text-indigo-600 font-medium">Today</span>
                                 <span>{formatDate(vipStats.lastEnd)}</span>
                             </div>
                         </div>
@@ -242,7 +242,7 @@ const MyVIPPackage = () => {
                         </div>
                         <div className="flex flex-wrap gap-2 justify-center">
                             <Link to="/vip-packages?type=all" className="px-4 py-2 bg-white text-indigo-600 rounded-lg font-medium hover:bg-indigo-50 transition-colors text-sm">
-                                Tất cả kỹ năng
+                                All skills
                             </Link>
                             <Link to="/vip-packages?type=listening" className="px-4 py-2 bg-white/20 text-white rounded-lg font-medium hover:bg-white/30 transition-colors text-sm">
                                 Listening
@@ -314,7 +314,7 @@ const MyVIPPackage = () => {
                                                                 {isActive && (
                                                                     <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-full">
                                                                         <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1 animate-pulse"></span>
-                                                                        Đang hoạt động
+                                                                        Active
                                                                     </span>
                                                                 )}
                                                             </h4>
@@ -347,7 +347,7 @@ const MyVIPPackage = () => {
                                 <Star className="w-8 h-8 text-gray-400" />
                             </div>
                             <h3 className="text-xl font-semibold text-gray-900 mb-2">Chưa có gói VIP nào</h3>
-                            <p className="text-gray-500 mb-6">Đăng ký gói VIP để truy cập đầy đủ nội dung học tập</p>
+                            <p className="text-gray-500 mb-6">Register gói VIP để truy cập đầy đủ nội dung học tập</p>
                             <Link
                                 to="/vip-packages"
                                 className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg shadow-indigo-200"

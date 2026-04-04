@@ -26,10 +26,10 @@ const AuthCallback = () => {
           // Handle specific device tracking errors
           if (errorMsg.startsWith('DEVICE_IN_COOLDOWN:')) {
             const remainingTime = errorMsg.split(':')[1];
-            setError(`Tài khoản của bạn hiện đang trong thời gian chờ do đăng nhập trên nhiều thiết bị. Thời gian chờ còn lại: ${remainingTime} giây\n\nVui lòng đợi hết thời gian chờ trước khi thử lại\nVui lòng chỉ sử dụng một tài khoản trên một thiết bị và một trình duyệt tại cùng một thời điểm.\nHệ thống sẽ tự động cho phép đăng nhập sau khi hết thời gian chờ.`);
+            setError(`Account is in cooldown due to multiple device logins. Cooldown remaining: ${remainingTime} seconds\n\nPlease wait for the cooldown before trying again\nPlease use only one account per device/browser at the same time.\nSystem will automatically allow login after cooldown.`);
             setTimeout(() => navigate('/login'), 3000);
           } else if (errorMsg === 'ACCOUNT_SHARING_DETECTED') {
-            setError(`Cảnh báo bảo mật • Vui lòng chỉ sử dụng một tài khoản trên một thiết bị và một trình duyệt tại cùng một thời điểm. Hãy thử đăng nhập lại sau 10 giây.`);
+            setError(`Security Warning • Please use only one account per device/browser at the same time. Try logging in again after 10s.`);
             setIsAccountSharingError(true);
             setCountdown(10);
           } else {

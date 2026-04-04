@@ -30,11 +30,11 @@ const PasswordStrengthMeter = ({ password }) => {
 
   const getLabel = () => {
     switch (strength) {
-      case 0: return 'Chưa nhập mật khẩu';
+      case 0: return 'Password not entered';
       case 1: return 'Yếu';
-      case 2: return 'Trung bình';
-      case 3: return 'Khá mạnh';
-      case 4: return 'Mạnh';
+      case 2: return 'Average';
+      case 3: return 'Quite strong';
+      case 4: return 'Strong';
       default: return '';
     }
   };
@@ -47,7 +47,7 @@ const PasswordStrengthMeter = ({ password }) => {
           style={{ width: `${(strength / 4) * 100}%` }}></div>
       </div>
       <div className="flex justify-between items-center text-xs text-gray-500">
-        <span>Độ mạnh mật khẩu:</span>
+        <span>Password strength:</span>
         <span className={`
           ${strength === 1 ? 'text-red-500' : ''}
           ${strength === 2 ? 'text-orange-500' : ''}
@@ -88,13 +88,13 @@ const ResetPassword = () => {
       const email = queryParams.get('email');
       
       if (!token) {
-        setErrors(prev => ({ ...prev, token: 'Token không hợp lệ hoặc đã hết hạn' }));
+        setErrors(prev => ({ ...prev, token: 'Invalid or expired token' }));
         setTokenVerificationInProgress(false);
         return;
       }
 
       if (email === 'thiieltstrenmay@gmail.com') {
-        setErrors(prev => ({ ...prev, token: 'Hành động quấy rối của bạn đang bị giám sát, vui lòng dừng lại ngay lập tức' }));
+        setErrors(prev => ({ ...prev, token: 'Your actions are being monitored, please stop immediately' }));
         setTokenVerificationInProgress(false);
         return;
       }
@@ -112,11 +112,11 @@ const ResetPassword = () => {
         if (response.ok) {
           setTokenValid(true);
         } else {
-          const errorMsg = typeof data.detail === 'string' ? data.detail : 'Token không hợp lệ hoặc đã hết hạn';
+          const errorMsg = typeof data.detail === 'string' ? data.detail : 'Invalid or expired token';
           setErrors(prev => ({ ...prev, token: errorMsg }));
         }
       } catch (error) {
-        setErrors(prev => ({ ...prev, token: 'Lỗi kết nối. Vui lòng thử lại sau.' }));
+        setErrors(prev => ({ ...prev, token: 'Connection error. Please try again later.' }));
       } finally {
         setTokenVerificationInProgress(false);
       }
@@ -159,19 +159,19 @@ const ResetPassword = () => {
     
     // Password validation
     if (!formData.password) {
-      newErrors.password = 'Vui lòng nhập mật khẩu';
+      newErrors.password = 'Please enter a password';
       valid = false;
     } else if (formData.password.length < 8) {
-      newErrors.password = 'Mật khẩu phải có ít nhất 8 ký tự';
+      newErrors.password = 'Password must be at least 8 characters';
       valid = false;
     }
     
     // Confirm password validation
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Vui lòng xác nhận mật khẩu';
+      newErrors.confirmPassword = 'Please confirm password';
       valid = false;
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Mật khẩu không khớp';
+      newErrors.confirmPassword = 'Passwords do not match';
       valid = false;
     }
     
@@ -218,7 +218,7 @@ const ResetPassword = () => {
           navigate('/login');
         }, 3000);
       } else {
-        const errorMsg = typeof data.detail === 'string' ? data.detail : 'Không thể đặt lại mật khẩu. Vui lòng thử lại sau.';
+        const errorMsg = typeof data.detail === 'string' ? data.detail : 'Could not reset password. Please try again later.';
         setErrors(prev => ({ 
           ...prev, 
           general: errorMsg
@@ -227,7 +227,7 @@ const ResetPassword = () => {
     } catch (error) {
       setErrors(prev => ({ 
         ...prev, 
-        general: 'Lỗi kết nối. Vui lòng thử lại sau.' 
+        general: 'Connection error. Please try again later.' 
       }));
     } finally {
       setLoading(false);
@@ -303,7 +303,7 @@ const ResetPassword = () => {
     if (errorValue && typeof errorValue === 'object') {
       return JSON.stringify(errorValue);
     }
-    return 'Đã xảy ra lỗi';
+    return 'An error occurred';
   };
 
   return (
@@ -327,19 +327,19 @@ const ResetPassword = () => {
           <div className="md:w-1/2 p-8">
             <div className="space-y-8">
               <div>
-                <h1 className="text-2xl font-bold text-lime-500 mb-6 text-center">Đặt lại mật khẩu</h1>
+                <h1 className="text-2xl font-bold text-lime-500 mb-6 text-center">Reset password</h1>
                 
                 {tokenVerificationInProgress ? (
                   <div className="flex flex-col items-center justify-center py-10">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-lime-500 mb-4"></div>
-                    <p className="text-gray-600">Đang xác thực...</p>
+                    <p className="text-gray-600">Validating...</p>
                   </div>
                 ) : !tokenValid ? (
                   <div className="bg-red-50 text-red-700 p-4 rounded-lg text-center">
-                    <h3 className="font-bold mb-2">Không thể đặt lại mật khẩu</h3>
-                    <p>{getErrorString(errors.token) || 'Link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.'}</p>
+                    <h3 className="font-bold mb-2">Could not reset password</h3>
+                    <p>{getErrorString(errors.token) || 'Reset link is invalid or expired.'}</p>
                     <Link to="/login" className="mt-4 inline-block text-lime-500 hover:text-lime-600 font-medium">
-                      Quay lại trang đăng nhập
+                      Back to login page
                     </Link>
                   </div>
                 ) : resetSuccess ? (
@@ -351,9 +351,9 @@ const ResetPassword = () => {
                     <svg className="w-12 h-12 text-green-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    <h3 className="font-bold text-lg mb-2">Đặt lại mật khẩu thành công!</h3>
-                    <p>Mật khẩu của bạn đã được cập nhật.</p>
-                    <p className="mt-2">Đang chuyển hướng về trang đăng nhập...</p>
+                    <h3 className="font-bold text-lg mb-2">Password reset successful!</h3>
+                    <p>Your password has been updated.</p>
+                    <p className="mt-2">Redirecting to login page...</p>
                   </motion.div>
                 ) : (
                   <form className="space-y-6" onSubmit={handleSubmit}>
@@ -365,14 +365,14 @@ const ResetPassword = () => {
                     )}
                     
                     <div>
-                      <h2 className="text-gray-700 font-medium mb-4">Tạo mật khẩu mới</h2>
+                      <h2 className="text-gray-700 font-medium mb-4">Create new password</h2>
                     </div>
                     
                     {/* Password field */}
                     <div className="space-y-2">
                       <div className="flex items-center justify-between mb-1">
                         <label htmlFor="password" className="block text-gray-500 font-bold">
-                          Mật khẩu mới
+                          New password
                         </label>
                         <button
                           type="button"
@@ -390,7 +390,7 @@ const ResetPassword = () => {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
                             </svg>
                           )}
-                          Tạo mật khẩu
+                          Create password
                         </button>
                       </div>
                       <div className="relative">
@@ -435,15 +435,15 @@ const ResetPassword = () => {
                       
                       {/* Password requirements hint */}
                       <div className="text-xs text-gray-500 mt-1">
-                        <p>Mật khẩu phải có ít nhất 8 ký tự.</p>
-                        <p>Nên có chữ hoa, chữ thường, số và ký tự đặc biệt để tăng độ bảo mật.</p>
+                        <p>Password must be at least 8 characters.</p>
+                        <p>Include an uppercase, lowercase, number, and special character.</p>
                       </div>
                     </div>
                     
                     {/* Confirm Password field */}
                     <div className="space-y-2">
                       <label htmlFor="confirmPassword" className="block text-gray-500 font-bold mb-1">
-                        Xác nhận mật khẩu
+                        Confirm password
                       </label>
                       <input
                         id="confirmPassword"
@@ -477,14 +477,14 @@ const ResetPassword = () => {
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
-                          Đang xử lý...
+                          Processing...
                         </span>
-                      ) : 'Đặt lại mật khẩu'}
+                      ) : 'Reset password'}
                     </button>
                     
                     <div className="text-center mt-4">
                       <Link to="/login" className="text-lime-500 hover:text-lime-600 font-medium">
-                        Quay lại trang đăng nhập
+                        Back to login page
                       </Link>
                     </div>
                   </form>

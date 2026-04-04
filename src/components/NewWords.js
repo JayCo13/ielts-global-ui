@@ -445,7 +445,7 @@ const NewWords = () => {
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">New Words</h1>
-                    <p className="text-gray-600">Từ vựng bạn đã lưu từ các bài tập Nghe và Đọc. Nhấp vào bất kỳ từ nào để xem định nghĩa của nó. Sử dụng tính năng Luyện Nghe Chép Chính Tả để ôn tập.</p>
+                    <p className="text-gray-600">Vocabulary bạn đã lưu words các bài tập Nghe và Đọc. Nhấp vào bất kỳ words nào để xem định nghĩa của nó. Sử dụng tính năng Luyện Nghe Chép Chính Tả để ôn tập.</p>
                 </div>
 
                 {mode === 'list' && (
@@ -565,13 +565,13 @@ const NewWords = () => {
                                     className="flex items-center gap-2 px-4 py-2 bg-purple-50 border border-purple-200 text-purple-700 rounded-xl hover:bg-purple-100 transition-colors mb-3 font-medium text-sm"
                                 >
                                     <Settings className="w-4 h-4" />
-                                    Cài đặt giọng nói & tốc độ
+                                    Voice & Speed Settings
                                     <span className="ml-1 px-2 py-0.5 bg-purple-600 text-white text-xs font-bold rounded-full">{speechRate}x</span>
                                 </button>
                                 {showSettings && (
                                     <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Giọng đọc</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Voice</label>
                                             <select
                                                 value={selectedVoiceURI}
                                                 onChange={(e) => setSelectedVoiceURI(e.target.value)}
@@ -586,7 +586,7 @@ const NewWords = () => {
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Tốc độ: <span className="text-purple-600 font-bold">{speechRate}x</span>
+                                                Speed: <span className="text-purple-600 font-bold">{speechRate}x</span>
                                             </label>
                                             <input
                                                 type="range"
@@ -598,8 +598,8 @@ const NewWords = () => {
                                                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
                                             />
                                             <div className="flex justify-between text-xs text-gray-400 mt-1">
-                                                <span>Chậm (0.5x)</span>
-                                                <span>Bình thường (1.0x)</span>
+                                                <span>Slow (0.5x)</span>
+                                                <span>Normal (1.0x)</span>
                                                 <span>Nhanh (2.0x)</span>
                                             </div>
                                         </div>
@@ -616,22 +616,22 @@ const NewWords = () => {
                                             className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                                         >
                                             <Volume2 className="w-4 h-4" />
-                                            Nghe thử
+                                            Test audio
                                         </button>
                                     </div>
                                 )}
 
                                 {/* Start Button */}
                                 <div className="flex flex-col items-center justify-center py-8 space-y-4">
-                                    <p className="text-gray-500">Cấu hình giọng nói và tốc độ xong thì bấm Bắt đầu</p>
+                                    <p className="text-gray-500">Cấu hình giọng nói và tốc độ xong thì bấm Start</p>
                                     <button
                                         onClick={beginDictation}
                                         className="flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-[#0096b1] to-[#007d94] text-white rounded-2xl shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 hover:scale-105 transition-all font-bold text-lg"
                                     >
                                         <Play className="w-6 h-6" />
-                                        Bắt đầu
+                                        Start
                                     </button>
-                                    <p className="text-xs text-gray-400">{shuffledWords.length} từ • Đã xáo trộn</p>
+                                    <p className="text-xs text-gray-400">{shuffledWords.length} words • Đã xáo trộn</p>
                                 </div>
                             </div>
                         )}

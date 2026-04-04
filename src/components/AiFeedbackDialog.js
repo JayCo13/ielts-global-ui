@@ -310,7 +310,7 @@ const AIFeedbackDialog = ({ isOpen, onClose, result, loading, setSelectedPart, s
                   animate={activeTab === 'evaluation' ? { scale: 1.1 } : { scale: 1 }}
                   transition={{ type: "spring", stiffness: 300, damping: 15 }}
                 >
-                  Đánh giá 
+                  Evaluation 
                 </motion.span>
               </motion.button> 
               <motion.button 
@@ -354,7 +354,7 @@ const AIFeedbackDialog = ({ isOpen, onClose, result, loading, setSelectedPart, s
                   animate={activeTab === 'improved' ? { scale: 1.1 } : { scale: 1 }}
                   transition={{ type: "spring", stiffness: 300, damping: 15 }}
                 >
-                  Gợi ý bài viết 8+ (dựa trên bài viết của bạn) 
+                  Suggested 8+ Version (based on your essay) 
                 </motion.span>
               </motion.button> 
             </div>
@@ -373,7 +373,7 @@ const AIFeedbackDialog = ({ isOpen, onClose, result, loading, setSelectedPart, s
                   bounce: 0.4 
                 }}
               >
-                Kết quả đánh giá bài viết từ ieltscomputertest.com AI
+                Essay evaluation results from ieltscomputertest.com AI
               </motion.h1>
               
                 <motion.button
@@ -408,7 +408,7 @@ const AIFeedbackDialog = ({ isOpen, onClose, result, loading, setSelectedPart, s
                         transition={{ delay: 0.2 }}
                         className="text-xl text-gray-700"
                       >
-                        Đang phân tích bài luận của bạn...
+                        Analyzing your essay...
                       </motion.p>
                       <motion.p
                         initial={{ y: 20, opacity: 0 }}
@@ -416,7 +416,7 @@ const AIFeedbackDialog = ({ isOpen, onClose, result, loading, setSelectedPart, s
                         transition={{ delay: 0.4 }}
                         className="text-gray-500"
                       >
-                        Hãy đợi hệ thống một lúc nhé!
+                        Please wait a moment!
                       </motion.p>
                       <motion.p
                         initial={{ y: 20, opacity: 0 }}
@@ -424,7 +424,7 @@ const AIFeedbackDialog = ({ isOpen, onClose, result, loading, setSelectedPart, s
                         transition={{ delay: 0.6 }}
                         className="text-amber-600 text-sm mt-4 px-4 py-2 bg-amber-50 rounded-lg border border-amber-200"
                       >
-                        Lưu ý: Kết quả đánh giá chỉ mang tính tương đối, kết quả có thể bị lệch 0.5-1 band
+                        Note: Evaluation results are relative and may deviate by 0.5-1 band
                       </motion.p>
                     </motion.div>
                   ) : result?.error ? (

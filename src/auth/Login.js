@@ -85,7 +85,7 @@ const WarningDialog = ({ message, isOpen, onClose, countdownTime = 30 }) => {
         className="bg-white rounded-lg shadow-xl max-w-lg w-full overflow-hidden"
       >
         <div className="bg-red-500 py-4 px-6">
-          <h3 className="text-white font-bold text-lg">Cảnh báo bảo mật</h3>
+          <h3 className="text-white font-bold text-lg">Security Warning</h3>
         </div>
         <div className="p-6">
           <div className="mb-6 max-h-96 overflow-y-auto">
@@ -93,13 +93,13 @@ const WarningDialog = ({ message, isOpen, onClose, countdownTime = 30 }) => {
           </div>
           <div className="flex justify-between items-center border-t pt-4">
             <div className="text-sm text-gray-500">
-              Tự động đóng sau {timer} giây
+              Auto-close in {timer} seconds
             </div>
             <button
               onClick={onClose}
               className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
             >
-              Đã hiểu
+              Got it
             </button>
           </div>
         </div>
@@ -217,13 +217,13 @@ const LoginForm = () => {
         // Handle specific HTTP status codes first
         if (response.status === 409) {
           // Account sharing detected (Multiple sessions)
-          setWarningMessage('Cảnh báo bảo mật\n\n• Vui lòng chỉ sử dụng một tài khoản trên một thiết bị và một trình duyệt tại cùng một thời điểm.\n\nHãy thử đăng nhập lại sau 10 giây.');
+          setWarningMessage('Security Warning\n\n• Please use only one account per device/browser at the same time.\n\nTry logging in again after 10s.');
           setWarningCountdownTime(10);
           setShowWarning(true);
           return;
         } else if (response.status === 403) {
           // Account temporarily restricted (should rarely occur with new 60-second system)
-          setWarningMessage('Tài khoản của bạn hiện đang trong thời gian chờ do đăng nhập trên nhiều thiết bị. Thời gian chờ còn lại:\n\nVui lòng đợi hết thời gian chờ trước khi thử lại\nVui lòng chỉ sử dụng một tài khoản trên một thiết bị và một trình duyệt tại cùng một thời điểm.\nHệ thống sẽ tự động cho phép đăng nhập sau khi hết thời gian chờ.');
+          setWarningMessage('Account is in cooldown due to multiple device logins. Cooldown remaining:\n\nPlease wait for the cooldown before trying again\nPlease use only one account per device/browser at the same time.\nSystem will automatically allow login after cooldown.');
           setWarningCountdownTime(10);
           setShowWarning(true);
           return;
@@ -232,7 +232,7 @@ const LoginForm = () => {
           const cooldownMatch = data.detail && data.detail.match(/DEVICE_IN_COOLDOWN:(\d+)/);
           const remainingTime = cooldownMatch ? parseInt(cooldownMatch[1]) : 60;
 
-          setWarningMessage(`Tài khoản của bạn hiện đang trong thời gian chờ do đăng nhập trên nhiều thiết bị. Thời gian chờ còn lại: ${remainingTime} giây\n\nVui lòng đợi hết thời gian chờ trước khi thử lại\nVui lòng chỉ sử dụng một tài khoản trên một thiết bị và một trình duyệt tại cùng một thời điểm.\nHệ thống sẽ tự động cho phép đăng nhập sau khi hết thời gian chờ.`);
+          setWarningMessage(`Account is in cooldown due to multiple device logins. Cooldown remaining: ${remainingTime} seconds\n\nPlease wait for the cooldown before trying again\nPlease use only one account per device/browser at the same time.\nSystem will automatically allow login after cooldown.`);
           setWarningCountdownTime(remainingTime);
           setShowWarning(true);
           return;
@@ -244,22 +244,22 @@ const LoginForm = () => {
 
         // Handle different error messages
         if (data.detail === "Username does not exist") {
-          setErrors(prev => ({ ...prev, username: 'Tên đăng nhập không tồn tại' }));
+          setErrors(prev => ({ ...prev, username: 'Username does not exist' }));
         } else if (data.detail === "Incorrect password") {
-          setErrors(prev => ({ ...prev, password: 'Mật khẩu không chính xác' }));
+          setErrors(prev => ({ ...prev, password: 'Incorrect password' }));
         } else if (data.detail === "This account has been blocked") {
-          setWarningMessage('Tài khoản không hợp lệ.');
+          setWarningMessage('Invalid account.');
           setShowWarning(true);
           return;
         }
         // Check if this is the third attempt
         if (newAttempts === 3) {
-          setWarningMessage('Đây là lần cuối cùng đăng nhập. Vui lòng nhập đúng thông tin để tránh bị khóa tài khoản.');
+          setWarningMessage('Last login attempt. Please enter correct info to avoid account lock.');
           setShowWarning(true);
         }
         // If more than 3 attempts, show warning message
         else if (newAttempts > 3) {
-          setWarningMessage('Tài khoản đã bị khóa tạm thời do đăng nhập sai quá nhiều lần. Vui lòng thử lại sau.');
+          setWarningMessage('Account temporarily locked due to too many failed attempts. Please try again later.');
           setWarningCountdownTime(60);
           setShowWarning(true);
         }
@@ -274,7 +274,7 @@ const LoginForm = () => {
         }, 5000);
       }
     } catch (error) {
-      setErrors({ username: 'Lỗi kết nối. Vui lòng thử lại sau.', password: '', account: '' });
+      setErrors({ username: 'Connection error. Please try again later.', password: '', account: '' });
     }
   };
 
@@ -310,12 +310,12 @@ const LoginForm = () => {
           <div className="md:w-1/2 p-8">
             <div className="space-y-8">
               <div>
-                <h1 className="text-2xl font-bold text-lime-500 mb-8 text-center">Đăng Nhập Ieltscomputertest.com</h1>
+                <h1 className="text-2xl font-bold text-lime-500 mb-8 text-center">Login Ieltscomputertest.com</h1>
 
                 <form className="space-y-6" onSubmit={handleSubmit}>
                   {/* Username field */}
                   <div className="space-y-2">
-                    <label className="block text-gray-500 font-bold mb-1">Tên đăng nhập</label>
+                    <label className="block text-gray-500 font-bold mb-1">Username</label>
                     <input
                       type="text"
                       name="username"
@@ -332,12 +332,12 @@ const LoginForm = () => {
                   {/* Password field */}
                   <div className="space-y-2">
                     <div className="flex justify-between items-center mb-1">
-                      <label className="block text-gray-500 font-bold">Mật khẩu</label>
+                      <label className="block text-gray-500 font-bold">Password</label>
                       <Link
                         to="/forgot-password"
                         className="text-sm text-lime-500 hover:text-lime-600 font-medium"
                       >
-                        Quên mật khẩu?
+                        Forgot password?
                       </Link>
                     </div>
                     <div className="relative">
@@ -384,7 +384,7 @@ const LoginForm = () => {
                     type="submit"
                     className="w-full py-3 px-4 mt-6 rounded-lg font-medium transition-colors bg-lime-500 text-white hover:bg-lime-600"
                   >
-                    Đăng nhập
+                    Login
                   </button>
 
                   {/* Add Google login button */}
@@ -393,7 +393,7 @@ const LoginForm = () => {
                       <div className="w-full border-t border-gray-300"></div>
                     </div>
                     <div className="relative flex justify-center text-sm">
-                      <span className="px-2 bg-white text-gray-500">Hoặc đăng nhập với</span>
+                      <span className="px-2 bg-white text-gray-500">Or login with</span>
                     </div>
                   </div>
 
@@ -410,12 +410,12 @@ const LoginForm = () => {
                         <path fill="#EA4335" d="M -14.754 43.989 C -12.984 43.989 -11.404 44.599 -10.154 45.789 L -6.734 42.369 C -8.804 40.429 -11.514 39.239 -14.754 39.239 C -19.444 39.239 -23.494 41.939 -25.464 45.859 L -21.484 48.949 C -20.534 46.099 -17.884 43.989 -14.754 43.989 Z" />
                       </g>
                     </svg>
-                    Đăng nhập với Google
+                    Login with Google
                   </button>
                 </form>
 
                 <p className="mt-8 text-center text-sm text-gray-600">
-                  Chưa có tài khoản? <Link to="/register" className="text-lime-500 hover:text-lime-600 font-medium">Đăng ký</Link>
+                  Don't have an account?? <Link to="/register" className="text-lime-500 hover:text-lime-600 font-medium">Register</Link>
                 </p>
               </div>
             </div>

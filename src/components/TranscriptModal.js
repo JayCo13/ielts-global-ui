@@ -50,7 +50,7 @@ const ExplanationModal = ({ isOpen, onClose, title, description }) => {
 
           <div className='flex flex-col items-center'>
             <h2 className="text-2xl font-bold text-center text-blue-600">Transcript - {title}</h2>
-            <span className="text-center mt-1 text-sm text-gray-500">-- Bản quyền transcript thuộc về ieltscomputertest.com --</span>
+            <span className="text-center mt-1 text-sm text-gray-500">-- Transcript copyright belongs to ieltscomputertest.com --</span>
 
             {/* Search form */}
             <form onSubmit={handleSearch} className="w-full max-w-md mt-4 flex gap-2">
@@ -58,14 +58,14 @@ const ExplanationModal = ({ isOpen, onClose, title, description }) => {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Nhập từ cần tìm..."
+                placeholder="Enter search term..."
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
                 type="submit"
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                Tìm kiếm
+                Search
               </button>
             </form>
           </div>

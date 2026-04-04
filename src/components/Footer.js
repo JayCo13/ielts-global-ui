@@ -21,31 +21,23 @@ const Footer = () => {
             <div className="max-w-6xl mx-auto relative z-10">
                 {/* Main Footer Content */}
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-                    {/* Logo and about section */}
-                    <div className="md:col-span-4 flex flex-col items-start">
-                        <div className='flex items-center gap-6'>
-                        <img
-                            src="/img/logo-ielts.png"
-                            alt="IELTS Prep Logo"
-                            className="h-28 w-28 mb-4"
-                        />
-                        <a href="http://online.gov.vn/Home/WebDetails/136413" target="_blank" rel="noopener noreferrer">
-                        <img
-                            src="/img/bocongthuong.png"
-                            alt="IELTS Prep Logo"
-                            className="h-16 w-25 mb-4"
-                        />
-                        </a>
+                    <div className="md:col-span-3 flex flex-col items-center">
+                        <div className='flex items-center justify-center gap-6'>
+                            <img
+                                src="/img/logo-ielts.png"
+                                alt="IELTS Prep Logo"
+                                className="h-28 w-28 mb-4"
+                            />
                         </div>
-                        <p className="text-gray-600 mb-4">Nền tảng luyện thi IELTS trên máy chuyên nghiệp với đề thi gốc và giao diện chuẩn quốc tế.</p>
+                        <p className="text-gray-600 mb-4 text-center">A professional computer-based IELTS test preparation platform.</p>
 
                         {/* Social Icons with hover effects */}
                     </div>
 
                     {/* Footer nav columns with animations */}
-                    <div className="md:col-span-8">
-                       <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 xl:gap-6 2xl:gap-8 3xl:gap-10 4xl:gap-12">
-                             {/* Column 1 - Test Practice */}
+                    <div className="md:col-span-9">
+                        <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 xl:gap-6 2xl:gap-8 3xl:gap-10 4xl:gap-12">
+                            {/* Column 1 - Test Practice */}
                             <motion.div
                                 initial="hidden"
                                 whileInView="visible"
@@ -53,7 +45,7 @@ const Footer = () => {
                                 variants={fadeInUp}
                             >
                                 <h3 className="text-gray-900 uppercase text-md font-medium mb-4 relative inline-block">
-                                    Thi Thử
+                                    Mock Test
                                     <span className="absolute -bottom-1 left-0 w-1/2 h-0.5 bg-gradient-to-r from-[#2b5356]/10 to-[#2b5356]"></span>
                                 </h3>
                                 <ul className="space-y-3">
@@ -85,7 +77,7 @@ const Footer = () => {
                                 transition={{ delay: 0.1 }}
                             >
                                 <h3 className="text-gray-900 uppercase text-md font-medium mb-4 relative inline-block">
-                                    Đăng kí gói VIP
+                                    Upgrade to VIP
                                     <span className="absolute -bottom-1 left-0 w-1/2 h-0.5 bg-gradient-to-r from-[#eb7e37]/10 to-[#eb7e37]"></span>
                                 </h3>
                                 <ul className="space-y-3">
@@ -107,8 +99,8 @@ const Footer = () => {
                                     </Link></li>
                                 </ul>
                             </motion.div>
-                            
-                              {/* Column 3 - About Us */}
+
+                            {/* Column 3 - About Us */}
                             <motion.div
                                 initial="hidden"
                                 whileInView="visible"
@@ -117,25 +109,25 @@ const Footer = () => {
                                 transition={{ delay: 0.2 }}
                             >
                                 <h3 className="text-gray-900 uppercase text-md font-medium mb-4 relative inline-block">
-                                    Về chúng tôi
+                                    About Us
                                     <span className="absolute -bottom-1 left-0 w-1/2 h-0.5 bg-gradient-to-r from-[#0096b1]/10 to-[#0096b1]"></span>
                                 </h3>
                                 <ul className="space-y-3 xl:space-y-4 2xl:space-y-5 3xl:space-y-6 4xl:space-y-7">
                                     <li><Link to="/about" className="text-gray-600 text-md hover:text-[#0096b1] transition-colors duration-300 flex items-center gap-1.5">
                                         <span className="w-1 h-1 rounded-full bg-gray-400 inline-block"></span>
-                                        Giới thiệu
+                                        Introduction
                                     </Link></li>
                                     <li><Link to="/permission" className="text-gray-600 text-md hover:text-[#0096b1] transition-colors duration-300 flex items-center gap-1.5">
                                         <span className="w-1 h-1 rounded-full bg-gray-400 inline-block"></span>
-                                        Điều kiện KD
+                                        Business Terms
                                     </Link></li>
-                                     <li><Link to="/comp-policy" className="text-gray-600 text-md hover:text-[#0096b1] transition-colors duration-300 flex items-center gap-1.5">
+                                    <li><Link to="/comp-policy" className="text-gray-600 text-md hover:text-[#0096b1] transition-colors duration-300 flex items-center gap-1.5">
                                         <span className="w-1 h-1 rounded-full bg-gray-400 inline-block"></span>
-                                        Điều kiện giao dịch chung
+                                        Transaction Terms
                                     </Link></li>
                                 </ul>
                             </motion.div>
-                            
+
                             {/* Column 4 - Policies */}
                             <motion.div
                                 initial="hidden"
@@ -145,25 +137,25 @@ const Footer = () => {
                                 transition={{ delay: 0.3 }}
                             >
                                 <h3 className="text-gray-900 uppercase text-md font-medium mb-4 relative inline-block">
-                                    Chính sách
+                                    Policies
                                     <span className="absolute -bottom-1 left-0 w-1/2 h-0.5 bg-gradient-to-r from-[#8b5cf6]/10 to-[#8b5cf6]"></span>
                                 </h3>
                                 <ul className="space-y-3 xl:space-y-4 2xl:space-y-5 3xl:space-y-6 4xl:space-y-7">
                                     <li><Link to="/privacy-policy" className="text-gray-600 text-md hover:text-[#8b5cf6] transition-colors duration-300 flex items-center gap-1.5">
                                         <span className="w-1 h-1 rounded-full bg-gray-400 inline-block"></span>
-                                        Chính sách bảo mật
+                                        Privacy Policy
                                     </Link></li>
                                     <li><Link to="/payment-policy" className="text-gray-600 text-md hover:text-[#8b5cf6] transition-colors duration-300 flex items-center gap-1.5">
                                         <span className="w-1 h-1 rounded-full bg-gray-400 inline-block"></span>
-                                        Chính sách thanh toán
+                                        Payment Policy
                                     </Link></li>
                                     <li><Link to="/deli-policy" className="text-gray-600 text-md hover:text-[#8b5cf6] transition-colors duration-300 flex items-center gap-1.5">
                                         <span className="w-1 h-1 rounded-full bg-gray-400 inline-block"></span>
-                                        Chính sách vận chuyển và giao nhận
+                                        Shipping Policy
                                     </Link></li>
                                 </ul>
                             </motion.div>
-                            
+
                             {/* Column 5 - Contact Info */}
                             <motion.div
                                 initial="hidden"
@@ -173,18 +165,18 @@ const Footer = () => {
                                 transition={{ delay: 0.2 }}
                             >
                                 <h3 className="text-gray-900 uppercase text-md font-medium mb-4 relative inline-block">
-                                    Liên Hệ
+                                    Contact us
                                     <span className="absolute -bottom-1 left-0 w-1/2 h-0.5 bg-gradient-to-r from-blue-100 to-blue-500"></span>
                                 </h3>
                                 <ul className="space-y-3">
-                                    <li><a href="mailto:thiieltstrenmay@gmail.com" className="text-gray-600 hover:text-blue-500 transition-colors duration-300 flex items-center gap-2">
-                                        <div className="rounded-full text-gray-500 hover:text-blue-500 transition-colors duration-300">
+                                    <li><a href="mailto:thiieltstrenmay@gmail.com" className="text-gray-600 hover:text-blue-500 transition-colors duration-300 flex items-center lg:items-start xl:items-center gap-2">
+                                        <div className="rounded-full text-gray-500 hover:text-blue-500 transition-colors duration-300 flex-shrink-0">
                                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
                                                 <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
                                             </svg>
                                         </div>
-                                        thiieltstrenmay@gmail.com
+                                        <span className="text-sm 2xl:text-base">ieltscomputertestglobal<wbr />@gmail.com</span>
                                     </a></li>
                                     <li><a href="tel:0964996195" className="text-gray-600 hover:text-blue-500 transition-colors duration-300 flex items-center gap-2">
                                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -194,24 +186,12 @@ const Footer = () => {
                                     </a></li>
                                     <li><a href="https://zalo.me/0964996195" className="text-gray-600 hover:text-blue-500 transition-colors duration-300 flex items-start gap-2">
                                         <img
-                                            src="/img/zalo.png"
+                                            src="/img/whatsapp-icon.webp"
                                             alt="Zalo"
-                                            className="w-4 h-4 mt-0.5 flex-shrink-0 transition-all duration-300"
-                                            style={{
-                                                filter: 'grayscale(1)',
-                                                ':hover': {
-                                                    filter: 'grayscale(0)',
-                                                    transform: 'scale(1.1)'
-                                                }
-                                            }}
+                                            className="w-5 h-5 mt-0.5 flex-shrink-0 transition-all duration-300"
+
                                         />
                                         <span>0964996195</span>
-                                    </a></li>
-                                    <li><a href="https://www.facebook.com/ieltstajun/" className="text-gray-600 hover:text-blue-500 transition-colors duration-300 flex items-start gap-2">
-                                        <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
-                                        </svg>
-                                        <span>Thi IELTS trên máy tính</span>
                                     </a></li>
                                 </ul>
                             </motion.div>

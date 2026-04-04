@@ -87,7 +87,7 @@ const EditProfile = ({ onProfileUpdate }) => {
       if (response.ok) {
         setSaveMessage({
           type: 'success',
-          text: 'Cập nhật hồ sơ thành công!'
+          text: 'Profile updated successfully!'
         });
 
         // Get updated data from response
@@ -131,14 +131,14 @@ const EditProfile = ({ onProfileUpdate }) => {
       } else {
         setSaveMessage({
           type: 'error',
-          text: 'Không thể cập nhật hồ sơ. Vui lòng thử lại.'
+          text: 'Failed to update profile. Please try again.'
         });
       }
     } catch (error) {
       console.error('Error updating profile:', error);
       setSaveMessage({
         type: 'error',
-        text: 'Đã xảy ra lỗi. Vui lòng thử lại sau.'
+        text: 'An error occurred. Please try again later.'
       });
     } finally {
       setIsSaving(false);
@@ -156,7 +156,7 @@ const EditProfile = ({ onProfileUpdate }) => {
   return (
     <div className="flex-1 p-6">
       <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-sm p-8">
-        <h2 className="text-2xl text-center font-bold mb-6">Chỉnh Sửa Hồ Sơ</h2>
+        <h2 className="text-2xl text-center font-bold mb-6">Edit Profile</h2>
 
         {saveMessage.text && (
           <div className={`mb-6 p-4 rounded-lg ${saveMessage.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
@@ -167,7 +167,7 @@ const EditProfile = ({ onProfileUpdate }) => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Ảnh Đại Diện</label>
+            <label className="block text-sm font-medium text-gray-700">Avatar</label>
             <div className="flex items-center space-x-4">
               <img
                 key={displayImage} // Add key to force re-render
@@ -186,7 +186,7 @@ const EditProfile = ({ onProfileUpdate }) => {
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Tên Người Dùng</label>
+            <label className="block text-sm font-medium text-gray-700">Username</label>
             <input
               type="text"
               value={formData.username}
@@ -194,7 +194,7 @@ const EditProfile = ({ onProfileUpdate }) => {
               disabled
               readOnly
             />
-            <p className="text-xs text-gray-400">Tên người dùng không thể thay đổi</p>
+            <p className="text-xs text-gray-400">Username cannot be changed</p>
           </div>
 
           <div className="space-y-2">
@@ -215,7 +215,7 @@ const EditProfile = ({ onProfileUpdate }) => {
               ${isSaving
                 ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-[#0096b1]/80 hover:bg-[#0096b1]/100'}`} >
-            {isSaving ? 'Đang Lưu...' : 'Lưu Thay Đổi'}
+            {isSaving ? 'Saving...' : 'Save Changes'}
           </button>
         </form>
       </div>

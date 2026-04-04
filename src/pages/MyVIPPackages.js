@@ -22,7 +22,7 @@ const MyVIPPackage = () => {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.detail || 'Không thể tải thông tin gói VIP');
+                throw new Error(data.detail || 'Cannot load VIP package info');
             }
 
             setSubscriptions(data);
@@ -85,10 +85,10 @@ const MyVIPPackage = () => {
                     <nav className="flex items-center space-x-2 text-sm">
                         <Link to="/" className="text-gray-500 hover:text-lime-600 flex items-center">
                             <Home size={16} className="mr-1" />
-                            Trang chủ
+                            Home
                         </Link>
                         <ChevronRight size={16} className="text-gray-400" />
-                        <span className="text-gray-900 font-medium">Gói VIP của tôi</span>
+                        <span className="text-gray-900 font-medium">My VIP Packages</span>
                     </nav>
                 </div>
             </div>
@@ -104,7 +104,7 @@ const MyVIPPackage = () => {
                             </svg>
                         </div>
                         <h2 className="text-4xl font-extrabold text-gray-900 sm:text-5xl lg:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-lime-600 to-lime-400">
-                            Gói VIP của tôi
+                            My VIP Packages
                         </h2>
                         <div className="mt-6 max-w-2xl mx-auto">
                             <p className="text-xl text-gray-600 leading-relaxed">
@@ -152,7 +152,7 @@ const MyVIPPackage = () => {
                         </div>
                         <div className="bg-white overflow-hidden shadow-sm rounded-xl border border-lime-100/50">
                             <div className="px-4 py-5 sm:p-6">
-                                <dt className="text-sm font-medium text-gray-500">Tổng số gói</dt>
+                                <dt className="text-sm font-medium text-gray-500">Total packages</dt>
                                 <dd className="mt-1 text-2xl font-semibold text-lime-600">{subscriptions.length}</dd>
                             </div>
                         </div>
@@ -217,7 +217,7 @@ const MyVIPPackage = () => {
                                                     </h3>
                                                     <div className={`ml-auto flex-shrink-0 ${subscription.is_active ? `${style.badge}` : 'text-gray-600 bg-gray-100'
                                                         } rounded-full px-4 py-1 text-sm font-medium`}>
-                                                        {subscription.is_active ? 'Đang hoạt động' : 'Hết hạn'}
+                                                        {subscription.is_active ? 'Active' : 'Expired'}
                                                     </div>
                                                 </div>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -237,8 +237,8 @@ const MyVIPPackage = () => {
                                                                 </svg>
                                                             )}
                                                             Trạng thái:
-                                                            {subscription.payment_status === 'completed' ? ' Đã thanh toán' :
-                                                                subscription.payment_status === 'pending' ? ' Đang xử lý' :
+                                                            {subscription.payment_status === 'completed' ? ' Paid' :
+                                                                subscription.payment_status === 'pending' ? ' Processing' :
                                                                     subscription.payment_status === 'rejected' ? ' Bị từ chối' :
                                                                         ' ' + subscription.payment_status}
                                                         </div>

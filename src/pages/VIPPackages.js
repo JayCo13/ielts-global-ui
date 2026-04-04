@@ -16,10 +16,10 @@ const VIPPackages = () => {
     const navigate = useNavigate();
 
     const skillNames = {
-        listening: 'Nghe',
-        reading: 'Đọc',
-        writing: 'Viết',
-        speaking: 'Nói'
+        listening: 'Listening',
+        reading: 'Reading',
+        writing: 'Writing',
+        speaking: 'Speaking'
     };
 
     useEffect(() => {
@@ -100,7 +100,7 @@ const VIPPackages = () => {
                             : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}
                 >
                     <Globe className="w-5 h-5" />
-                    <span>Tất cả kỹ năng</span>
+                    <span>All skills</span>
                 </motion.button>
                 {['listening', 'reading', 'writing', 'speaking'].map(skill => (
                     <motion.button
@@ -180,8 +180,8 @@ const VIPPackages = () => {
                                 <Icon className="w-6 h-6 text-white" />
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-xs text-gray-400">Thời hạn:</span>
-                                <span className="text-sm text-gray-500">{pkg.duration_months} tháng</span>
+                                <span className="text-xs text-gray-400">Duration:</span>
+                                <span className="text-sm text-gray-500">{pkg.duration_months} months</span>
                             </div>
                         </div>
                         <div className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -223,12 +223,12 @@ const VIPPackages = () => {
                     {/* Price and Action */}
                     <div className="flex items-center justify-between pt-6 mt-6 border-t border-gray-200">
                         <div className="flex flex-col">
-                            <span className="text-sm font-medium text-gray-500">Giá gói</span>
+                            <span className="text-sm font-medium text-gray-500">Package price</span>
                             <div className={`text-2xl font-bold bg-gradient-to-r ${style.gradient} bg-clip-text text-transparent`}>
-                                {new Intl.NumberFormat('vi-VN', {
+                                {new Intl.NumberFormat('en-US', {
                                     style: 'currency',
-                                    currency: 'VND',
-                                    maximumFractionDigits: 0
+                                    currency: 'USD',
+                                    minimumFractionDigits: 2
                                 }).format(pkg.price)}
                             </div>
                         </div>
@@ -236,7 +236,7 @@ const VIPPackages = () => {
                             onClick={() => handlePurchase(pkg.package_id)}
                             className={`px-8 py-3 bg-gradient-to-r ${style.gradient} text-white rounded-full font-medium hover:opacity-90 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50 focus:outline-none`}
                         >
-                            Đăng ký ngay
+                            Register ngay
                         </button>
                     </div>
                 </div>
@@ -267,7 +267,7 @@ const VIPPackages = () => {
                     : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
                     }`}
             >
-                Về Trước
+                Go Back
             </button>
 
             {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
@@ -319,7 +319,7 @@ const VIPPackages = () => {
                     <nav className="flex items-center space-x-2 text-sm">
                         <Link to="/" className="text-gray-500 hover:text-violet-600 flex items-center transition-colors duration-300">
                             <Home size={16} className="mr-1" />
-                            Trang chủ
+                            Home
                         </Link>
                         <ChevronRight size={16} className="text-gray-400" />
                         <span className="text-gray-900 font-medium">Gói VIP</span>
@@ -345,13 +345,13 @@ const VIPPackages = () => {
                         variants={item}
                         className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#34d399] to-[#10b981]"
                     >
-                        Gói VIP ieltscomputertest.com
+                        ieltscomputertest VIP Packages.com
                     </motion.h1>
                     <motion.p
                         variants={item}
                         className="text-xl text-gray-500 max-w-2xl mx-auto drop-shadow-[0_2px_8px_rgba(16,185,129,0.5)]"
                     >
-                        Chọn gói VIP phù hợp nhất cho hành trình IELTS của bạn
+                        Choose the most suitable VIP package for your IELTS journey
                     </motion.p>
                 </motion.div>
 

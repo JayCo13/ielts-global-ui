@@ -430,7 +430,7 @@ const ResultReview = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-xl text-gray-600">Đang tải kết quả...</div>
+        <div className="text-xl text-gray-600">Loading results...</div>
       </div>
     );
   }
@@ -469,7 +469,7 @@ const ResultReview = () => {
             className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
-            Quay lại trang Listening
+            Back to Listening page
           </button>
         </div>
 
@@ -479,7 +479,7 @@ const ResultReview = () => {
               bg-gradient-to-r from-lime-600 to-emerald-600 bg-clip-text text-transparent
               hover:scale-105 transform transition-transform duration-300"
           >
-            Kết Quả Bài Thi
+            Test Results
             <span className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-1 
               bg-gradient-to-r from-lime-500 to-emerald-500 rounded-full
               animate-pulse"></span>
@@ -503,8 +503,8 @@ const ResultReview = () => {
                   </svg>
                 </button>
                 <div className='flex flex-col items-center'>
-                  <h2 className="text-2xl font-bold text-center text-blue-600"> Giải thích - {testDescription.title}</h2>
-                  <span className="text-center mt-1 text-sm text-gray-500">-- Bản quyền lời giải thuộc về ieltscomputertest.com --</span>
+                  <h2 className="text-2xl font-bold text-center text-blue-600"> Explanation - {testDescription.title}</h2>
+                  <span className="text-center mt-1 text-sm text-gray-500">-- Explanation copyright belongs to ieltscomputertest.com --</span>
                 </div>
                 <div className="prose max-w-none mt-6">
                   <p className="text-gray-600 whitespace-pre-wrap">{testDescription.description}</p>
@@ -523,19 +523,19 @@ const ResultReview = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900">Xác nhận xem lại bài thi</h3>
+                  <h3 className="text-xl font-semibold text-gray-900">Confirm reviewing test</h3>
                 </div>
                 <p className="text-gray-600 mb-6">
-                  Trong chế độ xem lại phần Listening, các bạn có thể xem lại transcript & nghe lại audio cho từng Part.
+                  In review mode for Listening, you can view the transcript & listen to the audio for each part.
                   <br />
-                  <span className="text-red-600">Lưu ý: Sau khi xem lại, bạn không thể quay lại trang kết quả nên hãy xem thật kỹ trước khi chuyển chế độ xem lại.</span>
+                  <span className="text-red-600">Note: After reviewing, you cannot return to the results page, so check carefully before switching.</span>
                 </p>
                 <div className="flex justify-end space-x-3">
                   <button
                     onClick={() => setShowWarningDialog(false)}
                     className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
                   >
-                    Hủy
+                    Cancel
                   </button>
                   <button
                     onClick={() => {
@@ -551,7 +551,7 @@ const ResultReview = () => {
                     }}
                     className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                   >
-                    Xác nhận
+                    Confirm
                   </button>
                 </div>
               </div>
@@ -615,19 +615,19 @@ const ResultReview = () => {
 
               {/* Status Legend */}
               <div className="flex-grow">
-                <h3 className="text-sm font-medium text-gray-900 mb-4">Chú Thích Trạng Thái</h3>
+                <h3 className="text-sm font-medium text-gray-900 mb-4">Status Legend</h3>
                 <div className="space-y-3">
                   <div className="flex items-center bg-green-50 p-3 rounded-lg">
                     <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                    <span className="text-sm text-gray-700">Câu trả lời đúng</span>
+                    <span className="text-sm text-gray-700">Correct answer</span>
                   </div>
                   <div className="flex items-center bg-red-50 p-3 rounded-lg">
                     <XCircle className="w-5 h-5 text-red-500 mr-3" />
-                    <span className="text-sm text-gray-700">Câu trả lời sai</span>
+                    <span className="text-sm text-gray-700">Incorrect answer</span>
                   </div>
                   <div className="flex items-center bg-gray-50 p-3 rounded-lg">
                     <Circle className="w-5 h-5 text-gray-400 mr-3" />
-                    <span className="text-sm text-gray-700">Chưa trả lời</span>
+                    <span className="text-sm text-gray-700">Unanswered</span>
                   </div>
                 </div>
               </div>
@@ -638,7 +638,7 @@ const ResultReview = () => {
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <div className="items-center text-lg text-gray-700">
-                    <h3 className="text-sm font-medium text-gray-900 mb-2">Ngày Hoàn Thành</h3>
+                    <h3 className="text-sm font-medium text-gray-900 mb-2">Completion Date</h3>
                     <div className='flex items-center'>
                       <Clock className="w-5 h-5 mr-3 text-gray-400" />
                       <span>
@@ -655,17 +655,17 @@ const ResultReview = () => {
                     className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-lg font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 animate-bounce"
                   >
                     <BookOpen className="w-6 h-6 mr-2" />
-                    Xem giải thích
+                    View Explanation
                   </button>
                 </div>
                 <div className="pt-4 border-t border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-900 mb-2">Thống Kê Chi Tiết</h3>
+                  <h3 className="text-sm font-medium text-gray-900 mb-2">Detailed Statistics</h3>
                   <div className="grid grid-cols-3 gap-4 text-center">
                     <div className="bg-green-50 rounded-lg p-2">
                       <div className="text-green-500 font-semibold">
                         {resultData.detailed_answers.filter(a => a.evaluation === 'correct').length}
                       </div>
-                      <div className="text-xs text-gray-600">Đúng</div>
+                      <div className="text-xs text-gray-600">Correct</div>
                     </div>
                     <div className="bg-red-50 rounded-lg p-2">
                       <div className="text-red-500 font-semibold">
@@ -677,7 +677,7 @@ const ResultReview = () => {
                       <div className="text-gray-500 font-semibold">
                         {resultData.detailed_answers.filter(a => a.evaluation === 'blank').length}
                       </div>
-                      <div className="text-xs text-gray-600">Bỏ qua</div>
+                      <div className="text-xs text-gray-600">Skipped</div>
                     </div>
                   </div>
                 </div>
@@ -688,7 +688,7 @@ const ResultReview = () => {
 
         <div className="bg-white rounded-lg shadow-sm p-6 overflow-hidden">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold">Xem Lại Câu Hỏi</h2>
+            <h2 className="text-xl font-semibold">Review Questions</h2>
             <div className="flex gap-2">
               <select
                 value={filter}
@@ -698,10 +698,10 @@ const ResultReview = () => {
                 }}
                 className="px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-lime-500"
               >
-                <option value="all">Tất Cả Câu Trả Lời</option>
-                <option value="correct">Chỉ Câu Đúng</option>
-                <option value="incorrect">Chỉ Câu Sai</option>
-                <option value="blank">Chỉ Câu Chưa Trả Lời</option>
+                <option value="all">All Answers</option>
+                <option value="correct">Chỉ Câu Correct</option>
+                <option value="incorrect">Only Incorrect</option>
+                <option value="blank">Only Unanswered</option>
               </select>
             </div>
           </div>
@@ -755,8 +755,8 @@ const ResultReview = () => {
 
           <div className="mt-6 flex justify-between items-center">
             <div className="text-sm text-gray-500">
-              Hiển thị {Math.min(filteredAnswers.length, (currentPage - 1) * answersPerPage + 1)} đến{' '}
-              {Math.min(currentPage * answersPerPage, filteredAnswers.length)} trong tổng số {filteredAnswers.length} kết quả
+              Showing {Math.min(filteredAnswers.length, (currentPage - 1) * answersPerPage + 1)} to{' '}
+              {Math.min(currentPage * answersPerPage, filteredAnswers.length)} out of {filteredAnswers.length} results
             </div>
             <div className="flex gap-2">
               <button

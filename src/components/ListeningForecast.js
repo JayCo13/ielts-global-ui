@@ -170,7 +170,7 @@ const ListeningForecast = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder={!isVIP && userRole === 'customer' ? "Tìm kiếm chỉ dành cho VIP..." : "Tìm kiếm dự đoán..."}
+              placeholder={!isVIP && userRole === 'customer' ? "Search is VIP only..." : "Tìm kiếm dự đoán..."}
               className={`w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500 ${(!isVIP && userRole === 'customer') ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               value={searchQuery}
               onChange={(e) => {
@@ -187,7 +187,7 @@ const ListeningForecast = () => {
         </div>
 
         {loading ? (
-          <div className="p-8 text-center text-gray-600">Đang tải...</div>
+          <div className="p-8 text-center text-gray-600">Loading...</div>
         ) : filtered.length === 0 ? (
           <div className="p-8 text-center text-gray-600">Chưa có bài kiểm tra dự đoán</div>
         ) : (
@@ -214,7 +214,7 @@ const ListeningForecast = () => {
                             onClick={() => toggleExamHistoryDropdown(it.exam_id, it.part_number)}
                             className="flex items-center space-x-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
                           >
-                            Lịch sử
+                            History
                             <ChevronRight className={`w-4 h-4 transition-transform ${examHistoryDropdowns[`${it.exam_id}-${it.part_number}`] ? 'rotate-90' : ''}`} />
                           </button>
                           {examHistoryDropdowns[`${it.exam_id}-${it.part_number}`] && (
@@ -284,13 +284,13 @@ const ListeningForecast = () => {
                     <div className="mt-4 p-3 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-between">
                       <div className="flex items-center gap-2 text-gray-700">
                         <Lock className="w-5 h-5 text-[#0096b1]" />
-                        <span className="text-sm font-medium">VIP cần nâng cấp để truy cập</span>
+                        <span className="text-sm font-medium">VIP upgrade required</span>
                       </div>
                       <Link
                         to="/vip-packages?type=all"
                         className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#0096b1] text-white hover:bg-[#00839a] text-sm"
                       >
-                        Xem gói
+                        View packages
                         <ChevronRight className="w-4 h-4" />
                       </Link>
                     </div>
@@ -310,7 +310,7 @@ const ListeningForecast = () => {
                           }}
                           className={`mt-4 w-full py-2 rounded text-white ${hasHistory ? 'bg-orange-600 hover:bg-orange-700' : 'bg-[#0096b1] hover:bg-[#00839a]'}`}
                         >
-                          {hasHistory ? 'Làm lại' : 'Làm bài'}
+                          {hasHistory ? 'Retake' : 'Làm bài'}
                         </button>
                       );
                     })()

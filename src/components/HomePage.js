@@ -64,7 +64,7 @@ const FloatingMessengerIcon = () => {
         whileHover={{ scale: isMinimized ? 1.05 : 1.1 }}
         whileTap={{ scale: 0.9 }}
       >
-        {!isMinimized && <div className="fb-messenger-tooltip">Liên hệ ngay</div>}
+        {!isMinimized && <div className="fb-messenger-tooltip">Contact Us</div>}
 
         <div
           className="messenger-toggle"
@@ -74,10 +74,11 @@ const FloatingMessengerIcon = () => {
         </div>
 
         <img
-          src="/img/zalo.png"
-          alt="Zalo"
+          src="/img/whatsapp-icon.webp"
+          alt="WhatsApp"
           width="50"
           height="50"
+          className="rounded-md"
           style={{ objectFit: 'contain' }}
         />
       </motion.div>
@@ -201,20 +202,26 @@ const HomePage = () => {
               {/* IELTS Badge */}
               <motion.div
                 variants={slideRight}
-                className="inline-block mt-3 mb-4 px-3 py-1 bg-gradient-to-r from-[#eb7e37] to-[#0096b1] text-white text-sm font-semibold rounded-full shadow-md"
+                className="inline-block mt-3 mb-4 px-3 py-1 bg-gradient-to-r from-[#c98825] to-[#e4b231] text-white text-sm font-semibold rounded-full shadow-md"
               >
                 IELTS Computer-Based Test
               </motion.div>
 
               <motion.h1
                 variants={staggerChildren}
-                className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-6 leading-tight flex flex-col gap-3"
+                className="font-extrabold tracking-tight mb-8 flex flex-col gap-1 md:gap-2"
               >
-                <motion.span variants={slideUp} className="inline-block text-[#2b5356]">Thi IELTS trên máy</motion.span>
-                <motion.span variants={slideUp} className="inline-block text-4xl md:text-6xl text-[#eb7e37]">với đề thi gốc</motion.span>
-                <motion.span variants={slideUp} className="inline-block relative text-[#0096b1]">
-                  chuẩn quốc tế
-                  <span className="absolute -bottom-2 left-0 w-32 h-1 bg-gradient-to-r from-[#eb7e37] to-[#0096b1] rounded-full"></span>
+                <motion.span variants={slideUp} className="block text-3xl sm:text-4xl md:text-5xl lg:text-[45px] leading-tight text-[#0e233a]">
+                  Take the IELTS
+                </motion.span>
+                <motion.span variants={slideUp} className="block text-2xl sm:text-3xl md:text-4xl lg:text-[40px] leading-tight text-[#0e233a]">
+                  computer-based test
+                </motion.span>
+                <motion.span variants={slideUp} className="block text-2xl sm:text-3xl md:text-4xl lg:text-[40px] leading-tight text-[#d2922d]">
+                  with authentic,
+                </motion.span>
+                <motion.span variants={slideUp} className="block text-2xl sm:text-3xl md:text-4xl lg:text-[40px] leading-tight text-[#143c51] pb-1 md:pb-2">
+                  official-standard questions.
                 </motion.span>
               </motion.h1>
 
@@ -222,7 +229,7 @@ const HomePage = () => {
                 variants={slideUp}
                 className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl"
               >
-                Trải nghiệm thi thử IELTS trên máy tính với đề thi thật, giao diện chuẩn, chấm điểm tự động và phân tích chi tiết giúp bạn nâng band hiệu quả.
+                Experience computer-based IELTS practice with authentic tests, standard interface, AI automated scoring, and detailed analytics to help you improve your band score effectively.
               </motion.p>
 
               {/* Trust indicators */}
@@ -231,16 +238,16 @@ const HomePage = () => {
                 className="flex flex-wrap gap-6 mb-6 text-gray-500"
               >
                 <motion.div variants={fadeIn} className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-[#0096b1]" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
-                  <span>Đề thi chuẩn quốc tế</span>
+                  <svg className="w-5 h-5 text-[#b4904a]" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
+                  <span>International-standard test questions with detailed explanations</span>
                 </motion.div>
                 <motion.div variants={fadeIn} className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-[#0096b1]" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
-                  <span>Giao diện giống thật 100%</span>
+                  <svg className="w-5 h-5 text-[#b4904a]" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
+                  <span>100% realistic test interface</span>
                 </motion.div>
                 <motion.div variants={fadeIn} className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-[#0096b1]" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
-                  <span>Chấm chữa Writing bằng AI được phát triển bởi <span className="text-[#0096b1] font-bold"><i className='text-[#eb7e37]'>IELTS</i> <i className='text-[#0096b1]'>TAJUN</i></span></span>
+                  <svg className="w-5 h-5 text-[#b4904a]" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
+                  <span>Packed with useful learning support features</span>
                 </motion.div>
               </motion.div>
 
@@ -252,9 +259,9 @@ const HomePage = () => {
               >
                 <a href="/listening_list">
 
-                  <button className="group relative px-8 py-4 bg-[#eb7e37] text-white font-bold text-lg rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-2px] transition-all duration-300">
+                  <button className="group relative px-8 py-4 bg-gradient-to-r from-[#c98825] to-[#e4b231] text-white font-bold text-lg rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-2px] transition-all duration-300">
                     <span className="relative z-10 flex items-center justify-center gap-2">
-                      Bắt đầu ngay
+                      Start Now
                       <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
                     </span>
                     <span className="absolute inset-0 shimmer"></span>
@@ -269,9 +276,9 @@ const HomePage = () => {
                   </div>
                   <div className="flex flex-col">
                     <div className="flex items-baseline gap-1">
-                      <span className="text-2xl font-bold bg-gradient-to-r from-[#0096b1] to-[#eb7e37] bg-clip-text text-transparent">100K+</span>
+                      <span className="text-2xl font-bold bg-gradient-to-r from-[#c98825] to-[#e4b231] bg-clip-text text-transparent">100K+</span>
                     </div>
-                    <span className="text-xs text-gray-500 font-medium">Người tin dùng</span>
+                    <span className="text-xs text-gray-500 font-medium">Trusted Users</span>
                   </div>
                 </div>
               </motion.div>
@@ -330,18 +337,18 @@ const HomePage = () => {
               <motion.div
                 variants={fadeIn}
                 transition={{ delay: 0.8 }}
-                className="absolute -bottom-6 left-1/4 w-8 h-8 bg-[#305359] rounded-full opacity-50 z-10 ripple"
+                className="absolute -bottom-6 left-1/4 w-8 h-8 bg-[#c98825] rounded-full opacity-50 z-10 ripple"
               ></motion.div>
               <motion.div
                 variants={fadeIn}
                 transition={{ delay: 1.0 }}
-                className="absolute -bottom-10 left-2/3 w-12 h-12 bg-[#eb7e37] rounded-full opacity-40 z-10 ripple"
+                className="absolute -bottom-10 left-2/3 w-12 h-12 bg-[#b4904a] rounded-full opacity-40 z-10 ripple"
                 style={{ animationDelay: '1s' }}
               ></motion.div>
               <motion.div
                 variants={fadeIn}
                 transition={{ delay: 1.2 }}
-                className="absolute -bottom-8 left-1/2 w-10 h-10 bg-[#0096b1] rounded-full opacity-30 z-10 ripple"
+                className="absolute -bottom-8 left-1/2 w-10 h-10 bg-[#b4904a] rounded-full opacity-30 z-10 ripple"
                 style={{ animationDelay: '2s' }}
               ></motion.div>
             </motion.div>
@@ -393,109 +400,7 @@ const HomePage = () => {
             </svg>
           </div>
 
-          <div className="max-w-6xl mx-auto px-4 relative z-10 py-10">
-            <div className="flex flex-col md:flex-row items-center gap-5">
-              <div className="w-full md:w-1/2 space-y-4 mb-8 md:mb-0 mt-5">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6 }}
 
-                >
-                  <h1 className="text-3xl md:text-4xl font-bold mb-5 bg-gradient-to-r from-[#2b5356] via-[#0096b1] to-[#eb7e37] bg-clip-text text-transparent text-center">
-                    Check list các VIP members
-                    <span className="relative inline-block">
-                      <span className="absolute -inset-1 w-full h-full"></span>
-                      <span className="relative text-[#0096b1]">trúng tủ tại ieltscomputertest.com</span>
-                    </span>
-                  </h1>
-                  <div className="space-y-4 bg-gradient-to-r from-white via-[#f8f9fa] to-white p-6 rounded-xl shadow-lg border border-[#e9ecef] hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-start gap-4 group hover:transform hover:translate-x-2 transition-all duration-300">
-                      <div className="flex-shrink-0 w-12 h-12 bg-[#2b5356]/10 rounded-full flex items-center justify-center group-hover:bg-[#2b5356]/20 transition-colors duration-300">
-                        <svg className="w-6 h-6 text-[#2b5356]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
-                      </div>
-                      <p className="text-gray-600">Khi là thành viên VIP của ieltscomputertest.com, bạn sẽ được "thử lửa" với những bộ đề có layout được thiết kế giống đề thi thật.</p>
-                    </div>
-                    <div className="flex items-start gap-4 group hover:transform hover:translate-x-2 transition-all duration-300">
-                      <div className="flex-shrink-0 w-12 h-12 bg-[#eb7e37]/10 rounded-full flex items-center justify-center group-hover:bg-[#eb7e37]/20 transition-colors duration-300">
-                        <svg className="w-6 h-6 text-[#eb7e37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                      </div>
-                      <p className="text-gray-600">Các thành viên VIP được tiếp cận kho đề thi phong phú, giúp nâng cao kỹ năng toàn diện và đạt được band điểm IELTS mục tiêu một cách nhanh chóng.</p>
-                    </div>
-                    <div className="flex items-start gap-4 group hover:transform hover:translate-x-2 transition-all duration-300">
-                      <div className="flex-shrink-0 w-12 h-12 bg-[#0096b1]/10 rounded-full flex items-center justify-center group-hover:bg-[#0096b1]/20 transition-colors duration-300">
-                        <svg className="w-6 h-6 text-[#0096b1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                      </div>
-                      <p className="text-gray-600">Điều này giúp bạn làm quen "sương sương" với cấu trúc, định dạng và đặc biệt là áp lực thời gian của một kỳ thi IELTS thực tế.</p>
-                    </div>
-                    <div className="flex items-start gap-4 group hover:transform hover:translate-x-2 transition-all duration-300">
-                      <div className="flex-shrink-0 w-12 h-12 bg-[#eb7e37]/10 rounded-full flex items-center justify-center group-hover:bg-[#eb7e37]/20 transition-colors duration-300">
-                        <svg className="w-6 h-6 text-[#eb7e37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
-                      </div>
-                      <p className="text-gray-600">Rất nhiều thành viên VIP đã tự tin hơn hẳn và chinh phục điểm số cao sau thời gian "luyện công" tại ieltscomputertest.com đấy.</p>
-                    </div>
-
-                    <div className="flex items-start gap-4 group hover:transform hover:translate-x-2 transition-all duration-300">
-                      <div className="flex-shrink-0 w-12 h-12 bg-[#2b5356]/10 rounded-full flex items-center justify-center group-hover:bg-[#2b5356]/20 transition-colors duration-300">
-                        <svg className="w-6 h-6 text-[#2b5356]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
-                        </svg>
-                      </div>
-                      <p className="text-gray-600">Việc nâng cao kỹ năng và đạt band điểm IELTS mong muốn giờ đây thật sự trong tầm tay bạn!</p>
-                    </div>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  className="flex justify-center mt-3"
-                >
-                  <Link
-                    to="/achievements"
-                    className="inline-flex items-center gap-2 mt-3 px-6 py-4 bg-gradient-to-r from-[#2b5356] to-[#0096b1] text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                  >
-                    <span>Xem thêm thành tích</span>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                    </svg>
-                  </Link>
-                </motion.div>
-              </div>
-              <div className="w-full md:w-1/2 h-[250px] md:h-[450px] relative">
-                <CircularGallery
-                  cardDistance={60}
-                  verticalDistance={70}
-                  delay={5000}
-                  pauseOnHover={false}
-                >
-                  <Card className="relative overflow-hidden h-[300px] border border-white/20">
-                    <img src="/img/hp-img1.jpg" alt="Student 1" className="w-full h-full object-cover" />
-                    <p className="absolute bottom-0 left-0 right-0 p-4 text-white text-sm italic bg-black/50 backdrop-blur-sm">"Nhờ luyện thi đều đặn trên ieltscomputertest.com, mình không còn bị bỡ ngỡ khi bước vào phòng thi thật – mọi thứ quen thuộc như đã làm rồi vậy!"</p>
-                  </Card>
-                  <Card className="relative overflow-hidden h-[300px] border border-white/20">
-                    <img src="/img/hp-img2.jpg" alt="Student 2" className="w-full h-full object-cover" />
-                    <p className="absolute bottom-0 left-0 right-0 p-4 text-white text-sm italic bg-black/50 backdrop-blur-sm">"Giao diện y hệt thi thật và các đề real trúng tủ đã giúp mình nâng band Reading từ 6.0 lên 7.5 chỉ sau 3 tuần ôn luyện trên web"</p>
-                  </Card>
-                  <Card className="relative overflow-hidden h-[300px] border border-white/20">
-                    <img src="/img/hp-img3.jpg" alt="Student 3" className="w-full h-full object-cover" />
-                    <p className="absolute bottom-0 left-0 right-0 p-4 text-white text-sm italic bg-black/50 backdrop-blur-sm">"Thi xong mới thấy: học trên ieltscomputertest.com là quyết định sáng suốt nhất mùa hè này 🤯 Giao diện y chang thi thật, làm riết thuộc bài luôn!"</p>
-                  </Card>
-                </CircularGallery>
-              </div>
-            </div>
-          </div>
 
           <div className="max-w-6xl mx-auto px-4 relative z-10 py-10">
 
@@ -507,9 +412,9 @@ const HomePage = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.5, ease: "easeOut" }}
             >
-              <h2 className="text-4xl font-bold inline-flex items-center gap-3 bg-gradient-to-r from-[#2b5356] via-[#0096b1] to-[#eb7e37] text-transparent bg-clip-text min-h-[3rem] leading-relaxed">
+              <h2 className="text-4xl font-bold inline-flex items-center gap-3 bg-gradient-to-r from-[#0f263e] via-[#d1942d] to-[#d1942d] text-transparent bg-clip-text min-h-[3rem] leading-relaxed">
                 <span className="animate-pulse text-[#2b5356]">✨</span>
-                Phù hợp cho
+                Suitable for
                 <span className="animate-pulse text-[#eb7e37]">✨</span>
               </h2>
             </motion.div>
@@ -519,9 +424,9 @@ const HomePage = () => {
               viewport={{ once: true }}
               variants={slideInBottom}
               className="flex flex-col md:flex-row items-center gap-10 px-4 py-5 max-w-6xl mx-auto relative mb-10 mt-5 rounded-xl
-                before:absolute before:inset-0 before:border-t-2 before:border-b-2 before:border-[#0096b1] before:scale-x-0 before:transition-transform before:duration-500 hover:before:scale-x-100 before:rounded-xl
-                after:absolute after:inset-0 after:border-l-2 after:border-r-2 after:border-[#0096b1] after:scale-y-0 after:transition-transform after:duration-500 hover:after:scale-y-100 after:rounded-xl
-                bg-gradient-to-r from-transparent via-[#0096b1]/5 to-transparent
+                before:absolute before:inset-0 before:border-t-2 before:border-b-2 before:border-[#d1942d] before:scale-x-0 before:transition-transform before:duration-500 hover:before:scale-x-100 before:rounded-xl
+                after:absolute after:inset-0 after:border-l-2 after:border-r-2 after:border-[#d1942d] after:scale-y-0 after:transition-transform after:duration-500 hover:after:scale-y-100 after:rounded-xl
+                bg-gradient-to-r from-transparent via-[#d1942d]/5 to-transparent
                 backdrop-blur-sm
                 shadow-[0_0_15px_rgba(235,126,55,0.1)]
                 hover:shadow-[0_0_25px_rgba(235,126,55,0.2)]
@@ -542,23 +447,23 @@ const HomePage = () => {
                 <div className="grid grid-cols-1 gap-3">
                   {[
                     {
-                      title: "Người mới luyện thi IELTS.",
-                      desc: "Làm quen với hình thức thi, giao diện và các dạng câu hỏi thường gặp.",
+                      title: "Beginners preparing for IELTS.",
+                      desc: "Get familiar with the test format, interface, and common question types.",
                       icon: "🎯"
                     },
                     {
-                      title: "Người thi lại 1 kỹ năng IELTS.",
-                      desc: "Các bài thi riêng biệt cho từng kỹ năng, tập trung vào điểm yếu cần cải thiện.",
+                      title: "Candidates retaking a specific skill.",
+                      desc: "Access separate tests for each skill and focus on the areas that need improvement.",
                       icon: "🔄"
                     },
                     {
-                      title: "Người hướng tới tăng điểm IELTS cao nhanh chóng.",
-                      desc: "Phân tích chi tiết từng câu trả lời, cung cấp mẫu câu đạt điểm cao để tham khảo.",
+                      title: "Learners aiming to boost their IELTS score quickly",
+                      desc: "Receive detailed analysis of each answer, clear explanations, and helpful learning tools to make rapid progress.",
                       icon: "📈"
                     },
                     {
-                      title: "Người muốn trúng đề thi IELTS.",
-                      desc: "Làm quen với những dạng đề \"dễ được luyện chọn, nắm vững các chủ đề thường xuất hiện trong đề thi, rút gọn thời gian và công sức khi học.",
+                      title: "Learners who want to “study smart”",
+                      desc: "Practice high-probability question types, master frequently tested topics, and save time and effort in your preparation.",
                       icon: "🎯"
                     }
                   ].map((item, index) => (
@@ -572,15 +477,15 @@ const HomePage = () => {
                       className="group relative overflow-hidden rounded-lg bg-white p-3 shadow-[0_0_10px_rgba(43,83,86,0.1)] hover:shadow-[0_0_15px_rgba(43,83,86,0.2)] transition-all duration-300"
                     >
                       {/* Decorative gradient background */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#2b5356]/5 via-transparent to-[#0096b1]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#0f263e]/5 via-transparent to-[#0f263e]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                       {/* Content */}
                       <div className="relative flex items-center gap-3">
-                        <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-br from-[#2b5356] to-[#0096b1] text-white text-base transform group-hover:scale-110 transition-transform duration-300">
+                        <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-br from-[#0f263e] to-[#0f263e] text-white text-base transform group-hover:scale-110 transition-transform duration-300">
                           {item.icon}
                         </div>
                         <div className="flex-grow min-w-0">
-                          <h4 className="font-semibold text-[#2b5356] text-sm group-hover:text-[#0096b1] transition-colors duration-300 truncate">
+                          <h4 className="font-semibold text-[#0f263e] text-sm group-hover:text-[#0096b1] transition-colors duration-300 truncate">
                             {item.title}
                           </h4>
                           <p className="text-gray-600 text-sm line-clamp-2 group-hover:text-gray-700 transition-colors duration-300">
@@ -619,12 +524,11 @@ const HomePage = () => {
                   variants={slideRight}
                   className="md:col-span-2"
                 >
-                  <h2 className="text-3xl md:text-4xl font-bold mb-10 text-[#2b5356]">
-                    Hệ thống thi ielts trên máy được phát triển bởi đội ngũ <span className="text-[#0096b1] font-bold"><i className='text-[#eb7e37]'>IELTS</i> <i className='text-[#0096b1]'>TAJUN</i></span>
+                  <h2 className="text-2xl md:text-3xl font-bold mb-10 text-[#0f263e]">
+                    The computer-based IELTS testing system is developed by a team of highly <span className="text-[#d1942d]">qualified</span>, <span className="text-[#d1942d]">professional</span>, and <span className="text-[#d1942d]">experienced</span> teachers.
                   </h2>
                   <p className="text-lg text-gray-600 mb-4 max-w-2xl">
-                    Chúng tôi cung cấp nền tảng giúp bạn luyện thi IELTS trên máy tính với đề thi gốc,
-                    tái hiện chính xác môi trường thi thật, giúp bạn tự tin đạt được điểm số mong muốn.
+                    We provide a platform that allows you to practice on a computer with authentic test questions, accurately simulating the real test environment and helping you confidently achieve your target score.
                   </p>
                 </motion.div>
                 <motion.div
@@ -635,9 +539,9 @@ const HomePage = () => {
                   className="flex justify-center md:justify-end items-center"
                 >
                   <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#e49257] to-[#349caf] rounded-full blur-md transform rotate-12"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#d1942d] to-[#0f263e] rounded-full blur-md transform rotate-12"></div>
                     <div className="relative z-10 py-3 px-6 bg-white rounded-full shadow-md text-lg font-semibold text-gray-700">
-                      98% thí sinh cải thiện band sau <span className="text-[#0096b1]">2 tuần</span>
+                      98% of students improve their band score after <span className="text-[#d1942d]">2 weeks</span>
                     </div>
                   </div>
                 </motion.div>
@@ -666,10 +570,10 @@ const HomePage = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-gray-800 relative">
-                  Thi thật tại nhà, giống kỳ thi chính thức
+                  Take the real test at home, just like the official exam
                   <span className="absolute -left-2 top-1/2 w-1 h-6 bg-[#2b5356] -translate-y-1/2 rounded-full"></span>
                 </h3>
-                <p className="text-gray-600">Trải nghiệm thi hoàn toàn giống với kỳ thi IELTS chính thức với giao diện được tái hiện chính xác, giúp bạn làm quen với môi trường thi thật.</p>
+                <p className="text-gray-600">Enjoy a fully authentic test experience with an accurately replicated interface, helping you get familiar with the real exam environment.</p>
 
                 <div className="flex justify-end mt-4">
                   <span className="inline-flex items-center text-sm font-medium text-[#2b5356]">
@@ -697,10 +601,10 @@ const HomePage = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-gray-800 relative">
-                  Đề thi gốc từ ngân hàng đề chính thức
+                  Authentic questions from official test banks
                   <span className="absolute -left-2 top-1/2 w-1 h-6 bg-[#0096b1] -translate-y-1/2 rounded-full"></span>
                 </h3>
-                <p className="text-gray-600">Làm quen với dạng đề thi gốc được biên soạn từ đội ngũ chuyên gia IELTS, mang đến trải nghiệm thi thật nhất có thể.</p>
+                <p className="text-gray-600">Practice with real test formats developed by IELTS experts, delivering the most realistic exam experience possible.</p>
 
                 <div className="flex justify-end mt-4">
                   <span className="inline-flex items-center text-sm font-medium text-[#0096b1]">
@@ -728,10 +632,10 @@ const HomePage = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-gray-800 relative">
-                  Tăng khả năng trúng tủ, nâng band hiệu quả
+                  Boost your chances and improve your band score effectively
                   <span className="absolute -left-2 top-1/2 w-1 h-6 bg-[#eb7e37] -translate-y-1/2 rounded-full"></span>
                 </h3>
-                <p className="text-gray-600">Làm quen với nhiều dạng đề, câu hỏi và chủ đề thường gặp, giúp bạn tăng khả năng "trúng tủ" và đạt điểm cao trong kỳ thi thật.</p>
+                <p className="text-gray-600">Get exposed to a wide range of common question types and topics, increasing your chances of success and helping you achieve a higher score.</p>
 
                 <div className="flex justify-end mt-4">
                   <span className="inline-flex items-center text-sm font-medium text-[#eb7e37]">
@@ -751,7 +655,7 @@ const HomePage = () => {
               whileInView="visible"
               viewport={{ once: true }}
               variants={slideInBottom}
-              className="relative bg-gradient-to-br from-[#2b5356] to-[#0096b1] text-white rounded-lg mx-4 md:mx-auto max-w-5xl overflow-hidden shadow-xl"
+              className="relative bg-gradient-to-br from-[#d1942d] to-[#0f263e] text-white rounded-lg mx-4 md:mx-auto max-w-5xl overflow-hidden shadow-xl"
             >
               <div className="absolute right-0 top-0 w-1/3 h-full opacity-30">
                 <svg viewBox="0 0 200 450" xmlns="http://www.w3.org/2000/svg" className="h-full w-full">
@@ -761,11 +665,11 @@ const HomePage = () => {
 
               <div className="p-8 md:p-12 flex flex-col md:flex-row items-center">
                 <div className="md:w-2/3 mb-6 md:mb-0 md:pr-8">
-                  <h3 className="text-2xl md:text-3xl font-bold mb-4">Thi thử miễn phí ngay hôm nay!</h3>
-                  <p className="text-white/90 mb-6">Bắt đầu hành trình chinh phục IELTS của bạn với trải nghiệm thi thử miễn phí. Không giới hạn thời gian, không cần thẻ tín dụng.</p>
+                  <h3 className="text-2xl md:text-3xl font-bold mb-4">Take a free mock test today!</h3>
+                  <p className="text-white/90 mb-6">Start your IELTS journey with a free mock test experience. No time limits, no credit card required.</p>
                   <div className="flex flex-col sm:flex-row gap-4">
                     <a href="/listening_list">
-                      <button className="px-6 py-3 bg-[#eb7e37] text-white font-bold rounded-lg hover:bg-[#eb7e37]/90 transition-colors shadow-lg hover:shadow-xl">Bắt đầu thi thử</button>
+                      <button className="px-6 py-3 bg-[#eb7e37] text-white font-bold rounded-lg hover:bg-[#eb7e37]/90 transition-colors shadow-lg hover:shadow-xl">Start free test</button>
                     </a>
                   </div>
                 </div>

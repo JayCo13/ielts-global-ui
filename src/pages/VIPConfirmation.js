@@ -29,10 +29,10 @@ const VIPConfirmation = () => {
                         </svg>
                     </div>
                     <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-                        Chào mừng đến với VIP!
+                        Welcome to VIP!
                     </h2>
                     <p className="mt-2 text-sm text-gray-600">
-                        Gói VIP của bạn đã được kích hoạt thành công
+                        Your VIP package has been successfully activated
                     </p>
                 </div>
 
@@ -45,13 +45,13 @@ const VIPConfirmation = () => {
                             </span>
                         </div>
                         <div className="flex justify-between text-sm mt-2">
-                            <span className="text-gray-600">Ngày bắt đầu:</span>
+                            <span className="text-gray-600">Start date:</span>
                             <span className="font-medium text-gray-900">
                                 {formatDate(subscription.start_date)}
                             </span>
                         </div>
                         <div className="flex justify-between text-sm mt-2">
-                            <span className="text-gray-600">Ngày kết thúc:</span>
+                            <span className="text-gray-600">End date:</span>
                             <span className="font-medium text-gray-900">
                                 {formatDate(subscription.end_date)}
                             </span>
@@ -62,7 +62,7 @@ const VIPConfirmation = () => {
                         onClick={() => navigate('/')}
                         className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-amber-600 hover:to-amber-700 transition-all duration-200"
                     >
-                        Bắt đầu khám phá tính năng VIP
+                        Start exploring VIP features
                     </button>
                 </div>
             </div>

@@ -60,7 +60,7 @@ const Register = () => {
 
     // Check for blocked email
     if (formData.email.trim() === 'thiieltstrenmay@gmail.com') {
-      setErrors(prev => ({ ...prev, email: 'Hành động quấy rối của bạn đang bị giám sát, vui lòng dừng lại ngay lập tức' }));
+      setErrors(prev => ({ ...prev, email: 'Your actions are being monitored, please stop immediately' }));
       setIsEmailValid(false);
       return;
     }
@@ -87,21 +87,21 @@ const Register = () => {
         } else {
           setErrors(prev => ({
             ...prev,
-            email: data.message || 'Email không hợp lệ'
+            email: data.message || 'Invalid email'
           }));
           setIsEmailValid(false);
         }
       } else {
         setErrors(prev => ({
           ...prev,
-          email: 'Lỗi xác thực email. Vui lòng thử lại.'
+          email: 'Email validation error. Please try again.'
         }));
         setIsEmailValid(false);
       }
     } catch (error) {
       setErrors(prev => ({
         ...prev,
-        email: 'Lỗi kết nối. Vui lòng thử lại sau.'
+        email: 'Connection error. Please try again later.'
       }));
       setIsEmailValid(false);
     } finally {
@@ -199,10 +199,10 @@ const Register = () => {
   // Get the strength label
   const getStrengthLabel = () => {
     if (passwordStrength < 30) return 'Yếu';
-    if (passwordStrength < 60) return 'Trung bình';
-    if (passwordStrength < 80) return 'Mạnh';
-    if (passwordStrength === 100) return 'Cực Mạnh';
-    return 'Mạnh';
+    if (passwordStrength < 60) return 'Average';
+    if (passwordStrength < 80) return 'Strong';
+    if (passwordStrength === 100) return 'Very Strong';
+    return 'Strong';
   };
 
   const validateForm = async () => {
@@ -216,18 +216,18 @@ const Register = () => {
     };
 
     if (!formData.username.trim()) {
-      newErrors.username = 'Tên người dùng là bắt buộc';
+      newErrors.username = 'Username is required';
       isValid = false;
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = 'Email là bắt buộc';
+      newErrors.email = 'Email is required';
       isValid = false;
     } else if (formData.email.trim() === 'thiieltstrenmay@gmail.com') {
-      newErrors.email = 'Tài khoản này đã bị chặn';
+      newErrors.email = 'This account is blocked';
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Định dạng email không hợp lệ';
+      newErrors.email = 'Invalid email format';
       isValid = false;
     } else if (!isEmailValid) {
       // Verify email if not already validated
@@ -246,13 +246,13 @@ const Register = () => {
         const data = await response.json();
 
         if (!response.ok || !data.valid) {
-          newErrors.email = data.message || 'Email không hợp lệ';
+          newErrors.email = data.message || 'Invalid email';
           isValid = false;
         } else {
           setIsEmailValid(true);
         }
       } catch (error) {
-        newErrors.email = 'Lỗi kết nối. Vui lòng thử lại sau.';
+        newErrors.email = 'Connection error. Please try again later.';
         isValid = false;
       } finally {
         setIsVerifyingEmail(false);
@@ -260,15 +260,15 @@ const Register = () => {
     }
 
     if (!formData.password) {
-      newErrors.password = 'Mật khẩu là bắt buộc';
+      newErrors.password = 'Password is required';
       isValid = false;
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Mật khẩu phải có ít nhất 6 ký tự';
+      newErrors.password = 'Password must have at least 6 characters';
       isValid = false;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Mật khẩu không khớp';
+      newErrors.confirmPassword = 'Passwords do not match';
       isValid = false;
     }
 
@@ -315,15 +315,15 @@ const Register = () => {
       } else {
         // Handle specific error messages from the API
         if (data.detail === "Username already registered") {
-          setErrors(prev => ({ ...prev, username: 'Tên người dùng đã tồn tại' }));
+          setErrors(prev => ({ ...prev, username: 'Username already exists' }));
         } else if (data.detail === "Email already registered") {
-          setErrors(prev => ({ ...prev, email: 'Email đã được đăng ký' }));
+          setErrors(prev => ({ ...prev, email: 'Email has already been registered' }));
         } else {
-          setErrors(prev => ({ ...prev, general: data.detail || 'Đăng ký thất bại. Vui lòng thử lại.' }));
+          setErrors(prev => ({ ...prev, general: data.detail || 'Register failed. Please try again.' }));
         }
       }
     } catch (error) {
-      setErrors(prev => ({ ...prev, general: 'Lỗi kết nối. Vui lòng thử lại sau.' }));
+      setErrors(prev => ({ ...prev, general: 'Connection error. Please try again later.' }));
     } finally {
       setIsLoading(false);
     }
@@ -416,8 +416,8 @@ const Register = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-lime-600 mb-2">Đăng Ký Thành Công!</h2>
-          <p className="text-gray-600 mb-4">Tài khoản của bạn đã được tạo thành công. Chuyển hướng đến trang đăng nhập...</p>
+          <h2 className="text-2xl font-bold text-lime-600 mb-2">Register Success!</h2>
+          <p className="text-gray-600 mb-4">Your account has been created successfully. Chuyển hướng đếto login page...</p>
           <div className="w-full h-20 flex items-center justify-center">
             <div className="w-full max-w-xs">
               <Lottie
@@ -453,7 +453,7 @@ const Register = () => {
           <div className="md:w-1/2 p-8">
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl font-bold text-lime-500 mb-6 text-center">Tạo Tài Khoản</h1>
+                <h1 className="text-2xl font-bold text-lime-500 mb-6 text-center">Create Account</h1>
 
                 {errors.general && (
                   <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
@@ -464,7 +464,7 @@ const Register = () => {
                 <form className="space-y-4" onSubmit={handleSubmit}>
                   {/* Username field */}
                   <div className="space-y-1">
-                    <label className="block text-gray-500 font-bold mb-1">Tên người dùng</label>
+                    <label className="block text-gray-500 font-bold mb-1">Username</label>
                     <input
                       type="text"
                       name="username"
@@ -510,32 +510,32 @@ const Register = () => {
                       <p className="text-red-500 text-sm mt-1">{errors.email}</p>
                     )}
                     {isEmailValid && (
-                      <p className="text-green-500 text-sm mt-1">Email hợp lệ</p>
+                      <p className="text-green-500 text-sm mt-1">Valid email</p>
                     )}
                   </div>
 
                   {/* Password field with strength meter */}
                   <div className="space-y-1">
                     <div className="flex justify-between items-center mb-1">
-                      <label className="block text-gray-500 font-bold">Mật khẩu</label>
+                      <label className="block text-gray-500 font-bold">Password</label>
                       <button
                         type="button"
                         onClick={() => setShowPasswordGenerator(!showPasswordGenerator)}
                         className="text-xs text-lime-600 hover:text-lime-700"
                       >
-                        {showPasswordGenerator ? 'Ẩn gợi ý' : 'Gợi ý mật khẩu mạnh'}
+                        {showPasswordGenerator ? 'Hide hints' : 'Strong password hints'}
                       </button>
                     </div>
 
                     {showPasswordGenerator && (
                       <div className="bg-lime-50 p-3 rounded-lg mb-3">
-                        <p className="text-sm text-gray-600 mb-2">Tạo mật khẩu mạnh với các ký tự khác nhau để tăng độ an toàn.</p>
+                        <p className="text-sm text-gray-600 mb-2">Create a strong password with different characters for safety.</p>
                         <button
                           type="button"
                           onClick={generateStrongPassword}
                           className="bg-lime-500 text-white text-sm py-1.5 px-3 rounded hover:bg-lime-600"
                         >
-                          Tạo mật khẩu ngẫu nhiên
+                          Generate random password
                         </button>
                       </div>
                     )}
@@ -590,19 +590,19 @@ const Register = () => {
                       <ul className="mt-2 text-xs text-gray-500 space-y-1">
                         <li className={`flex items-center ${formData.password.length >= 6 ? 'text-green-600' : ''}`}>
                           <span className={`inline-block w-2 h-2 rounded-full mr-2 ${formData.password.length >= 6 ? 'bg-green-600' : 'bg-gray-400'}`}></span>
-                          Tối thiểu 6 ký tự
+                          Minimum 6 characters
                         </li>
                         <li className={`flex items-center ${/[A-Z]/.test(formData.password) ? 'text-green-600' : ''}`}>
                           <span className={`inline-block w-2 h-2 rounded-full mr-2 ${/[A-Z]/.test(formData.password) ? 'bg-green-600' : 'bg-gray-400'}`}></span>
-                          Có ít nhất 1 chữ in hoa
+                          At least 1 uppercase letter
                         </li>
                         <li className={`flex items-center ${/[0-9]/.test(formData.password) ? 'text-green-600' : ''}`}>
                           <span className={`inline-block w-2 h-2 rounded-full mr-2 ${/[0-9]/.test(formData.password) ? 'bg-green-600' : 'bg-gray-400'}`}></span>
-                          Có ít nhất 1 chữ số
+                          At least 1 number
                         </li>
                         <li className={`flex items-center ${/[^A-Za-z0-9]/.test(formData.password) ? 'text-green-600' : ''}`}>
                           <span className={`inline-block w-2 h-2 rounded-full mr-2 ${/[^A-Za-z0-9]/.test(formData.password) ? 'bg-green-600' : 'bg-gray-400'}`}></span>
-                          Có ít nhất 1 ký tự đặc biệt
+                          At least 1 special character
                         </li>
                       </ul>
                     )}
@@ -610,7 +610,7 @@ const Register = () => {
 
                   {/* Confirm Password field */}
                   <div className="space-y-1">
-                    <label className="block text-gray-500 font-bold mb-1">Xác nhận mật khẩu</label>
+                    <label className="block text-gray-500 font-bold mb-1">Confirm password</label>
                     <div className="relative">
                       <input
                         type={confirmPasswordVisible ? "text" : "password"}
@@ -649,7 +649,7 @@ const Register = () => {
                     className={`w-full py-3 px-4 mt-4 bg-lime-500 text-white rounded-lg hover:bg-lime-600 transition-colors font-medium ${isLoading ? 'opacity-70 cursor-not-allowed' : ''
                       }`}
                   >
-                    {isLoading ? 'Đang tạo tài khoản...' : 'Đăng ký'}
+                    {isLoading ? 'Creating account......' : 'Register'}
                   </button>
 
                   {/* Add Google login button */}
@@ -658,7 +658,7 @@ const Register = () => {
                       <div className="w-full border-t border-gray-300"></div>
                     </div>
                     <div className="relative flex justify-center text-sm">
-                      <span className="px-2 bg-white text-gray-500">Hoặc tiếp tục với</span>
+                      <span className="px-2 bg-white text-gray-500">Or continue with</span>
                     </div>
                   </div>
 
@@ -675,11 +675,11 @@ const Register = () => {
                         <path fill="#EA4335" d="M -14.754 43.989 C -12.984 43.989 -11.404 44.599 -10.154 45.789 L -6.734 42.369 C -8.804 40.429 -11.514 39.239 -14.754 39.239 C -19.444 39.239 -23.494 41.939 -25.464 45.859 L -21.484 48.949 C -20.534 46.099 -17.884 43.989 -14.754 43.989 Z" />
                       </g>
                     </svg>
-                    Đăng ký với Google
+                    Register with Google
                   </button>
 
                   <p className="mt-6 text-center text-sm text-gray-600">
-                    Đã có tài khoản? <Link to="/login" className="text-lime-500 hover:text-lime-600 font-medium">Đăng nhập</Link>
+                    Already have an account?? <Link to="/login" className="text-lime-500 hover:text-lime-600 font-medium">Login</Link>
                   </p>
                 </form>
               </div>

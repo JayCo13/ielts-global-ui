@@ -139,35 +139,35 @@ const Navbar = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className={`flex justify-between items-center w-full mx-auto sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'py-0.5 bg-[#0096b1]/80 backdrop-blur-md shadow-lg' : 'py-2 bg-[#0096b1]'
+            className={`flex justify-between items-center w-full mx-auto sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'py-0.5 bg-[#07223d]/80 backdrop-blur-md shadow-lg' : 'py-2 bg-[#07223d]'
                 }`}
         >
             <div className="max-w-7xl w-full mx-auto px-4 flex justify-between items-center">
                 <div className={`w-32 flex items-center transition-all duration-300 ${isScrolled ? 'scale-75' : 'scale-100'
                     }`}>
                     <Link to="/">
-                        <img src="/img/logo-ielts.png" alt="IELTS Prep Logo" className="w-full object-contain" />
+                        <img src="/img/logo-ielts.png" alt="IELTS Prep Logo" className="w-full object-contain rounded-full" />
                     </Link>
                 </div>
 
                 {/* Desktop Navigation */}
                 <div className="hidden md:flex items-center">
                     {[
-                        { name: 'Trang chủ', path: '/' },
+                        { name: 'Home', path: '/' },
                     ].map((item) => (
                         <Link
                             key={item.path}
                             to={item.path}
                             className={`relative px-5 py-2.5 rounded-lg text-lg font-bold transition-all duration-200 ${isActive(item.path)
-                                ? 'text-[#ffffff] bg-[#ffffff]/50'
-                                : 'text-[#ffffff] hover:text-[#ffffff]/700 hover:bg-[#ffffff]/10'
+                                ? 'text-[#aea091] bg-[#ffffff]/10'
+                                : 'text-[#aea091] hover:text-[#b4904a]/700 hover:bg-[#b4904a]/10'
                                 }`}
                         >
                             {item.name}
                             {isActive(item.path) && (
                                 <motion.span
                                     layoutId="navbar-indicator"
-                                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ffffff] mx-4"
+                                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#b4904a] mx-4"
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.3 }}
@@ -182,7 +182,7 @@ const Navbar = () => {
                         onMouseLeave={() => setIsReadingOpen(false)}
                     >
                         <button
-                            className={`px-5 py-2.5 rounded-lg text-lg font-bold text-white hover:bg-white/10 transition-all duration-200 ${isActive('/reading_list') ? 'bg-white/50' : ''}`}
+                            className={`px-5 py-2.5 rounded-lg text-lg font-bold text-[#aea091] hover:bg-white/10 transition-all duration-200 ${isActive('/reading_list') ? 'bg-white/50' : ''}`}
                         >
                             Reading
                         </button>
@@ -197,14 +197,14 @@ const Navbar = () => {
                                 >
                                     <Link
                                         to="/reading_list"
-                                        className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#0096b1]/10 hover:text-[#0096b1] transition-all duration-200"
+                                        className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsReadingOpen(false)}
                                     >
                                         Full Test
                                     </Link>
                                     <Link
                                         to="/reading_forecast"
-                                        className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#0096b1]/10 hover:text-[#0096b1] transition-all duration-200"
+                                        className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsReadingOpen(false)}
                                     >
                                         Forecast
@@ -220,7 +220,7 @@ const Navbar = () => {
                         onMouseLeave={() => setIsListeningOpen(false)}
                     >
                         <button
-                            className={`px-5 py-2.5 rounded-lg text-lg font-bold text-white hover:bg-white/10 transition-all duration-200 ${isActive('/listening_list') ? 'bg-white/50' : ''}`}
+                            className={`px-5 py-2.5 rounded-lg text-lg font-bold text-[#aea091] hover:bg-white/10 transition-all duration-200 ${isActive('/listening_list') ? 'bg-white/50' : ''}`}
                         >
                             Listening
                         </button>
@@ -235,14 +235,14 @@ const Navbar = () => {
                                 >
                                     <Link
                                         to="/listening_list"
-                                        className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#0096b1]/10 hover:text-[#0096b1] transition-all duration-200"
+                                        className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsListeningOpen(false)}
                                     >
                                         Full Test
                                     </Link>
                                     <Link
                                         to="/listening_forecast"
-                                        className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#0096b1]/10 hover:text-[#0096b1] transition-all duration-200"
+                                        className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsListeningOpen(false)}
                                     >
                                         Forecast
@@ -258,7 +258,7 @@ const Navbar = () => {
                         onMouseLeave={() => setIsWritingOpen(false)}
                     >
                         <button
-                            className={`px-5 py-2.5 rounded-lg text-lg font-bold text-white hover:bg-white/10 transition-all duration-200 ${isActive('/writing_list') ? 'bg-white/50' : ''}`}
+                            className={`px-5 py-2.5 rounded-lg text-lg font-bold text-[#aea091] hover:bg-white/10 transition-all duration-200 ${isActive('/writing_list') ? 'bg-white/50' : ''}`}
                         >
                             Writing
                         </button>
@@ -273,14 +273,14 @@ const Navbar = () => {
                                 >
                                     <Link
                                         to="/writing_list"
-                                        className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#0096b1]/10 hover:text-[#0096b1] transition-all duration-200"
+                                        className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsWritingOpen(false)}
                                     >
                                         Full Test
                                     </Link>
                                     <Link
                                         to="/writing_forecast"
-                                        className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#0096b1]/10 hover:text-[#0096b1] transition-all duration-200"
+                                        className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsWritingOpen(false)}
                                     >
                                         Forecast
@@ -292,7 +292,7 @@ const Navbar = () => {
 
                     <Link
                         to="/speaking_list?part=part1"
-                        className={`px-5 py-2.5 rounded-lg text-lg font-bold text-white hover:bg-white/10 transition-all duration-200 ${isActive('/speaking_list') ? 'bg-white/50' : ''}`}
+                        className={`px-5 py-2.5 rounded-lg text-lg font-bold text-[#aea091] hover:bg-white/10 transition-all duration-200 ${isActive('/speaking_list') ? 'bg-white/50' : ''}`}
                     >
                         Speaking
                     </Link>
@@ -303,7 +303,7 @@ const Navbar = () => {
                         onMouseLeave={() => setIsVocabularyOpen(false)}
                     >
                         <button
-                            className={`px-5 py-2.5 rounded-lg text-lg font-bold text-white hover:bg-white/10 transition-all duration-200 ${isActive('/dictation') || isActive('/new-vocabulary') ? 'bg-white/50' : ''}`}
+                            className={`px-5 py-2.5 rounded-lg text-lg font-bold text-[#aea091] hover:bg-white/10 transition-all duration-200 ${isActive('/dictation') || isActive('/new-vocabulary') ? 'bg-white/50' : ''}`}
                         >
                             Vocabulary
                         </button>
@@ -318,7 +318,7 @@ const Navbar = () => {
                                 >
                                     <Link
                                         to="/new-vocabulary"
-                                        className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#0096b1]/10 hover:text-[#0096b1] transition-all duration-200"
+                                        className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsVocabularyOpen(false)}
                                     >
                                         New Words
@@ -326,7 +326,7 @@ const Navbar = () => {
                                     {localStorage.getItem('role') === 'student' ? (
                                         <Link
                                             to="/dictation"
-                                            className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#0096b1]/10 hover:text-[#0096b1] transition-all duration-200"
+                                            className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                             onClick={() => setIsVocabularyOpen(false)}
                                         >
                                             <span className="flex-1">Student Only</span>
@@ -334,7 +334,7 @@ const Navbar = () => {
                                     ) : (
                                         <div
                                             className="flex items-center justify-between px-4 py-3 text-md font-bold text-gray-400 bg-gray-100/50 rounded-lg cursor-not-allowed border border-transparent hover:border-gray-200 transition-all duration-200 group"
-                                            title="Tính năng dành riêng cho học viên"
+                                            title="Feature reserved for students"
                                         >
                                             <span>Student Only</span>
                                             <div className="bg-gray-200 p-1.5 rounded-md group-hover:bg-gray-300 transition-colors">
@@ -353,7 +353,7 @@ const Navbar = () => {
                     {username && (
                         <div className="hidden sm:flex items-center">
                             {localStorage.getItem('role') === 'student' ? (
-                                <div className="bg-white/10 backdrop-blur-sm text-white text-sm font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 border border-white/20">
+                                <div className="bg-white/10 backdrop-blur-sm text-[#aea091] text-sm font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 border border-white/20">
                                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
                                     </svg>
@@ -398,15 +398,15 @@ const Navbar = () => {
 
                                             {/* Hover info for remaining days */}
                                             <div className="absolute top-full mt-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap pointer-events-none z-50">
-                                                {subscriptionStatus.days_remaining} ngày còn lại
+                                                {subscriptionStatus.days_remaining} days remaining
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg border border-white/20 hover:bg-amber-500 hover:border-amber-500 transition-all duration-200">
+                                        <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm text-[#aea091] px-3 py-1.5 rounded-lg border border-white/20 hover:bg-amber-500 hover:border-amber-500 transition-all duration-200">
                                             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                                 <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm2 3a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1z" />
                                             </svg>
-                                            <span className="text-sm font-medium">Nâng cấp VIP</span>
+                                            <span className="text-sm font-medium">Upgrade VIP</span>
                                         </div>
                                     )}
                                 </Link>
@@ -425,13 +425,13 @@ const Navbar = () => {
                         >
                             {username ? (
                                 <>
-                                    <div className="hidden sm:flex h-9 w-9 rounded-full bg-[#ffffff]/15 text-white items-center justify-center font-medium text-base">
+                                    <div className="hidden sm:flex h-9 w-9 rounded-full bg-[#b4904a]/15 text-[#aea091] items-center justify-center font-medium text-base">
                                         {username.charAt(0).toUpperCase()}
                                     </div>
-                                    <span className="hidden sm:block text-base font-medium text-white">{username}</span>
+                                    <span className="hidden sm:block text-base font-medium text-[#aea091]">{username}</span>
                                 </>
                             ) : (
-                                <User className="w-7 h-7 text-white" strokeWidth={2} />
+                                <User className="w-7 h-7 text-[#aea091]" strokeWidth={2} />
                             )}
                         </motion.div>
 
@@ -449,7 +449,7 @@ const Navbar = () => {
                                         <>
                                             <div className="px-4 py-3 border-b border-gray-100">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="h-12 w-12 rounded-full bg-[#0096b1]/5 text-[#0096b1] flex items-center justify-center font-bold text-lg">
+                                                    <div className="h-12 w-12 rounded-full bg-[#07223d]/5 text-[#07223d] flex items-center justify-center font-bold text-lg">
                                                         {username.charAt(0).toUpperCase()}
                                                     </div>
                                                     <div className="flex flex-col">
@@ -464,7 +464,7 @@ const Navbar = () => {
                                             <div className="py-1 px-2">
                                                 <Link
                                                     to="/profile"
-                                                    className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-[#0096b1]/10 rounded-lg transition-colors"
+                                                    className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-[#07223d]/10 rounded-lg transition-colors"
                                                 >
                                                     <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
@@ -473,17 +473,17 @@ const Navbar = () => {
                                                 </Link>
                                                 <Link
                                                     to="/exam-history"
-                                                    className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-[#0096b1]/10 rounded-lg transition-colors"
+                                                    className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-[#07223d]/10 rounded-lg transition-colors"
                                                 >
                                                     <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                     </svg>
-                                                    <span>Lịch sử bài làm</span>
+                                                    <span>Exam History</span>
                                                 </Link>
                                                 {localStorage.getItem('role') !== 'student' && (
                                                     <Link
                                                         to="/my-vip-package"
-                                                        className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-[#0096b1]/10 rounded-lg transition-colors"
+                                                        className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-[#07223d]/10 rounded-lg transition-colors"
                                                     >
                                                         <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
@@ -509,7 +509,7 @@ const Navbar = () => {
                                         <>
                                             <Link
                                                 to="/login"
-                                                className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-[#0096b1]/10 transition-colors"
+                                                className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-[#07223d]/10 transition-colors"
                                                 onClick={() => setIsUserMenuOpen(false)}
                                             >
                                                 <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -519,7 +519,7 @@ const Navbar = () => {
                                             </Link>
                                             <Link
                                                 to="/register"
-                                                className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-[#0096b1]/10 transition-colors"
+                                                className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-[#07223d]/10 transition-colors"
                                                 onClick={() => setIsUserMenuOpen(false)}
                                             >
                                                 <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -560,22 +560,22 @@ const Navbar = () => {
                         <div className="max-w-7xl mx-auto px-4 py-2">
                             <div className="flex flex-col space-y-1">
                                 {[
-                                    { name: 'Trang chủ', path: '/' },
+                                    { name: 'Home', path: '/' },
                                     { name: 'Listening – Full Test', path: '/listening_list' },
                                     { name: 'Listening – Forecast', path: '/listening_forecast' },
                                     { name: 'Reading – Full Test', path: '/reading_list' },
                                     { name: 'Reading – Forecast', path: '/reading_forecast' },
                                     { name: 'Writing', path: '/writing_list' },
                                     { name: 'Speaking', path: '/speaking_list?part=part1' },
-                                    { name: 'Chép chính tả', path: '/dictation' },
-                                    { name: 'Từ vựng mới', path: '/new-vocabulary' }
+                                    { name: 'Dictation', path: '/dictation' },
+                                    { name: 'New Vocabulary', path: '/new-vocabulary' }
                                 ].map((item) => (
                                     <Link
                                         key={item.path}
                                         to={item.path}
                                         className={`px-4 py-3 rounded-lg text-base ${isActive(item.path)
-                                            ? 'bg-[#0096b1]/5 text-[#0096b1] font-medium'
-                                            : 'text-gray-700 hover:bg-[#0096b1]/5'}`}
+                                            ? 'bg-[#07223d]/5 text-[#07223d] font-medium'
+                                            : 'text-gray-700 hover:bg-[#07223d]/5'}`}
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
                                         {item.name}
@@ -586,7 +586,7 @@ const Navbar = () => {
                                 {username && (
                                     <div className="pt-2 border-t border-gray-100 mt-2">
                                         <div className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 bg-gray-50 rounded-lg mb-2">
-                                            <div className="w-8 h-8 bg-[#0096b1] rounded-full flex items-center justify-center">
+                                            <div className="w-8 h-8 bg-[#07223d] rounded-full flex items-center justify-center">
                                                 <User size={16} className="text-white" />
                                             </div>
                                             <span className="font-medium">{username}</span>
@@ -594,7 +594,7 @@ const Navbar = () => {
 
                                         <Link
                                             to="/profile"
-                                            className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-[#0096b1]/10 rounded-lg transition-colors"
+                                            className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-[#07223d]/10 rounded-lg transition-colors"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
                                             <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -605,18 +605,18 @@ const Navbar = () => {
 
                                         <Link
                                             to="/exam-history"
-                                            className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-[#0096b1]/10 rounded-lg transition-colors"
+                                            className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-[#07223d]/10 rounded-lg transition-colors"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
                                             <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
-                                            <span>Lịch sử bài làm</span>
+                                            <span>Exam History</span>
                                         </Link>
 
                                         <Link
                                             to="/vip-package"
-                                            className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-[#0096b1]/10 rounded-lg transition-colors"
+                                            className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-[#07223d]/10 rounded-lg transition-colors"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
                                             <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -645,7 +645,7 @@ const Navbar = () => {
                                     <div className="pt-2 border-t border-gray-100 mt-2">
                                         <Link
                                             to="/login"
-                                            className="flex items-center justify-center gap-2 w-full py-2.5 text-gray-700 bg-[#0096b1]/90 hover:bg-[#0096b1]/80 rounded-lg font-medium"
+                                            className="flex items-center justify-center gap-2 w-full py-2.5 text-gray-700 bg-[#07223d]/90 hover:bg-[#07223d]/80 rounded-lg font-medium"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

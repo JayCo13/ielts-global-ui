@@ -44,9 +44,9 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
   const getStrengthLabel = () => {
     if (formData.new_password.length === 0) return '';
     if (passwordStrength <= 1) return 'Yếu';
-    if (passwordStrength <= 2) return 'Trung bình';
-    if (passwordStrength <= 3) return 'Khá';
-    return 'Mạnh';
+    if (passwordStrength <= 2) return 'Average';
+    if (passwordStrength <= 3) return 'Good';
+    return 'Strong';
   };
 
   const getStrengthColor = () => {
@@ -62,17 +62,17 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
 
     // Client-side validation
     if (formData.new_password.length < 6) {
-      setMessage({ type: 'error', text: 'Mật khẩu mới phải có ít nhất 6 ký tự' });
+      setMessage({ type: 'error', text: 'New password must be at least 6 characters' });
       return;
     }
 
     if (formData.new_password !== formData.confirm_password) {
-      setMessage({ type: 'error', text: 'Mật khẩu xác nhận không khớp' });
+      setMessage({ type: 'error', text: 'Passwords do not match' });
       return;
     }
 
     if (!isGoogleAccount && formData.current_password && formData.current_password === formData.new_password) {
-      setMessage({ type: 'error', text: 'Mật khẩu mới phải khác mật khẩu hiện tại' });
+      setMessage({ type: 'error', text: 'New password must be different from current password' });
       return;
     }
 
@@ -93,14 +93,14 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage({ type: 'success', text: data.message || 'Đổi mật khẩu thành công!' });
+        setMessage({ type: 'success', text: data.message || 'Password changed successfully!' });
         setFormData({ current_password: '', new_password: '', confirm_password: '' });
       } else {
-        setMessage({ type: 'error', text: data.detail || 'Đổi mật khẩu thất bại' });
+        setMessage({ type: 'error', text: data.detail || 'Failed to change password' });
       }
     } catch (error) {
       console.error('Error changing password:', error);
-      setMessage({ type: 'error', text: 'Đã xảy ra lỗi. Vui lòng thử lại sau.' });
+      setMessage({ type: 'error', text: 'An error occurred. Please try again later.' });
     } finally {
       setIsSubmitting(false);
     }
@@ -117,7 +117,7 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
           <div className="w-10 h-10 rounded-full bg-[#0096b1]/10 flex items-center justify-center">
             <Lock className="w-5 h-5 text-[#0096b1]" />
           </div>
-          <h2 className="text-2xl font-bold">{isGoogleAccount ? 'Đặt Mật Khẩu' : 'Đổi Mật Khẩu'}</h2>
+          <h2 className="text-2xl font-bold">{isGoogleAccount ? 'Set Password' : 'Change Password'}</h2>
         </div>
 
         {message.text && (
@@ -144,8 +144,8 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
                 <line x1="12" y1="8" x2="12.01" y2="8"/>
               </svg>
               <div>
-                <p className="font-medium">Tài khoản đăng nhập bằng Google</p>
-                <p className="text-xs mt-1 text-blue-600">Bạn có thể đặt mật khẩu để đăng nhập bằng email/mật khẩu ngoài Google.</p>
+                <p className="font-medium">Logged in with Google</p>
+                <p className="text-xs mt-1 text-blue-600">You can set a password to log in without Google.</p>
               </div>
             </div>
           )}
@@ -154,7 +154,7 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
           {!isGoogleAccount && (
             <div className="space-y-1.5">
               <label className="block text-sm font-medium text-gray-700">
-                Mật khẩu hiện tại <span className="text-red-500">*</span>
+                Current Password <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <input
@@ -162,7 +162,7 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
                   value={formData.current_password}
                   onChange={(e) => setFormData({ ...formData, current_password: e.target.value })}
                   className="w-full px-4 py-2.5 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0096b1]/30 focus:border-[#0096b1] transition-all outline-none"
-                  placeholder="Nhập mật khẩu hiện tại"
+                  placeholder="Enter current password"
                   required
                   disabled={isSubmitting}
                 />
@@ -180,7 +180,7 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
           {/* New Password */}
           <div className="space-y-1.5">
             <label className="block text-sm font-medium text-gray-700">
-              Mật khẩu mới <span className="text-red-500">*</span>
+              New Password <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
@@ -188,7 +188,7 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
                 value={formData.new_password}
                 onChange={(e) => setFormData({ ...formData, new_password: e.target.value })}
                 className="w-full px-4 py-2.5 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0096b1]/30 focus:border-[#0096b1] transition-all outline-none"
-                placeholder="Nhập mật khẩu mới (ít nhất 6 ký tự)"
+                placeholder="Enter new password (min 6 chars)"
                 required
                 minLength={6}
                 disabled={isSubmitting}
@@ -220,7 +220,7 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
                   passwordStrength <= 2 ? 'text-yellow-600' : 
                   passwordStrength <= 3 ? 'text-blue-600' : 'text-green-600'
                 }`}>
-                  Độ mạnh: {getStrengthLabel()}
+                  Strength: {getStrengthLabel()}
                 </p>
               </div>
             )}
@@ -229,7 +229,7 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
           {/* Confirm New Password */}
           <div className="space-y-1.5">
             <label className="block text-sm font-medium text-gray-700">
-              Xác nhận mật khẩu mới <span className="text-red-500">*</span>
+              Confirm New Password <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
@@ -243,7 +243,7 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
                       ? 'border-green-300 bg-green-50/50' 
                       : 'border-gray-300'
                 }`}
-                placeholder="Nhập lại mật khẩu mới"
+                placeholder="Re-enter new password"
                 required
                 disabled={isSubmitting}
               />
@@ -257,24 +257,24 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
             </div>
             {formData.confirm_password && formData.new_password !== formData.confirm_password && (
               <p className="text-xs text-red-500 flex items-center gap-1">
-                <AlertCircle className="w-3.5 h-3.5" /> Mật khẩu xác nhận không khớp
+                <AlertCircle className="w-3.5 h-3.5" /> Passwords do not match
               </p>
             )}
             {formData.confirm_password && formData.new_password === formData.confirm_password && (
               <p className="text-xs text-green-600 flex items-center gap-1">
-                <CheckCircle className="w-3.5 h-3.5" /> Mật khẩu khớp
+                <CheckCircle className="w-3.5 h-3.5" /> Passwords match
               </p>
             )}
           </div>
 
           {/* Tips */}
           <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600 space-y-1">
-            <p className="font-medium text-gray-700 mb-2">💡 Gợi ý tạo mật khẩu mạnh:</p>
+            <p className="font-medium text-gray-700 mb-2">💡 Tips for a strong password:</p>
             <ul className="list-disc list-inside space-y-0.5 text-xs">
-              <li>Ít nhất 8 ký tự</li>
-              <li>Kết hợp chữ hoa và chữ thường</li>
-              <li>Có chứa số</li>
-              <li>Có ký tự đặc biệt (@, #, $, ...)</li>
+              <li>At least 8 characters</li>
+              <li>Mix upper and lower case letters</li>
+              <li>Include numbers</li>
+              <li>Include special characters (@, #, $, ...)</li>
             </ul>
           </div>
 
@@ -293,12 +293,12 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
-                Đang xử lý...
+                Processing...
               </>
             ) : (
               <>
                 <Lock className="w-4 h-4" />
-                {isGoogleAccount ? 'Đặt Mật Khẩu' : 'Đổi Mật Khẩu'}
+                {isGoogleAccount ? 'Set Password' : 'Change Password'}
               </>
             )}
           </button>
@@ -417,17 +417,17 @@ const ProfilePage = () => {
                 <p className="text-gray-500 text-sm">{profileData?.email}</p>
                 <div className="flex items-center gap-2 mt-2">
                   <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Đang hoạt động
+                    Active
                   </div>
                   
                   {localStorage.getItem('role') === 'student' && accountStatus && (
                     <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                       {accountStatus.is_active ? (
-                        <span>Thời gian hoạt động còn {accountStatus.remaining_days} ngày</span>
+                        <span>Active time remaining: {accountStatus.remaining_days} days</span>
                       ) : accountStatus.activated_at === null ? (
-                        <span>Chưa kích hoạt</span>
+                        <span>Not activated</span>
                       ) : (
-                        <span>Đã hết hạn</span>
+                        <span>Expired</span>
                       )}
                     </div>
                   )}
@@ -435,8 +435,8 @@ const ProfilePage = () => {
                   {localStorage.getItem('role') === 'customer' && vipInfo && (
                     <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                       {vipInfo.has_active_subscription
-                        ? <>Gói VIP: còn {vipInfo.remaining_days} ngày ({vipInfo.package_name})</>
-                        : <>Chưa có gói VIP</>
+                        ? <>VIP Plan: remaining {vipInfo.remaining_days} days ({vipInfo.package_name})</>
+                        : <>No VIP Plan</>
                       }
                     </div>
                   )}
@@ -448,7 +448,7 @@ const ProfilePage = () => {
               {/* Section navigation */}
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">
-                  {statsSection === 0 ? "Tổng quan thống kê" : "Thống kê chi tiết"}
+                  {statsSection === 0 ? "Statistics Overview" : "Detailed Statistics"}
                 </h2>
                 <div className="flex gap-2">
                   <button 
@@ -459,7 +459,7 @@ const ProfilePage = () => {
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
-                    Tổng quan
+                    Overview
                   </button>
                   <button 
                     onClick={() => setStatsSection(1)}
@@ -479,7 +479,7 @@ const ProfilePage = () => {
                 <button 
                   onClick={() => setStatsSection(1)}
                   className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 z-10"
-                  aria-label="Xem thống kê chi tiết"
+                  aria-label="View detailed statistics"
                 >
                   <ArrowRight className="w-5 h-5 text-gray-600" />
                 </button>
@@ -489,7 +489,7 @@ const ProfilePage = () => {
                 <button 
                   onClick={() => setStatsSection(0)}
                   className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 z-10"
-                  aria-label="Quay lại tổng quan"
+                  aria-label="Back to overview"
                 >
                   <ArrowLeft className="w-5 h-5 text-gray-600" />
                 </button>
@@ -501,15 +501,15 @@ const ProfilePage = () => {
               }`}>
                 <div className="grid grid-cols-3 gap-6 mb-8">
                   <div className="bg-gray-50 rounded-xl p-6">
-                    <h3 className="text-gray-500 text-sm font-medium mb-2">Tổng số bài thi</h3>
+                    <h3 className="text-gray-500 text-sm font-medium mb-2">Total Tests</h3>
                     <p className="text-3xl font-bold text-gray-900">{testStats?.total_exams_completed || 0}</p>
                   </div>
                   <div className="bg-gray-50 rounded-xl p-6">
-                    <h3 className="text-gray-500 text-sm font-medium mb-2">Bài nghe đã hoàn thành</h3>
+                    <h3 className="text-gray-500 text-sm font-medium mb-2">Completed Listening</h3>
                     <p className="text-3xl font-bold text-gray-900">{testStats?.listening_statistics?.exams_completed || 0}</p>
                   </div>
                   <div className="bg-gray-50 rounded-xl p-6">
-                    <h3 className="text-gray-500 text-sm font-medium mb-2">Bài viết đã làm</h3>
+                    <h3 className="text-gray-500 text-sm font-medium mb-2">Completed Writing</h3>
                     <p className="text-3xl font-bold text-gray-900">{testStats?.writing_statistics?.tasks_completed || 0}</p>
                   </div>
                 </div>
@@ -517,14 +517,14 @@ const ProfilePage = () => {
                 {testStats?.latest_test && (
                   <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-xl font-semibold">Bài thi gần nhất</h2>
+                      <h2 className="text-xl font-semibold">Latest Test</h2>
                     </div>
                     
                     <div className="bg-gray-50 rounded-lg p-4 mb-4">
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                         <div>
-                          <h4 className="font-medium text-lg line-clamp-1">Tên bài thi: {testStats.latest_test.exam_title}</h4>
-                          <p className="text-sm text-gray-500 mt-1">Ngày hoàn thành: {new Date(testStats.latest_test.completion_date).toLocaleDateString('vi-VN', {
+                          <h4 className="font-medium text-lg line-clamp-1">Test Name: {testStats.latest_test.exam_title}</h4>
+                          <p className="text-sm text-gray-500 mt-1">Completion Date: {new Date(testStats.latest_test.completion_date).toLocaleDateString('en-US', {
                             day: '2-digit',
                             month: '2-digit',
                             year: 'numeric'
@@ -532,7 +532,7 @@ const ProfilePage = () => {
                         </div>
                         <div className="text-right">
                         <span className="text-2xl font-bold text-[#0096b1]">{testStats.latest_test.total_score}</span>
-                        <span className="text-sm text-gray-500 ml-1">Điểm</span>
+                        <span className="text-sm text-gray-500 ml-1">Score</span>
                       </div>
                       </div>
                     </div>
@@ -558,30 +558,30 @@ const ProfilePage = () => {
                   <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <div className="flex items-center gap-2 mb-4">
                       <Headphones className="w-5 h-5 text-[#0096b1]" />
-                      <h2 className="text-xl font-semibold">Thống kê bài nghe</h2>
+                      <h2 className="text-xl font-semibold">Listening Statistics</h2>
                     </div>
                     
                     {testStats?.listening_statistics?.exams_completed > 0 ? (
                       <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                           <div className="bg-gray-50 rounded-lg p-4">
-                            <h3 className="text-gray-500 text-xs font-medium mb-1">Độ chính xác trung bình</h3>
+                            <h3 className="text-gray-500 text-xs font-medium mb-1">Average Accuracy</h3>
                             <p className="text-xl font-bold text-gray-900">{testStats.listening_statistics.average_accuracy}%</p>
                           </div>
                           <div className="bg-gray-50 rounded-lg p-4">
-                            <h3 className="text-gray-500 text-xs font-medium mb-1">Điểm trung bình</h3>
+                            <h3 className="text-gray-500 text-xs font-medium mb-1">Score trung bình</h3>
                             <p className="text-xl font-bold text-gray-900">{testStats.listening_statistics.average_score}</p>
                           </div>
                         </div>
                         
                         {testStats.listening_statistics.exams.length > 0 && (
                           <div>
-                            <h3 className="text-sm font-medium text-gray-700 mb-2">Bài thi gần đây</h3>
+                            <h3 className="text-sm font-medium text-gray-700 mb-2">Recent Tests</h3>
                             {testStats.listening_statistics.exams.slice(0, 2).map((exam, index) => (
                               <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                                 <div>
                                   <h4 className="font-medium text-sm">{exam.exam_title}</h4>
-                                  <p className="text-xs text-gray-500">{new Date(exam.completion_date).toLocaleDateString('vi-VN')}</p>
+                                  <p className="text-xs text-gray-500">{new Date(exam.completion_date).toLocaleDateString('en-US')}</p>
                                 </div>
                                 <div className="text-right">
                                   <span className="font-medium text-[#0096b1]">{exam.accuracy.toFixed(1)}%</span>
@@ -592,14 +592,14 @@ const ProfilePage = () => {
                         )}
                       </div>
                     ) : (
-                      <p className="text-gray-500 text-center py-4">Chưa có bài nghe nào được hoàn thành</p>
+                      <p className="text-gray-500 text-center py-4">No completed listening tests</p>
                     )}
                   </div>
                   
                   <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <div className="flex items-center gap-2 mb-4">
                       <PenTool className="w-5 h-5 text-[#0096b1]" />
-                      <h2 className="text-xl font-semibold">Thống kê bài viết</h2>
+                      <h2 className="text-xl font-semibold">Writing Statistics</h2>
                     </div>
                     
                     {testStats?.writing_statistics?.tests_attempted > 0 ? (
@@ -617,12 +617,12 @@ const ProfilePage = () => {
                         
                         {testStats.writing_statistics.tests.length > 0 && (
                           <div>
-                            <h3 className="text-sm font-medium text-gray-700 mb-2">Bài thi gần đây</h3>
+                            <h3 className="text-sm font-medium text-gray-700 mb-2">Recent Tests</h3>
                             {testStats.writing_statistics.tests.slice(0, 2).map((test, index) => (
                               <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                                 <div>
                                   <h4 className="font-medium text-sm">{test.title}</h4>
-                                  <p className="text-xs text-gray-500">{new Date(test.latest_update).toLocaleDateString('vi-VN')}</p>
+                                  <p className="text-xs text-gray-500">{new Date(test.latest_update).toLocaleDateString('en-US')}</p>
                                 </div>
                                 <div className="text-right">
                                   <span className={`text-xs px-2 py-1 rounded-full ${
@@ -672,10 +672,10 @@ const ProfilePage = () => {
                     activeView === 'profile' ? 'text-[#0096b1] bg-[#0096b1]-50' : 'text-gray-600'
                   }`}
                   onClick={() => setActiveView('profile')}
-                  title={menuCollapsed ? "Tổng quan hồ sơ" : ""}
+                  title={menuCollapsed ? "Overview hồ sơ" : ""}
                 >
                   <User className="w-5 h-5 min-w-5" />
-                  {!menuCollapsed && <span>Tổng quan hồ sơ</span>}
+                  {!menuCollapsed && <span>Overview hồ sơ</span>}
                 </div>
                 <div 
                   className={`flex items-center gap-3 p-2 cursor-pointer rounded-lg hover:bg-gray-50 ${

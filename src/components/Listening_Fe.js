@@ -319,7 +319,7 @@ const Listening_Fe = () => {
           </div>
 
           <div className="mt-4 text-sm text-gray-500 max-w-xs text-center">
-            Đang tải các bài kiểm tra IELTS Listening. Vui lòng đợi trong giây lát...
+            Loading IELTS Listening tests. Please wait...
           </div>
         </div>
       </div>
@@ -354,7 +354,7 @@ const Listening_Fe = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder={!isVIP && userRole === 'customer' ? "Tìm kiếm chỉ dành cho VIP..." : "Tìm kiếm bài thi..."}
+              placeholder={!isVIP && userRole === 'customer' ? "Search only for VIP..." : "Search tests..."}
               className={`w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500 ${!isVIP && userRole === 'customer' ? 'bg-gray-100 cursor-not-allowed' : ''
                 }`}
               value={searchQuery}
@@ -377,8 +377,8 @@ const Listening_Fe = () => {
             <option value="alphabet">Theo Alphabet</option>
             {(isVIP || userRole === 'student') && (
               <>
-                <option value="latest">Mới nhất</option>
-                <option value="oldest">Cũ nhất</option>
+                <option value="latest">Newest</option>
+                <option value="oldest">Oldest</option>
               </>
             )}
           </select>
@@ -404,16 +404,16 @@ const Listening_Fe = () => {
                       <button
                         onClick={() => toggleExamHistoryDropdown(test.id)}
                         className="flex items-center space-x-1 px-3 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 text-sm font-semibold rounded-lg transition-colors border border-gray-200"
-                        title="Lịch sử bài thi"
+                        title="Exam history"
                       >
-                        <span>Lịch sử</span>
+                        <span>History</span>
                         <ChevronRight className={`w-4 h-4 transition-transform ${examHistoryDropdowns[test.id] ? 'rotate-90' : ''}`} />
                       </button>
 
                       {examHistoryDropdowns[test.id] && (
                         <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 z-30 overflow-hidden text-left origin-top-right">
                           <div className="p-3 border-b border-gray-50 bg-gray-50/50">
-                            <h4 className="text-sm font-semibold text-gray-700">Lịch sử bài thi</h4>
+                            <h4 className="text-sm font-semibold text-gray-700">Exam history</h4>
                           </div>
                           <div className="max-h-56 overflow-y-auto">
                             {loadingHistory[test.id] ? (
@@ -430,7 +430,7 @@ const Listening_Fe = () => {
                                   >
                                     <div className="flex justify-between items-center mb-1">
                                       <span className="text-sm font-semibold text-gray-700 group-hover:text-lime-700">
-                                        Lần {result.attempt_number}
+                                        Attempt {result.attempt_number}
                                       </span>
                                       <span className="text-base font-bold text-lime-600 bg-lime-50 px-2.5 py-1 rounded text-center min-w-[3rem]">
                                         {result.total_score}/40
@@ -449,13 +449,13 @@ const Listening_Fe = () => {
                                     to="/exam-history"
                                     className="w-full text-center p-3 block text-sm font-semibold text-lime-600 hover:text-lime-700 hover:bg-lime-50 transition-colors"
                                   >
-                                    Xem tất cả lịch sử
+                                    View all history
                                   </Link>
                                 )}
                               </>
                             ) : (
                               <div className="p-4 text-center text-gray-500 text-base">
-                                Không có dữ liệu
+                                No data
                               </div>
                             )}
                           </div>
@@ -469,7 +469,7 @@ const Listening_Fe = () => {
                 <div className="flex flex-col gap-2 mb-2 mt-2">
                   {[1, 2, 3, 4].map((partNum) => {
                     const rawTitle = (test.partTitles && test.partTitles[partNum]) ? test.partTitles[partNum] : '';
-                    const title = stripHtmlTags(rawTitle) || 'Tiêu đề trống';
+                    const title = stripHtmlTags(rawTitle) || 'Empty title';
                     return (
                       <div
                         key={partNum}
@@ -495,13 +495,13 @@ const Listening_Fe = () => {
                   <div className="relative flex items-center justify-between">
                     <div className="flex items-center space-x-2 text-gray-600">
                       <Lock className="w-5 h-5 text-[#0096b1]" />
-                      <span className="text-base font-semibold">VIP cần nâng cấp để truy cập</span>
+                      <span className="text-base font-semibold">VIP upgrade required</span>
                     </div>
                     <Link
                       to="/vip-packages"
                       className="inline-flex items-center px-4 py-2 bg-white border border-[#0096b1] text-[#0096b1] rounded-lg hover:bg-[#0096b1] hover:text-white transition-colors text-sm font-bold shadow-sm"
                     >
-                      Xem gói
+                      View packages
                     </Link>
                   </div>
                 </div>
@@ -514,10 +514,10 @@ const Listening_Fe = () => {
                           test.totalMarks <= 34 ? 'text-green-600' : 'text-yellow-500'
                         }`}>
                         <CheckCircle2 className="w-5 h-5 mr-2" />
-                        Đúng {test.totalMarks}/40
+                        Correct {test.totalMarks}/40
                       </span>
                     ) : (
-                      <span className="text-gray-400 font-semibold">Chưa làm bài</span>
+                      <span className="text-gray-400 font-semibold">Unattempted</span>
                     )}
                   </div>
 
@@ -528,7 +528,7 @@ const Listening_Fe = () => {
                       : 'bg-[#0096b1] text-white hover:bg-[#007b94] hover:shadow-[#0096b1]/30'
                       }`}
                   >
-                    <span>{test.isCompleted ? 'Làm lại' : 'Bắt đầu'}</span>
+                    <span>{test.isCompleted ? 'Retake' : 'Start'}</span>
                     <Play className="w-4 h-4 text-white" />
                   </button>
                 </div>
@@ -564,22 +564,22 @@ const Listening_Fe = () => {
               <div className="flex justify-center mb-4">
                 <AlertTriangle className="w-12 h-12 text-yellow-500" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Xác nhận làm lại</h3>
+              <h3 className="text-xl font-semibold mb-2">Retake Confirmation</h3>
               <p className="text-gray-600 mb-6">
-                Bạn có chắc chắn muốn làm lại bài thi này? Các câu trả lời trước đó sẽ bị xóa.
+                Are you sure you want to retake this exam? Previous answers will be cleared.
               </p>
               <div className="flex justify-center space-x-4">
                 <button
                   onClick={() => setShowConfirmDialog(false)}
                   className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
                 >
-                  Hủy
+                  Cancel
                 </button>
                 <button
                   onClick={confirmRetake}
                   className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                 >
-                  Xác nhận
+                  Confirm
                 </button>
               </div>
             </div>

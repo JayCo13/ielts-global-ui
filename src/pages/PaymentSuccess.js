@@ -6,7 +6,6 @@ const PaymentSuccess = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const [status, setStatus] = useState('verifying');
-    const orderCode = searchParams.get('orderCode');
 
     useEffect(() => {
         // Give the webhook a moment to process, then verify
@@ -26,8 +25,8 @@ const PaymentSuccess = () => {
                             <div className="flex justify-center mb-4">
                                 <Loader2 className="w-16 h-16 text-lime-500 animate-spin" />
                             </div>
-                            <h1 className="text-2xl font-bold text-gray-900 mb-2">Đang xác nhận thanh toán</h1>
-                            <p className="text-gray-500">Vui lòng đợi trong giây lát...</p>
+                            <h1 className="text-2xl font-bold text-gray-900 mb-2">Verifying Payment</h1>
+                            <p className="text-gray-500">Please wait a moment...</p>
                         </div>
                     ) : (
                         <div className="p-8 text-center">
@@ -36,21 +35,16 @@ const PaymentSuccess = () => {
                                     <CheckCircle className="w-16 h-16 text-green-500" />
                                 </div>
                             </div>
-                            <h1 className="text-2xl font-bold text-gray-900 mb-2">Thanh toán thành công!</h1>
+                            <h1 className="text-2xl font-bold text-gray-900 mb-2">Payment Successful!</h1>
                             <p className="text-gray-500 mb-6">
-                                Tài khoản VIP của bạn đã được kích hoạt. Bạn có thể sử dụng ngay bây giờ.
+                                Your VIP plan has been activated. You can start using it right away.
                             </p>
-                            {orderCode && (
-                                <p className="text-xs text-gray-400 mb-6">
-                                    Mã đơn hàng: {orderCode}
-                                </p>
-                            )}
                             <div className="space-y-3">
                                 <Link
                                     to="/my-vip-package"
                                     className="w-full py-3 px-6 bg-gradient-to-r from-lime-500 to-emerald-500 text-white rounded-xl font-semibold hover:from-lime-600 hover:to-emerald-600 transition-all flex items-center justify-center gap-2"
                                 >
-                                    Xem gói VIP của tôi
+                                    View My VIP Plan
                                     <ArrowRight className="w-4 h-4" />
                                 </Link>
                                 <Link
@@ -58,7 +52,7 @@ const PaymentSuccess = () => {
                                     className="w-full py-3 px-6 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
                                 >
                                     <Home className="w-4 h-4" />
-                                    Về trang chủ
+                                    Go to Homepage
                                 </Link>
                             </div>
                         </div>

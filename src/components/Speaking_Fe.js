@@ -188,14 +188,14 @@ const Speaking_Fe = () => {
                         onChange={(e) => setSortOrder(e.target.value)}
                     >
                         <option value="alphabet">Theo Alphabet</option>
-                        <option value="latest">Mới nhất</option>
-                        <option value="oldest">Cũ nhất</option>
+                        <option value="latest">Newest</option>
+                        <option value="oldest">Oldest</option>
                     </select>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {currentTopics.length === 0 ? (
-                        <div className="col-span-full text-center text-lime-600 py-12">Chưa có dữ liệu để hiển thị</div>
+                        <div className="col-span-full text-center text-lime-600 py-12">No data to display</div>
                     ) : (
                         currentTopics.map(topic => renderTopicCard(topic))
                     )}

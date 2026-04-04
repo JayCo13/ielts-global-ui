@@ -25,7 +25,7 @@ const ForceLogoutDialog = ({ isOpen, message, secondsRemaining }) => {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Phát hiện đăng nhập bất thường!</h2>
-            <p className="text-sm text-gray-500">Cảnh báo bảo mật</p>
+            <p className="text-sm text-gray-500">Warning bảo mật</p>
           </div>
         </div>
 

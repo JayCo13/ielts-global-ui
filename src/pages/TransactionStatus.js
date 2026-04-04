@@ -36,7 +36,7 @@ const TransactionStatus = () => {
                 setTimeout(() => navigate('/my-vip-package'), 3000);
             } else if (data.status === 'reject') {  // Backend sends 'reject'
                 setStatus('rejected');  // Frontend uses 'rejected'
-                setRejectReason(data.admin_note || 'Không có lý do được cung cấp');
+                setRejectReason(data.admin_note || 'No reason provided');
                 localStorage.removeItem('paymentEndTime');
             }
         };
@@ -155,10 +155,10 @@ const TransactionStatus = () => {
             icon: () => (
                 <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-500" />
             ),
-            title: 'Đang xem xét thanh toán',
+            title: 'Payment under review',
             message: showZalo
-                ? 'Đã vượt quá thời gian xác minh thanh toán. Vui lòng liên hệ với quản trị viên để được hỗ trợ.'
-                : `Thanh toán của bạn đang được đội ngũ của chúng tôi xác minh. Thời gian còn lại: ${formatTime(timeLeft)}`,
+                ? 'Payment verification time exceeded. Please contact the admin for support.'
+                : `Your payment is being verified. Time remaining: ${formatTime(timeLeft)}`,
             color: 'text-blue-500',
             bgColor: 'bg-blue-50'
         },
@@ -170,8 +170,8 @@ const TransactionStatus = () => {
                     </div>
                 </div>
             ),
-            title: 'Thanh toán đã được chấp nhận!',
-            message: 'Gói VIP của bạn đã được kích hoạt. Đang chuyển hướng đến trang quản lý VIP của bạn...',
+            title: 'Payment accepted!',
+            message: 'Your VIP package is activated. Redirecting to your VIP management page...',
             color: 'text-green-500',
             bgColor: 'bg-green-50'
         },
@@ -183,8 +183,8 @@ const TransactionStatus = () => {
                     </div>
                 </div>
             ),
-            title: 'Thanh toán bị từ chối',
-            message: `Thanh toán của bạn đã bị từ chối. Lý do: ${rejectReason}`,
+            title: 'Payment declined',
+            message: `Your payment was declined. Reason: ${rejectReason}`,
             color: 'text-red-500',
             bgColor: 'bg-red-50'
         }
@@ -214,7 +214,7 @@ const TransactionStatus = () => {
                                 rel="noopener noreferrer"
                                 className="block w-full py-3 px-6 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors"
                             >
-                                Liên hệ Admin qua Zalo
+                                Contact Admin
                             </a>
                         </div>
                     )}
@@ -225,7 +225,7 @@ const TransactionStatus = () => {
                                 to="/vip-packages"
                                 className="block w-full py-3 px-6 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors"
                             >
-                                Thử lại
+                                Try again
                             </Link>
                             <a
                                 href="https://zalo.me/0964996195"
@@ -233,7 +233,7 @@ const TransactionStatus = () => {
                                 rel="noopener noreferrer"
                                 className="block w-full py-3 px-6 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
                             >
-                                Liên hệ hỗ trợ
+                                Contact Support
                             </a>
                         </div>
                     )}

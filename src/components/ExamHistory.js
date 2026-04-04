@@ -393,7 +393,7 @@ const ExamHistory = () => {
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="text-gray-500">Đang tải...</div>
+        <div className="text-gray-500">Loading...</div>
       </div>
     );
   }
@@ -420,10 +420,10 @@ const ExamHistory = () => {
             <div className="space-y-6">
               <div className="space-y-3">
                 <h2 className="text-2xl font-bold text-gray-800">
-                  Chưa có lịch sử bài thi
+                  No Exam History
                 </h2>
                 <p className="text-gray-600 leading-relaxed">
-                  Bạn chưa hoàn thành bài thi nào. Hãy bắt đầu hành trình học IELTS của mình ngay hôm nay!
+                  You have not completed any exams yet. Start your IELTS journey today!
                 </p>
               </div>
 
@@ -434,7 +434,7 @@ const ExamHistory = () => {
                   className="group inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 transform"
                 >
                   <BookOpen className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-200" />
-                  Làm bài thi đầu tiên
+                  Take Your First Exam
                   <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-200" />
                 </button>
               </div>
@@ -499,16 +499,16 @@ const ExamHistory = () => {
                   {/* Title with gradient text */}
                   <div className="space-y-2">
                     <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white via-cyan-100 to-blue-100 bg-clip-text text-transparent leading-tight">
-                      Tính năng VIP
+                      VIP Feature
                     </h2>
                     <div className="w-16 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full mx-auto"></div>
                   </div>
 
                   {/* Description */}
                   <p className="text-base sm:text-lg text-white/90 leading-relaxed px-2">
-                    Lịch sử bài thi chi tiết chỉ dành cho thành viên VIP.
+                    Detailed exam history is only available for VIP members.
                     <span className="block mt-2 text-cyan-200 font-medium">
-                      Nâng cấp ngay để truy cập tất cả các tính năng!
+                      Upgrade now to access all features!
                     </span>
                   </p>
 
@@ -516,19 +516,19 @@ const ExamHistory = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-white/80 bg-white/5 rounded-2xl p-4 border border-white/10">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
-                      <span>Lịch sử chi tiết</span>
+                      <span>Detailed History</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                      <span>Phân tích kết quả</span>
+                      <span>Result Analysis</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
-                      <span>Theo dõi tiến độ</span>
+                      <span>Progress Tracking</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                      <span>Báo cáo nâng cao</span>
+                      <span>Advanced Reports</span>
                     </div>
                   </div>
 
@@ -539,7 +539,7 @@ const ExamHistory = () => {
                       className="group relative w-full inline-flex items-center justify-center px-6 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-2xl hover:from-cyan-400 hover:to-blue-500 transition-all duration-300 shadow-lg hover:shadow-cyan-500/25 hover:scale-105 transform"
                     >
                       <span className="relative z-10 flex items-center gap-2">
-                        Xem gói VIP
+                        View VIP Plans
                         <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
                       </span>
                       {/* Button glow effect */}
@@ -550,7 +550,7 @@ const ExamHistory = () => {
                       onClick={() => navigate('/reading_list')}
                       className="w-full text-white/80 hover:text-white font-medium py-3 px-4 rounded-xl hover:bg-white/10 transition-all duration-200 border border-white/20 hover:border-white/30"
                     >
-                      Quay lại danh sách bài thi
+                      Back to exam list
                     </button>
                   </div>
                 </div>
@@ -568,8 +568,8 @@ const ExamHistory = () => {
         {/* Skill Tab Selection - Main Navigation */}
         <div className="mb-8">
           <div className="text-center mb-6">
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">Tổng Quan Kết Quả</h1>
-            <p className="text-gray-500 text-sm sm:text-base">Chọn kỹ năng để xem thống kê chi tiết</p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">Results Overview</h1>
+            <p className="text-gray-500 text-sm sm:text-base">Select a skill to view detailed statistics</p>
           </div>
 
           {/* Skill Toggle Tabs */}
@@ -619,12 +619,12 @@ const ExamHistory = () => {
                 <div>
                   <h3 className="text-xl sm:text-2xl font-bold">{activeTab === 'reading' ? 'Reading' : 'Listening'}</h3>
                   <p className={`text-sm ${activeTab === 'reading' ? 'text-blue-100' : 'text-orange-100'}`}>
-                    {activeTab === 'reading' ? readingStats.totalExams : listeningStats.totalExams} bài thi đã hoàn thành
+                    {activeTab === 'reading' ? readingStats.totalExams : listeningStats.totalExams} completed exams
                   </p>
                 </div>
               </div>
               <div className="text-center sm:text-right">
-                <p className={`text-xs uppercase tracking-wide ${activeTab === 'reading' ? 'text-blue-100' : 'text-orange-100'}`}>Band Score Trung Bình</p>
+                <p className={`text-xs uppercase tracking-wide ${activeTab === 'reading' ? 'text-blue-100' : 'text-orange-100'}`}>Average Band Score</p>
                 <p className="text-5xl sm:text-6xl font-bold">
                   {activeTab === 'reading' ? readingStats.averageBandScore : listeningStats.averageBandScore}
                 </p>
@@ -635,13 +635,13 @@ const ExamHistory = () => {
                 <p className="text-2xl sm:text-3xl font-bold">
                   {activeTab === 'reading' ? readingStats.bestBandScore : listeningStats.bestBandScore}
                 </p>
-                <p className={`text-xs ${activeTab === 'reading' ? 'text-blue-100' : 'text-orange-100'}`}>Cao nhất</p>
+                <p className={`text-xs ${activeTab === 'reading' ? 'text-blue-100' : 'text-orange-100'}`}>Highest</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl sm:text-3xl font-bold">
                   {activeTab === 'reading' ? readingStats.recentBandScore : listeningStats.recentBandScore}
                 </p>
-                <p className={`text-xs ${activeTab === 'reading' ? 'text-blue-100' : 'text-orange-100'}`}>Gần nhất</p>
+                <p className={`text-xs ${activeTab === 'reading' ? 'text-blue-100' : 'text-orange-100'}`}>Latest</p>
               </div>
               <div className="text-center">
                 <p className={`text-2xl sm:text-3xl font-bold ${(activeTab === 'reading' ? readingStats.improvementTrend : listeningStats.improvementTrend) >= 0
@@ -651,7 +651,7 @@ const ExamHistory = () => {
                   {(activeTab === 'reading' ? readingStats.improvementTrend : listeningStats.improvementTrend) > 0 ? '+' : ''}
                   {activeTab === 'reading' ? readingStats.improvementTrend : listeningStats.improvementTrend}%
                 </p>
-                <p className={`text-xs ${activeTab === 'reading' ? 'text-blue-100' : 'text-orange-100'}`}>Xu hướng</p>
+                <p className={`text-xs ${activeTab === 'reading' ? 'text-blue-100' : 'text-orange-100'}`}>Trend</p>
               </div>
             </div>
           </div>
@@ -661,9 +661,9 @@ const ExamHistory = () => {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <div>
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900">
-                  Biểu Đồ Tiến Độ {activeTab === 'reading' ? 'Reading' : 'Listening'}
+                  Progress Chart {activeTab === 'reading' ? 'Reading' : 'Listening'}
                 </h2>
-                <p className="text-gray-500 text-sm">Band Score theo thời gian</p>
+                <p className="text-gray-500 text-sm">Band Score over time</p>
               </div>
               <div className="flex gap-2">
                 <button
@@ -673,7 +673,7 @@ const ExamHistory = () => {
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                 >
-                  Theo tuần
+                  Weekly
                 </button>
                 <button
                   onClick={() => setChartPeriod('monthly')}
@@ -682,7 +682,7 @@ const ExamHistory = () => {
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                 >
-                  Theo tháng
+                  Monthly
                 </button>
               </div>
             </div>
@@ -727,7 +727,7 @@ const ExamHistory = () => {
                         boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.15)'
                       }}
                       formatter={(value) => [
-                        value ? `Band ${value}` : 'Không có dữ liệu',
+                        value ? `Band ${value}` : 'No data',
                         activeTab === 'reading' ? 'Reading' : 'Listening'
                       ]}
                     />
@@ -746,8 +746,8 @@ const ExamHistory = () => {
               ) : (
                 <div className="h-full flex flex-col items-center justify-center text-gray-400">
                   <BarChart2 className="w-12 h-12 sm:w-16 sm:h-16 mb-4" />
-                  <p className="text-base sm:text-lg font-medium">Chưa có đủ dữ liệu</p>
-                  <p className="text-xs sm:text-sm text-center px-4">Hoàn thành thêm bài thi để xem biểu đồ tiến độ</p>
+                  <p className="text-base sm:text-lg font-medium">Not enough data</p>
+                  <p className="text-xs sm:text-sm text-center px-4">Complete more exams to see progress chart</p>
                 </div>
               )}
             </div>
@@ -766,21 +766,21 @@ const ExamHistory = () => {
                   <div className="absolute -inset-2 opacity-30 rounded-full blur animate-pulse"></div>
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                  Lịch Sử Bài Thi Chỉ Dành Cho VIP
+                  Exam History is for VIP Only
                 </h3>
                 <p className="text-gray-600 mb-6 max-w-md mx-auto leading-relaxed">
-                  Nâng cấp lên VIP để xem lại tất cả các bài thi đã hoàn thành, theo dõi tiến độ học tập và phân tích kết quả chi tiết.
+                  Nâng cấp lên VIP để xem lại tất cả các completed exams, theo dõi tiến độ học tập và phân tích results chi tiết.
                 </p>
                 <div className="space-y-3">
                   <Link
                     to="/vip-packages"
                     className="inline-flex items-center px-6 py-3 bg-[#0096b1] text-white rounded-xl hover:bg-[#eb7e37] transition-all duration-300 shadow-lg hover:shadow-[#eb7e37]/20 font-semibold text-lg"
                   >
-                    Nâng cấp VIP ngay
+                    Upgrade to VIP Now
                     <ChevronRight className="w-5 h-5 ml-2" />
                   </Link>
                   <div className="text-sm text-gray-500">
-                    Truy cập không giới hạn tất cả tính năng
+                    Unlimited access to all features
                   </div>
                 </div>
               </div>
@@ -791,10 +791,10 @@ const ExamHistory = () => {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900">
-                  Lịch Sử Bài Thi {activeTab === 'reading' ? 'Reading' : 'Listening'}
+                  Exam History {activeTab === 'reading' ? 'Reading' : 'Listening'}
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Xem lại các bài thi {activeTab === 'reading' ? 'Reading' : 'Listening'} đã hoàn thành
+                  Review completed {activeTab === 'reading' ? 'Reading' : 'Listening'} exams
                 </p>
               </div>
               {/* Full Test / Forecast Sub-tabs */}
@@ -831,7 +831,7 @@ const ExamHistory = () => {
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
                       type="text"
-                      placeholder="Tìm kiếm bài thi..."
+                      placeholder="Search exams..."
                       className="pl-12 pr-4 py-3 border border-gray-200 rounded-xl w-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                       value={readingSearchQuery}
                       onChange={(e) => setReadingSearchQuery(e.target.value)}
@@ -842,7 +842,7 @@ const ExamHistory = () => {
                 {currentReadingExams.length === 0 ? (
                   <div className="text-center py-12">
                     <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500 text-lg">Chưa có bài thi Reading nào</p>
+                    <p className="text-gray-500 text-lg">No completed Reading exams</p>
                   </div>
                 ) : (
                   <>
@@ -891,10 +891,10 @@ const ExamHistory = () => {
                                     ) : (
                                       <>
                                         <span className="text-sm font-medium text-gray-900">
-                                          Số câu đúng: <span className="font-bold text-blue-600">{exam.total_score}/{exam.total_questions || 40}</span>
+                                          Correct: <span className="font-bold text-blue-600">{exam.total_score}/{exam.total_questions || 40}</span>
                                         </span>
                                         <span className="text-xs text-gray-500 font-medium">
-                                          Tỷ lệ: {Math.round((exam.total_score / (exam.total_questions || 40)) * 100)}%
+                                          Rate: {Math.round((exam.total_score / (exam.total_questions || 40)) * 100)}%
                                         </span>
                                       </>
                                     )}
@@ -907,8 +907,8 @@ const ExamHistory = () => {
                                     <Target className="w-5 h-5 text-purple-600" />
                                   </div>
                                   <div className="flex flex-col space-y-1">
-                                    <span className="text-sm font-medium text-gray-900">Lần thử: {exam.attempt_number}</span>
-                                    <span className="text-xs text-gray-500 font-medium">Lần làm bài</span>
+                                    <span className="text-sm font-medium text-gray-900">Attempt: {exam.attempt_number}</span>
+                                    <span className="text-xs text-gray-500 font-medium">Attempt</span>
                                   </div>
                                 </div>
                               </div>
@@ -932,7 +932,7 @@ const ExamHistory = () => {
                     {totalReadingPages > 1 && (
                       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 pt-6 border-t border-gray-100">
                         <div className="text-sm text-gray-600 order-2 sm:order-1">
-                          Hiển thị {indexOfFirstReadingExam + 1}-{Math.min(indexOfLastReadingExam, filteredReadingExams.length)} trong tổng số {filteredReadingExams.length} kết quả
+                          Showing {indexOfFirstReadingExam + 1}-{Math.min(indexOfLastReadingExam, filteredReadingExams.length)} out of {filteredReadingExams.length} results
                         </div>
 
                         <div className="flex justify-center items-center space-x-1 order-1 sm:order-2">
@@ -940,7 +940,7 @@ const ExamHistory = () => {
                             onClick={() => setCurrentReadingPage(currentReadingPage - 1)}
                             disabled={currentReadingPage === 1}
                             className="p-2 rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-                            aria-label="Trang trước"
+                            aria-label="Previous page"
                           >
                             <ChevronLeft className="w-4 h-4" />
                           </button>
@@ -987,7 +987,7 @@ const ExamHistory = () => {
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
                       type="text"
-                      placeholder="Tìm kiếm bài thi..."
+                      placeholder="Search exams..."
                       className="pl-12 pr-4 py-3 border border-gray-200 rounded-xl w-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
                       value={listeningSearchQuery}
                       onChange={(e) => setListeningSearchQuery(e.target.value)}
@@ -998,7 +998,7 @@ const ExamHistory = () => {
                 {currentListeningExams.length === 0 ? (
                   <div className="text-center py-12">
                     <Headphones className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500 text-lg">Chưa có bài thi Listening nào</p>
+                    <p className="text-gray-500 text-lg">No completed Listening exams</p>
                   </div>
                 ) : (
                   <>
@@ -1047,10 +1047,10 @@ const ExamHistory = () => {
                                     ) : (
                                       <>
                                         <span className="text-sm font-medium text-gray-900">
-                                          Số câu đúng: <span className="font-bold text-orange-600">{exam.total_score}/{exam.total_questions || 40}</span>
+                                          Correct: <span className="font-bold text-orange-600">{exam.total_score}/{exam.total_questions || 40}</span>
                                         </span>
                                         <span className="text-xs text-gray-500 font-medium">
-                                          Tỷ lệ: {Math.round((exam.total_score / (exam.total_questions || 40)) * 100)}%
+                                          Rate: {Math.round((exam.total_score / (exam.total_questions || 40)) * 100)}%
                                         </span>
                                       </>
                                     )}
@@ -1063,8 +1063,8 @@ const ExamHistory = () => {
                                     <Target className="w-5 h-5 text-purple-600" />
                                   </div>
                                   <div className="flex flex-col space-y-1">
-                                    <span className="text-sm font-medium text-gray-900">Lần thử: {exam.attempt_number}</span>
-                                    <span className="text-xs text-gray-500 font-medium">Lần làm bài</span>
+                                    <span className="text-sm font-medium text-gray-900">Attempt: {exam.attempt_number}</span>
+                                    <span className="text-xs text-gray-500 font-medium">Attempt</span>
                                   </div>
                                 </div>
                               </div>
@@ -1088,7 +1088,7 @@ const ExamHistory = () => {
                     {totalListeningPages > 1 && (
                       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 pt-6 border-t border-gray-100">
                         <div className="text-sm text-gray-600 order-2 sm:order-1">
-                          Hiển thị {indexOfFirstListeningExam + 1}-{Math.min(indexOfLastListeningExam, filteredListeningExams.length)} trong tổng số {filteredListeningExams.length} kết quả
+                          Showing {indexOfFirstListeningExam + 1}-{Math.min(indexOfLastListeningExam, filteredListeningExams.length)} out of {filteredListeningExams.length} results
                         </div>
 
                         <div className="flex justify-center items-center space-x-1 order-1 sm:order-2">
@@ -1096,7 +1096,7 @@ const ExamHistory = () => {
                             onClick={() => setCurrentListeningPage(currentListeningPage - 1)}
                             disabled={currentListeningPage === 1}
                             className="p-2 rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-                            aria-label="Trang trước"
+                            aria-label="Previous page"
                           >
                             <ChevronLeft className="w-4 h-4" />
                           </button>
