@@ -33,7 +33,7 @@ const FloatingMessengerIcon = () => {
   }, []);
 
   const openMessenger = () => {
-    window.open('https://zalo.me/0964996195', '_blank'); // Replace with your Zalo ID
+    window.open('https://wa.me/84964996195', '_blank');
   };
 
   const toggleMinimize = (e) => {
@@ -601,7 +601,7 @@ const HomePage = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-gray-800 relative">
-                  Authentic questions from official test banks
+                  Authentic-style questions based on official IELTS standards
                   <span className="absolute -left-2 top-1/2 w-1 h-6 bg-[#0096b1] -translate-y-1/2 rounded-full"></span>
                 </h3>
                 <p className="text-gray-600">Practice with real test formats developed by IELTS experts, delivering the most realistic exam experience possible.</p>

@@ -436,7 +436,7 @@ const NewWords = () => {
                 <nav className="flex items-center text-sm text-gray-500 mb-6">
                     <Link to="/" className="hover:text-[#0096b1] flex items-center">
                         <Home className="w-4 h-4 mr-1" />
-                        Trang chủ
+                        Home
                     </Link>
                     <ChevronRight className="w-4 h-4 mx-2" />
                     <span className="text-gray-900 font-medium">New Words</span>
@@ -445,7 +445,7 @@ const NewWords = () => {
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">New Words</h1>
-                    <p className="text-gray-600">Vocabulary bạn đã lưu words các bài tập Nghe và Đọc. Nhấp vào bất kỳ words nào để xem định nghĩa của nó. Sử dụng tính năng Luyện Nghe Chép Chính Tả để ôn tập.</p>
+                    <p className="text-gray-600">Vocabulary you have saved from Listening and Reading exercises. Click on any word to see its definition. Use the Dictation Practice feature to review.</p>
                 </div>
 
                 {mode === 'list' && (
@@ -456,7 +456,7 @@ const NewWords = () => {
                             className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#0096b1] to-[#007d94] text-white rounded-xl shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 hover:scale-105 transition-all font-bold text-sm tracking-wide"
                         >
                             <PenTool className="w-4 h-4" />
-                            LUYỆN NGHE CHÉP CHÍNH TẢ
+                            DICTATION PRACTICE
                         </button>
                     </div>
                 )}
@@ -600,7 +600,7 @@ const NewWords = () => {
                                             <div className="flex justify-between text-xs text-gray-400 mt-1">
                                                 <span>Slow (0.5x)</span>
                                                 <span>Normal (1.0x)</span>
-                                                <span>Nhanh (2.0x)</span>
+                                                <span>Fast (2.0x)</span>
                                             </div>
                                         </div>
                                         <button
@@ -623,7 +623,7 @@ const NewWords = () => {
 
                                 {/* Start Button */}
                                 <div className="flex flex-col items-center justify-center py-8 space-y-4">
-                                    <p className="text-gray-500">Cấu hình giọng nói và tốc độ xong thì bấm Start</p>
+                                    <p className="text-gray-500">Configure voice and speed settings, then press Start</p>
                                     <button
                                         onClick={beginDictation}
                                         className="flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-[#0096b1] to-[#007d94] text-white rounded-2xl shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 hover:scale-105 transition-all font-bold text-lg"
@@ -631,7 +631,7 @@ const NewWords = () => {
                                         <Play className="w-6 h-6" />
                                         Start
                                     </button>
-                                    <p className="text-xs text-gray-400">{shuffledWords.length} words • Đã xáo trộn</p>
+                                    <p className="text-xs text-gray-400">{shuffledWords.length} words • Shuffled</p>
                                 </div>
                             </div>
                         )}

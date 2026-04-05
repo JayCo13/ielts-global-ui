@@ -501,7 +501,7 @@ const ResultReview = () => {
                 className="px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-lime-500"
               >
                 <option value="all">All Answers</option>
-                <option value="correct">Chỉ Câu Correct</option>
+                <option value="correct">Only Correct</option>
                 <option value="incorrect">Only Incorrect</option>
                 <option value="blank">Only Unanswered</option>
               </select>
