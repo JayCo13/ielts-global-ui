@@ -182,21 +182,22 @@ const Footer = () => {
                                         </div>
                                         <span className="text-sm 2xl:text-base">ieltscomputertestglobal<wbr />@gmail.com</span>
                                     </a></li>
-                                    <li><a href="tel:+84964996195" className="text-gray-600 hover:text-blue-500 transition-colors duration-300 flex items-center gap-2">
-                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
-                                        </svg>
-                                        +84 964 996 195
-                                    </a></li>
-                                    <li><a href="https://wa.me/84964996195" className="text-gray-600 hover:text-blue-500 transition-colors duration-300 flex items-start gap-2">
-                                        <img
-                                            src="/img/whatsapp-icon.webp"
-                                            alt="WhatsApp"
-                                            className="w-5 h-5 mt-0.5 flex-shrink-0 transition-all duration-300"
-
-                                        />
-                                        <span>+84 964 996 195</span>
-                                    </a></li>
+                                    <li className="flex items-center gap-4 flex-wrap">
+                                        <a href="tel:+84964996195" className="text-gray-600 hover:text-blue-500 transition-colors duration-300 flex items-center gap-1.5">
+                                            <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
+                                            </svg>
+                                            <span className="whitespace-nowrap">+84 964 996 195</span>
+                                        </a>
+                                        <a href="https://wa.me/84964996195" className="text-gray-600 hover:text-blue-500 transition-colors duration-300 flex items-center gap-1.5">
+                                            <img
+                                                src="/img/whatsapp-icon.webp"
+                                                alt="WhatsApp"
+                                                className="w-5 h-5 flex-shrink-0 transition-all duration-300"
+                                            />
+                                            <span className="whitespace-nowrap">+84 964 996 195</span>
+                                        </a>
+                                    </li>
                                 </ul>
                             </motion.div>
                         </div>
