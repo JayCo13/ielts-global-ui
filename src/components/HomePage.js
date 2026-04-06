@@ -270,9 +270,9 @@ const HomePage = () => {
                 {/* Social proof */}
                 <div className="flex items-center gap-4 bg-gradient-to-r from-gray-50 to-white px-4 py-3 rounded-2xl border border-gray-100 shadow-sm">
                   <div className="flex -space-x-3">
-                    <img src="/img/per4.jpg" alt="User" className="w-10 h-10 rounded-full border-2 border-white object-cover shadow-sm" />
-                    <img src="/img/per3.jpg" alt="User" className="w-10 h-10 rounded-full border-2 border-white object-cover shadow-sm" />
-                    <img src="/img/per2.jpg" alt="User" className="w-10 h-10 rounded-full border-2 border-white object-cover shadow-sm" />
+                    <img src="/img/per4.webp" alt="User" className="w-10 h-10 rounded-full border-2 border-white object-cover shadow-sm" />
+                    <img src="/img/per3.webp" alt="User" className="w-10 h-10 rounded-full border-2 border-white object-cover shadow-sm" />
+                    <img src="/img/per2.webp" alt="User" className="w-10 h-10 rounded-full border-2 border-white object-cover shadow-sm" />
                   </div>
                   <div className="flex flex-col">
                     <div className="flex items-baseline gap-1">
@@ -436,7 +436,7 @@ const HomePage = () => {
               {/* Left side - Student Image */}
               <div className="w-full md:w-1/2">
                 <img
-                  src="/img/hp3.webp"
+                  src="/img/hp4.webp"
                   alt="Student studying IELTS online"
                   className="rounded-lg shadow-lg w-full h-auto"
                 />
