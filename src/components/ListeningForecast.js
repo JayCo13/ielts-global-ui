@@ -5,6 +5,7 @@ import { Search, Lock, ChevronRight, ChevronLeft, Star } from 'lucide-react';
 import secureStorage from '../utils/secureStorage';
 import ConfirmDialog from './ConfirmDialog';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const ListeningForecast = () => {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ const ListeningForecast = () => {
         return;
       }
       try {
-        const response = await fetch(`${API_BASE}/student/user-role/${userId}`, {
+        const response = await fetchWithTimeout(`${API_BASE}/student/user-role/${userId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {
@@ -97,7 +98,7 @@ const ListeningForecast = () => {
     setLoadingHistory(prev => ({ ...prev, [key]: true }));
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE}/student/listening/forecast-history/${examId}/${partNumber}`, {
+      const response = await fetchWithTimeout(`${API_BASE}/student/listening/forecast-history/${examId}/${partNumber}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
@@ -347,7 +348,7 @@ const ListeningForecast = () => {
           if (!examToRetake) { setShowConfirmDialog(false); return; }
           try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`${API_BASE}/student/listening/exam/${examToRetake.examId}/retake`, {
+            const res = await fetchWithTimeout(`${API_BASE}/student/listening/exam/${examToRetake.examId}/retake`, {
               method: 'DELETE',
               headers: { 'Authorization': `Bearer ${token}` }
             });

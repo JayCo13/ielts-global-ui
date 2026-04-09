@@ -9,6 +9,7 @@ import { create } from 'framer-motion/m';
 import { checkExamAccess } from '../utils/examAccess';
 import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const Writing_Fe = () => {
   const navigate = useNavigate();
@@ -177,7 +178,7 @@ const Writing_Fe = () => {
       const token = secureStorage.getItem('token') || localStorage.getItem('token');
 
       // Fetch essay data
-      const essayResponse = await fetch(`${API_BASE}/student/writing/part/${task.task_id}/essay`, {
+      const essayResponse = await fetchWithTimeout(`${API_BASE}/student/writing/part/${task.task_id}/essay`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -200,7 +201,7 @@ const Writing_Fe = () => {
 
       while (retryCount <= maxRetries) {
         try {
-          const response = await fetch(`${API_BASE}/ai/evaluate-and-save/${task.task_id}`, {
+          const response = await fetchWithTimeout(`${API_BASE}/ai/evaluate-and-save/${task.task_id}`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -281,7 +282,7 @@ const Writing_Fe = () => {
   const handleConfirmReset = async () => {
     const token = secureStorage.getItem('token') || localStorage.getItem('token');
     try {
-      const response = await fetch(`${API_BASE}/student/writing/test/${selectedTest.test_id}/reset`, {
+      const response = await fetchWithTimeout(`${API_BASE}/student/writing/test/${selectedTest.test_id}/reset`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -289,7 +290,7 @@ const Writing_Fe = () => {
       });
 
       if (response.ok) {
-        const testsResponse = await fetch(`${API_BASE}/student/writing/tasks`, {
+        const testsResponse = await fetchWithTimeout(`${API_BASE}/student/writing/tasks`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -326,7 +327,7 @@ const Writing_Fe = () => {
       const fetchTests = async () => {
         const token = secureStorage.getItem('token') || localStorage.getItem('token');
         try {
-          const response = await fetch(`${API_BASE}/student/writing/tasks`, {
+          const response = await fetchWithTimeout(`${API_BASE}/student/writing/tasks`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }

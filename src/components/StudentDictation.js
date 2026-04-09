@@ -5,6 +5,7 @@ import Footer from './Footer';
 import { toast, Toaster } from 'react-hot-toast';
 import TranslatorDialog from '../translator/TranslatorDialog';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const ITEMS_PER_PAGE = 5;
 const REVIEW_ITEMS_PER_PAGE = 20;
@@ -47,7 +48,7 @@ const StudentDictation = () => {
 
     const fetchUnits = useCallback(async () => {
         try {
-            const res = await fetch(`${API_BASE}/student/dictation/units`, {
+            const res = await fetchWithTimeout(`${API_BASE}/student/dictation/units`, {
                 headers: { 'Authorization': `Bearer ${getToken()}` }
             });
             if (res.ok) {
@@ -63,7 +64,7 @@ const StudentDictation = () => {
 
     const fetchUnitWords = useCallback(async (unitId) => {
         try {
-            const res = await fetch(`${API_BASE}/student/dictation/units/${unitId}/words`, {
+            const res = await fetchWithTimeout(`${API_BASE}/student/dictation/units/${unitId}/words`, {
                 headers: { 'Authorization': `Bearer ${getToken()}` }
             });
             if (res.ok) {
@@ -328,7 +329,7 @@ const StudentDictation = () => {
 
     const toggleImportant = async (wordId, currentValue) => {
         try {
-            const res = await fetch(`${API_BASE}/student/dictation/words/${wordId}/important`, {
+            const res = await fetchWithTimeout(`${API_BASE}/student/dictation/words/${wordId}/important`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

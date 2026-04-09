@@ -4,6 +4,7 @@ import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
 import { ChevronRight, Home, Shield, Lock, AlertCircle, Crown, CheckCircle } from 'lucide-react';
 import { checkTokenExpiration, logout } from '../utils/authUtils';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const Payment = () => {
     const [error, setError] = useState(null);
@@ -54,7 +55,7 @@ const Payment = () => {
             const token = localStorage.getItem('token');
             if (!token) throw new Error('Session expired. Please login again.');
 
-            const response = await fetch(`${API_BASE}/customer/vip/packages/${packageId}/purchase`, {
+            const response = await fetchWithTimeout(`${API_BASE}/customer/vip/packages/${packageId}/purchase`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -94,7 +95,7 @@ const Payment = () => {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${API_BASE}/customer/vip/packages/${packageId}/capture`, {
+            const response = await fetchWithTimeout(`${API_BASE}/customer/vip/packages/${packageId}/capture`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

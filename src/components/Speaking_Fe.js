@@ -3,6 +3,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Play, Search, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
 import Navbar from './Navbar';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const toAbsoluteUrl = (u) => (u && u.startsWith('/')) ? `${API_BASE}${u}` : u;
 
@@ -60,7 +61,7 @@ const Speaking_Fe = () => {
 
             try {
                 // Always fetch Part 1 only (Speaking Forecast)
-                const materialsResponse = await fetch(`${API_BASE}/student/speaking/materials?part=part1`, {
+                const materialsResponse = await fetchWithTimeout(`${API_BASE}/student/speaking/materials?part=part1`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 

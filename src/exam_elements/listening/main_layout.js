@@ -11,6 +11,7 @@ import ForceLogoutDialog from '../../components/ForceLogoutDialog';
 import Split from 'react-split';
 import { TranslatorDialog, useTextSelection } from '../../translator';
 import API_BASE from '../../config/api';
+import fetchWithTimeout from '../../utils/fetchWithTimeout';
 
 // Audio Control Component
 const AudioControl = ({ examId, currentPart, colorTheme, isReviewMode }) => {
@@ -847,7 +848,7 @@ const MainLayout = () => {
   useEffect(() => {
     const fetchTestDescription = async () => {
       try {
-        const response = await fetch(`${API_BASE}/student/reading/reading-test/${examId}/description`, {
+        const response = await fetchWithTimeout(`${API_BASE}/student/reading/reading-test/${examId}/description`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -864,7 +865,7 @@ const MainLayout = () => {
 
     const fetchPartDescriptions = async () => {
       try {
-        const response = await fetch(`${API_BASE}/student/listening/exam/${examId}/part-descriptions`, {
+        const response = await fetchWithTimeout(`${API_BASE}/student/listening/exam/${examId}/part-descriptions`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -895,7 +896,7 @@ const MainLayout = () => {
   useEffect(() => {
     const fetchAudioLengths = async () => {
       try {
-        const response = await fetch(`${API_BASE}/student/exam/${examId}/audio-lengths`, {
+        const response = await fetchWithTimeout(`${API_BASE}/student/exam/${examId}/audio-lengths`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -926,7 +927,7 @@ const MainLayout = () => {
         // Forecast: need to resolve R2 URL from backend
         const token = localStorage.getItem('token');
         try {
-          const response = await fetch(`${API_BASE}/student/exam/${examId}/audio-part/${currentPart}`, {
+          const response = await fetchWithTimeout(`${API_BASE}/student/exam/${examId}/audio-part/${currentPart}`, {
             headers: token ? { 'Authorization': `Bearer ${token}` } : {}
           });
           if (!response.ok) throw new Error('Failed to fetch audio');
@@ -953,7 +954,7 @@ const MainLayout = () => {
 
     const fetchExamData = async () => {
       try {
-        const response = await fetch(`${API_BASE}/student/exam/${examId}/start`, {
+        const response = await fetchWithTimeout(`${API_BASE}/student/exam/${examId}/start`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -982,7 +983,7 @@ const MainLayout = () => {
       if (!isReviewMode || !resultId) return;
 
       try {
-        const response = await fetch(`${API_BASE}/student/exam-result/${resultId}`, {
+        const response = await fetchWithTimeout(`${API_BASE}/student/exam-result/${resultId}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -1064,7 +1065,7 @@ const MainLayout = () => {
       }
 
       try {
-        const response = await fetch(`${API_BASE}/customer/vip/subscription/status`, {
+        const response = await fetchWithTimeout(`${API_BASE}/customer/vip/subscription/status`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -1145,7 +1146,7 @@ const MainLayout = () => {
 
     try {
       const forecastParam = isForecastSession && currentPart ? `?forecast_part=${currentPart}` : '';
-      const response = await fetch(`${API_BASE}/student/exam/${examId}/submit${forecastParam}`, {
+      const response = await fetchWithTimeout(`${API_BASE}/student/exam/${examId}/submit${forecastParam}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -1227,7 +1228,7 @@ const MainLayout = () => {
   const handleRetakeConfirm = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE}/student/listening/exam/${examId}/retake`, {
+      const response = await fetchWithTimeout(`${API_BASE}/student/listening/exam/${examId}/retake`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1861,7 +1862,7 @@ const MainLayout = () => {
     if (!vocabMenu.selectedText) return;
 
     try {
-      const response = await fetch(`${API_BASE}/student/vocabulary`, {
+      const response = await fetchWithTimeout(`${API_BASE}/student/vocabulary`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

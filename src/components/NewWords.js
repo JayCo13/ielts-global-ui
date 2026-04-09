@@ -7,6 +7,7 @@ import { toast, Toaster } from 'react-hot-toast';
 import { TranslatorDialog } from '../translator';
 import ConfirmDialog from './ConfirmDialog';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -97,7 +98,7 @@ const NewWords = () => {
 
     const fetchVocabulary = async () => {
         try {
-            const response = await fetch(`${API_BASE}/student/vocabulary`, {
+            const response = await fetchWithTimeout(`${API_BASE}/student/vocabulary`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
@@ -118,7 +119,7 @@ const NewWords = () => {
 
     const toggleImportant = async (id, currentValue) => {
         try {
-            const response = await fetch(`${API_BASE}/student/vocabulary/${id}`, {
+            const response = await fetchWithTimeout(`${API_BASE}/student/vocabulary/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -147,7 +148,7 @@ const NewWords = () => {
         if (!wordToDelete) return;
 
         try {
-            const response = await fetch(`${API_BASE}/student/vocabulary/${wordToDelete}`, {
+            const response = await fetchWithTimeout(`${API_BASE}/student/vocabulary/${wordToDelete}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`

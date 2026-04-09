@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 // In EditProfile.js, modify the component definition:
 const EditProfile = ({ onProfileUpdate }) => {
@@ -18,7 +19,7 @@ const EditProfile = ({ onProfileUpdate }) => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`${API_BASE}/student/profile`, {
+        const response = await fetchWithTimeout(`${API_BASE}/student/profile`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -76,7 +77,7 @@ const EditProfile = ({ onProfileUpdate }) => {
     }
 
     try {
-      const response = await fetch(`${API_BASE}/student/profile`, {
+      const response = await fetchWithTimeout(`${API_BASE}/student/profile`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`

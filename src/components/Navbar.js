@@ -4,6 +4,7 @@ import { PhoneCall, User, Menu, X, Lock } from 'lucide-react';
 import { logout } from '../utils/authUtils';
 import { motion, AnimatePresence } from 'framer-motion';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -60,39 +61,25 @@ const Navbar = () => {
 
     const fetchSubscriptionStatus = async () => {
         try {
-            const response = await fetch(`${API_BASE}/customer/vip/subscription/status`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            console.log('Response status:', response.status);
+            const response = await fetchWithTimeout(`${API_BASE}/customer/vip/subscription/status`);
             const data = await response.json();
-            console.log('Raw API response:', data);
 
             if (response.ok && data) {
-                console.log('Setting subscription status:', {
-                    is_active: data.is_active,
-                    package_name: data.package_name,
-                    payment_status: data.payment_status
-                });
                 setSubscriptionStatus(data);
             } else {
-                console.error('Invalid response:', data);
                 setSubscriptionStatus(null);
             }
         } catch (error) {
-            console.error('Error fetching subscription status:', error);
+            if (error.name !== 'AbortError') {
+                console.error('Error fetching subscription status:', error);
+            }
             setSubscriptionStatus(null);
         }
     };
 
     const fetchUserProfile = async () => {
         try {
-            const profileResponse = await fetch(`${API_BASE}/student/profile`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
+            const profileResponse = await fetchWithTimeout(`${API_BASE}/student/profile`);
             const profileData = await profileResponse.json();
 
             if (profileResponse.ok && profileData) {
@@ -104,9 +91,12 @@ const Navbar = () => {
                 }
             }
         } catch (error) {
-            console.error('Error fetching profile:', error);
+            if (error.name !== 'AbortError') {
+                console.error('Error fetching profile:', error);
+            }
         }
     };
+
 
     useEffect(() => {
         if (localStorage.getItem('token')) {
@@ -143,7 +133,7 @@ const Navbar = () => {
                 }`}
         >
             <div className="max-w-7xl w-full mx-auto px-4 flex justify-between items-center">
-                <div className={`w-32 flex items-center transition-all duration-300 ${isScrolled ? 'scale-75' : 'scale-100'
+                <div className={`w-48 flex items-center transition-all duration-300 ${isScrolled ? 'scale-80' : 'scale-100'
                     }`}>
                     <Link to="/">
                         <img src="/img/logo-ielts.png" alt="IELTS Prep Logo" className="w-full object-contain rounded-full" />

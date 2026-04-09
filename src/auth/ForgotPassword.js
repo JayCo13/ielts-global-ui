@@ -4,6 +4,7 @@ import Lottie from 'lottie-react';
 import animationData from '../effect/Login.json';
 import { motion } from 'framer-motion';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -40,7 +41,7 @@ const ForgotPassword = () => {
     setLoading(true);
     
     try {
-      const response = await fetch(`${API_BASE}/auth/request-password-reset`, {
+      const response = await fetchWithTimeout(`${API_BASE}/auth/request-password-reset`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -8,6 +8,7 @@ import secureStorage from '../utils/secureStorage';
 // Add this import at the top of the file
 import { startStatusPing } from '../utils/statusManager';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 // Warning Dialog Component
 const WarningDialog = ({ message, isOpen, onClose, countdownTime = 30 }) => {
@@ -183,7 +184,7 @@ const LoginForm = () => {
     formBody.append('password', formData.password);
 
     try {
-      const response = await fetch(`${API_BASE}/login`, {
+      const response = await fetchWithTimeout(`${API_BASE}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

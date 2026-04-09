@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ChevronRight, Home, Crown, Star, Sparkles, Zap, BookOpen, Mic, Lightbulb, Globe } from 'lucide-react';
+import { ChevronRight, Home, Crown, Star, Sparkles, Zap, BookOpen, Mic, Lightbulb, Globe, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const VIPPackages = () => {
     const [packages, setPackages] = useState([]);
@@ -28,7 +29,7 @@ const VIPPackages = () => {
 
     const fetchData = async () => {
         try {
-            const response = await fetch(`${API_BASE}/customer/vip/packages/available`, {
+            const response = await fetchWithTimeout(`${API_BASE}/customer/vip/packages/available`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }

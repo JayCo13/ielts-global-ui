@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import { ChevronLeft } from 'lucide-react';
 import API_BASE from '../../config/api';
+import fetchWithTimeout from '../../utils/fetchWithTimeout';
 
 const WritingForecastLayout = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const WritingForecastLayout = () => {
     if (!taskId) { setLoading(false); return; }
     const fetchDetail = async () => {
       try {
-        const res = await fetch(`${API_BASE}/student/writing/forecast/${taskId}`, {
+        const res = await fetchWithTimeout(`${API_BASE}/student/writing/forecast/${taskId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!res.ok) throw new Error('Failed');

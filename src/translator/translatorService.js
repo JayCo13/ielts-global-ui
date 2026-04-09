@@ -20,7 +20,7 @@ class TranslatorService {
 
 "${text}"`;
 
-      const response = await fetch(this.baseUrl, {
+      const response = await fetchWithTimeout(this.baseUrl, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
@@ -113,7 +113,7 @@ Rules:
 - Include examples when relevant
 - Return ONLY the JSON object, no other text`;
 
-      const response = await fetch(this.baseUrl, {
+      const response = await fetchWithTimeout(this.baseUrl, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,

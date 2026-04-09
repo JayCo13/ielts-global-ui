@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import API_BASE from '../../config/api';
+import fetchWithTimeout from '../../utils/fetchWithTimeout';
 
 const toAbsoluteUrl = (u) => (u && u.startsWith('/')) ? `${API_BASE}${u}` : u;
 
@@ -29,7 +30,7 @@ const SpeakingLayout = () => {
         return;
       }
       try {
-        const res = await fetch(`${API_BASE}/student/speaking/materials/${id}`, {
+        const res = await fetchWithTimeout(`${API_BASE}/student/speaking/materials/${id}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!res.ok) throw new Error('Failed to load material');

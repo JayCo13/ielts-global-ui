@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import API_BASE from './config/api';
+import fetchWithTimeout from './utils/fetchWithTimeout';
 
 const StudentGuard = () => {
   const [status, setStatus] = useState(null);
@@ -12,6 +13,8 @@ const StudentGuard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let isMounted = true;
+
     const checkAccess = async () => {
       // If no token or role, just render children (public access)
       if (!token || !role) {
@@ -41,11 +44,11 @@ const StudentGuard = () => {
         }
 
         
-        const response = await fetch(endpoint, {
+        const response = await fetchWithTimeout(endpoint, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
-        
+        if (!isMounted) return;
 
         if (response.status === 403) {
          
@@ -65,16 +68,25 @@ const StudentGuard = () => {
             setStatus(data);
           }
         }
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.error('StudentGuard: fetch failed (network issue), allowing access:', error.message);
+        }
+        // On network failure, don't block the user — allow access gracefully
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
     checkAccess();
-    // Optionally, poll every 10 seconds to check for status changes
-    const interval = setInterval(checkAccess, 10000);
-    return () => clearInterval(interval);
+    // Poll every 30 seconds (was 10s — too aggressive for remote backend)
+    const interval = setInterval(checkAccess, 30000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, [studentId, token, role]);
+
 
   // Persist countdown across reloads
   useEffect(() => {
@@ -185,7 +197,7 @@ const StudentGuard = () => {
           <button
             className="px-6 py-2 bg-lime-500 text-white rounded-lg"
             onClick={async () => {
-              await fetch(`${API_BASE}/activate-account`, {
+              await fetchWithTimeout(`${API_BASE}/activate-account`, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}` }
               });

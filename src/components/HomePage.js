@@ -12,6 +12,8 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-coverflow';
 import CircularGallery, { Card } from './CircularGallery';
+import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const heroImages = [
   '/img/hp1.webp',
@@ -50,38 +52,7 @@ const FloatingMessengerIcon = () => {
 
   return (
     <>
-      <motion.div
-        className={`fb-messenger-icon ${isMinimized ? 'minimized' : ''} ${showScrollTop ? 'shifted' : ''}`}
-        onClick={openMessenger}
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{
-          type: "spring",
-          stiffness: 260,
-          damping: 20,
-          delay: 1.5
-        }}
-        whileHover={{ scale: isMinimized ? 1.05 : 1.1 }}
-        whileTap={{ scale: 0.9 }}
-      >
-        {!isMinimized && <div className="fb-messenger-tooltip">Contact Us</div>}
 
-        <div
-          className="messenger-toggle"
-          onClick={toggleMinimize}
-        >
-          <span className="text-white text-xs font-bold">1</span>
-        </div>
-
-        <img
-          src="/img/whatsapp-icon.webp"
-          alt="WhatsApp"
-          width="50"
-          height="50"
-          className="rounded-md"
-          style={{ objectFit: 'contain' }}
-        />
-      </motion.div>
 
       <motion.div
         className={`scroll-to-top ${showScrollTop ? 'visible' : ''}`}
@@ -115,6 +86,34 @@ const FloatingMessengerIcon = () => {
 };
 
 const HomePage = () => {
+
+  const [feedbackImages, setFeedbackImages] = useState([]);
+
+  useEffect(() => {
+    const sampleImages = [
+      { feedback_id: 's1', image_url: '/img/hp-img1.jpg', content: 'Sample 1' },
+      { feedback_id: 's2', image_url: '/img/hp-img2.jpg', content: 'Sample 2' },
+      { feedback_id: 's3', image_url: '/img/hp-img3.jpg', content: 'Sample 3' },
+      { feedback_id: 's4', image_url: '/img/hp1.webp', content: 'Sample 4' },
+      { feedback_id: 's5', image_url: '/img/hp2.webp', content: 'Sample 5' },
+      { feedback_id: 's6', image_url: '/img/hp4.webp', content: 'Sample 6' },
+    ];
+    const fetchFeedbacks = async () => {
+      try {
+        const res = await fetchWithTimeout(`${API_BASE}/student/action/feedbacks?limit=15`);
+        if (res.ok) {
+          const data = await res.json();
+          const withImages = data.filter(fb => fb.image_url).slice(0, 15);
+          setFeedbackImages(withImages.length > 0 ? withImages : sampleImages);
+        } else {
+          setFeedbackImages(sampleImages);
+        }
+      } catch (e) {
+        setFeedbackImages(sampleImages);
+      }
+    };
+    fetchFeedbacks();
+  }, []);
 
   // Keep your existing animation variants
   const fadeIn = {
@@ -400,7 +399,64 @@ const HomePage = () => {
             </svg>
           </div>
 
+          {/* VIP Members Feedback Slider */}
+          {feedbackImages.length > 0 && (
+          <div className="max-w-6xl mx-auto px-4 relative z-10 py-10">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-8"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#2b5356] via-[#0096b1] to-[#eb7e37] bg-clip-text text-transparent">
+                VIP Members Feedback
+              </h2>
+              <p className="text-gray-500 mt-2">Real results from our VIP members</p>
+            </motion.div>
 
+            <Swiper
+              modules={[Autoplay, Pagination]}
+              spaceBetween={20}
+              slidesPerView={1}
+              autoplay={{ delay: 4000, disableOnInteraction: false }}
+              pagination={{ clickable: true }}
+              loop={feedbackImages.length > 3}
+              speed={800}
+              className="feedback-swiper rounded-2xl pb-12"
+            >
+              {(() => {
+                const slides = [];
+                for (let i = 0; i < feedbackImages.length; i += 3) {
+                  slides.push(feedbackImages.slice(i, i + 3));
+                }
+                return slides.map((group, slideIdx) => (
+                  <SwiperSlide key={slideIdx}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 px-2">
+                      {group.map((fb) => (
+                        <motion.div
+                          key={fb.feedback_id}
+                          whileHover={{ scale: 1.03 }}
+                          transition={{ type: "spring", stiffness: 300 }}
+                          className="rounded-xl overflow-hidden shadow-lg border border-gray-100 bg-white"
+                        >
+                          {fb.image_url && (
+                            <img
+                              src={`${fb.image_url.startsWith('/') ? (window.location.origin.includes('localhost') ? 'http://localhost:8000' : '') : ''}${fb.image_url}`}
+                              alt={fb.content || 'Feedback'}
+                              className="w-full h-[280px] object-cover"
+                              loading="lazy"
+                            />
+                          )}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </SwiperSlide>
+                ));
+              })()}
+            </Swiper>
+          </div>
+          )}
 
           <div className="max-w-6xl mx-auto px-4 relative z-10 py-10">
 

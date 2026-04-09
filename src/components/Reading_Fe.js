@@ -5,6 +5,7 @@ import Navbar from './Navbar';
 import { canAccessExam } from '../utils/examAccess';
 import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const Reading_Fe = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -77,9 +78,8 @@ const Reading_Fe = () => {
         navigate('/login');
         return;
       }
-
       try {
-        const response = await fetch(`${API_BASE}/student/user-role/${userId}`, {
+        const response = await fetchWithTimeout(`${API_BASE}/student/user-role/${userId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -90,7 +90,9 @@ const Reading_Fe = () => {
           navigate('/login');
         }
       } catch (error) {
-        console.error('Error fetching user role:', error);
+        if (error.name !== 'AbortError') {
+          console.error('Error fetching user role:', error);
+        }
       }
     };
 
@@ -104,7 +106,6 @@ const Reading_Fe = () => {
         navigate('/login');
         return;
       }
-
       try {
         const [testsResponse, subscriptionResponse] = await Promise.all([
           fetch(`${API_BASE}/student/reading/reading-tests`, {
@@ -142,7 +143,9 @@ const Reading_Fe = () => {
           navigate('/login');
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        if (error.name !== 'AbortError') {
+          console.error('Error fetching data:', error);
+        }
       } finally {
         setLoading(false);
       }
@@ -150,6 +153,7 @@ const Reading_Fe = () => {
 
     fetchData();
   }, [navigate]);
+
 
   const handleStartTest = (test) => {
 
@@ -164,7 +168,7 @@ const Reading_Fe = () => {
   const confirmRetake = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE}/student/reading/reading-test/${testToRetake.id}/retake`, {
+      const response = await fetchWithTimeout(`${API_BASE}/student/reading/reading-test/${testToRetake.id}/retake`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -209,11 +213,7 @@ const Reading_Fe = () => {
   const fetchExamHistory = async (examId) => {
     setLoadingHistory(prev => ({ ...prev, [examId]: true }));
     try {
-      const response = await fetch(`${API_BASE}/student/my-exam-history`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      const response = await fetchWithTimeout(`${API_BASE}/student/my-exam-history`);
 
       if (response.ok) {
         const allHistory = await response.json();

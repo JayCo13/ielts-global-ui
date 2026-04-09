@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Home } from 'lucide-react';
+import { ChevronRight, Home, Info } from 'lucide-react';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const MyVIPPackage = () => {
     const [subscriptions, setSubscriptions] = useState([]);
@@ -14,7 +15,7 @@ const MyVIPPackage = () => {
 
     const fetchSubscriptions = async () => {
         try {
-            const response = await fetch(`${API_BASE}/customer/vip/subscription/history`, {
+            const response = await fetchWithTimeout(`${API_BASE}/customer/vip/subscription/history`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
@@ -106,37 +107,69 @@ const MyVIPPackage = () => {
                         <h2 className="text-4xl font-extrabold text-gray-900 sm:text-5xl lg:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-lime-600 to-lime-400">
                             My VIP Packages
                         </h2>
-                        <div className="mt-6 max-w-2xl mx-auto">
-                            <p className="text-xl text-gray-600 leading-relaxed">
-                                Quản lý và theo dõi hành trình thành viên cao cấp của bạn với lịch sử gói VIP toàn diện <br />
-                                Bạn muốn đăng ký gói VIP? Chọn loại gói:
-                                <div className="mt-4 flex flex-wrap gap-3 justify-center">
-                                    <Link
-                                        to="/vip-packages?type=all"
-                                        className="inline-flex items-center px-4 py-2 bg-lime-600 hover:bg-lime-700 text-white rounded-lg transition-colors"
-                                    >
-                                        Gói tất cả kỹ năng
-                                    </Link>
-                                    <Link
-                                        to="/vip-packages?type=reading"
-                                        className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                                    >
-                                        Gói Reading
-                                    </Link>
-                                    <Link
-                                        to="/vip-packages?type=writing"
-                                        className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
-                                    >
-                                        Gói Writing
-                                    </Link>
-                                    <Link
-                                        to="/vip-packages?type=listening"
-                                        className="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
-                                    >
-                                        Gói Listening
-                                    </Link>
-                                </div>
+                        <div className="mt-6 max-w-4xl mx-auto">
+                            <p className="text-xl text-gray-600 leading-relaxed mb-4">
+                                Quản lý và theo dõi hành trình thành viên cao cấp của bạn với lịch sử gói VIP toàn diện
                             </p>
+
+                            {!subscriptions.some(s => s.is_active) && (
+                                <div className="mt-6 mb-8 bg-white border border-emerald-100 rounded-2xl shadow-sm p-5 text-left">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="bg-emerald-100 p-2 rounded-xl">
+                                            <Info className="w-5 h-5 text-emerald-600" />
+                                        </div>
+                                        <h4 className="font-bold text-gray-900 text-lg m-0">No VIP Account - Benefits</h4>
+                                    </div>
+                                    <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 bg-gray-50 p-2 rounded-xl border border-gray-100 text-sm">
+                                        <div className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-lg shadow-sm border border-emerald-50 flex-1 justify-center whitespace-nowrap">
+                                            <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                                            <span className="text-gray-700">Access free <strong className="text-gray-900">Speaking</strong></span>
+                                        </div>
+                                        <div className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-lg shadow-sm border border-emerald-50 flex-1 justify-center whitespace-nowrap">
+                                            <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                                            <span className="text-gray-700">Access free <strong className="text-gray-900">Writing</strong> (1 AI/day)</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-lg shadow-sm border border-amber-50 flex-1 justify-center whitespace-nowrap">
+                                            <span className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span>
+                                            <span className="text-gray-700"><strong className="text-amber-600">6 free Listening tests</strong> only</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-lg shadow-sm border border-amber-50 flex-1 justify-center whitespace-nowrap">
+                                            <span className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span>
+                                            <span className="text-gray-700"><strong className="text-amber-600">6 free Reading tests</strong> only</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            <p className="text-xl text-gray-800 font-medium mt-4">
+                                Bạn muốn đăng ký gói VIP? Chọn loại gói:
+                            </p>
+                            <div className="mt-4 flex flex-wrap gap-3 justify-center">
+                                <Link
+                                    to="/vip-packages?type=all"
+                                    className="inline-flex items-center px-4 py-2 bg-lime-600 hover:bg-lime-700 text-white rounded-lg transition-colors shadow-sm"
+                                >
+                                    Gói tất cả kỹ năng
+                                </Link>
+                                <Link
+                                    to="/vip-packages?type=reading"
+                                    className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-sm"
+                                >
+                                    Gói Reading
+                                </Link>
+                                <Link
+                                    to="/vip-packages?type=writing"
+                                    className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors shadow-sm"
+                                >
+                                    Gói Writing
+                                </Link>
+                                <Link
+                                    to="/vip-packages?type=listening"
+                                    className="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors shadow-sm"
+                                >
+                                    Gói Listening
+                                </Link>
+                            </div>
                         </div>
                     </div>
 

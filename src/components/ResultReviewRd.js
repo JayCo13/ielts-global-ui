@@ -13,6 +13,7 @@ import API_BASE from '../config/api';
 const circumference = 2 * Math.PI * 45;
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(-10px); }
+import fetchWithTimeout from '../utils/fetchWithTimeout';
   to { opacity: 1; transform: translateY(0); }
 `;
 
@@ -97,7 +98,7 @@ const ResultReview = () => {
   useEffect(() => {
     const fetchResultDetails = async () => {
       try {
-        const response = await fetch(`${API_BASE}/student/exam-result/${resultId}`, {
+        const response = await fetchWithTimeout(`${API_BASE}/student/exam-result/${resultId}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -117,7 +118,7 @@ const ResultReview = () => {
 
     const fetchTestDescription = async () => {
       try {
-        const response = await fetch(`${API_BASE}/student/reading/reading-test/${examId}/description`, {
+        const response = await fetchWithTimeout(`${API_BASE}/student/reading/reading-test/${examId}/description`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -173,7 +174,7 @@ const ResultReview = () => {
     if (!contextMenu.selectedText) return;
 
     try {
-      const response = await fetch(`${API_BASE}/student/vocabulary`, {
+      const response = await fetchWithTimeout(`${API_BASE}/student/vocabulary`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

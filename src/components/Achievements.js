@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const Achievements = () => {
     const [selectedImage, setSelectedImage] = useState(null);
@@ -20,7 +21,7 @@ const Achievements = () => {
     useEffect(() => {
         const fetchFeedbacks = async () => {
             try {
-                const response = await fetch(`${API_BASE}/student/action/feedbacks`, {
+                const response = await fetchWithTimeout(`${API_BASE}/student/action/feedbacks`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }

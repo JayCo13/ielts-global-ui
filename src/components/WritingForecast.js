@@ -6,6 +6,7 @@ import AIFeedbackDialog from './AiFeedbackDialog';
 import EditEssayDialog from './EditEssayDialog';
 import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const WritingForecast = () => {
   const navigate = useNavigate();
@@ -103,8 +104,8 @@ const WritingForecast = () => {
             </ol>
           </nav>
           <div className="text-sm font-semibold text-red-700 mt-5">
-            <p>* Nâng cấp VIP Listening và Reading để mở khóa thêm 6 lượt chấm điểm AI Writing miễn phí mỗi ngày. *</p>
-            <p>* Số lượt chấm điểm bằng AI miễn phí còn lại trong ngày: {aiRemaining} *</p>
+            <p>* Upgrade to VIP Listening and Reading to unlock 6 more free AI Writing evaluations per day *</p>
+            <p>* Free AI evaluation remaining today: {aiRemaining} *</p>
           </div>
         </div>
       </div>
@@ -219,14 +220,14 @@ const WritingForecast = () => {
                           setAiDialogOpen(true);
                           try {
                             const token = secureStorage.getItem('token') || localStorage.getItem('token');
-                            const essayResponse = await fetch(`${API_BASE}/student/writing/part/${it.task_id}/essay`, { headers: { 'Authorization': `Bearer ${token}` } });
+                            const essayResponse = await fetchWithTimeout(`${API_BASE}/student/writing/part/${it.task_id}/essay`, { headers: { 'Authorization': `Bearer ${token}` } });
                             if (!essayResponse.ok) throw new Error('Failed to fetch essay');
                             const essayData = await essayResponse.json();
                             if (!essayData.essay?.answer_text) {
                               setAiResult({ error: 'Không có nội dung bài viết để đánh giá. Vui lòng làm bài trước.' });
                               return;
                             }
-                            const response = await fetch(`${API_BASE}/ai/evaluate-and-save/${it.task_id}`, {
+                            const response = await fetchWithTimeout(`${API_BASE}/ai/evaluate-and-save/${it.task_id}`, {
                               method: 'POST',
                               headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                               body: JSON.stringify({ essay_text: essayData.essay.answer_text, instructions: it.instructions })

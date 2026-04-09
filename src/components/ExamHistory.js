@@ -4,6 +4,7 @@ import { Clock, BarChart2, ChevronRight, Search, ChevronLeft, Trophy, Target, Tr
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, defs } from 'recharts';
 import Navbar from './Navbar';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 // Function to calculate band score based on correct answers for Reading Academic
 // Based on official IELTS Reading Academic scoring criteria
@@ -50,7 +51,7 @@ const ExamHistory = () => {
   useEffect(() => {
     const fetchUserRole = async () => {
       try {
-        const response = await fetch(`${API_BASE}/student/profile`, {
+        const response = await fetchWithTimeout(`${API_BASE}/student/profile`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -70,7 +71,7 @@ const ExamHistory = () => {
 
     const checkVIPAccess = async () => {
       try {
-        const response = await fetch(`${API_BASE}/customer/vip/subscription/status`, {
+        const response = await fetchWithTimeout(`${API_BASE}/customer/vip/subscription/status`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -104,7 +105,7 @@ const ExamHistory = () => {
   useEffect(() => {
     const fetchExamHistory = async () => {
       try {
-        const response = await fetch(`${API_BASE}/student/my-exam-history`, {
+        const response = await fetchWithTimeout(`${API_BASE}/student/my-exam-history`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -134,7 +135,7 @@ const ExamHistory = () => {
   const handleViewReadingDetails = async (exam) => {
     try {
       // Fetch exam details to get the answer data
-      const response = await fetch(`${API_BASE}/student/exam-result/${exam.result_id}`, {
+      const response = await fetchWithTimeout(`${API_BASE}/student/exam-result/${exam.result_id}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }

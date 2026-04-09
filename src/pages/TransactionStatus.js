@@ -3,6 +3,7 @@ import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { ChevronRight, Home, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const TransactionStatus = () => {
     const [status, setStatus] = useState('pending');
@@ -46,7 +47,7 @@ const TransactionStatus = () => {
 
         const checkStatus = async () => {
             try {
-                const response = await fetch(`${API_BASE}/customer/vip/transactions/${transactionId}/status`, {
+                const response = await fetchWithTimeout(`${API_BASE}/customer/vip/transactions/${transactionId}/status`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }

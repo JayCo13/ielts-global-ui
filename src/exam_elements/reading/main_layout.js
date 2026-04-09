@@ -12,6 +12,7 @@ import ConfirmDialog from '../../components/ConfirmDialog';
 import ForceLogoutDialog from '../../components/ForceLogoutDialog';
 import { TranslatorDialog, useTextSelection } from '../../translator';
 import API_BASE from '../../config/api';
+import fetchWithTimeout from '../../utils/fetchWithTimeout';
 
 const MainLayout = () => {
   const [currentQuestion, setCurrentQuestion] = useState(1);
@@ -340,7 +341,7 @@ const MainLayout = () => {
 
     const fetchTestDescription = async () => {
       try {
-        const response = await fetch(`${API_BASE}/student/reading/reading-test/${examId}/description`, {
+        const response = await fetchWithTimeout(`${API_BASE}/student/reading/reading-test/${examId}/description`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -616,7 +617,7 @@ const MainLayout = () => {
     if (!vocabMenu.selectedText) return;
 
     try {
-      const response = await fetch(`${API_BASE}/student/vocabulary`, {
+      const response = await fetchWithTimeout(`${API_BASE}/student/vocabulary`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -735,7 +736,7 @@ const MainLayout = () => {
   useEffect(() => {
     const fetchExamData = async () => {
       try {
-        const response = await fetch(`${API_BASE}/student/reading/reading-test/${examId}`, {
+        const response = await fetchWithTimeout(`${API_BASE}/student/reading/reading-test/${examId}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -815,7 +816,7 @@ const MainLayout = () => {
         else if (resultId) {
           try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${API_BASE}/student/exam-result/${resultId}`, {
+            const response = await fetchWithTimeout(`${API_BASE}/student/exam-result/${resultId}`, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }
@@ -909,7 +910,7 @@ const MainLayout = () => {
           return;
         }
 
-        const response = await fetch(`${API_BASE}/customer/vip/subscription/status`, {
+        const response = await fetchWithTimeout(`${API_BASE}/customer/vip/subscription/status`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -938,7 +939,7 @@ const MainLayout = () => {
   const handleRetakeConfirm = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE}/student/reading/reading-test/${examId}/retake`, {
+      const response = await fetchWithTimeout(`${API_BASE}/student/reading/reading-test/${examId}/retake`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1176,7 +1177,7 @@ const MainLayout = () => {
           answersByNumber[String(num)] = val;
         }
       });
-      const response = await fetch(url, {
+      const response = await fetchWithTimeout(url, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

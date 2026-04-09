@@ -6,6 +6,7 @@ import { Bell, Menu, Wifi, Volume2, FileText } from 'lucide-react';
 import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import Split from 'react-split';
 import API_BASE from '../../config/api';
+import fetchWithTimeout from '../../utils/fetchWithTimeout';
 
 const processInstructions = (instructions) => {
   const parser = new DOMParser();
@@ -70,7 +71,7 @@ const WritingLayout = () => {
       if (!token || !testId || isForecast) return;
 
       try {
-        const response = await fetch(`${API_BASE}/student/writing/tasks`, {
+        const response = await fetchWithTimeout(`${API_BASE}/student/writing/tasks`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -103,7 +104,7 @@ const WritingLayout = () => {
       }
 
       try {
-        const response = await fetch(`${API_BASE}/student/writing/tasks/${taskId}`, {
+        const response = await fetchWithTimeout(`${API_BASE}/student/writing/tasks/${taskId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -183,7 +184,7 @@ const WritingLayout = () => {
       }));
 
       if (isForecast) {
-        const response = await fetch(
+        const response = await fetchWithTimeout(
           `${API_BASE}/student/writing/part/${taskId}/essay`,
           {
             method: 'PUT',
@@ -218,7 +219,7 @@ const WritingLayout = () => {
         return;
       }
 
-      const response = await fetch(
+      const response = await fetchWithTimeout(
         `${API_BASE}/student/writing/test/${testId}/submit`,
         {
           method: 'POST',
@@ -299,7 +300,7 @@ const WritingLayout = () => {
 
       setLoading(true);
       try {
-        const response = await fetch(`${API_BASE}/student/writing/tasks/${previousPart.task_id}`, {
+        const response = await fetchWithTimeout(`${API_BASE}/student/writing/tasks/${previousPart.task_id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -331,7 +332,7 @@ const WritingLayout = () => {
 
       setLoading(true);
       try {
-        const response = await fetch(`${API_BASE}/student/writing/tasks/${nextPart.task_id}`, {
+        const response = await fetchWithTimeout(`${API_BASE}/student/writing/tasks/${nextPart.task_id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }

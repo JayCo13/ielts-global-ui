@@ -4,6 +4,7 @@ import Navbar from './Navbar';
 import { Search, Lock, ChevronRight, ChevronLeft, Star } from 'lucide-react';
 import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const ReadingForecast = () => {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const ReadingForecast = () => {
       let userId = secureStorage.getItem('user_id') || localStorage.getItem('user_id');
       if (!token || !userId) { navigate('/login'); return; }
       try {
-        const res = await fetch(`${API_BASE}/student/user-role/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const res = await fetchWithTimeout(`${API_BASE}/student/user-role/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } });
         if (res.ok) { const data = await res.json(); setUserRole(data.role); } else if (res.status === 401) { navigate('/login'); }
       } catch (_) { }
     };
@@ -91,7 +92,7 @@ const ReadingForecast = () => {
     setLoadingHistory(prev => ({ ...prev, [key]: true }));
     try {
       const token = secureStorage.getItem('token') || localStorage.getItem('token');
-      const response = await fetch(`${API_BASE}/student/reading/forecast-history/${examId}/${partNumber}`, {
+      const response = await fetchWithTimeout(`${API_BASE}/student/reading/forecast-history/${examId}/${partNumber}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {

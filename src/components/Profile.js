@@ -5,6 +5,7 @@ import ExamHistory from './ExamHistory';
 import Navbar from './Navbar';
 import { User, Edit, History, ChevronLeft, ChevronRight, BarChart, Headphones, PenTool, ArrowLeft, ArrowRight, Lock, Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const ChangePassword = ({ isGoogleAccount = false }) => {
   const [formData, setFormData] = useState({
@@ -78,7 +79,7 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`${API_BASE}/auth/change-password`, {
+      const response = await fetchWithTimeout(`${API_BASE}/auth/change-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -319,14 +320,14 @@ const ProfilePage = () => {
   const fetchData = useCallback(async () => {
     try {
       // Fetch profile data
-      const profileResponse = await fetch(`${API_BASE}/student/profile`, {
+      const profileResponse = await fetchWithTimeout(`${API_BASE}/student/profile`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
 
       // Fetch test statistics
-      const statsResponse = await fetch(`${API_BASE}/student/my-test-statistics`, {
+      const statsResponse = await fetchWithTimeout(`${API_BASE}/student/my-test-statistics`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -334,7 +335,7 @@ const ProfilePage = () => {
 
       // Fetch account status for students
       if (localStorage.getItem('role') === 'student') {
-        const accountResponse = await fetch(`${API_BASE}/account-status`, {
+        const accountResponse = await fetchWithTimeout(`${API_BASE}/account-status`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }

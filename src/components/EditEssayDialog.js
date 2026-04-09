@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import CustomRichTextEditor from './CustomRichTextEditor';
 import { X, Check } from 'lucide-react';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const EditEssayDialog = ({ isOpen, onClose, taskId, partNumber }) => {
   const [essay, setEssay] = useState('');
@@ -31,7 +32,7 @@ const EditEssayDialog = ({ isOpen, onClose, taskId, partNumber }) => {
   const fetchEssay = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch(`${API_BASE}/student/writing/part/${taskId.task_id}/essay`, {
+      const response = await fetchWithTimeout(`${API_BASE}/student/writing/part/${taskId.task_id}/essay`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -56,7 +57,7 @@ const EditEssayDialog = ({ isOpen, onClose, taskId, partNumber }) => {
 
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch(`${API_BASE}/student/writing/part/${taskId.task_id}/essay`, {
+      const response = await fetchWithTimeout(`${API_BASE}/student/writing/part/${taskId.task_id}/essay`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

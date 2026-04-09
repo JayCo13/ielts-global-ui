@@ -4,6 +4,7 @@ import Lottie from 'lottie-react';
 import animationData from '../effect/Login.json';
 import { motion } from 'framer-motion';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 // Password strength indicators
 const PasswordStrengthMeter = ({ password }) => {
@@ -100,7 +101,7 @@ const ResetPassword = () => {
       }
       
       try {
-        const response = await fetch(`${API_BASE}/auth/verify-reset-token?token=${token}`, {
+        const response = await fetchWithTimeout(`${API_BASE}/auth/verify-reset-token?token=${token}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -196,7 +197,7 @@ const ResetPassword = () => {
       const queryParams = new URLSearchParams(location.search);
       const token = queryParams.get('token');
       
-      const response = await fetch(`${API_BASE}/auth/reset-password`, {
+      const response = await fetchWithTimeout(`${API_BASE}/auth/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -7,6 +7,7 @@ import loadingAnimation from '../effect/loading.json';
 import { startStatusPing } from '../utils/statusManager';
 import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -69,7 +70,7 @@ const Register = () => {
     setErrors(prev => ({ ...prev, email: '' }));
 
     try {
-      const response = await fetch(`${API_BASE}/auth/verify-email`, {
+      const response = await fetchWithTimeout(`${API_BASE}/auth/verify-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -233,7 +234,7 @@ const Register = () => {
       // Verify email if not already validated
       setIsVerifyingEmail(true);
       try {
-        const response = await fetch(`${API_BASE}/verify-email`, {
+        const response = await fetchWithTimeout(`${API_BASE}/verify-email`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -286,7 +287,7 @@ const Register = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE}/register`, {
+      const response = await fetchWithTimeout(`${API_BASE}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

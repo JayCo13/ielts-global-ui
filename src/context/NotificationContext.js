@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect } fr
 import FloatingNotification from '../components/FloatingNotification';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const NotificationContext = createContext();
 
@@ -21,8 +22,12 @@ export const NotificationProvider = ({ children }) => {
  
   useEffect(() => {
     const fetchNotifications = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return; // Don't fetch if not logged in
       try {
-        const response = await fetch(`${API_BASE}/student/action/user-notifications`);
+        const response = await fetchWithTimeout(`${API_BASE}/student/action/user-notifications`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -41,7 +46,9 @@ export const NotificationProvider = ({ children }) => {
           setShowNotifications(shouldShow);
         }
       } catch (error) {
-        console.error('Error fetching notifications:', error);
+        if (error.name !== 'AbortError') {
+          console.error('Error fetching notifications:', error);
+        }
       }
     };
 
@@ -56,6 +63,7 @@ export const NotificationProvider = ({ children }) => {
     
     return () => clearInterval(checkInterval);
   }, [lastClosedTime]);
+
 
   const showNotification = useCallback((message, type = 'announcement', image_url = null) => {
     const newNotification = {
