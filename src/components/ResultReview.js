@@ -9,11 +9,11 @@ import highAnimation from '../effect/high.json';
 import mediumAnimation from '../effect/medium.json';
 import lowAnimation from '../effect/low.json';
 import API_BASE from '../config/api';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const circumference = 2 * Math.PI * 45;
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(-10px); }
-import fetchWithTimeout from '../utils/fetchWithTimeout';
   to { opacity: 1; transform: translateY(0); }
 `;
 

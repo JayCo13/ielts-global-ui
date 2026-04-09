@@ -1,3 +1,5 @@
+import fetchWithTimeout from '../utils/fetchWithTimeout';
+
 class TranslatorService {
   constructor() {
     // You should replace this with your actual Groq API key
