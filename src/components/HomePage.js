@@ -442,10 +442,11 @@ const HomePage = () => {
                         >
                           {fb.image_url && (
                             <img
-                              src={`${fb.image_url.startsWith('/') ? (window.location.origin.includes('localhost') ? 'http://localhost:8000' : '') : ''}${fb.image_url}`}
+                              src={fb.image_url.startsWith('/static/') ? `${API_BASE}${fb.image_url}` : fb.image_url}
                               alt={fb.content || 'Feedback'}
                               className="w-full h-[280px] object-cover"
                               loading="lazy"
+                              onError={(e) => { e.target.style.display = 'none'; }}
                             />
                           )}
                         </motion.div>
