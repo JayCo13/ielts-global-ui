@@ -448,7 +448,7 @@ const HomePage = () => {
                                 fb.image_url
                               }
                               alt={fb.content || 'Feedback'}
-                              className="w-full h-[280px] object-cover"
+                              className="w-full h-[280px] object-contain bg-gray-50"
                               loading="lazy"
                               onError={(e) => { e.target.style.display = 'none'; }}
                             />
