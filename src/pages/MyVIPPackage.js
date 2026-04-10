@@ -35,7 +35,7 @@ const MyVIPPackage = () => {
     };
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('vi-VN', {
+        return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
             day: 'numeric'
@@ -43,7 +43,7 @@ const MyVIPPackage = () => {
     };
 
     const formatDateLong = (dateString) => {
-        return new Date(dateString).toLocaleDateString('vi-VN', {
+        return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -215,7 +215,7 @@ const MyVIPPackage = () => {
                                 Your VIP Timeline
                             </h3>
                             <span className="text-sm text-gray-500">
-                                {vipStats.usedDays} / {vipStats.totalDays} ngày
+                                {vipStats.usedDays} / {vipStats.totalDays} days
                             </span>
                         </div>
                         <div className="relative">

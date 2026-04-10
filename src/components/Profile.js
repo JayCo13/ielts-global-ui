@@ -44,7 +44,7 @@ const ChangePassword = ({ isGoogleAccount = false }) => {
 
   const getStrengthLabel = () => {
     if (formData.new_password.length === 0) return '';
-    if (passwordStrength <= 1) return 'Yếu';
+    if (passwordStrength <= 1) return 'Weak';
     if (passwordStrength <= 2) return 'Average';
     if (passwordStrength <= 3) return 'Good';
     return 'Strong';
@@ -561,7 +561,7 @@ const ProfilePage = () => {
                             <p className="text-xl font-bold text-gray-900">{testStats.listening_statistics.average_accuracy}%</p>
                           </div>
                           <div className="bg-gray-50 rounded-lg p-4">
-                            <h3 className="text-gray-500 text-xs font-medium mb-1">Score trung bình</h3>
+                            <h3 className="text-gray-500 text-xs font-medium mb-1">Average Score</h3>
                             <p className="text-xl font-bold text-gray-900">{testStats.listening_statistics.average_score}</p>
                           </div>
                         </div>
@@ -598,11 +598,11 @@ const ProfilePage = () => {
                       <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                           <div className="bg-gray-50 rounded-lg p-4">
-                            <h3 className="text-gray-500 text-xs font-medium mb-1">Bài thi đã thử</h3>
+                            <h3 className="text-gray-500 text-xs font-medium mb-1">Tests Attempted</h3>
                             <p className="text-xl font-bold text-gray-900">{testStats.writing_statistics.tests_attempted}</p>
                           </div>
                           <div className="bg-gray-50 rounded-lg p-4">
-                            <h3 className="text-gray-500 text-xs font-medium mb-1">Phần đã hoàn thành</h3>
+                            <h3 className="text-gray-500 text-xs font-medium mb-1">Parts Completed</h3>
                             <p className="text-xl font-bold text-gray-900">{testStats.writing_statistics.tasks_completed}</p>
                           </div>
                         </div>
@@ -619,7 +619,7 @@ const ProfilePage = () => {
                                 <div className="text-right">
                                   <span className={`text-xs px-2 py-1 rounded-full ${test.is_completed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                                     }`}>
-                                    {test.is_completed ? 'Hoàn thành' : `${test.parts_completed}/${test.total_parts}`}
+                                    {test.is_completed ? 'Completed' : `${test.parts_completed}/${test.total_parts}`}
                                   </span>
                                 </div>
                               </div>
@@ -628,7 +628,7 @@ const ProfilePage = () => {
                         )}
                       </div>
                     ) : (
-                      <p className="text-gray-500 text-center py-4">Chưa có bài viết nào được thử</p>
+                      <p className="text-gray-500 text-center py-4">No writing tests attempted</p>
                     )}
                   </div>
                 </div>
@@ -662,7 +662,7 @@ const ProfilePage = () => {
                   className={`flex items-center gap-3 p-2 cursor-pointer rounded-lg hover:bg-gray-50 ${activeView === 'profile' ? 'text-[#0096b1] bg-[#0096b1]-50' : 'text-gray-600'
                     }`}
                   onClick={() => setActiveView('profile')}
-                  title={menuCollapsed ? "Overview hồ sơ" : ""}
+                  title={menuCollapsed ? "Profile Overview" : ""}
                 >
                   <User className="w-5 h-5 min-w-5" />
                   {!menuCollapsed && <span>Overview</span>}

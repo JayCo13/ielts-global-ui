@@ -35,7 +35,7 @@ const MyVIPPackage = () => {
     };
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('vi-VN', {
+        return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -109,7 +109,7 @@ const MyVIPPackage = () => {
                         </h2>
                         <div className="mt-6 max-w-4xl mx-auto">
                             <p className="text-xl text-gray-600 leading-relaxed mb-4">
-                                Quản lý và theo dõi hành trình thành viên cao cấp của bạn với lịch sử gói VIP toàn diện
+                                Manage and track your premium membership journey with comprehensive VIP package history
                             </p>
 
                             {!subscriptions.some(s => s.is_active) && (
@@ -142,32 +142,32 @@ const MyVIPPackage = () => {
                             )}
 
                             <p className="text-xl text-gray-800 font-medium mt-4">
-                                Bạn muốn đăng ký gói VIP? Chọn loại gói:
+                                Want to subscribe to a VIP package? Choose a type:
                             </p>
                             <div className="mt-4 flex flex-wrap gap-3 justify-center">
                                 <Link
                                     to="/vip-packages?type=all"
                                     className="inline-flex items-center px-4 py-2 bg-lime-600 hover:bg-lime-700 text-white rounded-lg transition-colors shadow-sm"
                                 >
-                                    Gói tất cả kỹ năng
+                                    All Skills Package
                                 </Link>
                                 <Link
                                     to="/vip-packages?type=reading"
                                     className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-sm"
                                 >
-                                    Gói Reading
+                                    Reading Package
                                 </Link>
                                 <Link
                                     to="/vip-packages?type=writing"
                                     className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors shadow-sm"
                                 >
-                                    Gói Writing
+                                    Writing Package
                                 </Link>
                                 <Link
                                     to="/vip-packages?type=listening"
                                     className="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors shadow-sm"
                                 >
-                                    Gói Listening
+                                    Listening Package
                                 </Link>
                             </div>
                         </div>
@@ -177,9 +177,9 @@ const MyVIPPackage = () => {
                     <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-3">
                         <div className="bg-white overflow-hidden shadow-sm rounded-xl border border-lime-100/50">
                             <div className="px-4 py-5 sm:p-6">
-                                <dt className="text-sm font-medium text-gray-500">Hoạt động từ</dt>
+                                <dt className="text-sm font-medium text-gray-500">Active Since</dt>
                                 <dd className="mt-1 text-2xl font-semibold text-lime-600">
-                                    {subscriptions[0]?.start_date ? formatDate(subscriptions[0].start_date) : 'Chưa có'}
+                                    {subscriptions[0]?.start_date ? formatDate(subscriptions[0].start_date) : 'N/A'}
                                 </dd>
                             </div>
                         </div>
@@ -191,7 +191,7 @@ const MyVIPPackage = () => {
                         </div>
                         <div className="bg-white overflow-hidden shadow-sm rounded-xl border border-lime-100/50">
                             <div className="px-4 py-5 sm:p-6">
-                                <dt className="text-sm font-medium text-gray-500">Gói đang hoạt động</dt>
+                                <dt className="text-sm font-medium text-gray-500">Active Packages</dt>
                                 <dd className="mt-1 text-2xl font-semibold text-lime-600">
                                     {subscriptions.filter(sub => sub.is_active).length}
                                 </dd>
@@ -269,10 +269,10 @@ const MyVIPPackage = () => {
                                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                                 </svg>
                                                             )}
-                                                            Trạng thái:
+                                                            Status:
                                                             {subscription.payment_status === 'completed' ? ' Paid' :
                                                                 subscription.payment_status === 'pending' ? ' Processing' :
-                                                                    subscription.payment_status === 'rejected' ? ' Bị từ chối' :
+                                                                    subscription.payment_status === 'rejected' ? ' Rejected' :
                                                                         ' ' + subscription.payment_status}
                                                         </div>
                                                     </div>
@@ -288,13 +288,13 @@ const MyVIPPackage = () => {
                             <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <h3 className="mt-4 text-lg font-medium text-gray-900">Không có gói VIP</h3>
-                            <p className="mt-2 text-gray-600">Bạn chưa đăng ký bất kỳ gói VIP nào.</p>
+                            <h3 className="mt-4 text-lg font-medium text-gray-900">No VIP Packages</h3>
+                            <p className="mt-2 text-gray-600">You have not subscribed to any VIP packages.</p>
                             <Link
                                 to="/vip-packages"
                                 className="mt-6 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-lime-500 to-lime-600 hover:from-lime-600 hover:to-lime-700"
                             >
-                                Xem các gói hiện có
+                                View Available Packages
                             </Link>
                         </div>
                     )}

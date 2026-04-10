@@ -246,7 +246,7 @@ const DictationAdmin = () => {
 
             <main className="flex-1 max-w-7xl mx-auto px-4 py-8 w-full">
                 <div className="flex items-center justify-between mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Quản lý bài chép chính tả</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">Dictation Management</h1>
                     <button
                         onClick={() => setShowUnitForm(true)}
                         className="flex items-center gap-2 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors"
@@ -377,7 +377,7 @@ const DictationAdmin = () => {
                                                         newInputs[actualIdx] = e.target.value;
                                                         setWordInputs(newInputs);
                                                     }}
-                                                    placeholder={`Từ ${actualIdx + 1}`}
+                                                    placeholder={`Word ${actualIdx + 1}`}
                                                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition-all"
                                                 />
                                             );
@@ -448,7 +448,7 @@ const DictationAdmin = () => {
                                 type="text"
                                 value={unitName}
                                 onChange={(e) => setUnitName(e.target.value)}
-                                placeholder="Tên bài (VD: Unit 1 - Vocabulary)"
+                                placeholder="Unit name (e.g., Unit 1 - Vocabulary)"
                                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none"
                             />
                             <textarea

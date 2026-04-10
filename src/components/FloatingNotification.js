@@ -100,7 +100,7 @@ const FloatingNotification = ({ notifications = [], onClose }) => {
             <button
               onClick={handleClose}
               className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors duration-200 rounded-full p-1 hover:bg-gray-100 focus:outline-none z-10"
-              aria-label="Đóng thông báo"
+              aria-label="Close notification"
             >
               <svg
                 className="w-5 h-5"
@@ -135,7 +135,7 @@ const FloatingNotification = ({ notifications = [], onClose }) => {
             >
               {notificationGroups.map((group, groupIndex) => (
                 <SwiperSlide key={`group-${groupIndex}`}>
-                  <div className="notification-date text-xs text-gray-500 mb-3"> <Bell className="inline-block size-4" strokeWidth={3} /> Thông báo ngày: {group.date}</div>
+                  <div className="notification-date text-xs text-gray-500 mb-3"> <Bell className="inline-block size-4" strokeWidth={3} /> Notification: {group.date}</div>
 
                   {group.items.length > 1 ? (
                     <Swiper

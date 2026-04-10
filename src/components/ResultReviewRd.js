@@ -445,7 +445,7 @@ const ResultReview = () => {
                     <div className='flex items-center'>
                       <Clock className="w-5 h-5 mr-3 text-gray-400" />
                       <span>
-                        {new Date(resultData.completion_date).toLocaleDateString('vi-VN', {
+                        {new Date(resultData.completion_date).toLocaleDateString('en-US', {
                           day: '2-digit',
                           month: '2-digit',
                           year: 'numeric'
@@ -474,7 +474,7 @@ const ResultReview = () => {
                       <div className="text-red-500 font-semibold">
                         {resultData.detailed_answers.filter(a => a.evaluation === 'wrong').length}
                       </div>
-                      <div className="text-xs text-gray-600">Sai</div>
+                      <div className="text-xs text-gray-600">Incorrect</div>
                     </div>
                     <div className="bg-gray-100 rounded-lg p-2">
                       <div className="text-gray-500 font-semibold">

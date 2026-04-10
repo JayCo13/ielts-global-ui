@@ -837,10 +837,10 @@ const ExamHistory = () => {
                                   </div>
                                   <div className="flex flex-col space-y-1">
                                     <span className="text-sm font-medium text-gray-900">
-                                      {new Date(exam.completion_date).toLocaleDateString('vi-VN')}
+                                      {new Date(exam.completion_date).toLocaleDateString('en-US')}
                                     </span>
                                     <span className="text-xs text-gray-500 font-medium">
-                                      {new Date(exam.completion_date).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                                      {new Date(exam.completion_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                                     </span>
                                   </div>
                                 </div>
@@ -892,7 +892,7 @@ const ExamHistory = () => {
                                 onClick={() => handleViewReadingDetails(exam)}
                                 className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md group"
                               >
-                                <span className="mr-2">Xem chi tiết</span>
+                                <span className="mr-2">View Details</span>
                                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                               </button>
                             </div>
@@ -993,10 +993,10 @@ const ExamHistory = () => {
                                   </div>
                                   <div className="flex flex-col space-y-1">
                                     <span className="text-sm font-medium text-gray-900">
-                                      {new Date(exam.completion_date).toLocaleDateString('vi-VN')}
+                                      {new Date(exam.completion_date).toLocaleDateString('en-US')}
                                     </span>
                                     <span className="text-xs text-gray-500 font-medium">
-                                      {new Date(exam.completion_date).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                                      {new Date(exam.completion_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                                     </span>
                                   </div>
                                 </div>
@@ -1048,7 +1048,7 @@ const ExamHistory = () => {
                                 onClick={() => handleViewListeningDetails(exam)}
                                 className="inline-flex items-center px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md group"
                               >
-                                <span className="mr-2">Xem chi tiết</span>
+                                <span className="mr-2">View Details</span>
                                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                               </button>
                             </div>

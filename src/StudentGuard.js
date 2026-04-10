@@ -164,22 +164,22 @@ const StudentGuard = () => {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
         <div className="bg-white p-8 rounded-lg shadow-lg text-center max-w-md">
-          <h2 className="text-xl font-bold mb-4 text-red-600">Tài khoản đã bị vô hiệu hoá</h2>
+          <h2 className="text-xl font-bold mb-4 text-red-600">Account has been disabled</h2>
           <p className="mb-4">
-           Tài khoản của bạn đã bị đội ngũ kiểm duyệt vô hiệu hoá do vi phạm quy tắc của Ieltstrenmay.com
+           Your account has been disabled by the moderation team for violating the rules of ieltscomputertest.com
           </p>
           <div className="flex justify-center gap-4">
             <button
               className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-lime-600 transition-colors"
               onClick={() => navigate('/vip-packages')}
             >
-              Liên hệ hỗ trợ
+              Contact Support
             </button>
             <button
               className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
               onClick={() => navigate('/')}
             >
-              Về trang chủ
+              Go to Home
             </button>
           </div>
         </div>
@@ -192,8 +192,8 @@ const StudentGuard = () => {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
         <div className="bg-white p-8 rounded-lg shadow-lg text-center">
-          <h2 className="text-xl font-bold mb-4">Xác nhận tài khoản</h2>
-          <p className="mb-4">Bạn cần xác nhận tài khoản để tiếp tục sử dụng hệ thống.</p>
+          <h2 className="text-xl font-bold mb-4">Verify Account</h2>
+          <p className="mb-4">You need to verify your account to continue using the system.</p>
           <button
             className="px-6 py-2 bg-lime-500 text-white rounded-lg"
             onClick={async () => {
@@ -204,7 +204,7 @@ const StudentGuard = () => {
               window.location.reload();
             }}
           >
-            Xác nhận tài khoản
+            Verify Account
           </button>
         </div>
       </div>
@@ -216,10 +216,10 @@ const StudentGuard = () => {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
         <div className="bg-white p-8 rounded-lg shadow-lg text-center max-w-md">
-          <h2 className="text-xl font-bold mb-4 text-yellow-600">Thanh toán đang chờ xác nhận</h2>
+          <h2 className="text-xl font-bold mb-4 text-yellow-600">Payment Pending Verification</h2>
           <p className="mb-4">
-            Gói VIP <span className="font-semibold">{status.package_name}</span> của bạn đang chờ xác nhận thanh toán.
-            Vui lòng đợi trong khi quản trị viên xác minh thanh toán của bạn.
+            VIP Package <span className="font-semibold">{status.package_name}</span> your is pending payment verification.
+            Please wait while the admin verifies your payment.
           </p>
           <button
             className="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors"
@@ -230,7 +230,7 @@ const StudentGuard = () => {
               }
             })}
           >
-            Kiểm tra trạng thái
+            Check Status
           </button>
         </div>
       </div>

@@ -50,13 +50,13 @@ const TranslatorDialog = ({
                     word: selectedText,
                     phonetics: { uk: '', us: '' },
                     meanings: [{
-                        partOfSpeech: 'Dịch nghĩa',
+                        partOfSpeech: 'Translation',
                         definitions: [{ meaning: simpleResult.translatedText }]
                     }]
                 });
                 setExpandedSections({ 0: true });
             } catch (fallbackErr) {
-                setError('Không thể tra cứu từ này. Vui lòng thử lại.');
+                setError('Unable to look up this word. Please try again.');
             }
         } finally {
             setLoading(false);
@@ -111,7 +111,7 @@ const TranslatorDialog = ({
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-12 text-gray-400 space-y-3">
                             <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
-                            <p className="text-sm">Đang tra cứu...</p>
+                            <p className="text-sm">Looking up...</p>
                         </div>
                     ) : error ? (
                         <div className="flex flex-col items-center justify-center py-8 text-red-500 space-y-2">

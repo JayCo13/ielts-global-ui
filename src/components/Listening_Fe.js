@@ -442,7 +442,7 @@ const Listening_Fe = () => {
                                     </div>
                                     <div className="flex justify-between items-center text-xs text-gray-500 font-medium">
                                       <span>
-                                        {new Date(result.completion_date).toLocaleDateString('vi-VN')}
+                                        {new Date(result.completion_date).toLocaleDateString('en-US')}
                                       </span>
                                       <span>Band {result.band_score}</span>
                                     </div>

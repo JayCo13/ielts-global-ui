@@ -116,7 +116,7 @@ const WritingForecast = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder={!isVIP && userRole === 'customer' ? "Search is VIP only..." : "Tìm kiếm dự đoán..."}
+              placeholder={!isVIP && userRole === 'customer' ? "Search is VIP only..." : "Search forecasts..."}
               className={`w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500 ${(!isVIP && userRole === 'customer') ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               value={searchQuery}
               onChange={(e) => {
@@ -143,7 +143,25 @@ const WritingForecast = () => {
         </div>
 
         {loading ? (
-          <div className="p-8 text-center text-gray-600">Loading...</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-white rounded-lg shadow border border-gray-100 p-4 animate-pulse">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="h-5 w-16 bg-gray-200 rounded" />
+                  <div className="h-5 w-32 bg-gray-200 rounded" />
+                </div>
+                <div className="h-4 w-40 bg-gray-100 rounded mb-3" />
+                <div className="space-y-2 mb-4">
+                  <div className="h-3 w-full bg-gray-100 rounded" />
+                  <div className="h-3 w-5/6 bg-gray-100 rounded" />
+                  <div className="h-3 w-4/6 bg-gray-100 rounded" />
+                </div>
+                <div className="h-9 w-full bg-gray-200 rounded mb-2" />
+                <div className="h-9 w-full bg-gray-100 rounded mb-2" />
+                <div className="h-9 w-full bg-gradient-to-r from-gray-200 to-gray-100 rounded" />
+              </div>
+            ))}
+          </div>
         ) : sorted.length === 0 ? (
           <div className="p-8 text-center text-gray-600">No forecast items to display</div>
         ) : (
@@ -161,7 +179,7 @@ const WritingForecast = () => {
                     <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/35 hover:bg-black/45 backdrop-blur-[2px] rounded-lg transition-all">
                       <div className="w-full px-4 sm:max-w-xs text-center">
                         <Lock className="w-10 h-10 text-white mx-auto mb-3" />
-                        <p className="text-white font-semibold mb-2 text-base sm:text-lg">Nâng cấp VIP để mở khóa</p>
+                        <p className="text-white font-semibold mb-2 text-base sm:text-lg">Upgrade to VIP to unlock</p>
                         <Link
                           to="/vip-packages?type=writing"
                           className="inline-flex items-center px-4 py-2 bg-[#0096b1] text-white rounded-lg hover:bg-[#eb7e37] transition-colors font-medium text-sm"
@@ -199,19 +217,19 @@ const WritingForecast = () => {
                           if (!counters[dateKey]) counters[dateKey] = { full: 0, forecast: 0, total: 0 };
                           const isVipOrStudent = isVIP || role === 'student';
                           if (aiRemaining <= 0) {
-                            setAiResult({ error: 'Bạn đã hết số lượt đánh giá AI trong ngày.' });
+                            setAiResult({ error: 'You have reached the daily AI evaluation limit.' });
                             setAiDialogOpen(true);
                             return;
                           }
                           if (isVipOrStudent) {
                             if (counters[dateKey].total >= 6) {
-                              setAiResult({ error: 'Bạn đã vượt quá giới hạn đánh giá AI trong ngày (6).' });
+                              setAiResult({ error: 'You have exceeded the daily AI evaluation limit (6).' });
                               setAiDialogOpen(true);
                               return;
                             }
                           } else {
                             if (counters[dateKey].forecast >= 2) {
-                              setAiResult({ error: 'Tài khoản thường chỉ được đánh giá 2 bài forecast mỗi ngày.' });
+                              setAiResult({ error: 'Regular accounts can only evaluate 2 forecast essays per day.' });
                               setAiDialogOpen(true);
                               return;
                             }
@@ -224,7 +242,7 @@ const WritingForecast = () => {
                             if (!essayResponse.ok) throw new Error('Failed to fetch essay');
                             const essayData = await essayResponse.json();
                             if (!essayData.essay?.answer_text) {
-                              setAiResult({ error: 'Không có nội dung bài viết để đánh giá. Vui lòng làm bài trước.' });
+                              setAiResult({ error: 'No essay content to evaluate. Please write your essay first.' });
                               return;
                             }
                             const response = await fetchWithTimeout(`${API_BASE}/ai/evaluate-and-save/${it.task_id}`, {
@@ -251,7 +269,7 @@ const WritingForecast = () => {
                             counters[dateKey].forecast = (counters[dateKey].forecast || 0) + 1;
                             localStorage.setItem(storeKey, JSON.stringify(counters));
                           } catch (err) {
-                            setAiResult({ error: `Không thể xử lý phản hồi AI: ${err.message}` });
+                            setAiResult({ error: `Unable to process AI response: ${err.message}` });
                           } finally {
                             setAiLoading(false);
                           }
@@ -276,7 +294,7 @@ const WritingForecast = () => {
                 <ChevronLeft className="w-5 h-5" strokeWidth={3} />
               </button>
               <span className="text-gray-600 font-bold">
-                Trang {currentPage} / {totalPages}
+                Page {currentPage} / {totalPages}
               </span>
               <button
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}

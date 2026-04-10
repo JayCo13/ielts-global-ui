@@ -24,22 +24,22 @@ const ForceLogoutDialog = ({ isOpen, message, secondsRemaining }) => {
             </svg>
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Phát hiện đăng nhập bất thường!</h2>
-            <p className="text-sm text-gray-500">Warning bảo mật</p>
+            <h2 className="text-lg font-semibold text-gray-900">Unusual login detected!</h2>
+            <p className="text-sm text-gray-500">Security Warning</p>
           </div>
         </div>
 
         <div className="px-6 py-5 space-y-4">
           <div className="text-gray-700 space-y-2">
-            <p>• Hệ thống phát hiện tài khoản của bạn đang được đăng nhập trên nhiều thiết bị.</p>
-            <p>• Vui lòng chỉ sử dụng một tài khoản trên một thiết bị và một trình duyệt tại cùng một thời điểm.</p>
-            <p>• Vui lòng không chia sẻ tài khoản để tránh sự cố tương tự.</p>
+            <p>• Your account has been detected logging in on multiple devices.</p>
+            <p>• Please use only one account on one device and one browser at a time.</p>
+            <p>• Please do not share your account to avoid similar issues.</p>
           </div>
 
           <div className="rounded-lg bg-gray-50 p-4">
             <div className="flex items-baseline justify-between">
-              <span className="text-sm text-gray-500">Tự động đăng xuất sau</span>
-              <span className="text-base font-semibold text-red-600">{sec} giây</span>
+              <span className="text-sm text-gray-500">Auto logout in</span>
+              <span className="text-base font-semibold text-red-600">{sec}s</span>
             </div>
             <div className="mt-2 h-2 rounded-full bg-gray-200">
               <div
@@ -50,7 +50,7 @@ const ForceLogoutDialog = ({ isOpen, message, secondsRemaining }) => {
           </div>
 
           <p className="text-sm text-red-500">
-            Hệ thống sẽ tự động cho phép đăng nhập sau khi hết thời gian chờ.
+            The system will automatically allow login after the waiting period ends.
           </p>
         </div>
       </div>

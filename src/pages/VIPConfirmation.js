@@ -12,7 +12,7 @@ const VIPConfirmation = () => {
     }
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('vi-VN', {
+        return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -39,7 +39,7 @@ const VIPConfirmation = () => {
                 <div className="mt-8 space-y-4">
                     <div className="border-t border-b border-gray-200 py-4">
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">Gói:</span>
+                            <span className="text-gray-600">Package:</span>
                             <span className="font-medium text-gray-900">
                                 {subscription.package_name}
                             </span>

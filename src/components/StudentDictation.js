@@ -733,7 +733,7 @@ const StudentDictation = () => {
                             </div>
                             <div className="bg-red-50 rounded-xl p-4 text-center">
                                 <p className="text-3xl font-bold text-red-600">{results.incorrect}</p>
-                                <p className="text-sm text-red-600">Sai</p>
+                                <p className="text-sm text-red-600">Incorrect</p>
                             </div>
                         </div>
 
