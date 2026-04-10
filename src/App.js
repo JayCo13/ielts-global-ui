@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { NotificationProvider } from './context/NotificationContext';
 import { initializeAuth } from './utils/authUtils';
+import API_BASE from './config/api';
+
 import Achievement from './components/Achievements';
 import HomePage from './components/HomePage';
 import ListeningTests from './components/Listening_Fe';
@@ -62,6 +64,16 @@ function App() {
   useEffect(() => {
     // Initialize authentication and device tracking
     initializeAuth();
+
+    // Pre-warm backend immediately (wake Koyeb from cold start)
+    const warmupBackend = () => {
+      fetch(`${API_BASE}/health`, { method: 'GET', mode: 'cors' }).catch(() => {});
+    };
+    warmupBackend();
+
+    // Keep-alive: ping every 4 minutes to prevent Koyeb from sleeping
+    const keepAlive = setInterval(warmupBackend, 4 * 60 * 1000);
+    return () => clearInterval(keepAlive);
   }, []);
 
   return (
