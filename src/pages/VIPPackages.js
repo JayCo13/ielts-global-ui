@@ -346,7 +346,7 @@ const VIPPackages = () => {
                         variants={item}
                         className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#34d399] to-[#10b981]"
                     >
-                        ieltscomputertest VIP Packages.com
+                        ieltscomputertest.com VIP Packages
                     </motion.h1>
                     <motion.p
                         variants={item}
@@ -354,6 +354,39 @@ const VIPPackages = () => {
                     >
                         Choose the most suitable VIP package for your IELTS journey
                     </motion.p>
+                </motion.div>
+
+                {/* No VIP Account - Benefits Info */}
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="mb-8 bg-white/80 backdrop-blur-sm border border-emerald-100 rounded-2xl shadow-sm p-5 text-left"
+                >
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="bg-emerald-100 p-2 rounded-xl">
+                            <Info className="w-5 h-5 text-emerald-600" />
+                        </div>
+                        <h4 className="font-bold text-gray-900 text-lg m-0">No VIP Account - Benefits</h4>
+                    </div>
+                    <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 bg-gray-50 p-2 rounded-xl border border-gray-100 text-sm">
+                        <div className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-lg shadow-sm border border-emerald-50 flex-1 justify-center whitespace-nowrap">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                            <span className="text-gray-700">Access free <strong className="text-gray-900">Speaking</strong></span>
+                        </div>
+                        <div className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-lg shadow-sm border border-emerald-50 flex-1 justify-center whitespace-nowrap">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                            <span className="text-gray-700">Access free <strong className="text-gray-900">Writing</strong> (1 AI/day)</span>
+                        </div>
+                        <div className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-lg shadow-sm border border-amber-50 flex-1 justify-center whitespace-nowrap">
+                            <span className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span>
+                            <span className="text-gray-700"><strong className="text-amber-600">6 free Listening tests</strong> only</span>
+                        </div>
+                        <div className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-lg shadow-sm border border-amber-50 flex-1 justify-center whitespace-nowrap">
+                            <span className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span>
+                            <span className="text-gray-700"><strong className="text-amber-600">6 free Reading tests</strong> only</span>
+                        </div>
+                    </div>
                 </motion.div>
 
                 <FilterSection />

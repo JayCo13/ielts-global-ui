@@ -20,8 +20,7 @@ const heroImages = [
   '/img/hp2.webp',
   '/img/hp4.webp',
 ];
-const FloatingMessengerIcon = () => {
-  const [isMinimized, setIsMinimized] = React.useState(false);
+const FloatingGuideIcon = () => {
   const [showScrollTop, setShowScrollTop] = React.useState(false);
 
   React.useEffect(() => {
@@ -34,13 +33,8 @@ const FloatingMessengerIcon = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const openMessenger = () => {
-    window.open('https://wa.me/84964996195', '_blank');
-  };
-
-  const toggleMinimize = (e) => {
-    e.stopPropagation();
-    setIsMinimized(!isMinimized);
+  const openGuide = () => {
+    window.location.href = '/instruction';
   };
 
   const scrollToTop = () => {
@@ -52,8 +46,75 @@ const FloatingMessengerIcon = () => {
 
   return (
     <>
+      {/* Instruction floating icon + label wrapper */}
+      <div
+        onClick={openGuide}
+        style={{
+          position: 'fixed',
+          right: '27px',
+          bottom: showScrollTop ? '110px' : '35px',
+          width: '66px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '8px',
+          zIndex: 999,
+          cursor: 'pointer',
+          transition: 'bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        }}
+      >
+        {/* Label */}
+        <div
+          style={{
+            backgroundColor: '#fff',
+            color: '#333',
+            padding: '5px 12px',
+            borderRadius: '20px',
+            fontSize: '11px',
+            fontWeight: 600,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+            whiteSpace: 'nowrap',
+            transform: 'translateX(-20px)',
+          }}
+        >
+          Instructions for use
+        </div>
 
+        {/* Circle icon - pulse animation only here */}
+        <motion.div
+          className="fb-messenger-icon"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 1, type: "spring", stiffness: 260, damping: 20 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          style={{
+            position: 'relative',
+            bottom: 'auto',
+            right: 'auto',
+            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.25)',
+            padding: '6px',
+            border: '2px solid white',
+            borderRadius: '50%',
+            width: '66px',
+            height: '66px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden',
+            background: '#0f1d34',
+          }}
+        >
+          <img
+            src="/img/floating-icon.jpg"
+            alt="How to use"
+            className="w-full h-full object-contain"
+            style={{ transform: 'translateY(-3px)' }}
+          />
+        </motion.div>
+      </div>
 
+      {/* Scroll to top button */}
       <motion.div
         className={`scroll-to-top ${showScrollTop ? 'visible' : ''}`}
         onClick={scrollToTop}
@@ -401,66 +462,66 @@ const HomePage = () => {
 
           {/* VIP Members Feedback Slider */}
           {feedbackImages.length > 0 && (
-          <div className="max-w-6xl mx-auto px-4 relative z-10 py-10">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-8"
-            >
-              <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#2b5356] via-[#0096b1] to-[#eb7e37] bg-clip-text text-transparent">
-                VIP Members Feedback
-              </h2>
-              <p className="text-gray-500 mt-2">Real results from our VIP members</p>
-            </motion.div>
+            <div className="max-w-6xl mx-auto px-4 relative z-10 py-10">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="text-center mb-8"
+              >
+                <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#2b5356] via-[#0096b1] to-[#eb7e37] bg-clip-text text-transparent">
+                  VIP Members Feedback
+                </h2>
+                <p className="text-gray-500 mt-2">Real results from our VIP members</p>
+              </motion.div>
 
-            <Swiper
-              modules={[Autoplay, Pagination]}
-              spaceBetween={20}
-              slidesPerView={1}
-              autoplay={{ delay: 4000, disableOnInteraction: false }}
-              pagination={{ clickable: true }}
-              loop={feedbackImages.length > 3}
-              speed={800}
-              className="feedback-swiper rounded-2xl pb-12"
-            >
-              {(() => {
-                const slides = [];
-                for (let i = 0; i < feedbackImages.length; i += 3) {
-                  slides.push(feedbackImages.slice(i, i + 3));
-                }
-                return slides.map((group, slideIdx) => (
-                  <SwiperSlide key={slideIdx}>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 px-2">
-                      {group.map((fb) => (
-                        <motion.div
-                          key={fb.feedback_id}
-                          whileHover={{ scale: 1.03 }}
-                          transition={{ type: "spring", stiffness: 300 }}
-                          className="rounded-xl overflow-hidden shadow-lg border border-gray-100 bg-white"
-                        >
-                          {fb.image_url && (
-                            <img
-                              src={
-                                fb.image_url.startsWith('data:') ? fb.image_url :
-                                fb.image_url.startsWith('/static/') ? `${API_BASE}${fb.image_url}` :
-                                fb.image_url
-                              }
-                              alt={fb.content || 'Feedback'}
-                              className="w-full h-[280px] object-contain bg-gray-50"
-                              loading="lazy"
-                              onError={(e) => { e.target.style.display = 'none'; }}
-                            />
-                          )}
-                        </motion.div>
-                      ))}
-                    </div>
-                  </SwiperSlide>
-                ));
-              })()}
-            </Swiper>
-          </div>
+              <Swiper
+                modules={[Autoplay, Pagination]}
+                spaceBetween={20}
+                slidesPerView={1}
+                autoplay={{ delay: 4000, disableOnInteraction: false }}
+                pagination={{ clickable: true }}
+                loop={feedbackImages.length > 3}
+                speed={800}
+                className="feedback-swiper rounded-2xl pb-12"
+              >
+                {(() => {
+                  const slides = [];
+                  for (let i = 0; i < feedbackImages.length; i += 3) {
+                    slides.push(feedbackImages.slice(i, i + 3));
+                  }
+                  return slides.map((group, slideIdx) => (
+                    <SwiperSlide key={slideIdx}>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 px-2">
+                        {group.map((fb) => (
+                          <motion.div
+                            key={fb.feedback_id}
+                            whileHover={{ scale: 1.03 }}
+                            transition={{ type: "spring", stiffness: 300 }}
+                            className="rounded-xl overflow-hidden shadow-lg border border-gray-100 bg-white"
+                          >
+                            {fb.image_url && (
+                              <img
+                                src={
+                                  fb.image_url.startsWith('data:') ? fb.image_url :
+                                    fb.image_url.startsWith('/static/') ? `${API_BASE}${fb.image_url}` :
+                                      fb.image_url
+                                }
+                                alt={fb.content || 'Feedback'}
+                                className="w-full h-[280px] object-contain bg-gray-50"
+                                loading="lazy"
+                                onError={(e) => { e.target.style.display = 'none'; }}
+                              />
+                            )}
+                          </motion.div>
+                        ))}
+                      </div>
+                    </SwiperSlide>
+                  ));
+                })()}
+              </Swiper>
+            </div>
           )}
 
           <div className="max-w-6xl mx-auto px-4 relative z-10 py-10">
@@ -770,7 +831,7 @@ const HomePage = () => {
       <Footer />
 
       {/* Add the floating messenger icon */}
-      <FloatingMessengerIcon />
+      <FloatingGuideIcon />
 
     </div>
   );

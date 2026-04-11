@@ -42,6 +42,7 @@ import CompPolicy from './pages/adsense/CompPolicy';
 import DeliPolicy from './pages/adsense/DeliPolicy';
 import RefundPolicy from './pages/adsense/RefundPolicy';
 import Permission from './pages/adsense/Permission';
+import Instruction from './pages/Instruction';
 import NotFoundPage from './pages/NotFoundPage';
 import NewWords from './components/NewWords';
 import StudentDictation from './components/StudentDictation';
@@ -82,6 +83,7 @@ function App() {
         <Routes>
           {/* Public routes - accessible without authentication */}
           <Route path="/" element={<HomePage />} />
+          <Route path="/instruction" element={<Instruction />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/auth-callback" element={<AuthCallback />} />

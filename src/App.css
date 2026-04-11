@@ -482,6 +482,8 @@
   opacity: 0.6;
   transform: scale(0);
   animation: pulse-ring 2s infinite;
+  z-index: 2;
+  pointer-events: none;
 }
 
 .messenger-toggle {

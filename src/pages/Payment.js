@@ -55,13 +55,17 @@ const Payment = () => {
             const token = localStorage.getItem('token');
             if (!token) throw new Error('Session expired. Please login again.');
 
+            // Pre-warm the backend before making the payment call
+            await fetch(`${API_BASE}/health`, { method: 'GET', mode: 'cors' }).catch(() => {});
+
+            // Use a longer timeout (45s) for payment — backend needs to call PayPal API
             const response = await fetchWithTimeout(`${API_BASE}/customer/vip/packages/${packageId}/purchase`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
-            });
+            }, 45000);
 
             const data = await response.json();
 
@@ -81,7 +85,7 @@ const Payment = () => {
 
         } catch (err) {
             console.error('Create order error:', err);
-            setError(err.message);
+            setError(err.message || 'Unable to connect to server. Please try again.');
             throw err;
         } finally {
             setIsCreatingOrder(false);
@@ -104,7 +108,7 @@ const Payment = () => {
                 body: JSON.stringify({
                     paypal_order_id: data.orderID
                 })
-            });
+            }, 45000);
 
             const result = await response.json();
 
