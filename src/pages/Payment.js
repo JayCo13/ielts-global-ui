@@ -53,23 +53,25 @@ const Payment = () => {
         setIsCreatingOrder(true);
         setError(null);
 
+        const url = `${API_BASE}/customer/vip/packages/${packageId}/purchase`;
+        console.log('[PayPal] createOrder called, URL:', url);
+
         try {
             const token = localStorage.getItem('token');
             if (!token) throw new Error('Session expired. Please login again.');
 
-            // Pre-warm the backend before making the payment call
-            await fetch(`${API_BASE}/health`, { method: 'GET', mode: 'cors' }).catch(() => {});
-
-            // Use a longer timeout (45s) for payment — backend needs to call PayPal API
-            const response = await fetchWithTimeout(`${API_BASE}/customer/vip/packages/${packageId}/purchase`, {
+            console.log('[PayPal] Sending purchase request...');
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
-            }, 45000);
+            });
 
+            console.log('[PayPal] Response status:', response.status);
             const data = await response.json();
+            console.log('[PayPal] Response data:', data);
 
             if (!response.ok) {
                 if (response.status === 401) {
@@ -83,10 +85,12 @@ const Payment = () => {
             }
 
             setPaypalOrderId(data.paypal_order_id);
+            console.log('[PayPal] Order created:', data.paypal_order_id);
             return data.paypal_order_id;
 
         } catch (err) {
-            console.error('Create order error:', err);
+            console.error('[PayPal] createOrder FAILED:', err.name, err.message);
+            console.error('[PayPal] Full error:', err);
             setError(err.message || 'Unable to connect to server. Please try again.');
             throw err;
         } finally {
