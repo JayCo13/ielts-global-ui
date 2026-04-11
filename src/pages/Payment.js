@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
-import { ChevronRight, Home, Shield, Lock, AlertCircle, Crown, CheckCircle } from 'lucide-react';
+import { ChevronRight, Home, Shield, Lock, AlertCircle, Crown, CheckCircle, Loader2 } from 'lucide-react';
 import { checkTokenExpiration, logout } from '../utils/authUtils';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
@@ -12,6 +12,7 @@ const Payment = () => {
     const [isCreatingOrder, setIsCreatingOrder] = useState(false);
     const [isCapturing, setIsCapturing] = useState(false);
     const [paymentComplete, setPaymentComplete] = useState(false);
+    const [orderReady, setOrderReady] = useState(false);
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -43,35 +44,29 @@ const Payment = () => {
 
     useEffect(() => {
         validateTokenAndRedirect();
-        // Pre-warm PayPal token on backend so createOrder is instant
-        fetch(`${API_BASE}/warmup-paypal`, { method: 'GET', mode: 'cors' }).catch(() => {});
     }, []);
 
-    // Create PayPal order via backend
-    const createOrder = async () => {
+    // Pre-create PayPal order when user clicks "Proceed to Pay"
+    const preCreateOrder = async () => {
         if (!validateTokenAndRedirect()) return;
         setIsCreatingOrder(true);
         setError(null);
 
         const url = `${API_BASE}/customer/vip/packages/${packageId}/purchase`;
-        console.log('[PayPal] createOrder called, URL:', url);
 
         try {
             const token = localStorage.getItem('token');
             if (!token) throw new Error('Session expired. Please login again.');
 
-            console.log('[PayPal] Sending purchase request...');
-            const response = await fetch(url, {
+            const response = await fetchWithTimeout(url, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
-            });
+            }, 45000);
 
-            console.log('[PayPal] Response status:', response.status);
             const data = await response.json();
-            console.log('[PayPal] Response data:', data);
 
             if (!response.ok) {
                 if (response.status === 401) {
@@ -84,18 +79,22 @@ const Payment = () => {
                 throw new Error(data.detail || 'Failed to create payment. Please try again.');
             }
 
+            console.log('[PayPal] Order pre-created:', data.paypal_order_id);
             setPaypalOrderId(data.paypal_order_id);
-            console.log('[PayPal] Order created:', data.paypal_order_id);
-            return data.paypal_order_id;
+            setOrderReady(true);
 
         } catch (err) {
-            console.error('[PayPal] createOrder FAILED:', err.name, err.message);
-            console.error('[PayPal] Full error:', err);
+            console.error('[PayPal] Pre-create FAILED:', err);
             setError(err.message || 'Unable to connect to server. Please try again.');
-            throw err;
         } finally {
             setIsCreatingOrder(false);
         }
+    };
+
+    // PayPal createOrder — just returns the pre-created order ID (no fetch needed!)
+    const createOrder = () => {
+        console.log('[PayPal] Returning pre-created order:', paypalOrderId);
+        return paypalOrderId;
     };
 
     // Capture payment after PayPal approval
@@ -146,6 +145,9 @@ const Payment = () => {
 
     const onCancel = () => {
         setError('Payment cancelled. You can try again whenever you\'re ready.');
+        // Reset so user can try again
+        setOrderReady(false);
+        setPaypalOrderId(null);
     };
 
     if (!selectedPackage) return null;
@@ -254,7 +256,7 @@ const Payment = () => {
                     </div>
                 )}
 
-                {/* PayPal Buttons */}
+                {/* Payment Section */}
                 {!paymentComplete && (
                     <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 mb-6">
                         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -262,26 +264,57 @@ const Payment = () => {
                             Choose Payment Method
                         </h3>
 
-                        <PayPalScriptProvider options={{
-                            "client-id": paypalClientId,
-                            currency: "USD",
-                            intent: "capture",
-                        }}>
-                            <PayPalButtons
-                                style={{
-                                    layout: "vertical",
-                                    color: "gold",
-                                    shape: "rect",
-                                    label: "pay",
-                                    height: 50,
-                                }}
-                                disabled={isCreatingOrder || isCapturing}
-                                createOrder={createOrder}
-                                onApprove={onApprove}
-                                onError={onError}
-                                onCancel={onCancel}
-                            />
-                        </PayPalScriptProvider>
+                        {/* Step 1: Proceed to Pay button (pre-creates order) */}
+                        {!orderReady && (
+                            <button
+                                onClick={preCreateOrder}
+                                disabled={isCreatingOrder}
+                                className="w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-200
+                                    bg-gradient-to-r from-lime-500 to-emerald-500 text-white 
+                                    hover:from-lime-600 hover:to-emerald-600 hover:shadow-lg
+                                    disabled:opacity-60 disabled:cursor-not-allowed
+                                    flex items-center justify-center gap-3"
+                            >
+                                {isCreatingOrder ? (
+                                    <>
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        Preparing payment...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Lock className="w-5 h-5" />
+                                        Proceed to Pay ${Number(selectedPackage.price).toFixed(2)}
+                                    </>
+                                )}
+                            </button>
+                        )}
+
+                        {/* Step 2: PayPal buttons (shown after order is pre-created) */}
+                        {orderReady && paypalOrderId && (
+                            <PayPalScriptProvider options={{
+                                "client-id": paypalClientId,
+                                currency: "USD",
+                                intent: "capture",
+                            }}>
+                                <div className="mb-3 p-3 bg-green-50 rounded-lg border border-green-200 text-green-700 text-sm text-center">
+                                    ✅ Order ready — choose your payment method below
+                                </div>
+                                <PayPalButtons
+                                    style={{
+                                        layout: "vertical",
+                                        color: "gold",
+                                        shape: "rect",
+                                        label: "pay",
+                                        height: 50,
+                                    }}
+                                    disabled={isCapturing}
+                                    createOrder={createOrder}
+                                    onApprove={onApprove}
+                                    onError={onError}
+                                    onCancel={onCancel}
+                                />
+                            </PayPalScriptProvider>
+                        )}
 
                         <p className="text-xs text-gray-400 text-center mt-4">
                             Pay securely with PayPal or Credit/Debit Card
