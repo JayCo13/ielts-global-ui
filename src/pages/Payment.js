@@ -1,18 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
-import { ChevronRight, Home, Shield, Lock, AlertCircle, Crown, CheckCircle, Loader2 } from 'lucide-react';
+import { ChevronRight, Home, Shield, Lock, AlertCircle, Crown, CheckCircle } from 'lucide-react';
 import { checkTokenExpiration, logout } from '../utils/authUtils';
 import API_BASE from '../config/api';
-import fetchWithTimeout from '../utils/fetchWithTimeout';
+
+/**
+ * XMLHttpRequest-based API call — avoids PayPal SDK's fetch() interception.
+ * Returns a Promise so it can be used with async/await.
+ */
+const apiCall = (method, url, body = null) => {
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open(method, url, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        
+        const token = localStorage.getItem('token');
+        if (token) {
+            xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+        }
+        
+        xhr.timeout = 45000;
+        
+        xhr.onload = () => {
+            try {
+                const data = JSON.parse(xhr.responseText);
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    resolve(data);
+                } else {
+                    reject(new Error(data.detail || `Request failed with status ${xhr.status}`));
+                }
+            } catch (e) {
+                reject(new Error('Invalid response from server'));
+            }
+        };
+        
+        xhr.onerror = () => reject(new Error('Network error. Please check your connection.'));
+        xhr.ontimeout = () => reject(new Error('Request timed out. Please try again.'));
+        
+        xhr.send(body ? JSON.stringify(body) : null);
+    });
+};
 
 const Payment = () => {
     const [error, setError] = useState(null);
-    const [paypalOrderId, setPaypalOrderId] = useState(null);
-    const [isCreatingOrder, setIsCreatingOrder] = useState(false);
     const [isCapturing, setIsCapturing] = useState(false);
     const [paymentComplete, setPaymentComplete] = useState(false);
-    const [orderReady, setOrderReady] = useState(false);
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -46,93 +79,65 @@ const Payment = () => {
         validateTokenAndRedirect();
     }, []);
 
-    // Pre-create PayPal order when user clicks "Proceed to Pay"
-    const preCreateOrder = async () => {
+    // PayPal creates the order CLIENT-SIDE (no backend call needed)
+    const createOrder = (data, actions) => {
         if (!validateTokenAndRedirect()) return;
-        setIsCreatingOrder(true);
         setError(null);
 
-        const url = `${API_BASE}/customer/vip/packages/${packageId}/purchase`;
-
-        try {
-            const token = localStorage.getItem('token');
-            if (!token) throw new Error('Session expired. Please login again.');
-
-            const response = await fetchWithTimeout(url, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            }, 45000);
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                if (response.status === 401) {
-                    logout();
-                    navigate('/login', {
-                        state: { message: 'Session expired. Please login again.', redirectFrom: 'payment' }
-                    });
-                    return;
-                }
-                throw new Error(data.detail || 'Failed to create payment. Please try again.');
-            }
-
-            console.log('[PayPal] Order pre-created:', data.paypal_order_id);
-            setPaypalOrderId(data.paypal_order_id);
-            setOrderReady(true);
-
-        } catch (err) {
-            console.error('[PayPal] Pre-create FAILED:', err);
-            setError(err.message || 'Unable to connect to server. Please try again.');
-        } finally {
-            setIsCreatingOrder(false);
-        }
+        return actions.order.create({
+            purchase_units: [{
+                amount: {
+                    value: Number(selectedPackage.price).toFixed(2),
+                    currency_code: "USD"
+                },
+                description: `VIP Package: ${selectedPackage.name}`
+            }]
+        });
     };
 
-    // PayPal createOrder — just returns the pre-created order ID (no fetch needed!)
-    const createOrder = () => {
-        console.log('[PayPal] Returning pre-created order:', paypalOrderId);
-        return paypalOrderId;
-    };
-
-    // Capture payment after PayPal approval
-    const onApprove = async (data) => {
+    // After user approves: capture client-side, then verify+activate on backend
+    const onApprove = async (data, actions) => {
         setIsCapturing(true);
         setError(null);
 
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetchWithTimeout(`${API_BASE}/customer/vip/packages/${packageId}/capture`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    paypal_order_id: data.orderID
-                })
-            }, 45000);
+            // Step 1: Capture the payment via PayPal SDK (client-side)
+            const details = await actions.order.capture();
+            console.log('[PayPal] Captured:', details.id, details.status);
 
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.detail || 'Payment capture failed.');
+            if (details.status !== 'COMPLETED') {
+                throw new Error(`Payment not completed. Status: ${details.status}`);
             }
+
+            // Step 2: Verify + activate VIP on backend (uses XMLHttpRequest, not fetch)
+            const result = await apiCall(
+                'POST',
+                `${API_BASE}/customer/vip/packages/${packageId}/verify-and-activate`,
+                { paypal_order_id: details.id }
+            );
+
+            console.log('[PayPal] VIP activated:', result);
 
             if (result.status === 'completed') {
                 setPaymentComplete(true);
-                // Redirect to success page after short delay
                 setTimeout(() => {
                     navigate('/payment-success', { state: { fromPayment: true } });
                 }, 2000);
             } else {
-                setError(`Payment status: ${result.status}. Please contact support.`);
+                setError(`Unexpected status: ${result.status}. Please contact support.`);
             }
         } catch (err) {
-            console.error('Capture error:', err);
-            setError(err.message);
+            console.error('[PayPal] Error:', err);
+            
+            if (err.message?.includes('Session expired') || err.message?.includes('401')) {
+                logout();
+                navigate('/login', {
+                    state: { message: 'Session expired. Please login again.', redirectFrom: 'payment' }
+                });
+                return;
+            }
+            
+            setError(err.message || 'Payment processing failed. Please contact support.');
         } finally {
             setIsCapturing(false);
         }
@@ -145,9 +150,6 @@ const Payment = () => {
 
     const onCancel = () => {
         setError('Payment cancelled. You can try again whenever you\'re ready.');
-        // Reset so user can try again
-        setOrderReady(false);
-        setPaypalOrderId(null);
     };
 
     if (!selectedPackage) return null;
@@ -243,7 +245,7 @@ const Payment = () => {
                         </svg>
                         <div>
                             <p className="font-bold">Processing payment...</p>
-                            <p className="text-sm text-blue-600">Please wait while we confirm your payment.</p>
+                            <p className="text-sm text-blue-600">Please wait while we verify and activate your VIP.</p>
                         </div>
                     </div>
                 )}
@@ -256,7 +258,7 @@ const Payment = () => {
                     </div>
                 )}
 
-                {/* Payment Section */}
+                {/* PayPal Buttons — order is created client-side, no backend fetch needed */}
                 {!paymentComplete && (
                     <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 mb-6">
                         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -264,57 +266,26 @@ const Payment = () => {
                             Choose Payment Method
                         </h3>
 
-                        {/* Step 1: Proceed to Pay button (pre-creates order) */}
-                        {!orderReady && (
-                            <button
-                                onClick={preCreateOrder}
-                                disabled={isCreatingOrder}
-                                className="w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-200
-                                    bg-gradient-to-r from-lime-500 to-emerald-500 text-white 
-                                    hover:from-lime-600 hover:to-emerald-600 hover:shadow-lg
-                                    disabled:opacity-60 disabled:cursor-not-allowed
-                                    flex items-center justify-center gap-3"
-                            >
-                                {isCreatingOrder ? (
-                                    <>
-                                        <Loader2 className="w-5 h-5 animate-spin" />
-                                        Preparing payment...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Lock className="w-5 h-5" />
-                                        Proceed to Pay ${Number(selectedPackage.price).toFixed(2)}
-                                    </>
-                                )}
-                            </button>
-                        )}
-
-                        {/* Step 2: PayPal buttons (shown after order is pre-created) */}
-                        {orderReady && paypalOrderId && (
-                            <PayPalScriptProvider options={{
-                                "client-id": paypalClientId,
-                                currency: "USD",
-                                intent: "capture",
-                            }}>
-                                <div className="mb-3 p-3 bg-green-50 rounded-lg border border-green-200 text-green-700 text-sm text-center">
-                                    ✅ Order ready — choose your payment method below
-                                </div>
-                                <PayPalButtons
-                                    style={{
-                                        layout: "vertical",
-                                        color: "gold",
-                                        shape: "rect",
-                                        label: "pay",
-                                        height: 50,
-                                    }}
-                                    disabled={isCapturing}
-                                    createOrder={createOrder}
-                                    onApprove={onApprove}
-                                    onError={onError}
-                                    onCancel={onCancel}
-                                />
-                            </PayPalScriptProvider>
-                        )}
+                        <PayPalScriptProvider options={{
+                            "client-id": paypalClientId,
+                            currency: "USD",
+                            intent: "capture",
+                        }}>
+                            <PayPalButtons
+                                style={{
+                                    layout: "vertical",
+                                    color: "gold",
+                                    shape: "rect",
+                                    label: "pay",
+                                    height: 50,
+                                }}
+                                disabled={isCapturing}
+                                createOrder={createOrder}
+                                onApprove={onApprove}
+                                onError={onError}
+                                onCancel={onCancel}
+                            />
+                        </PayPalScriptProvider>
 
                         <p className="text-xs text-gray-400 text-center mt-4">
                             Pay securely with PayPal or Credit/Debit Card
