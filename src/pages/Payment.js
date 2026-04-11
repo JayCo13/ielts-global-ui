@@ -43,6 +43,8 @@ const Payment = () => {
 
     useEffect(() => {
         validateTokenAndRedirect();
+        // Pre-warm PayPal token on backend so createOrder is instant
+        fetch(`${API_BASE}/warmup-paypal`, { method: 'GET', mode: 'cors' }).catch(() => {});
     }, []);
 
     // Create PayPal order via backend
