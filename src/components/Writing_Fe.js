@@ -10,6 +10,7 @@ import { checkExamAccess } from '../utils/examAccess';
 import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
+import { Helmet } from 'react-helmet-async';
 
 const Writing_Fe = () => {
   const navigate = useNavigate();
@@ -63,51 +64,63 @@ const Writing_Fe = () => {
     const fetchData = async () => {
 
       const token = secureStorage.getItem('token') || localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
 
       try {
-        const [testsResponse, subscriptionResponse] = await Promise.all([
-          fetch(`${API_BASE}/student/writing/tasks`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          }),
-          fetch(`${API_BASE}/customer/vip/subscription/status`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          })
-        ]);
-
-        if (testsResponse.status === 401 || subscriptionResponse.status === 401) {
-          navigate('/login');
-          return;
-        }
-
-        if (testsResponse.ok && subscriptionResponse.ok) {
-          const [testsData, subscriptionData] = await Promise.all([
-            testsResponse.json(),
-            subscriptionResponse.json()
+        if (!token) {
+          const response = await fetch(`${API_BASE}/public/writing-forecasts`);
+          if (response.ok) {
+            const data = await response.json();
+            const mapped = data.map(exam => ({
+              id: exam.exam_id,
+              title: exam.exam_title,
+              created_at: new Date().toISOString(), // Fallback since it's not provided by public API
+              test_id: exam.exam_id,
+              parts: exam.parts,
+              is_completed: false
+            }));
+            setTests(mapped);
+          }
+        } else {
+          const [testsResponse, subscriptionResponse] = await Promise.all([
+            fetch(`${API_BASE}/student/writing/tasks`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            }),
+            fetch(`${API_BASE}/customer/vip/subscription/status`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            })
           ]);
 
-          setAccountStatus(subscriptionData);
+          if (testsResponse.status === 401 || subscriptionResponse.status === 401) {
+            navigate('/login');
+            return;
+          }
 
-          // Writing-specific VIP access logic
-          const hasWritingAccess = subscriptionData.is_subscribed && (
-            subscriptionData.package_type === 'all_skills' ||
-            (subscriptionData.package_type === 'single_skill' &&
-              subscriptionData.skill_type === 'writing')
-          );
+          if (testsResponse.ok && subscriptionResponse.ok) {
+            const [testsData, subscriptionData] = await Promise.all([
+              testsResponse.json(),
+              subscriptionResponse.json()
+            ]);
 
-          setIsVIP(hasWritingAccess);
-          const mapped = testsData.map(exam => ({
-            id: exam.exam_id,
-            title: exam.title,
-            created_at: exam.created_at,
-            test_id: exam.test_id,
-            parts: exam.parts,
-            is_completed: exam.is_completed
-          }));
-          setTests(mapped);
+            setAccountStatus(subscriptionData);
+
+            // Writing-specific VIP access logic
+            const hasWritingAccess = subscriptionData.is_subscribed && (
+              subscriptionData.package_type === 'all_skills' ||
+              (subscriptionData.package_type === 'single_skill' &&
+                subscriptionData.skill_type === 'writing')
+            );
+
+            setIsVIP(hasWritingAccess);
+            const mapped = testsData.map(exam => ({
+              id: exam.exam_id,
+              title: exam.title,
+              created_at: exam.created_at,
+              test_id: exam.test_id,
+              parts: exam.parts,
+              is_completed: exam.is_completed
+            }));
+            setTests(mapped);
+          }
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -265,6 +278,10 @@ const Writing_Fe = () => {
     }
   };
   const handleStartTest = async (test) => {
+    if (!localStorage.getItem('token') && !secureStorage.getItem('token')) {
+      navigate('/login');
+      return;
+    }
     if (test.is_completed) {
       setSelectedTest(test);
       setDialogOpen(true);
@@ -490,6 +507,10 @@ const Writing_Fe = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Helmet>
+        <title>IELTS Writing Practice Tasks | Official & Forecasted</title>
+        <meta name="description" content={`Practice your IELTS Writing skills. Includes tasks like ${tests.slice(0, 3).map(t => t.title).join(', ')}...`} />
+      </Helmet>
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 py-8">

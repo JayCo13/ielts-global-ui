@@ -7,6 +7,7 @@ import { checkTokenExpiration } from '../utils/authUtils';
 import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
+import { Helmet } from 'react-helmet-async';
 
 const Listening_Fe = () => {
   // Helper to strip HTML tags from part titles (they may contain rich text HTML)
@@ -85,7 +86,7 @@ const Listening_Fe = () => {
       }
 
       if (!token || !userId) {
-        navigate('/login');
+        setUserRole('guest');
         return;
       }
       try {
@@ -113,32 +114,47 @@ const Listening_Fe = () => {
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
       try {
-        const [testsResponse, subscriptionResponse] = await Promise.all([
-          fetch(`${API_BASE}/student/available-listening-exams`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          }),
-          fetch(`${API_BASE}/customer/vip/subscription/status`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          })
-        ]);
-
-        if (testsResponse.ok && subscriptionResponse.ok) {
-          const [testsData, subscriptionData] = await Promise.all([
-            testsResponse.json(),
-            subscriptionResponse.json()
+        if (!token) {
+          // Public SEO fetch
+          const response = await fetch(`${API_BASE}/public/listening-tests`);
+          if (response.ok) {
+            const data = await response.json();
+            setTests(data.map(exam => ({
+              id: exam.exam_id,
+              title: exam.title,
+              created_at: exam.created_at,
+              difficulty: "Medium",
+              duration: exam.duration ? `${exam.duration} minutes` : "30 minutes",
+              questions: 40,
+              totalMarks: exam.total_score,
+              isCompleted: exam.is_completed || false,
+              correctAnswers: exam.is_completed ? correctAnswers : 0,
+              partTitles: exam.part_titles || {}
+            })));
+          }
+        } else {
+          const [testsResponse, subscriptionResponse] = await Promise.all([
+            fetch(`${API_BASE}/student/available-listening-exams`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            }),
+            fetch(`${API_BASE}/customer/vip/subscription/status`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            })
           ]);
 
-          setAccountStatus(subscriptionData);
+          if (testsResponse.ok && subscriptionResponse.ok) {
+            const [testsData, subscriptionData] = await Promise.all([
+              testsResponse.json(),
+              subscriptionResponse.json()
+            ]);
 
-          // Use the new skill-specific access flag (supports multiple subscriptions)
-          const hasListeningAccess = subscriptionData.has_listening_access || false;
+            setAccountStatus(subscriptionData);
 
-          setIsVIP(hasListeningAccess);
+            // Use the new skill-specific access flag (supports multiple subscriptions)
+            const hasListeningAccess = subscriptionData.has_listening_access || false;
+
+            setIsVIP(hasListeningAccess);
           setTests(testsData.map(exam => ({
             id: exam.exam_id,
             title: exam.title,
@@ -151,8 +167,9 @@ const Listening_Fe = () => {
             correctAnswers: exam.is_completed ? correctAnswers : 0,
             partTitles: exam.part_titles || {}
           })));
-        } else if (testsResponse.status === 401 || subscriptionResponse.status === 401) {
-          navigate('/login');
+          } else if (testsResponse.status === 401 || subscriptionResponse.status === 401) {
+            navigate('/login');
+          }
         }
       } catch (error) {
         if (error.name !== 'AbortError') {
@@ -168,6 +185,10 @@ const Listening_Fe = () => {
 
 
   const handleStartTest = (test) => {
+    if (!localStorage.getItem('token')) {
+      navigate('/login');
+      return;
+    }
     checkTokenExpiration();
     navigate(`/listening_test_room`, { state: { examId: test.id } });
   };
@@ -331,6 +352,10 @@ const Listening_Fe = () => {
   }
   return (
     <div className="min-h-screen bg-gray-50">
+      <Helmet>
+        <title>IELTS Listening Practice Tests | Official & Forecasted</title>
+        <meta name="description" content={`Practice your IELTS Listening skills. Includes tests like ${tests.slice(0, 3).map(t => t.title).join(', ')}... and many more parts!`} />
+      </Helmet>
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-4">
         <nav className="flex" aria-label="Breadcrumb">

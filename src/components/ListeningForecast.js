@@ -6,6 +6,7 @@ import secureStorage from '../utils/secureStorage';
 import ConfirmDialog from './ConfirmDialog';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
+import { Helmet } from 'react-helmet-async';
 
 const ListeningForecast = () => {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const ListeningForecast = () => {
         userId = localStorage.getItem('user_id');
       }
       if (!token || !userId) {
-        navigate('/login');
+        setUserRole('guest');
         return;
       }
       try {
@@ -52,16 +53,24 @@ const ListeningForecast = () => {
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem('token');
-      if (!token) { navigate('/login'); return; }
       try {
-        const [forecastsRes, vipRes] = await Promise.all([
-          fetch(`${API_BASE}/student/listening/forecasts`, { headers: { 'Authorization': `Bearer ${token}` } }),
-          fetch(`${API_BASE}/customer/vip/subscription/status`, { headers: { 'Authorization': `Bearer ${token}` } })
-        ]);
-        const [forecastsData, vipData] = await Promise.all([forecastsRes.json(), vipRes.json()]);
-        // Use the new skill-specific access flag (supports multiple subscriptions)
-        const hasAccess = vipData.has_listening_access || false;
-        setIsVIP(hasAccess);
+        let forecastsData = [];
+        if (!token) {
+          const forecastsRes = await fetch(`${API_BASE}/public/listening-forecasts`);
+          if (forecastsRes.ok) {
+            forecastsData = await forecastsRes.json();
+          }
+        } else {
+          const [forecastsRes, vipRes] = await Promise.all([
+            fetch(`${API_BASE}/student/listening/forecasts`, { headers: { 'Authorization': `Bearer ${token}` } }),
+            fetch(`${API_BASE}/customer/vip/subscription/status`, { headers: { 'Authorization': `Bearer ${token}` } })
+          ]);
+          forecastsData = await forecastsRes.json();
+          const vipData = await vipRes.json();
+          // Use the new skill-specific access flag (supports multiple subscriptions)
+          const hasAccess = vipData.has_listening_access || false;
+          setIsVIP(hasAccess);
+        }
         const normalized = Array.isArray(forecastsData)
           ? forecastsData.flatMap(exam => (Array.isArray(exam.parts) ? exam.parts.map(p => ({
             exam_id: exam.exam_id,
@@ -148,6 +157,10 @@ const ListeningForecast = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Helmet>
+        <title>IELTS Listening Forecast | Practice Actual Tests</title>
+        <meta name="description" content={`Practice your IELTS Listening skills with forecasted exams like ${items.slice(0, 3).map(i => i.exam_title).join(', ')}...`} />
+      </Helmet>
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
         <nav className="flex" aria-label="Breadcrumb">
@@ -302,6 +315,10 @@ const ListeningForecast = () => {
                       return (
                         <button
                           onClick={() => {
+                            if (!localStorage.getItem('token')) {
+                              navigate('/login');
+                              return;
+                            }
                             if (hasHistory) {
                               setExamToRetake({ examId: it.exam_id, forecastPart });
                               setShowConfirmDialog(true);

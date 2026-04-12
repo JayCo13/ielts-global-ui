@@ -5,6 +5,7 @@ import { Search, Lock, ChevronRight, ChevronLeft, Star } from 'lucide-react';
 import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
+import { Helmet } from 'react-helmet-async';
 
 const ReadingForecast = () => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const ReadingForecast = () => {
     const fetchUserRole = async () => {
       let token = secureStorage.getItem('token') || localStorage.getItem('token');
       let userId = secureStorage.getItem('user_id') || localStorage.getItem('user_id');
-      if (!token || !userId) { navigate('/login'); return; }
+      if (!token || !userId) { setUserRole('guest'); return; }
       try {
         const res = await fetchWithTimeout(`${API_BASE}/student/user-role/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } });
         if (res.ok) { const data = await res.json(); setUserRole(data.role); } else if (res.status === 401) { navigate('/login'); }
@@ -36,16 +37,22 @@ const ReadingForecast = () => {
   useEffect(() => {
     const fetchData = async () => {
       const token = secureStorage.getItem('token') || localStorage.getItem('token');
-      if (!token) { navigate('/login'); return; }
       try {
-        const [forecastRes, vipRes] = await Promise.all([
-          fetch(`${API_BASE}/student/reading/forecasts`, { headers: { 'Authorization': `Bearer ${token}` } }),
-          fetch(`${API_BASE}/customer/vip/subscription/status`, { headers: { 'Authorization': `Bearer ${token}` } })
-        ]);
-        const [forecastData, vipData] = await Promise.all([forecastRes.json(), vipRes.json()]);
-        // Use the new skill-specific access flag (supports multiple subscriptions)
-        const hasAccess = vipData.has_reading_access || false;
-        setIsVIP(hasAccess);
+        let forecastData = [];
+        if (!token) {
+          const forecastRes = await fetch(`${API_BASE}/public/reading-forecasts`);
+          if (forecastRes.ok) { forecastData = await forecastRes.json(); }
+        } else {
+          const [forecastRes, vipRes] = await Promise.all([
+            fetch(`${API_BASE}/student/reading/forecasts`, { headers: { 'Authorization': `Bearer ${token}` } }),
+            fetch(`${API_BASE}/customer/vip/subscription/status`, { headers: { 'Authorization': `Bearer ${token}` } })
+          ]);
+          forecastData = await forecastRes.json();
+          const vipData = await vipRes.json();
+          // Use the new skill-specific access flag (supports multiple subscriptions)
+          const hasAccess = vipData.has_reading_access || false;
+          setIsVIP(hasAccess);
+        }
         const flat = [];
         (Array.isArray(forecastData) ? forecastData : []).forEach(exam => {
           (exam.parts || []).forEach(p => flat.push({
@@ -131,6 +138,10 @@ const ReadingForecast = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Helmet>
+        <title>IELTS Reading Forecast | Practice Actual Tests</title>
+        <meta name="description" content={`Practice your IELTS Reading skills with forecasted exams like ${items.slice(0, 3).map(i => i.exam_title).join(', ')}...`} />
+      </Helmet>
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
         <nav className="flex" aria-label="Breadcrumb">
@@ -276,6 +287,10 @@ const ReadingForecast = () => {
                   ) : (
                     <button
                       onClick={() => {
+                        if (!secureStorage.getItem('token') && !localStorage.getItem('token')) {
+                          navigate('/login');
+                          return;
+                        }
                         // Clear highlights and notes from previous attempt
                         localStorage.removeItem('ielts-highlights');
                         localStorage.removeItem('ielts-notes');

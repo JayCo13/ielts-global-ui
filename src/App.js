@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { NotificationProvider } from './context/NotificationContext';
 import { initializeAuth } from './utils/authUtils';
 import API_BASE from './config/api';
-
+import { HelmetProvider } from 'react-helmet-async';
 import Achievement from './components/Achievements';
 import HomePage from './components/HomePage';
 import ListeningTests from './components/Listening_Fe';
@@ -78,9 +78,10 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <NotificationProvider>
-        <Routes>
+    <HelmetProvider>
+      <Router>
+        <NotificationProvider>
+          <Routes>
           {/* Public routes - accessible without authentication */}
           <Route path="/" element={<HomePage />} />
           <Route path="/instruction" element={<Instruction />} />
@@ -101,14 +102,15 @@ function App() {
           <Route path="/payment-cancel" element={<PaymentCancel />} />
 
           {/* Protected routes - require authentication and active status */}
+          <Route path="/listening_list" element={<ListeningTests />} />
+          <Route path="/speaking_list" element={<Speaking />} />
+          <Route path="/writing_list" element={<Writing />} />
+          <Route path="/listening_forecast" element={<ListeningForecast />} />
+          <Route path="/writing_forecast" element={<WritingForecast />} />
+          <Route path="/reading_list" element={<Reading />} />
+          <Route path="/reading_forecast" element={<ReadingForecast />} />
+
           <Route element={<StudentGuard />}>
-            <Route path="/listening_list" element={<ListeningTests />} />
-            <Route path="/speaking_list" element={<Speaking />} />
-            <Route path="/writing_list" element={<Writing />} />
-            <Route path="/listening_forecast" element={<ListeningForecast />} />
-            <Route path="/writing_forecast" element={<WritingForecast />} />
-            <Route path="/reading_list" element={<Reading />} />
-            <Route path="/reading_forecast" element={<ReadingForecast />} />
             <Route path="/listening_test_room" element={<ListeningPageWrapper />} />
             <Route path="/reading_test_room" element={<ReadingPageWrapper />} />
             <Route path="/speaking_test_room" element={<SpeakingLayout />} />
@@ -132,6 +134,7 @@ function App() {
         </Routes>
       </NotificationProvider>
     </Router>
+  </HelmetProvider>
   );
 }
 

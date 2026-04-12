@@ -6,6 +6,7 @@ import { canAccessExam } from '../utils/examAccess';
 import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
+import { Helmet } from 'react-helmet-async';
 
 const Reading_Fe = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -75,7 +76,7 @@ const Reading_Fe = () => {
       }
 
       if (!token || !userId) {
-        navigate('/login');
+        setUserRole('guest');
         return;
       }
       try {
@@ -102,31 +103,45 @@ const Reading_Fe = () => {
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
       try {
-        const [testsResponse, subscriptionResponse] = await Promise.all([
-          fetch(`${API_BASE}/student/reading/reading-tests`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          }),
-          fetch(`${API_BASE}/customer/vip/subscription/status`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          })
-        ]);
-
-        if (testsResponse.ok && subscriptionResponse.ok) {
-          const [testsData, subscriptionData] = await Promise.all([
-            testsResponse.json(),
-            subscriptionResponse.json()
+        if (!token) {
+          const response = await fetch(`${API_BASE}/public/reading-tests`);
+          if (response.ok) {
+            const data = await response.json();
+            setTests(data.map(exam => ({
+              id: exam.exam_id,
+              title: exam.title,
+              created_at: exam.created_at,
+              difficulty: "Medium",
+              duration: exam.duration ? `${exam.duration} minutes` : "30 minutes",
+              questions: 40,
+              totalMarks: exam.total_score,
+              isCompleted: exam.is_completed || false,
+              correctAnswers: exam.is_completed ? correctAnswers : 0,
+              partTitles: exam.part_titles || {}
+            })));
+          }
+        } else {
+          const [testsResponse, subscriptionResponse] = await Promise.all([
+            fetch(`${API_BASE}/student/reading/reading-tests`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            }),
+            fetch(`${API_BASE}/customer/vip/subscription/status`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            })
           ]);
-          setAccountStatus(subscriptionData);
-          console.log("testsData", testsResponse);
-          // Use the new skill-specific access flag (supports multiple subscriptions)
-          const hasReadingAccess = subscriptionData.has_reading_access || false;
 
-          setIsVIP(hasReadingAccess);
+          if (testsResponse.ok && subscriptionResponse.ok) {
+            const [testsData, subscriptionData] = await Promise.all([
+              testsResponse.json(),
+              subscriptionResponse.json()
+            ]);
+            setAccountStatus(subscriptionData);
+            console.log("testsData", testsResponse);
+            // Use the new skill-specific access flag (supports multiple subscriptions)
+            const hasReadingAccess = subscriptionData.has_reading_access || false;
+
+            setIsVIP(hasReadingAccess);
           setTests(testsData.map(exam => ({
             id: exam.exam_id,
             title: exam.title,
@@ -139,8 +154,9 @@ const Reading_Fe = () => {
             correctAnswers: exam.is_completed ? correctAnswers : 0,
             partTitles: exam.part_titles || {}
           })));
-        } else if (testsResponse.status === 401 || subscriptionResponse.status === 401) {
-          navigate('/login');
+          } else if (testsResponse.status === 401 || subscriptionResponse.status === 401) {
+            navigate('/login');
+          }
         }
       } catch (error) {
         if (error.name !== 'AbortError') {
@@ -156,7 +172,10 @@ const Reading_Fe = () => {
 
 
   const handleStartTest = (test) => {
-
+    if (!localStorage.getItem('token')) {
+      navigate('/login');
+      return;
+    }
     navigate(`/reading_test_room`, { state: { examId: test.id } });
   };
 
@@ -326,6 +345,10 @@ const Reading_Fe = () => {
   }
   return (
     <div className="min-h-screen bg-gray-50">
+      <Helmet>
+        <title>IELTS Reading Practice Tests | Official & Forecasted</title>
+        <meta name="description" content={`Practice your IELTS Reading skills. Includes tests like ${tests.slice(0, 3).map(t => t.title).join(', ')}...`} />
+      </Helmet>
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-4">
         <nav className="flex" aria-label="Breadcrumb">

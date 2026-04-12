@@ -7,6 +7,7 @@ import EditEssayDialog from './EditEssayDialog';
 import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
+import { Helmet } from 'react-helmet-async';
 
 const WritingForecast = () => {
   const navigate = useNavigate();
@@ -29,17 +30,23 @@ const WritingForecast = () => {
   useEffect(() => {
     const fetchData = async () => {
       const token = secureStorage.getItem('token') || localStorage.getItem('token');
-      if (!token) { navigate('/login'); return; }
       try {
-        const [forecastRes, vipRes] = await Promise.all([
-          fetch(`${API_BASE}/student/writing/forecasts`, { headers: { 'Authorization': `Bearer ${token}` } }),
-          fetch(`${API_BASE}/customer/vip/subscription/status`, { headers: { 'Authorization': `Bearer ${token}` } })
-        ]);
-        const [forecastData, vipData] = await Promise.all([forecastRes.json(), vipRes.json()]);
-        const hasAccess = vipData.is_subscribed && (
-          vipData.package_type === 'all_skills' || (vipData.package_type === 'single_skill' && vipData.skill_type === 'writing')
-        );
-        setIsVIP(hasAccess);
+        let forecastData = [];
+        if (!token) {
+          const forecastRes = await fetch(`${API_BASE}/public/writing-forecasts`);
+          if (forecastRes.ok) { forecastData = await forecastRes.json(); }
+        } else {
+          const [forecastRes, vipRes] = await Promise.all([
+            fetch(`${API_BASE}/student/writing/forecasts`, { headers: { 'Authorization': `Bearer ${token}` } }),
+            fetch(`${API_BASE}/customer/vip/subscription/status`, { headers: { 'Authorization': `Bearer ${token}` } })
+          ]);
+          forecastData = await forecastRes.json();
+          const vipData = await vipRes.json();
+          const hasAccess = vipData.is_subscribed && (
+            vipData.package_type === 'all_skills' || (vipData.package_type === 'single_skill' && vipData.skill_type === 'writing')
+          );
+          setIsVIP(hasAccess);
+        }
         const flat = [];
         forecastData.forEach(exam => {
           exam.parts.forEach(p => flat.push({
@@ -91,6 +98,10 @@ const WritingForecast = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Helmet>
+        <title>IELTS Writing Forecast | Practice Actual Tests</title>
+        <meta name="description" content={`Practice your IELTS Writing skills with forecasted exams like ${items.slice(0, 3).map(i => i.exam_title).join(', ')}...`} />
+      </Helmet>
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
@@ -192,7 +203,13 @@ const WritingForecast = () => {
                   ) : (
                     <>
                       <button
-                        onClick={() => navigate('/writing_test_room', { state: { taskId: it.task_id, testId: it.exam_id, isForecast: true } })}
+                        onClick={() => {
+                          if (!secureStorage.getItem('token') && !localStorage.getItem('token')) {
+                            navigate('/login');
+                            return;
+                          }
+                          navigate('/writing_test_room', { state: { taskId: it.task_id, testId: it.exam_id, isForecast: true } });
+                        }}
                         className="mt-4 w-full bg-[#0096b1] text-white py-2 rounded"
                       >
                         Take Forecast

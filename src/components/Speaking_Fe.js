@@ -4,6 +4,7 @@ import { Play, Search, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
 import Navbar from './Navbar';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
+import { Helmet } from 'react-helmet-async';
 
 const toAbsoluteUrl = (u) => (u && u.startsWith('/')) ? `${API_BASE}${u}` : u;
 
@@ -54,30 +55,41 @@ const Speaking_Fe = () => {
     useEffect(() => {
         const fetchData = async () => {
             const token = localStorage.getItem('token');
-            if (!token) {
-                navigate('/login');
-                return;
-            }
-
             try {
-                // Always fetch Part 1 only (Speaking Forecast)
-                const materialsResponse = await fetchWithTimeout(`${API_BASE}/student/speaking/materials?part=part1`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                if (!token) {
+                    const materialsResponse = await fetch(`${API_BASE}/public/speaking/materials?part=part1`);
+                    if (materialsResponse.ok) {
+                        const data = await materialsResponse.json();
+                        const formatted = data.map(m => ({
+                            id: m.material_id,
+                            title: m.title || 'Untitled',
+                            part_type: m.part_type,
+                            pdf_url: toAbsoluteUrl(m.pdf_url),
+                            created_at: m.created_at || new Date().toISOString(),
+                            has_access: false
+                        }));
+                        setMaterials(formatted);
+                    }
+                } else {
+                    // Always fetch Part 1 only (Speaking Forecast)
+                    const materialsResponse = await fetchWithTimeout(`${API_BASE}/student/speaking/materials?part=part1`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
 
-                if (materialsResponse.ok) {
-                    const data = await materialsResponse.json();
-                    const formatted = data.map(m => ({
-                        id: m.material_id,
-                        title: m.title || 'Untitled',
-                        part_type: m.part_type,
-                        pdf_url: toAbsoluteUrl(m.pdf_url),
-                        created_at: m.created_at || new Date().toISOString(),
-                        has_access: m.has_access
-                    }));
-                    setMaterials(formatted);
-                } else if (materialsResponse.status === 401) {
-                    navigate('/login');
+                    if (materialsResponse.ok) {
+                        const data = await materialsResponse.json();
+                        const formatted = data.map(m => ({
+                            id: m.material_id,
+                            title: m.title || 'Untitled',
+                            part_type: m.part_type,
+                            pdf_url: toAbsoluteUrl(m.pdf_url),
+                            created_at: m.created_at || new Date().toISOString(),
+                            has_access: m.has_access
+                        }));
+                        setMaterials(formatted);
+                    } else if (materialsResponse.status === 401) {
+                        navigate('/login');
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -127,6 +139,10 @@ const Speaking_Fe = () => {
                 <button
                     disabled={!m.has_access}
                     onClick={() => {
+                        if (!localStorage.getItem('token')) {
+                            navigate('/login');
+                            return;
+                        }
                         if (m.has_access) {
                             navigate(`/speaking_test_room`, {
                                 state: {
@@ -159,6 +175,10 @@ const Speaking_Fe = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
+            <Helmet>
+                <title>IELTS Speaking Materials | Practice & Forecast</title>
+                <meta name="description" content={`Practice your IELTS Speaking skills. Includes materials like ${materials.slice(0, 3).map(m => m.title).join(', ')}...`} />
+            </Helmet>
             <Navbar />
 
             <div className="max-w-7xl mx-auto px-4 py-4">
