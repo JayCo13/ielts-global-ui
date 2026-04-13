@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Lock, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 import API_BASE from '../config/api';
 
@@ -13,9 +13,11 @@ const PaymentProcessing = () => {
     const [errorMsg, setErrorMsg] = useState('');
     const [debugInfo, setDebugInfo] = useState('');
 
-    const location = useLocation();
     const navigate = useNavigate();
-    const { paypalOrderId, packageId, packageName } = location.state || {};
+
+    // Read payment data from sessionStorage (set by Payment.js before full redirect)
+    const paymentData = JSON.parse(sessionStorage.getItem('payment_data') || '{}');
+    const { paypalOrderId, packageId, packageName } = paymentData;
 
     useEffect(() => {
         if (!paypalOrderId || !packageId) {
@@ -104,6 +106,7 @@ const PaymentProcessing = () => {
                 console.log(`[Payment] ${name}: success`, result);
 
                 if (result.status === 'completed') {
+                    sessionStorage.removeItem('payment_data');
                     setStatus('success');
                     setTimeout(() => {
                         navigate('/payment-success', { state: { fromPayment: true } });

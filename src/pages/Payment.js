@@ -87,16 +87,18 @@ const Payment = () => {
      */
     const onApprove = (data) => {
         const paypalOrderId = data.orderID;
-        console.log('[PayPal] User approved order:', paypalOrderId, '→ navigating to processing page');
+        console.log('[PayPal] User approved order:', paypalOrderId, '→ full redirect to processing page');
 
-        // Navigate to processing page with order details
-        navigate('/payment-processing', {
-            state: {
-                paypalOrderId,
-                packageId,
-                packageName: selectedPackage.name,
-            }
-        });
+        // Store payment data in sessionStorage (survives page reload)
+        sessionStorage.setItem('payment_data', JSON.stringify({
+            paypalOrderId,
+            packageId,
+            packageName: selectedPackage.name,
+        }));
+
+        // FULL PAGE REDIRECT — completely destroys PayPal SDK from memory
+        // This ensures fetch/XHR on the processing page are 100% clean
+        window.location.href = '/payment-processing';
     };
 
     const onError = (err) => {
