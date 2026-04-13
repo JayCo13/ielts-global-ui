@@ -31,6 +31,7 @@ import VIPPackages from './pages/VIPPackages';
 import Payment from './pages/Payment';
 import PaymentProcessing from './pages/PaymentProcessing';
 import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentFailure from './pages/PaymentFailure';
 import PaymentCancel from './pages/PaymentCancel';
 import VIPConfirmation from './pages/VIPConfirmation';
 import MyVIPPackage from './pages/MyVIPPackage';
@@ -100,6 +101,7 @@ function App() {
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/permission" element={<Permission />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/payment-failure" element={<PaymentFailure />} />
           <Route path="/payment-cancel" element={<PaymentCancel />} />
 
           {/* Protected routes - require authentication and active status */}

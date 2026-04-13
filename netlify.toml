@@ -2,6 +2,16 @@
   command = "CI=false npm run build"
   publish = "build"
 
+# Proxy API calls to backend — eliminates CORS for POST requests
+# Netlify processes redirects in order: first match wins.
+# status=200 means "proxy" (reverse proxy, not redirect).
+[[redirects]]
+  from = "/api/*"
+  to = "https://double-hetti-jaydenco1-dee125d7.koyeb.app/:splat"
+  status = 200
+  force = true
+
+# SPA fallback — all other routes serve index.html
 [[redirects]]
   from = "/*"
   to = "/index.html"
