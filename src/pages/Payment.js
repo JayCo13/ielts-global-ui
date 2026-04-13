@@ -270,6 +270,8 @@ const Payment = () => {
                             "client-id": paypalClientId,
                             currency: "USD",
                             intent: "capture",
+                            "enable-funding": "venmo",
+                            "buyer-country": undefined,
                         }}>
                             <PayPalButtons
                                 style={{
@@ -288,7 +290,7 @@ const Payment = () => {
                         </PayPalScriptProvider>
 
                         <p className="text-xs text-gray-400 text-center mt-4">
-                            Pay securely with PayPal or Credit/Debit Card
+                            Pay securely with PayPal, Credit/Debit Card, Venmo, or Apple Pay
                         </p>
                     </div>
                 )}
