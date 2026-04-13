@@ -29,6 +29,7 @@ import ExamHistory from './components/ExamHistory';
 import AuthCallback from './auth/AuthCallback';
 import VIPPackages from './pages/VIPPackages';
 import Payment from './pages/Payment';
+import PaymentProcessing from './pages/PaymentProcessing';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentCancel from './pages/PaymentCancel';
 import VIPConfirmation from './pages/VIPConfirmation';
@@ -122,6 +123,7 @@ function App() {
             <Route path="/result_review_rd" element={<ResultReviewRd />} />
             <Route path="/vip-packages" element={<VIPPackages />} />
             <Route path="/payment" element={<Payment />} />
+            <Route path="/payment-processing" element={<PaymentProcessing />} />
             <Route path="/transaction-status" element={<TransactionStatus />} />
             <Route path="/vip-confirmation" element={<VIPConfirmation />} />
             <Route path="/my-vip-package" element={<MyVIPPackage />} />
