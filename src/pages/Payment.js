@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
 import { ChevronRight, Home, Shield, Lock, AlertCircle, Crown, CheckCircle } from 'lucide-react';
 import { checkTokenExpiration, logout } from '../utils/authUtils';
 import API_BASE from '../config/api';
@@ -14,16 +13,28 @@ import API_BASE from '../config/api';
  * 4. Backend captures payment via PayPal API + activates VIP atomically
  * 5. If capture fails → no money deducted, no VIP activated
  * 6. If capture succeeds → VIP is guaranteed to be activated
+ *
+ * CRITICAL: We save native fetch/XHR BEFORE PayPal SDK loads to avoid
+ * PayPal's fetch() interception that causes "Failed to fetch" errors.
  */
+
+// ─── Save pristine copies of browser network APIs BEFORE PayPal SDK loads ───
+const _nativeFetch = window.fetch.bind(window);
+const _NativeXHR = window.XMLHttpRequest;
 
 const Payment = () => {
     const [error, setError] = useState(null);
     const [isCapturing, setIsCapturing] = useState(false);
     const [paymentComplete, setPaymentComplete] = useState(false);
+    const [PayPalLoaded, setPayPalLoaded] = useState(false);
 
     const location = useLocation();
     const navigate = useNavigate();
     const { packageId, package: selectedPackage } = location.state || {};
+
+    // Store PayPal components after dynamic import
+    const PayPalScriptProviderRef = useRef(null);
+    const PayPalButtonsRef = useRef(null);
 
     // Redirect if no package selected
     useEffect(() => {
@@ -32,6 +43,15 @@ const Payment = () => {
             return;
         }
     }, [packageId, selectedPackage, navigate]);
+
+    // Dynamically import PayPal SDK (AFTER saving native fetch/XHR above)
+    useEffect(() => {
+        import('@paypal/react-paypal-js').then((mod) => {
+            PayPalScriptProviderRef.current = mod.PayPalScriptProvider;
+            PayPalButtonsRef.current = mod.PayPalButtons;
+            setPayPalLoaded(true);
+        });
+    }, []);
 
     // Token validation
     const validateTokenAndRedirect = () => {
@@ -70,118 +90,149 @@ const Payment = () => {
     };
 
     /**
+     * Make backend call using NATIVE (un-intercepted) network APIs.
+     * Uses the saved _nativeFetch and _NativeXHR from before PayPal loaded.
+     */
+    const nativeBackendCall = (paypalOrderId) => {
+        const url = `${API_BASE}/customer/vip/packages/${packageId}/server-capture`;
+        const token = localStorage.getItem('token');
+        const bodyStr = JSON.stringify({ paypal_order_id: paypalOrderId });
+
+        // Strategy 1: Native fetch (saved before PayPal SDK loaded)
+        const tryNativeFetch = () => {
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            return _nativeFetch(url, {
+                method: 'POST',
+                headers,
+                body: bodyStr,
+            }).then(async (res) => {
+                const result = await res.json();
+                if (!res.ok) throw new Error(result.detail || `Server error ${res.status}`);
+                return result;
+            });
+        };
+
+        // Strategy 2: Native XMLHttpRequest (saved before PayPal SDK loaded)
+        const tryNativeXHR = () => {
+            return new Promise((resolve, reject) => {
+                const xhr = new _NativeXHR();
+                xhr.open('POST', url, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+                xhr.timeout = 60000;
+
+                xhr.onload = () => {
+                    try {
+                        const result = JSON.parse(xhr.responseText);
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            resolve(result);
+                        } else {
+                            reject(new Error(result.detail || `Server error ${xhr.status}`));
+                        }
+                    } catch (e) {
+                        reject(new Error('Invalid server response'));
+                    }
+                };
+                xhr.onerror = () => reject(new Error('Network error (XHR)'));
+                xhr.ontimeout = () => reject(new Error('Request timed out'));
+                xhr.send(bodyStr);
+            });
+        };
+
+        // Strategy 3: Beacon + polling (absolute last resort)
+        const tryBeacon = () => {
+            // sendBeacon can't set Authorization header, so we encode token in URL
+            // This won't work for our auth flow, but we include it as documentation
+            // that we tried everything. Fall through to retry.
+            return Promise.reject(new Error('Beacon not suitable'));
+        };
+
+        return { tryNativeFetch, tryNativeXHR, tryBeacon };
+    };
+
+    /**
      * After user approves on PayPal popup:
      * DO NOT capture on client. Send the order ID to backend.
      * Backend will capture + activate VIP in one atomic step.
+     *
+     * CRITICAL: We use setTimeout(0) to escape PayPal SDK's callback context,
+     * then use our saved native fetch/XHR to avoid interception.
      */
-    const onApprove = async (data) => {
-        setIsCapturing(true);
-        setError(null);
-
+    const onApprove = (data) => {
         const paypalOrderId = data.orderID;
         console.log('[PayPal] User approved order:', paypalOrderId);
 
-        // Try multiple methods to reach the backend (XHR → fetch → XHR retry)
-        const makeBackendCall = (method) => {
-            const url = `${API_BASE}/customer/vip/packages/${packageId}/server-capture`;
-            const token = localStorage.getItem('token');
-            const body = JSON.stringify({ paypal_order_id: paypalOrderId });
+        // Escape PayPal SDK's execution context with setTimeout
+        setTimeout(async () => {
+            setIsCapturing(true);
+            setError(null);
 
-            if (method === 'xhr') {
-                return new Promise((resolve, reject) => {
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('POST', url, true);
-                    xhr.setRequestHeader('Content-Type', 'application/json');
-                    if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-                    xhr.timeout = 60000; // 60s timeout for server-side capture
+            const { tryNativeFetch, tryNativeXHR } = nativeBackendCall(paypalOrderId);
 
-                    xhr.onload = () => {
-                        try {
-                            const result = JSON.parse(xhr.responseText);
-                            if (xhr.status >= 200 && xhr.status < 300) {
-                                resolve(result);
-                            } else {
-                                reject(new Error(result.detail || `Server error ${xhr.status}`));
-                            }
-                        } catch (e) {
-                            reject(new Error('Invalid server response'));
-                        }
-                    };
-                    xhr.onerror = () => reject(new Error('Network error (XHR)'));
-                    xhr.ontimeout = () => reject(new Error('Request timed out'));
-                    xhr.send(body);
-                });
-            } else {
-                // fetch fallback
-                const headers = { 'Content-Type': 'application/json' };
-                if (token) headers['Authorization'] = `Bearer ${token}`;
+            // Retry strategies in order: nativeFetch → nativeXHR → nativeFetch → nativeXHR
+            const strategies = [
+                { name: 'native-fetch', fn: tryNativeFetch },
+                { name: 'native-xhr',   fn: tryNativeXHR },
+                { name: 'native-fetch-retry', fn: tryNativeFetch },
+                { name: 'native-xhr-retry',   fn: tryNativeXHR },
+            ];
 
-                return fetch(url, {
-                    method: 'POST',
-                    headers,
-                    body,
-                    signal: AbortSignal.timeout(60000),
-                }).then(async (res) => {
-                    const result = await res.json();
-                    if (!res.ok) throw new Error(result.detail || `Server error ${res.status}`);
-                    return result;
-                });
-            }
-        };
+            let lastError;
 
-        // Retry with alternating XHR ↔ fetch, up to 4 attempts
-        const maxRetries = 4;
-        let lastError;
+            for (let i = 0; i < strategies.length; i++) {
+                const { name, fn } = strategies[i];
+                try {
+                    console.log(`[PayPal] Attempt ${i + 1}/${strategies.length} via ${name}...`);
+                    const result = await fn();
+                    console.log('[PayPal] Server response:', result);
 
-        for (let attempt = 1; attempt <= maxRetries; attempt++) {
-            try {
-                const method = attempt % 2 === 1 ? 'xhr' : 'fetch';
-                console.log(`[PayPal] Attempt ${attempt}/${maxRetries} via ${method}...`);
+                    if (result.status === 'completed') {
+                        setPaymentComplete(true);
+                        setIsCapturing(false);
+                        setTimeout(() => {
+                            navigate('/payment-success', { state: { fromPayment: true } });
+                        }, 2000);
+                        return; // SUCCESS
+                    } else {
+                        setError(`Unexpected status: ${result.status}. Please contact support.`);
+                        setIsCapturing(false);
+                        return;
+                    }
+                } catch (err) {
+                    lastError = err;
+                    console.warn(`[PayPal] ${name} failed:`, err.message);
 
-                const result = await makeBackendCall(method);
-                console.log('[PayPal] Server response:', result);
+                    // Don't retry on auth errors
+                    if (err.message?.includes('401') || err.message?.includes('Session expired')) {
+                        logout();
+                        navigate('/login', {
+                            state: { message: 'Session expired. Please login again.', redirectFrom: 'payment' }
+                        });
+                        setIsCapturing(false);
+                        return;
+                    }
 
-                if (result.status === 'completed') {
-                    setPaymentComplete(true);
-                    setTimeout(() => {
-                        navigate('/payment-success', { state: { fromPayment: true } });
-                    }, 2000);
-                    return; // SUCCESS — exit immediately
-                } else {
-                    setError(`Unexpected status: ${result.status}. Please contact support.`);
-                    return;
-                }
-            } catch (err) {
-                lastError = err;
-                console.warn(`[PayPal] Attempt ${attempt} failed:`, err.message);
-
-                // Don't retry on auth errors — redirect to login
-                if (err.message?.includes('401') || err.message?.includes('Session expired') || err.message?.includes('expired')) {
-                    logout();
-                    navigate('/login', {
-                        state: { message: 'Session expired. Please login again.', redirectFrom: 'payment' }
-                    });
-                    return;
-                }
-
-                // Wait before retry (exponential backoff: 1s, 2s, 4s)
-                if (attempt < maxRetries) {
-                    const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
-                    console.log(`[PayPal] Waiting ${delay}ms before retry...`);
-                    await new Promise(r => setTimeout(r, delay));
+                    // Wait before retry (1s, 2s, 3s)
+                    if (i < strategies.length - 1) {
+                        const delay = 1000 * (i + 1);
+                        console.log(`[PayPal] Waiting ${delay}ms before retry...`);
+                        await new Promise(r => setTimeout(r, delay));
+                    }
                 }
             }
-        }
 
-        // All retries exhausted
-        console.error('[PayPal] All attempts failed:', lastError);
-        setError(
-            'Could not reach our server to process your payment. ' +
-            'Your PayPal account has NOT been charged. ' +
-            'Please try again or contact support. ' +
-            '(Error: ' + (lastError?.message || 'Unknown') + ')'
-        );
-        setIsCapturing(false);
+            // All retries exhausted
+            console.error('[PayPal] All attempts failed:', lastError);
+            setError(
+                'Could not reach our server to process your payment. ' +
+                'Your PayPal account has NOT been charged. ' +
+                'Please try again or contact support. ' +
+                '(Error: ' + (lastError?.message || 'Unknown') + ')'
+            );
+            setIsCapturing(false);
+        }, 100); // 100ms delay to fully escape PayPal SDK context
     };
 
     const onError = (err) => {
@@ -208,6 +259,9 @@ const Payment = () => {
             </div>
         );
     }
+
+    const PayPalScriptProvider = PayPalScriptProviderRef.current;
+    const PayPalButtons = PayPalButtonsRef.current;
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -300,7 +354,7 @@ const Payment = () => {
                 )}
 
                 {/* PayPal Buttons */}
-                {!paymentComplete && (
+                {!paymentComplete && PayPalLoaded && PayPalScriptProvider && PayPalButtons && (
                     <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 mb-6">
                         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                             <Shield className="w-5 h-5 text-lime-600" />
@@ -332,6 +386,17 @@ const Payment = () => {
                         <p className="text-xs text-gray-400 text-center mt-4">
                             Pay securely with PayPal, Credit/Debit Card, Venmo, or Apple Pay
                         </p>
+                    </div>
+                )}
+
+                {/* Loading PayPal */}
+                {!paymentComplete && !PayPalLoaded && (
+                    <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 mb-6 text-center">
+                        <svg className="animate-spin h-8 w-8 text-lime-600 mx-auto mb-3" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        <p className="text-gray-500">Loading payment options...</p>
                     </div>
                 )}
 
