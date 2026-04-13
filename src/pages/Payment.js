@@ -6,41 +6,15 @@ import { checkTokenExpiration, logout } from '../utils/authUtils';
 import API_BASE from '../config/api';
 
 /**
- * XMLHttpRequest-based API call — avoids PayPal SDK's fetch() interception.
- * Returns a Promise so it can be used with async/await.
+ * BULLETPROOF PAYMENT FLOW (Server-Side Capture)
+ * ================================================
+ * 1. Client creates PayPal order (client-side) — NO money moves yet
+ * 2. User approves payment on PayPal popup
+ * 3. Client sends order_id to backend — still NO money moves
+ * 4. Backend captures payment via PayPal API + activates VIP atomically
+ * 5. If capture fails → no money deducted, no VIP activated
+ * 6. If capture succeeds → VIP is guaranteed to be activated
  */
-const apiCall = (method, url, body = null) => {
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open(method, url, true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        
-        const token = localStorage.getItem('token');
-        if (token) {
-            xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-        }
-        
-        xhr.timeout = 45000;
-        
-        xhr.onload = () => {
-            try {
-                const data = JSON.parse(xhr.responseText);
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    resolve(data);
-                } else {
-                    reject(new Error(data.detail || `Request failed with status ${xhr.status}`));
-                }
-            } catch (e) {
-                reject(new Error('Invalid response from server'));
-            }
-        };
-        
-        xhr.onerror = () => reject(new Error('Network error. Please check your connection.'));
-        xhr.ontimeout = () => reject(new Error('Request timed out. Please try again.'));
-        
-        xhr.send(body ? JSON.stringify(body) : null);
-    });
-};
 
 const Payment = () => {
     const [error, setError] = useState(null);
@@ -79,7 +53,7 @@ const Payment = () => {
         validateTokenAndRedirect();
     }, []);
 
-    // PayPal creates the order CLIENT-SIDE (no backend call needed)
+    // PayPal creates the order CLIENT-SIDE — NO money is captured here
     const createOrder = (data, actions) => {
         if (!validateTokenAndRedirect()) return;
         setError(null);
@@ -95,52 +69,119 @@ const Payment = () => {
         });
     };
 
-    // After user approves: capture client-side, then verify+activate on backend
-    const onApprove = async (data, actions) => {
+    /**
+     * After user approves on PayPal popup:
+     * DO NOT capture on client. Send the order ID to backend.
+     * Backend will capture + activate VIP in one atomic step.
+     */
+    const onApprove = async (data) => {
         setIsCapturing(true);
         setError(null);
 
-        try {
-            // Step 1: Capture the payment via PayPal SDK (client-side)
-            const details = await actions.order.capture();
-            console.log('[PayPal] Captured:', details.id, details.status);
+        const paypalOrderId = data.orderID;
+        console.log('[PayPal] User approved order:', paypalOrderId);
 
-            if (details.status !== 'COMPLETED') {
-                throw new Error(`Payment not completed. Status: ${details.status}`);
-            }
+        // Try multiple methods to reach the backend (XHR → fetch → XHR retry)
+        const makeBackendCall = (method) => {
+            const url = `${API_BASE}/customer/vip/packages/${packageId}/server-capture`;
+            const token = localStorage.getItem('token');
+            const body = JSON.stringify({ paypal_order_id: paypalOrderId });
 
-            // Step 2: Verify + activate VIP on backend (uses XMLHttpRequest, not fetch)
-            const result = await apiCall(
-                'POST',
-                `${API_BASE}/customer/vip/packages/${packageId}/verify-and-activate`,
-                { paypal_order_id: details.id }
-            );
+            if (method === 'xhr') {
+                return new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', url, true);
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+                    if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+                    xhr.timeout = 60000; // 60s timeout for server-side capture
 
-            console.log('[PayPal] VIP activated:', result);
-
-            if (result.status === 'completed') {
-                setPaymentComplete(true);
-                setTimeout(() => {
-                    navigate('/payment-success', { state: { fromPayment: true } });
-                }, 2000);
-            } else {
-                setError(`Unexpected status: ${result.status}. Please contact support.`);
-            }
-        } catch (err) {
-            console.error('[PayPal] Error:', err);
-            
-            if (err.message?.includes('Session expired') || err.message?.includes('401')) {
-                logout();
-                navigate('/login', {
-                    state: { message: 'Session expired. Please login again.', redirectFrom: 'payment' }
+                    xhr.onload = () => {
+                        try {
+                            const result = JSON.parse(xhr.responseText);
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                resolve(result);
+                            } else {
+                                reject(new Error(result.detail || `Server error ${xhr.status}`));
+                            }
+                        } catch (e) {
+                            reject(new Error('Invalid server response'));
+                        }
+                    };
+                    xhr.onerror = () => reject(new Error('Network error (XHR)'));
+                    xhr.ontimeout = () => reject(new Error('Request timed out'));
+                    xhr.send(body);
                 });
-                return;
+            } else {
+                // fetch fallback
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                return fetch(url, {
+                    method: 'POST',
+                    headers,
+                    body,
+                    signal: AbortSignal.timeout(60000),
+                }).then(async (res) => {
+                    const result = await res.json();
+                    if (!res.ok) throw new Error(result.detail || `Server error ${res.status}`);
+                    return result;
+                });
             }
-            
-            setError(err.message || 'Payment processing failed. Please contact support.');
-        } finally {
-            setIsCapturing(false);
+        };
+
+        // Retry with alternating XHR ↔ fetch, up to 4 attempts
+        const maxRetries = 4;
+        let lastError;
+
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                const method = attempt % 2 === 1 ? 'xhr' : 'fetch';
+                console.log(`[PayPal] Attempt ${attempt}/${maxRetries} via ${method}...`);
+
+                const result = await makeBackendCall(method);
+                console.log('[PayPal] Server response:', result);
+
+                if (result.status === 'completed') {
+                    setPaymentComplete(true);
+                    setTimeout(() => {
+                        navigate('/payment-success', { state: { fromPayment: true } });
+                    }, 2000);
+                    return; // SUCCESS — exit immediately
+                } else {
+                    setError(`Unexpected status: ${result.status}. Please contact support.`);
+                    return;
+                }
+            } catch (err) {
+                lastError = err;
+                console.warn(`[PayPal] Attempt ${attempt} failed:`, err.message);
+
+                // Don't retry on auth errors — redirect to login
+                if (err.message?.includes('401') || err.message?.includes('Session expired') || err.message?.includes('expired')) {
+                    logout();
+                    navigate('/login', {
+                        state: { message: 'Session expired. Please login again.', redirectFrom: 'payment' }
+                    });
+                    return;
+                }
+
+                // Wait before retry (exponential backoff: 1s, 2s, 4s)
+                if (attempt < maxRetries) {
+                    const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+                    console.log(`[PayPal] Waiting ${delay}ms before retry...`);
+                    await new Promise(r => setTimeout(r, delay));
+                }
+            }
         }
+
+        // All retries exhausted
+        console.error('[PayPal] All attempts failed:', lastError);
+        setError(
+            'Could not reach our server to process your payment. ' +
+            'Your PayPal account has NOT been charged. ' +
+            'Please try again or contact support. ' +
+            '(Error: ' + (lastError?.message || 'Unknown') + ')'
+        );
+        setIsCapturing(false);
     };
 
     const onError = (err) => {
@@ -245,7 +286,7 @@ const Payment = () => {
                         </svg>
                         <div>
                             <p className="font-bold">Processing payment...</p>
-                            <p className="text-sm text-blue-600">Please wait while we verify and activate your VIP.</p>
+                            <p className="text-sm text-blue-600">Please do not close this page. We are securely processing your payment.</p>
                         </div>
                     </div>
                 )}
@@ -258,7 +299,7 @@ const Payment = () => {
                     </div>
                 )}
 
-                {/* PayPal Buttons — order is created client-side, no backend fetch needed */}
+                {/* PayPal Buttons */}
                 {!paymentComplete && (
                     <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 mb-6">
                         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -271,7 +312,6 @@ const Payment = () => {
                             currency: "USD",
                             intent: "capture",
                             "enable-funding": "venmo",
-                            "buyer-country": undefined,
                         }}>
                             <PayPalButtons
                                 style={{
@@ -299,7 +339,7 @@ const Payment = () => {
                 <div className="mt-6 flex justify-center">
                     <div className="flex items-center gap-2 text-xs text-gray-500">
                         <Lock className="w-4 h-4 text-lime-600" />
-                        <span>Secured by PayPal • SSL Encrypted</span>
+                        <span>Secured by PayPal • SSL Encrypted • Server-side processing</span>
                     </div>
                 </div>
             </div>
