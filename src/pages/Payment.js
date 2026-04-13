@@ -84,10 +84,14 @@ const Payment = () => {
      * After user approves: DO NOT call backend here.
      * Instead, navigate to a CLEAN page that has no PayPal SDK loaded.
      * That page will handle the backend call without any interference.
+     *
+     * CRITICAL: window.location.href in an SPA (Netlify) does NOT truly
+     * reload the page — the service worker and PayPal SDK interceptors
+     * survive. We must force a HARD reload.
      */
     const onApprove = (data) => {
         const paypalOrderId = data.orderID;
-        console.log('[PayPal] User approved order:', paypalOrderId, '→ full redirect to processing page');
+        console.log('[PayPal] User approved order:', paypalOrderId, '→ hard redirect to processing page');
 
         // Store payment data in sessionStorage (survives page reload)
         sessionStorage.setItem('payment_data', JSON.stringify({
@@ -96,9 +100,15 @@ const Payment = () => {
             packageName: selectedPackage.name,
         }));
 
-        // FULL PAGE REDIRECT — completely destroys PayPal SDK from memory
-        // This ensures fetch/XHR on the processing page are 100% clean
-        window.location.href = '/payment-processing';
+        // Remove all PayPal iframes and scripts BEFORE navigating
+        document.querySelectorAll('iframe[name*="paypal"], iframe[src*="paypal"]').forEach(el => el.remove());
+        document.querySelectorAll('script[src*="paypal"]').forEach(el => el.remove());
+
+        // HARD PAGE REDIRECT — window.location.replace + explicit origin
+        // Using the full absolute URL forces the browser to do a real navigation
+        // instead of an SPA client-side route change
+        const fullUrl = window.location.origin + '/payment-processing';
+        window.location.replace(fullUrl);
     };
 
     const onError = (err) => {
