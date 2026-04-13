@@ -6,13 +6,12 @@ import API_BASE from '../config/api';
 /**
  * PaymentProcessing — A CLEAN page with NO PayPal SDK loaded.
  * This page receives the PayPal order ID and calls the backend
- * to capture + activate VIP. Since PayPal SDK is NOT present,
- * fetch/XHR work normally without any interception.
+ * to capture + activate VIP.
  */
 const PaymentProcessing = () => {
-    const [status, setStatus] = useState('processing'); // processing | success | error
+    const [status, setStatus] = useState('processing');
     const [errorMsg, setErrorMsg] = useState('');
-    const [attempt, setAttempt] = useState(0);
+    const [debugInfo, setDebugInfo] = useState('');
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -26,10 +25,53 @@ const PaymentProcessing = () => {
         capturePayment();
     }, []);
 
+    // XHR-based call (most reliable, no SDK interference possible)
+    const xhrCall = (url, token, body) => {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+            xhr.timeout = 90000; // 90 seconds
+
+            xhr.onload = () => {
+                try {
+                    const result = JSON.parse(xhr.responseText);
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        resolve(result);
+                    } else {
+                        reject(new Error(result.detail || `HTTP ${xhr.status}`));
+                    }
+                } catch (e) {
+                    reject(new Error(`Parse error: ${xhr.responseText?.substring(0, 100)}`));
+                }
+            };
+            xhr.onerror = () => reject(new Error(`XHR network error (readyState=${xhr.readyState})`));
+            xhr.ontimeout = () => reject(new Error('XHR timeout after 90s'));
+            xhr.send(body);
+        });
+    };
+
+    // Fetch-based call
+    const fetchCall = (url, token, body) => {
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        return Promise.race([
+            fetch(url, { method: 'POST', headers, body })
+                .then(async (res) => {
+                    const result = await res.json();
+                    if (!res.ok) throw new Error(result.detail || `HTTP ${res.status}`);
+                    return result;
+                }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Fetch timeout 90s')), 90000))
+        ]);
+    };
+
     const capturePayment = async () => {
         setStatus('processing');
         setErrorMsg('');
-        setAttempt(prev => prev + 1);
+        setDebugInfo('Starting...');
 
         const token = localStorage.getItem('token');
         if (!token) {
@@ -38,49 +80,68 @@ const PaymentProcessing = () => {
         }
 
         const url = `${API_BASE}/customer/vip/packages/${packageId}/server-capture`;
+        const body = JSON.stringify({ paypal_order_id: paypalOrderId });
 
-        // Try up to 3 times with increasing delays
-        for (let i = 0; i < 3; i++) {
+        setDebugInfo(`URL: ${url}\nToken: ${token ? token.substring(0, 20) + '...' : 'NONE'}`);
+
+        // Strategy: XHR → fetch → XHR → fetch (4 attempts)
+        const strategies = [
+            { name: 'XHR-1', fn: () => xhrCall(url, token, body) },
+            { name: 'fetch-1', fn: () => fetchCall(url, token, body) },
+            { name: 'XHR-2', fn: () => xhrCall(url, token, body) },
+            { name: 'fetch-2', fn: () => fetchCall(url, token, body) },
+        ];
+
+        let lastError;
+
+        for (let i = 0; i < strategies.length; i++) {
+            const { name, fn } = strategies[i];
             try {
-                console.log(`[Payment] Attempt ${i + 1}/3 to capture order ${paypalOrderId}`);
-                
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({ paypal_order_id: paypalOrderId }),
-                });
+                setDebugInfo(prev => prev + `\n[${name}] Sending...`);
+                console.log(`[Payment] ${name}: calling ${url}`);
 
-                const result = await response.json();
+                const result = await fn();
+                console.log(`[Payment] ${name}: success`, result);
 
-                if (response.ok && result.status === 'completed') {
-                    console.log('[Payment] VIP activated successfully!');
+                if (result.status === 'completed') {
                     setStatus('success');
                     setTimeout(() => {
                         navigate('/payment-success', { state: { fromPayment: true } });
                     }, 2500);
                     return;
-                } else if (response.status === 401) {
-                    navigate('/login', { state: { message: 'Session expired. Please login again.' } });
+                } else if (result.status === 'completed' || result.message?.includes('already processed')) {
+                    setStatus('success');
+                    setTimeout(() => {
+                        navigate('/payment-success', { state: { fromPayment: true } });
+                    }, 2500);
                     return;
                 } else {
-                    throw new Error(result.detail || `Server returned status ${response.status}`);
+                    throw new Error(`Unexpected: ${JSON.stringify(result)}`);
                 }
             } catch (err) {
-                console.warn(`[Payment] Attempt ${i + 1} failed:`, err.message);
-                
-                if (i < 2) {
-                    // Wait before retry (2s, 4s)
-                    await new Promise(r => setTimeout(r, 2000 * (i + 1)));
-                } else {
-                    // All retries failed
-                    setStatus('error');
-                    setErrorMsg(err.message || 'Unknown error');
+                lastError = err;
+                const msg = err.message || 'Unknown';
+                console.warn(`[Payment] ${name} failed:`, msg);
+                setDebugInfo(prev => prev + `\n[${name}] FAIL: ${msg}`);
+
+                // Auth error → go to login
+                if (msg.includes('401') || msg.includes('credentials') || msg.includes('expired')) {
+                    navigate('/login', { state: { message: 'Session expired.' } });
+                    return;
+                }
+
+                // Wait before retry
+                if (i < strategies.length - 1) {
+                    const delay = 3000 * (i + 1);
+                    setDebugInfo(prev => prev + `\n  Waiting ${delay / 1000}s...`);
+                    await new Promise(r => setTimeout(r, delay));
                 }
             }
         }
+
+        // All failed
+        setStatus('error');
+        setErrorMsg(lastError?.message || 'Unknown error');
     };
 
     if (!paypalOrderId) return null;
@@ -97,17 +158,17 @@ const PaymentProcessing = () => {
                         </div>
                         <h2 className="text-xl font-bold text-gray-900 mb-2">Processing Your Payment</h2>
                         <p className="text-gray-500 mb-4">
-                            Please do not close this page. We are securely capturing your payment and activating your VIP access.
+                            Please do not close this page. We are securely processing your payment.
                         </p>
                         {packageName && (
-                            <div className="bg-lime-50 rounded-lg px-4 py-2 inline-block">
+                            <div className="bg-lime-50 rounded-lg px-4 py-2 inline-block mb-4">
                                 <span className="text-sm font-medium text-lime-700">{packageName}</span>
                             </div>
                         )}
-                        <div className="mt-6 flex items-center justify-center gap-2 text-xs text-gray-400">
-                            <Lock className="w-3 h-3" />
-                            <span>Secured by PayPal • SSL Encrypted</span>
-                        </div>
+                        {/* Debug info - visible during processing */}
+                        <pre className="text-left text-xs text-gray-400 bg-gray-50 rounded-lg p-3 mt-4 max-h-32 overflow-auto whitespace-pre-wrap">
+                            {debugInfo}
+                        </pre>
                     </div>
                 )}
 
@@ -121,9 +182,6 @@ const PaymentProcessing = () => {
                         <p className="text-green-600 mb-4">
                             Your VIP plan has been activated. Redirecting you now...
                         </p>
-                        <div className="w-full bg-green-100 rounded-full h-1.5 overflow-hidden">
-                            <div className="bg-green-500 h-full rounded-full animate-pulse" style={{ width: '100%' }}></div>
-                        </div>
                     </div>
                 )}
 
@@ -135,11 +193,11 @@ const PaymentProcessing = () => {
                         </div>
                         <h2 className="text-xl font-bold text-red-800 mb-2">Processing Failed</h2>
                         <p className="text-gray-600 mb-2">
-                            We couldn't process your payment. Your PayPal account has NOT been charged.
+                            We couldn't reach our server. Your PayPal has NOT been charged.
                         </p>
-                        <p className="text-sm text-red-500 mb-6 bg-red-50 rounded-lg px-3 py-2">
-                            {errorMsg}
-                        </p>
+                        <pre className="text-left text-xs text-red-500 mb-4 bg-red-50 rounded-lg p-3 max-h-40 overflow-auto whitespace-pre-wrap">
+                            {debugInfo}
+                        </pre>
                         <button
                             onClick={capturePayment}
                             className="w-full px-6 py-3 bg-gradient-to-r from-lime-500 to-emerald-500 text-white font-bold rounded-xl hover:shadow-lg transition-all flex items-center justify-center gap-2"
