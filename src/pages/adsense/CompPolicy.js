@@ -13,7 +13,7 @@ const CompPolicy = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col w-full">
       <Navbar />
@@ -25,7 +25,7 @@ const CompPolicy = () => {
           transition={{ duration: 0.6 }}
           className="bg-white rounded-lg shadow-sm overflow-hidden w-full"
         >
-          <div className="w-full max-w-7xl mx-auto p-4 sm:p-6">                      
+          <div className="w-full max-w-7xl mx-auto p-4 sm:p-6">
             {/* Header */}
             <div className="px-4 sm:px-6 pb-4">
               <h1 className="text-4xl sm:text-3xl text-center font-bold text-gray-900 mb-2">Terms and Conditions</h1>
@@ -36,14 +36,14 @@ const CompPolicy = () => {
                 Last updated: April 2, 2026
               </p>
             </div>
-            
+
             {/* Full width content */}
             <div className="w-full px-4 sm:px-6 pb-6">
               <p className="text-gray-700 mb-6">
-                These Terms and Conditions govern the purchase and use of products/services 
+                These Terms and Conditions govern the purchase and use of products/services
                 on the website <span className="font-bold">ieltscomputertest.com</span>.
               </p>
-              
+
               {/* Section 1: Scope of Service */}
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
@@ -52,7 +52,7 @@ const CompPolicy = () => {
                 </h2>
                 <div className="bg-blue-50 p-4 rounded-lg mb-4">
                   <p className="text-gray-700 mb-2">
-                    <strong>Products/services provided:</strong> IELTS preparation materials, mock tests, online courses 
+                    <strong>Products/services provided:</strong> IELTS preparation materials, mock tests, online courses
                     (digital files: PDF, audio, video).
                   </p>
                   <p className="text-gray-700 mb-2">
@@ -86,13 +86,14 @@ const CompPolicy = () => {
                 </h2>
                 <div className="bg-green-50 p-4 rounded-lg">
                   <p className="text-gray-700 mb-3">
-                    Due to the nature of digital products, refunds are not available once the customer has successfully registered for the course, unless there is a technical issue that significantly affects the customer's access to the course.
+                    Due to the nature of digital products, refunds are not available once the customer has successfully registered for the course, unless there is a technical issue that significantly affects access to the course.
                   </p>
                   <p className="text-gray-700 mb-3">
-                    If customers experience technical issues such as corrupted files or inaccessible content, they must contact us via email. Support will be provided within <span className="font-semibold text-green-700">5 days</span> of receiving the request.
+                    If customers experience technical issues such as corrupted files or inaccessible content, they must contact us via email. Support will be provided within
+                    <span className="font-semibold text-green-700">5 days</span> of receiving the request.
                   </p>
                   <p className="text-gray-700">
-                    If the issue is confirmed to seriously affect the user's access to the course, we will either extend the access period accordingly or issue a full refund.
+                    If the issue is confirmed to seriously affect the user's access to the course (i.e. the course is inaccessible for more than 3 consecutive days due to technical issues on our website), we will either extend the access period accordingly or issue a full refund.
                   </p>
                 </div>
               </div>
@@ -218,7 +219,7 @@ const CompPolicy = () => {
                   If you have any questions regarding these Terms and Conditions, please contact us via:
                 </p>
                 <p className="text-gray-700 text-sm mt-1">
-                  Email: <span className="text-blue-600">ieltscomputertestglobal@gmail.com</span> | 
+                  Email: <span className="text-blue-600">ieltscomputertestglobal@gmail.com</span> |
                   WhatsApp: <span className="text-blue-600">+84 964 996 195</span>
                 </p>
               </div>

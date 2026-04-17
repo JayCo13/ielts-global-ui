@@ -31,7 +31,7 @@ const Permission = () => {
                   <h4 className="font-semibold text-blue-400 mb-3">Business Information</h4>
                   <p className="text-gray-300">
                     <span className="font-medium">Owner:</span><br />
-                    Lê Tiết An
+                    Nguyen Thi Mai Anh
                   </p>
                 </div>
 
@@ -39,7 +39,7 @@ const Permission = () => {
                   <h4 className="font-semibold text-green-400 mb-3">Tax ID</h4>
                   <p className="text-gray-300">
                     <span className="font-medium">Tax Identification Number:</span><br />
-                    072091003266
+                    030195007851
                   </p>
                 </div>
 
