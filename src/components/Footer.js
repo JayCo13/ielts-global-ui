@@ -213,6 +213,13 @@ const Footer = () => {
                         <p>Copyright © 2025 ieltscomputertest.com. All rights reserved</p>
                     </div>
                 </div>
+
+                {/* Trademark Disclaimer */}
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                    <p className="text-center text-xs text-gray-400 leading-relaxed max-w-3xl mx-auto">
+                        <strong>Disclaimer:</strong> IELTS is a registered trademark jointly owned by the University of Cambridge ESOL Examinations (Cambridge Assessment English), the British Council, and IDP Education Australia. This website is independently operated and is <strong>not affiliated with, approved, or endorsed by</strong> any of these organizations. All test preparation materials on this platform are created independently for educational purposes only.
+                    </p>
+                </div>
             </div>
         </footer>
     );
