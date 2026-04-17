@@ -34,18 +34,23 @@ const PaymentProcessing = () => {
             return;
         }
 
-        const url = `${API_BASE}/customer/vip/packages/${packageId}/server-capture`;
+        // Use Netlify proxy (same-origin, no CORS) → falls back to direct
+        const proxyUrl = `/api/customer/vip/packages/${packageId}/server-capture`;
+        const directUrl = `${API_BASE}/customer/vip/packages/${packageId}/server-capture`;
         const body = JSON.stringify({ paypal_order_id: paypalOrderId });
+
+        // Try proxy first (attempt 1-2), then direct (attempt 3)
+        const urls = [proxyUrl, proxyUrl, directUrl];
 
         // Retry up to 3 times with increasing delay
         for (let i = 0; i < 3; i++) {
             try {
-                console.log(`[Payment] Attempt ${i + 1}/3: ${url}`);
+                console.log(`[Payment] Attempt ${i + 1}/3: ${urls[i]}`);
 
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 60000);
 
-                const res = await fetch(url, {
+                const res = await fetch(urls[i], {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
