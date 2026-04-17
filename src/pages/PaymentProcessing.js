@@ -61,7 +61,11 @@ const PaymentProcessing = () => {
                 });
                 clearTimeout(timeoutId);
 
-                const result = await res.json();
+                const text = await res.text();
+                console.log(`[Payment] Response ${res.status}:`, text.substring(0, 500));
+
+                let result;
+                try { result = JSON.parse(text); } catch { result = { detail: text }; }
 
                 if (res.status === 401) {
                     navigate('/login', { state: { message: 'Session expired.' } });
