@@ -60,7 +60,7 @@ const RefundPolicy = () => {
                   <div className="flex items-start">
                     <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
                     <p className="text-gray-700">
-                      If the issue is confirmed to seriously affect the user's access to the course, we will either <strong>extend the access period</strong> accordingly or <strong>issue a full refund</strong>.
+                      If the issue is confirmed to seriously affect the user's access to the course (i.e. the course is inaccessible for more than 3 consecutive days due to technical issues on our website), we will either extend the access period accordingly or issue a full refund.
                     </p>
                   </div>
                 </div>

@@ -187,7 +187,7 @@ const VIPPackages = () => {
                         </div>
                         <div className="text-gray-400 hover:text-gray-600 transition-colors">
                             <img
-                                src="/img/logo-ielts.png"
+                                src="/img/logo-ielts.png?v=2"
                                 alt="IELTS Logo"
                                 className="w-7 h-7 object-contain"
                             />

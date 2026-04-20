@@ -136,7 +136,7 @@ const Navbar = () => {
                 <div className={`w-48 flex items-center transition-all duration-300 ${isScrolled ? 'scale-80' : 'scale-100'
                     }`}>
                     <Link to="/">
-                        <img src="/img/logo-ielts.png" alt="IELTS Prep Logo" className="w-full object-contain rounded-full" />
+                        <img src="/img/logo-ielts.png?v=2" alt="IELTS Prep Logo" className="w-full object-contain rounded-full" />
                     </Link>
                 </div>
 

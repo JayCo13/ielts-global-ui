@@ -106,7 +106,7 @@ const FloatingGuideIcon = () => {
           }}
         >
           <img
-            src="/img/floating-icon.jpg"
+            src="/img/floating-icon.jpg?v=2"
             alt="How to use"
             className="w-full h-full object-contain"
             style={{ transform: 'translateY(-3px)' }}

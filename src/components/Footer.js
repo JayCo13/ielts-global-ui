@@ -24,7 +24,7 @@ const Footer = () => {
                     <div className="md:col-span-3 flex flex-col items-center">
                         <div className='flex items-center justify-center gap-6'>
                             <img
-                                src="/img/logo-ielts.png"
+                                src="/img/logo-ielts.png?v=2"
                                 alt="IELTS Prep Logo"
                                 className="h-28 w-28 mb-4"
                             />
