@@ -99,8 +99,8 @@ const PrivacyPolicy = () => {
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-3">5. Information Controller Details</h2>
                 <ul className="space-y-2 text-gray-700">
-                  <li><strong>Business owner:</strong> Nguyen Thi Mai Anh</li>
-                  <li><strong>Address:</strong> No. 10, Street 5B, Quarter 3, Hoa Phu Ward, Thu Dau Mot City, Binh Duong, Vietnam</li>
+                  <li><strong>Business owner:</strong> Le Tiet An</li>
+                  <li><strong>Address:</strong> 105, Street 5B, Quarter 3, Hoa Phu Ward, Thu Dau Mot City, Binh Duong, Vietnam</li>
                   <li><strong>Email:</strong> <a href="mailto:ieltscomputertestglobal@gmail.com" className="text-blue-500 hover:underline">ieltscomputertestglobal@gmail.com</a></li>
                   <li><strong>WhatsApp:</strong> <a href="https://wa.me/84964996195" className="text-blue-500 hover:underline">+84 964 996 195</a></li>
                 </ul>

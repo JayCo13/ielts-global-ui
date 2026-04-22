@@ -13,7 +13,7 @@ const DeliPolicy = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col w-full">
       <Navbar />
@@ -25,7 +25,7 @@ const DeliPolicy = () => {
           transition={{ duration: 0.6 }}
           className="bg-white rounded-lg shadow-sm overflow-hidden w-full"
         >
-          <div className="w-full max-w-7xl mx-auto p-4 sm:p-6">                      
+          <div className="w-full max-w-7xl mx-auto p-4 sm:p-6">
             {/* Header */}
             <div className="px-4 sm:px-6 pb-4">
               <h1 className="text-4xl sm:text-3xl text-center font-bold text-gray-900 mb-2">Delivery Policy</h1>
@@ -36,20 +36,20 @@ const DeliPolicy = () => {
                 Last updated: April 2, 2026
               </p>
             </div>
-            
+
             {/* Full width content */}
             <div className="w-full px-4 sm:px-6 pb-6">
               <p className="text-gray-700 mb-6">
                 This Shipping and Delivery Policy outlines how products and services are delivered on ieltscomputertest.com.
               </p>
-              
+
               {/* Section 1: Delivery Method */}
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
                   <Truck className="mr-2 h-5 w-5 text-blue-600" />
                   1. Delivery Method / Service Provision
                 </h2>
-                
+
                 {/* Digital Products */}
                 <div className="bg-blue-50 p-4 rounded-lg mb-4">
                   <h3 className="font-semibold text-gray-900 mb-3 flex items-center">
