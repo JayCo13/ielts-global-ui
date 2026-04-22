@@ -102,14 +102,14 @@ const Instruction = () => {
                   <div>
                     <h3 className="text-xl font-bold text-blue-900 flex items-center gap-2 mb-2">
                       <Sparkles className="w-5 h-5 text-blue-500" />
-                      Forecast
+                      Focus
                     </h3>
                     <p className="text-gray-600 leading-relaxed ml-7">
-                      These tests are carefully selected from Full Tests and regularly updated based on the latest exam trends. They focus on question types that are likely to appear or repeat in upcoming exams. Forecast tests are especially suitable for candidates planning to take the exam within the next month.
+                      These tests are carefully selected from Full Tests and regularly updated based on the latest exam trends. They focus on question types that are likely to appear or repeat in upcoming exams. Focus tests are especially suitable for candidates planning to take the exam within the next month.
                     </p>
                     <div className="ml-7 mt-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 rounded-xl flex items-start gap-3">
                       <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
-                      <p><strong>Note:</strong> These forecasts are based on probability only. There is no guarantee that these topics will appear in your actual exam.</p>
+                      <p><strong>Note:</strong> These Focus are based on probability only. There is no guarantee that these topics will appear in your actual exam.</p>
                     </div>
                   </div>
 
@@ -162,14 +162,14 @@ const Instruction = () => {
                   <div>
                     <h3 className="text-xl font-bold text-emerald-900 flex items-center gap-2 mb-2">
                       <Sparkles className="w-5 h-5 text-emerald-500" />
-                      Forecast
+                      Focus
                     </h3>
                     <p className="text-gray-600 leading-relaxed ml-7">
-                      These tests are selected from Full Tests and updated regularly based on the latest exam trends. They focus on questions that are likely to appear or repeat in upcoming exams. Forecast tests are recommended for candidates preparing for the exam within one month.
+                      These tests are selected from Full Tests and updated regularly based on the latest exam trends. They focus on questions that are likely to appear or repeat in upcoming exams. Focus tests are recommended for candidates preparing for the exam within one month.
                     </p>
                     <div className="ml-7 mt-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 rounded-xl flex items-start gap-3">
                       <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
-                      <p><strong>Note:</strong> These forecasts are based on probability only. There is no guarantee that these topics will appear in your actual exam.</p>
+                      <p><strong>Note:</strong> These Focus are based on probability only. There is no guarantee that these topics will appear in your actual exam.</p>
                     </div>
                   </div>
 
@@ -222,14 +222,14 @@ const Instruction = () => {
                   <div>
                     <h3 className="text-xl font-bold text-amber-900 flex items-center gap-2 mb-2">
                       <Sparkles className="w-5 h-5 text-amber-500" />
-                      Forecast
+                      Focus
                     </h3>
                     <p className="text-gray-600 leading-relaxed ml-7">
                       These tests are selected from Full Tests and updated regularly according to the latest exam trends. They are ideal for candidates preparing for the exam within one month. Users can also receive AI evaluation and feedback after completing each test.
                     </p>
                     <div className="ml-7 mt-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 rounded-xl flex items-start gap-3">
                       <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
-                      <p><strong>Note:</strong> These forecasts are based on probability only. There is no guarantee that these topics will appear in your actual exam.</p>
+                      <p><strong>Note:</strong> These Focus are based on probability only. There is no guarantee that these topics will appear in your actual exam.</p>
                     </div>
                   </div>
 
@@ -272,7 +272,7 @@ const Instruction = () => {
 
                   <div className="space-y-5">
                     <p className="text-gray-600 leading-relaxed">
-                      Users can access <strong className="text-purple-700">free Speaking Forecast PDFs</strong> covering all months:
+                      Users can access <strong className="text-purple-700">free Speaking Focus PDFs</strong> covering all months:
                     </p>
                     <ul className="space-y-2 ml-4">
                       {['January – April', 'May – August', 'September – December'].map((month, i) => (
@@ -300,7 +300,7 @@ const Instruction = () => {
 
                     <div className="bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 rounded-xl flex items-start gap-3">
                       <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
-                      <p><strong>Note:</strong> These forecasts are based on probability only. There is no guarantee that these topics will appear in your actual exam.</p>
+                      <p><strong>Note:</strong> These Focus are based on probability only. There is no guarantee that these topics will appear in your actual exam.</p>
                     </div>
                   </div>
                 </div>
