@@ -155,7 +155,7 @@ const ReadingForecast = () => {
         </nav>
         <div className="inline-flex items-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg text-sm">
           <Star className="w-5 h-5 text-yellow-500" fill="currentColor" />
-          <span className="text-gray-700">= High rate - Important</span>
+          <span className="text-gray-700">= Important</span>
         </div>
       </div>
 
