@@ -142,18 +142,18 @@ const Reading_Fe = () => {
             const hasReadingAccess = subscriptionData.has_reading_access || false;
 
             setIsVIP(hasReadingAccess);
-          setTests(testsData.map(exam => ({
-            id: exam.exam_id,
-            title: exam.title,
-            created_at: exam.created_at,
-            difficulty: "Medium",
-            duration: exam.duration ? `${exam.duration} minutes` : "30 minutes",
-            questions: 40,
-            totalMarks: exam.total_score,
-            isCompleted: exam.is_completed || false,
-            correctAnswers: exam.is_completed ? correctAnswers : 0,
-            partTitles: exam.part_titles || {}
-          })));
+            setTests(testsData.map(exam => ({
+              id: exam.exam_id,
+              title: exam.title,
+              created_at: exam.created_at,
+              difficulty: "Medium",
+              duration: exam.duration ? `${exam.duration} minutes` : "30 minutes",
+              questions: 40,
+              totalMarks: exam.total_score,
+              isCompleted: exam.is_completed || false,
+              correctAnswers: exam.is_completed ? correctAnswers : 0,
+              partTitles: exam.part_titles || {}
+            })));
           } else if (testsResponse.status === 401 || subscriptionResponse.status === 401) {
             navigate('/login');
           }
@@ -346,7 +346,7 @@ const Reading_Fe = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Helmet>
-        <title>IELTS Reading Practice Tests | Official & Forecasted</title>
+        <title>IELTS Reading Practice Tests | Official Mockup Test</title>
         <meta name="description" content={`Practice your IELTS Reading skills. Includes tests like ${tests.slice(0, 3).map(t => t.title).join(', ')}...`} />
       </Helmet>
       <Navbar />

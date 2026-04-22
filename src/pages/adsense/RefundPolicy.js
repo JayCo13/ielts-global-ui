@@ -42,69 +42,105 @@ const RefundPolicy = () => {
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
                   <RefreshCw className="mr-2 h-5 w-5 text-green-600" />
-                  Refund Terms
+                  1. General Policy
                 </h2>
-                <div className="bg-green-50 p-5 rounded-lg space-y-4">
-                  <div className="flex items-start">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                    <p className="text-gray-700">
-                      Due to the nature of digital products, <strong>refunds are not available</strong> once the customer has successfully registered for the course, unless there is a technical issue that significantly affects the customer's access to the course.
-                    </p>
-                  </div>
-                  <div className="flex items-start">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                    <p className="text-gray-700">
-                      If customers experience technical issues such as <strong>corrupted files or inaccessible content</strong>, they must contact us via email. Support will be provided within <span className="font-semibold text-green-700">5 days</span> of receiving the request.
-                    </p>
-                  </div>
-                  <div className="flex items-start">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                    <p className="text-gray-700">
-                      If the issue is confirmed to seriously affect the user's access to the course (i.e. the course is inaccessible for more than 3 consecutive days due to technical issues on our website), we will either extend the access period accordingly or issue a full refund.
-                    </p>
-                  </div>
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <p className="text-gray-700 mb-2">
+                    Due to the nature of digital products, all sales are generally final and non-refundable once access has been granted.
+                  </p>
+                  <p className="text-gray-700">
+                    However, refunds may be considered in specific cases where technical issues significantly affect the customer's ability to access or use the product.
+                  </p>
                 </div>
               </div>
 
-              {/* How to Request a Refund */}
               <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">How to Request a Refund</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">2. Eligible Refund Cases</h2>
+                <p className="text-gray-700 mb-2">Customers may be eligible for a refund if:</p>
+                <ul className="space-y-2 text-gray-700 mb-4 ml-2">
+                  <li className="flex items-start">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                    <p>The product is inaccessible or unusable due to technical issues, and</p>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                    <p>The issue persists for more than 3 consecutive days, and</p>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                    <p>The issue is confirmed to originate from our system</p>
+                  </li>
+                </ul>
+                <p className="text-gray-700 mb-2">In such cases, we may:</p>
+                <ul className="space-y-2 text-gray-700 ml-2">
+                  <li className="flex items-start">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                    <p>Extend the access period, or</p>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                    <p>Provide a full or partial refund, depending on the situation</p>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">3. Technical Support</h2>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-gray-700 mb-2">
+                    If you experience any issues (e.g., inaccessible content, system errors), please contact us:
+                  </p>
+                  <p className="text-gray-700 mb-2 font-medium">Email: <a href="mailto:ieltscomputertestglobal@gmail.com" className="text-blue-500 hover:underline">ieltscomputertestglobal@gmail.com</a></p>
+                  <p className="text-gray-700">
+                    Our support team will respond within <span className="font-semibold">5 business days</span> and work to resolve the issue as quickly as possible.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">4. Refund Request Process</h2>
                 <div className="space-y-3">
                   <div className="flex items-start">
                     <div className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium mr-3 mt-0.5">
                       1
                     </div>
-                    <p className="text-gray-700">Contact us via email at <a href="mailto:ieltscomputertestglobal@gmail.com" className="text-blue-500 hover:underline">ieltscomputertestglobal@gmail.com</a> describing the issue you encountered.</p>
+                    <p className="text-gray-700"><span className="font-medium text-gray-900">Step 1:</span> Contact us via email with a detailed description of the issue.</p>
                   </div>
                   <div className="flex items-start">
                     <div className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium mr-3 mt-0.5">
                       2
                     </div>
-                    <p className="text-gray-700">Our support team will review your request within 5 business days.</p>
+                    <p className="text-gray-700"><span className="font-medium text-gray-900">Step 2:</span> Our team reviews your request within 5 business days.</p>
                   </div>
                   <div className="flex items-start">
                     <div className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium mr-3 mt-0.5">
                       3
                     </div>
-                    <p className="text-gray-700">If approved, the refund will be processed via PayPal to your original payment method.</p>
+                    <p className="text-gray-700"><span className="font-medium text-gray-900">Step 3:</span> If approved, the refund will be processed via Lemon Squeezy to your original payment method.</p>
                   </div>
                 </div>
               </div>
 
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">5. Refund Processing Time</h2>
+                <p className="text-gray-700 mb-2">Once approved, refunds are processed by <span className="font-semibold">Lemon Squeezy</span>.</p>
+                <p className="text-gray-700">Depending on your payment provider, it may take <span className="font-semibold">5–10 business days</span> for the refunded amount to appear in your account.</p>
+              </div>
+
               {/* Contact */}
               <div className="mt-8 p-4 bg-gray-100 rounded-lg">
-                <h3 className="font-semibold text-gray-900 mb-2">Contact Information</h3>
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">6. Contact Information</h2>
                 <p className="text-gray-700 text-sm">
-                  For refund inquiries, please reach out to us:
+                  For refund inquiries, please contact us:
                 </p>
                 <div className="mt-2 space-y-1 text-sm text-gray-700">
                   <p className="flex items-center gap-2">
                     <Mail className="w-4 h-4 text-blue-500" />
-                    <span className="font-medium">Email:</span> ieltscomputertestglobal@gmail.com
+                    <span className="font-medium">Email:</span> <a href="mailto:ieltscomputertestglobal@gmail.com" className="text-blue-500 hover:underline">ieltscomputertestglobal@gmail.com</a>
                   </p>
                   <p className="flex items-center gap-2">
                     <MessageCircle className="w-4 h-4 text-green-500" />
-                    <span className="font-medium">WhatsApp:</span> +84 964 996 195
+                    <span className="font-medium">WhatsApp:</span> <a href="https://wa.me/84964996195" className="text-blue-500 hover:underline">+84 964 996 195</a>
                   </p>
                 </div>
               </div>

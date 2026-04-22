@@ -41,13 +41,12 @@ const AboutUs = () => {
             <div className="w-full md:w-3/4">
               <div className="space-y-8">
                 <p className="text-gray-700">
-                  <span className="font-bold text-[#e67e22]">ieltscomputertest.com</span> was founded with the mission of providing a professional computer-based IELTS preparation platform featuring authentic test materials and an international-standard interface. We are committed to delivering an effective learning experience, enabling learners to access IELTS practice tests conveniently and achieve their highest possible scores.
+                  <span className="font-bold text-[#e67e22]">ieltscomputertest.com</span> was founded with the mission of providing a professional computer-based IELTS preparation platform featuring high-quality, exam-style materials and a user-friendly interface. We are committed to delivering an effective learning experience, enabling learners to access IELTS practice tests conveniently and improve their band scores.
 
                 </p>
 
                 <p className="text-gray-700">
-                  With the motto “Right trust – Breakthrough future”, we continuously improve and develop our system, integrating advanced AI technology into the learning process. Our team of IELTS experts with scores of 8.0+ is always ready to support learners by providing high-quality materials and effective study methods, helping them confidently conquer any IELTS exam.
-
+                  With the motto “Right trust – Breakthrough future”, we continuously improve and develop our system by integrating advanced AI technology into the learning process. Our team of experienced teachers is dedicated to supporting learners with carefully designed materials and effective study methods, helping them prepare with confidence for the IELTS exam.
                 </p>
               </div>
             </div>

@@ -40,8 +40,7 @@ const PaymentPolicy = () => {
             {/* Full width content */}
             <div className="w-full px-4 sm:px-6 pb-6">
               <p className="text-gray-700 mb-6">
-                <span className="font-bold">ieltscomputertest.com</span> provides convenient and secure payment methods
-                to ensure the best shopping experience for our customers.
+                <span className="font-bold">ieltscomputertest.com</span> provides secure and convenient payment methods to ensure a smooth purchasing experience for our customers.
               </p>
 
               <div className="mb-6">
@@ -50,18 +49,17 @@ const PaymentPolicy = () => {
                   1. Accepted Payment Methods
                 </h2>
                 <p className="text-gray-700 mb-4">
-                  Currently, we only support payment via <strong>PayPal</strong>.
+                  We accept payments via <strong>Lemon Squeezy</strong>.
                 </p>
 
-                {/* PayPal Section */}
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                   <h3 className="font-semibold text-blue-900 mb-2 flex items-center">
-                    <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal" className="h-5 mr-2" />
-                    PayPal
+                    Lemon Squeezy
                   </h3>
-                  <p className="text-gray-700 text-sm">
-                    Secure international payment via PayPal. Supports credit/debit cards and PayPal balance.
-                  </p>
+                  <ul className="space-y-2 text-gray-700 text-sm">
+                    <li>• Secure international payments</li>
+                    <li>• Supports major credit/debit cards and other local payment methods (depending on availability)</li>
+                  </ul>
                 </div>
               </div>
 
@@ -73,8 +71,8 @@ const PaymentPolicy = () => {
                       1
                     </div>
                     <div>
-                      <p className="text-gray-900 font-medium">Select Product</p>
-                      <p className="text-gray-700 text-sm">Customers choose products and place an order on the website.</p>
+                      <p className="text-gray-900 font-medium">Step 1: Select Product</p>
+                      <p className="text-gray-700 text-sm">Customers choose a product and place an order on the website.</p>
                     </div>
                   </div>
                   <div className="flex items-start">
@@ -82,8 +80,8 @@ const PaymentPolicy = () => {
                       2
                     </div>
                     <div>
-                      <p className="text-gray-900 font-medium">Order Confirmation</p>
-                      <p className="text-gray-700 text-sm">The system sends an order confirmation along with payment details.</p>
+                      <p className="text-gray-900 font-medium">Step 2: Checkout</p>
+                      <p className="text-gray-700 text-sm">Customers are redirected to a secure checkout page provided by Lemon Squeezy.</p>
                     </div>
                   </div>
                   <div className="flex items-start">
@@ -91,8 +89,8 @@ const PaymentPolicy = () => {
                       3
                     </div>
                     <div>
-                      <p className="text-gray-900 font-medium">Make Payment</p>
-                      <p className="text-gray-700 text-sm">Customers complete the payment according to the provided instructions.</p>
+                      <p className="text-gray-900 font-medium">Step 3: Make Payment</p>
+                      <p className="text-gray-700 text-sm">Customers complete the payment using the available payment methods.</p>
                     </div>
                   </div>
                   <div className="flex items-start">
@@ -100,8 +98,8 @@ const PaymentPolicy = () => {
                       4
                     </div>
                     <div>
-                      <p className="text-gray-900 font-medium">Receive Product</p>
-                      <p className="text-gray-700 text-sm">After receiving the payment, we will confirm via the system/phone and proceed to provide access to the purchased product.</p>
+                      <p className="text-gray-900 font-medium">Step 4: Receive Product</p>
+                      <p className="text-gray-700 text-sm">Once payment is successfully processed, access to the purchased product will be granted automatically via the user account or email.</p>
                     </div>
                   </div>
                 </div>
@@ -113,27 +111,35 @@ const PaymentPolicy = () => {
                   <ul className="space-y-2 text-gray-700">
                     <li className="flex items-start">
                       <span className="text-yellow-600 mr-2">⚠️</span>
-                      Customers are advised to keep their payment receipt/transaction proof for verification if needed.
+                      Customers are advised to keep their payment receipt or transaction confirmation email for verification if necessary.
                     </li>
                     <li className="flex items-start">
                       <span className="text-yellow-600 mr-2">⚠️</span>
-                      An order is considered complete only after full payment has been received.
+                      Orders are considered complete only after successful payment confirmation from Lemon Squeezy.
                     </li>
                     <li className="flex items-start">
                       <span className="text-yellow-600 mr-2">⚠️</span>
-                      If payment is not received within 24 hours after placing the order, the order may be automatically canceled.
+                      If a payment attempt fails or is not completed, the order will not be processed.
                     </li>
                   </ul>
                 </div>
               </div>
 
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">4. Payment Processing</h2>
+                <p className="text-gray-700">
+                  All payments are securely processed by Lemon Squeezy, which acts as the Merchant of Record. This means Lemon Squeezy handles payment processing, tax calculation, and compliance on our behalf.
+                </p>
+              </div>
+
               <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">5. Contact Information</h2>
                 <p className="text-sm text-gray-600">
-                  If you have any questions regarding payment methods, please contact us via:
+                  If you have any questions regarding payments, please contact us:
                 </p>
                 <div className="mt-2 space-y-1 text-sm text-gray-700">
-                  <p><span className="font-medium">Email:</span> ieltscomputertestglobal@gmail.com</p>
-                  <p><span className="font-medium">WhatsApp:</span> +84 964 996 195</p>
+                  <p><span className="font-medium">Email:</span> <a href="mailto:ieltscomputertestglobal@gmail.com" className="text-blue-500 hover:underline">ieltscomputertestglobal@gmail.com</a></p>
+                  <p><span className="font-medium">WhatsApp:</span> <a href="https://wa.me/84964996195" className="text-blue-500 hover:underline">+84 964 996 195</a></p>
                 </div>
               </div>
             </div>

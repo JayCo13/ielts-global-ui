@@ -158,8 +158,8 @@ const ListeningForecast = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Helmet>
-        <title>IELTS Listening Forecast | Practice Actual Tests</title>
-        <meta name="description" content={`Practice your IELTS Listening skills with forecasted exams like ${items.slice(0, 3).map(i => i.exam_title).join(', ')}...`} />
+        <title>IELTS Listening Focus | Practice Mockup Test</title>
+        <meta name="description" content={`Practice your IELTS Listening skills with focus exams like ${items.slice(0, 3).map(i => i.exam_title).join(', ')}...`} />
       </Helmet>
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -169,12 +169,12 @@ const ListeningForecast = () => {
               <Link to="/" className="text-gray-500 hover:text-[#0096b1]">Home</Link>
             </li>
             <li><span className="text-gray-400 mx-2">/</span></li>
-            <li><span className="text-[#0096b1] font-medium">Listening Forecast</span></li>
+            <li><span className="text-[#0096b1] font-medium">Listening Focus</span></li>
           </ol>
         </nav>
         <div className="inline-flex items-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg text-sm">
           <Star className="w-5 h-5 text-yellow-500" fill="currentColor" />
-          <span className="text-gray-700">= High hit rate</span>
+          <span className="text-gray-700">= High rate - Important</span>
         </div>
       </div>
 
@@ -184,7 +184,7 @@ const ListeningForecast = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder={!isVIP && userRole === 'customer' ? "Search is VIP only..." : "Search forecasts..."}
+              placeholder={!isVIP && userRole === 'customer' ? "Search is VIP only..." : "Search Focus..."}
               className={`w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500 ${(!isVIP && userRole === 'customer') ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               value={searchQuery}
               onChange={(e) => {
@@ -203,7 +203,7 @@ const ListeningForecast = () => {
         {loading ? (
           <div className="p-8 text-center text-gray-600">Loading...</div>
         ) : filtered.length === 0 ? (
-          <div className="p-8 text-center text-gray-600">No forecast tests available</div>
+          <div className="p-8 text-center text-gray-600">No Focus tests available</div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -289,7 +289,7 @@ const ListeningForecast = () => {
                     })()}
                   </div>
                   <div className="mt-2 text-md text-gray-700">
-                    <span>Forecast Part: </span>
+                    <span>Focus Part: </span>
                     <span className={`${(!isVIP && userRole === 'customer' && (index + indexOfFirstItem) >= 6) ? 'blur-[4px] select-none' : ''}`}>
                       {it.part_number}{it.forecast_title ? ` – ${it.forecast_title}` : ''}
                     </span>
@@ -360,7 +360,7 @@ const ListeningForecast = () => {
       </div>
       <ConfirmDialog
         isOpen={showConfirmDialog}
-        message="Are you sure you want to retake this forecast? Your previous attempts are saved in history."
+        message="Are you sure you want to retake this Focus? Your previous attempts are saved in history."
         onConfirm={async () => {
           if (!examToRetake) { setShowConfirmDialog(false); return; }
           try {

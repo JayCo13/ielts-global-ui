@@ -272,16 +272,16 @@ const HomePage = () => {
                 className="font-extrabold tracking-tight mb-8 flex flex-col gap-1 md:gap-2"
               >
                 <motion.span variants={slideUp} className="block text-3xl sm:text-4xl md:text-5xl lg:text-[45px] leading-tight text-[#0e233a]">
-                  Take the IELTS
+                  Prepare for the IELTS
                 </motion.span>
                 <motion.span variants={slideUp} className="block text-2xl sm:text-3xl md:text-4xl lg:text-[40px] leading-tight text-[#0e233a]">
-                  computer-based test
+                  on computer
                 </motion.span>
                 <motion.span variants={slideUp} className="block text-2xl sm:text-3xl md:text-4xl lg:text-[40px] leading-tight text-[#d2922d]">
-                  with authentic,
+                  with high-quality,
                 </motion.span>
                 <motion.span variants={slideUp} className="block text-2xl sm:text-3xl md:text-4xl lg:text-[40px] leading-tight text-[#143c51] pb-1 md:pb-2">
-                  official-standard questions.
+                  exam-style questions.
                 </motion.span>
               </motion.h1>
 
@@ -289,7 +289,7 @@ const HomePage = () => {
                 variants={slideUp}
                 className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl"
               >
-                Experience computer-based IELTS practice with authentic tests, standard interface, AI automated scoring, and detailed analytics to help you improve your band score effectively.
+                Experience realistic IELTS practice on computer with high-quality mock tests, a standard test interface, AI-powered scoring, and detailed analytics to help you improve your band score effectively.
               </motion.p>
 
               {/* Trust indicators */}
@@ -303,7 +303,7 @@ const HomePage = () => {
                 </motion.div>
                 <motion.div variants={fadeIn} className="flex items-center gap-2">
                   <svg className="w-5 h-5 text-[#b4904a]" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
-                  <span>100% realistic test interface</span>
+                  <span>Realistic test interface</span>
                 </motion.div>
                 <motion.div variants={fadeIn} className="flex items-center gap-2">
                   <svg className="w-5 h-5 text-[#b4904a]" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
@@ -650,7 +650,7 @@ const HomePage = () => {
                     The computer-based IELTS testing system is developed by a team of highly <span className="text-[#d1942d]">qualified</span>, <span className="text-[#d1942d]">professional</span>, and <span className="text-[#d1942d]">experienced</span> teachers.
                   </h2>
                   <p className="text-lg text-gray-600 mb-4 max-w-2xl">
-                    We provide a platform that allows you to practice on a computer with authentic test questions, accurately simulating the real test environment and helping you confidently achieve your target score.
+                    We provide a platform that allows you to practice IELTS on a computer with high-quality test questions. It offers a realistic test experience and helps you confidently achieve your target band score.
                   </p>
                 </motion.div>
                 <motion.div
@@ -692,10 +692,10 @@ const HomePage = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-gray-800 relative">
-                  Take the real test at home, just like the official exam
+                  Take mock tests at home in a realistic exam-like environment.
                   <span className="absolute -left-2 top-1/2 w-1 h-6 bg-[#2b5356] -translate-y-1/2 rounded-full"></span>
                 </h3>
-                <p className="text-gray-600">Enjoy a fully authentic test experience with an accurately replicated interface, helping you get familiar with the real exam environment.</p>
+                <p className="text-gray-600">Enjoy a realistic test experience with a user-friendly interface designed to reflect the computer-based exam format, helping you feel more confident on test day.</p>
 
                 <div className="flex justify-end mt-4">
                   <span className="inline-flex items-center text-sm font-medium text-[#2b5356]">
@@ -723,10 +723,12 @@ const HomePage = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-gray-800 relative">
-                  Authentic-style questions based on official IELTS standards
+                  Exam-style questions aligned with the IELTS format.
+
                   <span className="absolute -left-2 top-1/2 w-1 h-6 bg-[#0096b1] -translate-y-1/2 rounded-full"></span>
                 </h3>
-                <p className="text-gray-600">Practice with real test formats developed by IELTS experts, delivering the most realistic exam experience possible.</p>
+                <p className="text-gray-600">Practice with high-quality mock tests designed by experienced teachers, helping you prepare with confidence through a realistic exam experience.
+                </p>
 
                 <div className="flex justify-end mt-4">
                   <span className="inline-flex items-center text-sm font-medium text-[#0096b1]">
@@ -754,10 +756,11 @@ const HomePage = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-gray-800 relative">
-                  Boost your chances and improve your band score effectively
+                  Boost your chances of achieving a higher band score.
                   <span className="absolute -left-2 top-1/2 w-1 h-6 bg-[#eb7e37] -translate-y-1/2 rounded-full"></span>
                 </h3>
-                <p className="text-gray-600">Get exposed to a wide range of common question types and topics, increasing your chances of success and helping you achieve a higher score.</p>
+                <p className="text-gray-600">Get familiar with a wide range of common question types and topics to improve your performance and succeed on test day.
+                </p>
 
                 <div className="flex justify-end mt-4">
                   <span className="inline-flex items-center text-sm font-medium text-[#eb7e37]">
@@ -788,7 +791,7 @@ const HomePage = () => {
               <div className="p-8 md:p-12 flex flex-col md:flex-row items-center">
                 <div className="md:w-2/3 mb-6 md:mb-0 md:pr-8">
                   <h3 className="text-2xl md:text-3xl font-bold mb-4">Take a free mock test today!</h3>
-                  <p className="text-white/90 mb-6">Start your IELTS journey with a free mock test experience. No time limits, no credit card required.</p>
+                  <p className="text-white/90 mb-6">Start your IELTS journey with a free mock test.</p>
                   <div className="flex flex-col sm:flex-row gap-4">
                     <a href="/listening_list">
                       <button className="px-6 py-3 bg-[#eb7e37] text-white font-bold rounded-lg hover:bg-[#eb7e37]/90 transition-colors shadow-lg hover:shadow-xl">Start free test</button>

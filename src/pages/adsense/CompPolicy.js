@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
-import { FileText, ShoppingCart, RefreshCw, Shield, Users, DollarSign, Settings } from 'lucide-react';
+import { FileText, ShoppingCart, RefreshCw, Shield, Users, DollarSign, Settings, AlertTriangle } from 'lucide-react';
 
 const CompPolicy = () => {
   const fadeIn = {
@@ -40,8 +40,7 @@ const CompPolicy = () => {
             {/* Full width content */}
             <div className="w-full px-4 sm:px-6 pb-6">
               <p className="text-gray-700 mb-6">
-                These Terms and Conditions govern the purchase and use of products/services
-                on the website <span className="font-bold">ieltscomputertest.com</span>.
+                These Terms and Conditions govern the purchase and use of products and services on <span className="font-bold">ieltscomputertest.com</span>.
               </p>
 
               {/* Section 1: Scope of Service */}
@@ -50,66 +49,74 @@ const CompPolicy = () => {
                   <FileText className="mr-2 h-5 w-5 text-blue-600" />
                   1. Scope of Service
                 </h2>
-                <div className="bg-blue-50 p-4 rounded-lg mb-4">
+                <div className="bg-blue-50 p-4 rounded-lg">
                   <p className="text-gray-700 mb-2">
-                    <strong>Products/services provided:</strong> IELTS preparation materials, mock tests, online courses
-                    (digital files: PDF, audio, video).
+                    We provide IELTS preparation materials, including mock tests, online courses, and digital resources (PDF, audio, video).
                   </p>
                   <p className="text-gray-700 mb-2">
                     All products are intended for study and reference purposes only and are not official test materials from any authorized examination board.
                   </p>
                   <p className="text-gray-700">
-                    <strong>Scope of service:</strong> Worldwide (delivered online).
+                    Our services are delivered online and available worldwide.
                   </p>
                 </div>
               </div>
 
-              {/* Section 2: Conditions and Limitations */}
+              {/* Section 2: Access to Products */}
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
                   <Settings className="mr-2 h-5 w-5 text-orange-600" />
-                  2. Conditions and Limitations
+                  2. Access to Products
                 </h2>
-                <div className="space-y-3">
-                  <div className="flex items-start">
-                    <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                    <p className="text-gray-700">After completing payment via PayPal, customers will be granted access to the purchased materials immediately, within the validity period specified for each course package on the website.</p>
-                  </div>
+                <div className="space-y-2 text-gray-700 ml-2">
+                  <p className="flex items-start">
+                    <span className="mr-2">•</span> After successful payment, customers will be granted access to the purchased materials via their account or email.
+                  </p>
+                  <p className="flex items-start">
+                    <span className="mr-2">•</span> Access is provided immediately, and remains valid for the duration specified in each product or course package.
+                  </p>
+                  <p className="flex items-start">
+                    <span className="mr-2">•</span> All payments are securely processed by Lemon Squeezy, which acts as the Merchant of Record.
+                  </p>
                 </div>
               </div>
 
-              {/* Section 3: Inspection, Return, and Refund Policy */}
+              {/* Section 3: Refund Policy */}
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
                   <RefreshCw className="mr-2 h-5 w-5 text-green-600" />
-                  3. Inspection, Return, and Refund Policy
+                  3. Refund Policy
                 </h2>
                 <div className="bg-green-50 p-4 rounded-lg">
                   <p className="text-gray-700 mb-3">
-                    Due to the nature of digital products, refunds are not available once the customer has successfully registered for the course, unless there is a technical issue that significantly affects access to the course.
+                    Due to the nature of digital products, all purchases are generally non-refundable once access has been granted.
                   </p>
-                  <p className="text-gray-700 mb-3">
-                    If customers experience technical issues such as corrupted files or inaccessible content, they must contact us via email. Support will be provided within
-                    <span className="font-semibold text-green-700">5 days</span> of receiving the request.
-                  </p>
-                  <p className="text-gray-700">
-                    If the issue is confirmed to seriously affect the user's access to the course (i.e. the course is inaccessible for more than 3 consecutive days due to technical issues on our website), we will either extend the access period accordingly or issue a full refund.
-                  </p>
+                  <p className="text-gray-700 mb-2">Refunds may be considered only if:</p>
+                  <ul className="space-y-2 text-gray-700 mb-3 ml-4">
+                    <li className="list-disc">The product is inaccessible due to technical issues</li>
+                    <li className="list-disc">The issue persists for more than 3 consecutive days</li>
+                    <li className="list-disc">The issue is confirmed to originate from our system</li>
+                  </ul>
+                  <p className="text-gray-700 mb-2">In such cases, we may:</p>
+                  <ul className="space-y-2 text-gray-700 ml-4">
+                    <li className="list-disc">Extend access time, or</li>
+                    <li className="list-disc">Issue a refund in accordance with our Refund Policy</li>
+                  </ul>
                 </div>
               </div>
 
-              {/* Section 4: Product Warranty Policy */}
+              {/* Section 4: Product Warranty */}
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
                   <Shield className="mr-2 h-5 w-5 text-purple-600" />
-                  4. Product Warranty Policy
+                  4. Product Warranty
                 </h2>
-                <div className="space-y-3">
-                  <p className="text-gray-700">
-                    As these are digital products, no physical warranty is applicable.
+                <div className="space-y-2 text-gray-700 ml-2">
+                  <p className="flex items-start">
+                    <span className="mr-2">•</span> As all products are digital, no physical warranty applies.
                   </p>
-                  <p className="text-gray-700">
-                    <strong>For online courses:</strong> access accounts are valid for the duration specified in the product description.
+                  <p className="flex items-start">
+                    <span className="mr-2">•</span> For online courses, access is valid for the duration specified in the product description.
                   </p>
                 </div>
               </div>
@@ -124,30 +131,30 @@ const CompPolicy = () => {
                   <div className="bg-indigo-50 p-4 rounded-lg">
                     <div className="flex items-center mb-2">
                       <span className="bg-indigo-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-2">1</span>
-                      <span className="font-semibold text-gray-900">Select Product</span>
+                      <span className="font-semibold text-gray-900">Step 1: Select Product</span>
                     </div>
-                    <p className="text-gray-700 text-sm">Customers select the course and add them to the cart.</p>
+                    <p className="text-gray-700 text-sm">Customers select a course or product.</p>
                   </div>
                   <div className="bg-indigo-50 p-4 rounded-lg">
                     <div className="flex items-center mb-2">
                       <span className="bg-indigo-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-2">2</span>
-                      <span className="font-semibold text-gray-900">Choose Payment Method</span>
+                      <span className="font-semibold text-gray-900">Step 2: Checkout</span>
                     </div>
-                    <p className="text-gray-700 text-sm">Select PayPal as the payment method.</p>
+                    <p className="text-gray-700 text-sm">Customers proceed to secure checkout via Lemon Squeezy.</p>
                   </div>
                   <div className="bg-indigo-50 p-4 rounded-lg">
                     <div className="flex items-center mb-2">
                       <span className="bg-indigo-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-2">3</span>
-                      <span className="font-semibold text-gray-900">Confirm Order</span>
+                      <span className="font-semibold text-gray-900">Step 3: Payment Confirmation</span>
                     </div>
-                    <p className="text-gray-700 text-sm">Review and confirm the order.</p>
+                    <p className="text-gray-700 text-sm">Payment is processed and confirmed.</p>
                   </div>
                   <div className="bg-indigo-50 p-4 rounded-lg">
                     <div className="flex items-center mb-2">
                       <span className="bg-indigo-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-2">4</span>
-                      <span className="font-semibold text-gray-900">Receive Product</span>
+                      <span className="font-semibold text-gray-900">Step 4: Access Granted</span>
                     </div>
-                    <p className="text-gray-700 text-sm">Upon successful payment, the system will unlock access to the registered course.</p>
+                    <p className="text-gray-700 text-sm">The system automatically unlocks access to the purchased materials.</p>
                   </div>
                 </div>
               </div>
@@ -161,67 +168,98 @@ const CompPolicy = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="bg-red-50 p-4 rounded-lg">
                     <h3 className="font-semibold text-gray-900 mb-3">Seller's obligations:</h3>
-                    <ul className="space-y-2">
+                    <ul className="space-y-2 text-gray-700 ml-2">
                       <li className="flex items-start">
                         <div className="w-2 h-2 bg-red-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                        <span className="text-gray-700 text-sm">Provide products/services as described.</span>
+                        <span className="text-sm">Provide products/services as described</span>
                       </li>
                       <li className="flex items-start">
                         <div className="w-2 h-2 bg-red-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                        <span className="text-gray-700 text-sm">Protect customer information in accordance with the Privacy Policy.</span>
+                        <span className="text-sm">Protect customer information in accordance with the Privacy Policy</span>
                       </li>
                       <li className="flex items-start">
                         <div className="w-2 h-2 bg-red-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                        <span className="text-gray-700 text-sm">Handle complaints and provide technical support when issues arise.</span>
+                        <span className="text-sm">Provide support and handle complaints when necessary</span>
                       </li>
                     </ul>
                   </div>
                   <div className="bg-blue-50 p-4 rounded-lg">
                     <h3 className="font-semibold text-gray-900 mb-3">Customer's obligations:</h3>
-                    <ul className="space-y-2">
+                    <ul className="space-y-2 text-gray-700 ml-2">
                       <li className="flex items-start">
                         <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                        <span className="text-gray-700 text-sm">Provide accurate information when making a purchase.</span>
+                        <span className="text-sm">Provide accurate information when making a purchase</span>
                       </li>
                       <li className="flex items-start">
                         <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                        <span className="text-gray-700 text-sm">Complete full payment for the order.</span>
+                        <span className="text-sm">Complete full payment for the order</span>
                       </li>
                       <li className="flex items-start">
                         <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                        <span className="text-gray-700 text-sm">Not copy, distribute, or commercially exploit the products without authorization.</span>
+                        <span className="text-sm">Not copy, distribute, or commercially exploit the materials without permission</span>
                       </li>
                     </ul>
                   </div>
                 </div>
               </div>
 
-              {/* Section 7: Fees */}
+              {/* Section 7: Fees and Pricing */}
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
                   <DollarSign className="mr-2 h-5 w-5 text-yellow-600" />
-                  7. Fees
+                  7. Fees and Pricing
                 </h2>
                 <div className="bg-yellow-50 p-4 rounded-lg">
-                  <p className="text-gray-700 mb-3">
-                    All prices are listed in <span className="font-semibold text-yellow-700">US dollars (USD)</span> and include applicable taxes (if any).
+                  <p className="text-gray-700 mb-2">
+                    All prices are listed in USD and include applicable taxes (if any).
                   </p>
                   <p className="text-gray-700">
-                    No additional fees will be charged beyond the listed price unless clearly stated prior to payment.
+                    No additional fees will be charged unless clearly stated before payment.
                   </p>
                 </div>
               </div>
 
+              {/* Section 8: Limitation of Liability */}
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
+                  <Shield className="mr-2 h-5 w-5 text-gray-600" />
+                  8. Limitation of Liability
+                </h2>
+                <p className="text-gray-700 mb-2">We are not liable for:</p>
+                <ul className="space-y-2 text-gray-700 mb-3 ml-4">
+                  <li className="list-disc">Any indirect or consequential losses</li>
+                  <li className="list-disc">User performance outcomes (e.g., exam results)</li>
+                  <li className="list-disc">Issues caused by external factors beyond our control</li>
+                </ul>
+              </div>
+
+              {/* Section 9: Disclaimer */}
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
+                  <AlertTriangle className="mr-2 h-5 w-5 text-red-600" />
+                  9. Disclaimer
+                </h2>
+                <p className="text-gray-700">
+                  This website is not affiliated with, endorsed by, or officially connected to IELTS, Cambridge, or any official test provider.
+                </p>
+              </div>
+
               {/* Contact Information */}
               <div className="mt-8 p-4 bg-gray-100 rounded-lg">
-                <h3 className="font-semibold text-gray-900 mb-2">Contact Information</h3>
+                <h2 className="text-xl font-semibold text-gray-900 mb-2 flex items-center">
+                  10. Contact Information
+                </h2>
                 <p className="text-gray-700 text-sm">
-                  If you have any questions regarding these Terms and Conditions, please contact us via:
+                  If you have any questions regarding these Terms and Conditions, please contact us:
                 </p>
-                <p className="text-gray-700 text-sm mt-1">
-                  Email: <span className="text-blue-600">ieltscomputertestglobal@gmail.com</span> |
-                  WhatsApp: <span className="text-blue-600">+84 964 996 195</span>
-                </p>
+                <div className="mt-2 space-y-1 text-sm text-gray-700">
+                  <p>
+                    <span className="font-medium">Email:</span> <a href="mailto:ieltscomputertestglobal@gmail.com" className="text-blue-500 hover:underline">ieltscomputertestglobal@gmail.com</a>
+                  </p>
+                  <p>
+                    <span className="font-medium">WhatsApp:</span> <a href="https://wa.me/84964996195" className="text-blue-500 hover:underline">+84 964 996 195</a>
+                  </p>
+                </div>
               </div>
             </div>
           </div>

@@ -155,18 +155,18 @@ const Listening_Fe = () => {
             const hasListeningAccess = subscriptionData.has_listening_access || false;
 
             setIsVIP(hasListeningAccess);
-          setTests(testsData.map(exam => ({
-            id: exam.exam_id,
-            title: exam.title,
-            created_at: exam.created_at,
-            difficulty: "Medium",
-            duration: exam.duration ? `${exam.duration} minutes` : "30 minutes",
-            questions: 40,
-            totalMarks: exam.total_score,
-            isCompleted: exam.is_completed || false,
-            correctAnswers: exam.is_completed ? correctAnswers : 0,
-            partTitles: exam.part_titles || {}
-          })));
+            setTests(testsData.map(exam => ({
+              id: exam.exam_id,
+              title: exam.title,
+              created_at: exam.created_at,
+              difficulty: "Medium",
+              duration: exam.duration ? `${exam.duration} minutes` : "30 minutes",
+              questions: 40,
+              totalMarks: exam.total_score,
+              isCompleted: exam.is_completed || false,
+              correctAnswers: exam.is_completed ? correctAnswers : 0,
+              partTitles: exam.part_titles || {}
+            })));
           } else if (testsResponse.status === 401 || subscriptionResponse.status === 401) {
             navigate('/login');
           }
@@ -353,7 +353,7 @@ const Listening_Fe = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Helmet>
-        <title>IELTS Listening Practice Tests | Official & Forecasted</title>
+        <title>IELTS Listening Practice Tests | Official & Focus</title>
         <meta name="description" content={`Practice your IELTS Listening skills. Includes tests like ${tests.slice(0, 3).map(t => t.title).join(', ')}... and many more parts!`} />
       </Helmet>
       <Navbar />

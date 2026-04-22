@@ -206,7 +206,7 @@ const Navbar = () => {
                                         className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsReadingOpen(false)}
                                     >
-                                        Forecast
+                                        Focus
                                     </Link>
                                 </motion.div>
                             )}
@@ -253,7 +253,7 @@ const Navbar = () => {
                                         className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsListeningOpen(false)}
                                     >
-                                        Forecast
+                                        Focus
                                     </Link>
                                 </motion.div>
                             )}
@@ -300,7 +300,7 @@ const Navbar = () => {
                                         className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsWritingOpen(false)}
                                     >
-                                        Forecast
+                                        Focus
                                     </Link>
                                 </motion.div>
                             )}
@@ -597,9 +597,9 @@ const Navbar = () => {
                                 {[
                                     { name: 'Home', path: '/' },
                                     { name: 'Listening – Full Test', path: '/listening_list' },
-                                    { name: 'Listening – Forecast', path: '/listening_forecast' },
+                                    { name: 'Listening – Focus', path: '/listening_forecast' },
                                     { name: 'Reading – Full Test', path: '/reading_list' },
-                                    { name: 'Reading – Forecast', path: '/reading_forecast' },
+                                    { name: 'Reading – Focus', path: '/reading_forecast' },
                                     { name: 'Writing', path: '/writing_list' },
                                     { name: 'Speaking', path: '/speaking_list?part=part1' },
                                     { name: 'Dictation', path: '/dictation' },

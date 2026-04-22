@@ -99,8 +99,8 @@ const WritingForecast = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Helmet>
-        <title>IELTS Writing Forecast | Practice Actual Tests</title>
-        <meta name="description" content={`Practice your IELTS Writing skills with forecasted exams like ${items.slice(0, 3).map(i => i.exam_title).join(', ')}...`} />
+        <title>IELTS Writing Focus | Practice Mockup Tests</title>
+        <meta name="description" content={`Practice your IELTS Writing skills with Focus exams like ${items.slice(0, 3).map(i => i.exam_title).join(', ')}...`} />
       </Helmet>
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-4">
@@ -111,7 +111,7 @@ const WritingForecast = () => {
                 <Link to="/" className="text-gray-500 hover:text-[#0096b1]">Home</Link>
               </li>
               <li><span className="text-gray-400 mx-2">/</span></li>
-              <li><span className="text-[#0096b1] font-medium">Writing Forecast</span></li>
+              <li><span className="text-[#0096b1] font-medium">Writing Focus</span></li>
             </ol>
           </nav>
           <div className="text-sm font-semibold text-red-700 mt-5">
@@ -174,7 +174,7 @@ const WritingForecast = () => {
             ))}
           </div>
         ) : sorted.length === 0 ? (
-          <div className="p-8 text-center text-gray-600">No forecast items to display</div>
+          <div className="p-8 text-center text-gray-600">No focus items to display</div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -212,7 +212,7 @@ const WritingForecast = () => {
                         }}
                         className="mt-4 w-full bg-[#0096b1] text-white py-2 rounded"
                       >
-                        Take Forecast
+                        Take Focus
                       </button>
                       <button
                         onClick={() => { setSelectedPart(it); setEditDialogOpen(true); }}
