@@ -579,7 +579,7 @@ const HomePage = () => {
                       icon: "🔄"
                     },
                     {
-                      title: "Learners aiming to boost their IELTS score quickly",
+                      title: "Learners aiming to boost their score effectively",
                       desc: "Receive detailed analysis for each answer, clear explanations, and helpful learning tools to support rapid progress.",
                       icon: "📈"
                     },
