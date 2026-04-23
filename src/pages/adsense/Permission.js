@@ -62,7 +62,7 @@ const Permission = () => {
                 <div className="space-y-2">
                   <h4 className="font-semibold text-orange-400 mb-3">Industry</h4>
                   <p className="text-gray-300 text-xs leading-relaxed">
-                    Online IELTS preparation materials provider
+                    Online English Learning Platform
                   </p>
                 </div>
               </div>

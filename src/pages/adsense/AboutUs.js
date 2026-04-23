@@ -41,11 +41,11 @@ const AboutUs = () => {
             <div className="w-full md:w-3/4">
               <div className="space-y-8">
                 <p className="text-gray-700">
-                  <span className="font-bold text-[#e67e22]">ieltscomputertest.com</span> is developed by a team of highly qualified and experienced educators to deliver a professional computer-based test preparation experience with high-quality exercises and an intuitive interface. We are dedicated to providing a highly effective learning experience that allows learners to conveniently access mock tests and targeted practice exercises to improve their band scores.
+                  <span className="font-bold text-[#e67e22]">ieltscomputertest.com</span> is designed to deliver a professional computer-based test preparation experience with high-quality materials and an intuitive interface. Our platform enables learners to practice efficiently, track their progress, and continuously improve their performance.
                 </p>
 
                 <p className="text-gray-700">
-                  With the motto "Right trust – Breakthrough future", we continuously refine and develop our platform by integrating smart tools and analytics into the learning process. Our team of expert teachers is committed to offering rigorously designed exercises and proven study methods, empowering learners to prepare for the test with completely confidence.
+                  Powered by advanced learning tools, we provide smart insights and personalized support. Backed by a team of experienced educators, our system offers carefully designed materials and effective study methods to help learners prepare with confidence and achieve their goals.
                 </p>
               </div>
             </div>
@@ -69,7 +69,7 @@ const AboutUs = () => {
           <div className="flex flex-col md:flex-row gap-8 mb-24 justify-center items-center mx-auto max-w-5xl">
             <div className="w-full md:w-1/2 flex flex-col justify-center">
               <blockquote className="italic text-2xl md:text-3xl text-gray-700 mb-4">
-                "Master the computer-based IELTS, where every practice sharpens your skill and brings your dream score within reach."
+                "Master computer-based practice, where every session sharpens your skills and brings your goals within reach."
               </blockquote>
               <p className="text-gray-500">- ieltscomputertest.com team</p>
             </div>
@@ -90,15 +90,15 @@ const AboutUs = () => {
           <div className="mb-24">
             <h2 className="text-2xl font-semibold text-gray-900 mb-6">Our Team</h2>
             <p className="text-gray-700 mb-6">
-              ieltscomputertest.com is powered by a team of highly qualified professionals in teaching and technology development. We continuously research and enhance our platform to deliver the most effective test preparation solutions for our users.
+              Ieltscomputertest.com brings together a team of experienced professionals in education and technology. We continuously research and improve our platform to deliver effective and up-to-date learning solutions for our users.
             </p>
             <p className="text-gray-700 mb-4">Our team includes:</p>
 
             <ul className="list-disc list-inside space-y-3 text-gray-700">
-              <li>Experienced instructors with a deep understanding of test formats and scoring criteria</li>
-              <li>Leading engineers in test platform and educational technology development</li>
+              <li>Experienced instructors with years of teaching expertise </li>
+              <li>Experts in AI and educational technology</li>
               <li>Dedicated content development specialists</li>
-              <li>24/7 technical support and customer service team</li>
+              <li>24/7 technical support and customer service team </li>
             </ul>
           </div>
 

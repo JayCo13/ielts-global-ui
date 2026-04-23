@@ -51,13 +51,13 @@ const CompPolicy = () => {
                 </h2>
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <p className="text-gray-700 mb-2">
-                    We provide IELTS preparation materials, including mock tests, online courses, and digital resources (PDF, audio, video).
+                    We provide English test preparation materials designed for use on our website, including mock tests and practice exercises with audio components.
                   </p>
                   <p className="text-gray-700 mb-2">
-                    All products are intended for study and reference purposes only and are not official test materials from any authorized examination board.
+                    All materials are intended for study and reference purposes only and do not constitute official materials from any authorized examination board.
                   </p>
                   <p className="text-gray-700">
-                    Our services are delivered online and available worldwide.
+                    Our services are delivered digitally and are accessible worldwide.
                   </p>
                 </div>
               </div>
@@ -70,10 +70,10 @@ const CompPolicy = () => {
                 </h2>
                 <div className="space-y-2 text-gray-700 ml-2">
                   <p className="flex items-start">
-                    <span className="mr-2">•</span> After successful payment, customers will be granted access to the purchased materials via their account or email.
+                    <span className="mr-2">•</span> Upon successful payment, customers will be granted access to purchased materials via their account or email.
                   </p>
                   <p className="flex items-start">
-                    <span className="mr-2">•</span> Access is provided immediately, and remains valid for the duration specified in each product or course package.
+                    <span className="mr-2">•</span> Access is provided immediately and remains valid for the duration specified in each product or course package.
                   </p>
                   <p className="flex items-start">
                     <span className="mr-2">•</span> All payments are securely processed by Lemon Squeezy, which acts as the Merchant of Record.
@@ -91,32 +91,29 @@ const CompPolicy = () => {
                   <p className="text-gray-700 mb-3">
                     Due to the nature of digital products, all purchases are generally non-refundable once access has been granted.
                   </p>
-                  <p className="text-gray-700 mb-2">Refunds may be considered only if:</p>
+                  <p className="text-gray-700 mb-2">Refunds may only be considered if all of the following conditions are met:</p>
                   <ul className="space-y-2 text-gray-700 mb-3 ml-4">
-                    <li className="list-disc">The product is inaccessible due to technical issues</li>
-                    <li className="list-disc">The issue persists for more than 3 consecutive days</li>
-                    <li className="list-disc">The issue is confirmed to originate from our system</li>
+                    <li className="list-disc">The product is inaccessible due to a technical issue</li>
+                    <li className="list-disc">The issue persists for more than three (3) consecutive days</li>
+                    <li className="list-disc">The issue is verified to originate from our system</li>
                   </ul>
-                  <p className="text-gray-700 mb-2">In such cases, we may:</p>
+                  <p className="text-gray-700 mb-2">In such cases, we reserve the right to:</p>
                   <ul className="space-y-2 text-gray-700 ml-4">
-                    <li className="list-disc">Extend access time, or</li>
+                    <li className="list-disc">Extend access time; or</li>
                     <li className="list-disc">Issue a refund in accordance with our Refund Policy</li>
                   </ul>
                 </div>
               </div>
 
-              {/* Section 4: Product Warranty */}
+              {/* Section 4: Product Nature */}
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
                   <Shield className="mr-2 h-5 w-5 text-purple-600" />
-                  4. Product Warranty
+                  4. Product Nature
                 </h2>
                 <div className="space-y-2 text-gray-700 ml-2">
                   <p className="flex items-start">
-                    <span className="mr-2">•</span> As all products are digital, no physical warranty applies.
-                  </p>
-                  <p className="flex items-start">
-                    <span className="mr-2">•</span> For online courses, access is valid for the duration specified in the product description.
+                    <span className="mr-2">•</span> All products are delivered digitally. No physical goods are shipped, and no physical warranties apply.
                   </p>
                 </div>
               </div>
@@ -133,28 +130,28 @@ const CompPolicy = () => {
                       <span className="bg-indigo-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-2">1</span>
                       <span className="font-semibold text-gray-900">Step 1: Select Product</span>
                     </div>
-                    <p className="text-gray-700 text-sm">Customers select a course or product.</p>
+                    <p className="text-gray-700 text-sm">Customer selects a product.</p>
                   </div>
                   <div className="bg-indigo-50 p-4 rounded-lg">
                     <div className="flex items-center mb-2">
                       <span className="bg-indigo-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-2">2</span>
                       <span className="font-semibold text-gray-900">Step 2: Checkout</span>
                     </div>
-                    <p className="text-gray-700 text-sm">Customers proceed to secure checkout via Lemon Squeezy.</p>
+                    <p className="text-gray-700 text-sm">Customer completes secure checkout.</p>
                   </div>
                   <div className="bg-indigo-50 p-4 rounded-lg">
                     <div className="flex items-center mb-2">
                       <span className="bg-indigo-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-2">3</span>
                       <span className="font-semibold text-gray-900">Step 3: Payment Confirmation</span>
                     </div>
-                    <p className="text-gray-700 text-sm">Payment is processed and confirmed.</p>
+                    <p className="text-gray-700 text-sm">Payment is confirmed.</p>
                   </div>
                   <div className="bg-indigo-50 p-4 rounded-lg">
                     <div className="flex items-center mb-2">
                       <span className="bg-indigo-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-2">4</span>
                       <span className="font-semibold text-gray-900">Step 4: Access Granted</span>
                     </div>
-                    <p className="text-gray-700 text-sm">The system automatically unlocks access to the purchased materials.</p>
+                    <p className="text-gray-700 text-sm">Access to materials is automatically granted.</p>
                   </div>
                 </div>
               </div>
@@ -167,36 +164,36 @@ const CompPolicy = () => {
                 </h2>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="bg-red-50 p-4 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-3">Seller's obligations:</h3>
+                    <h3 className="font-semibold text-gray-900 mb-3">Seller obligations:</h3>
                     <ul className="space-y-2 text-gray-700 ml-2">
                       <li className="flex items-start">
                         <div className="w-2 h-2 bg-red-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                        <span className="text-sm">Provide products/services as described</span>
+                        <span className="text-sm">Provide products and services as described</span>
                       </li>
                       <li className="flex items-start">
                         <div className="w-2 h-2 bg-red-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                        <span className="text-sm">Protect customer information in accordance with the Privacy Policy</span>
+                        <span className="text-sm">Protect customer data in accordance with the Privacy Policy</span>
                       </li>
                       <li className="flex items-start">
                         <div className="w-2 h-2 bg-red-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                        <span className="text-sm">Provide support and handle complaints when necessary</span>
+                        <span className="text-sm">Provide reasonable support when required</span>
                       </li>
                     </ul>
                   </div>
                   <div className="bg-blue-50 p-4 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-3">Customer's obligations:</h3>
+                    <h3 className="font-semibold text-gray-900 mb-3">Customer obligations:</h3>
                     <ul className="space-y-2 text-gray-700 ml-2">
                       <li className="flex items-start">
                         <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                        <span className="text-sm">Provide accurate information when making a purchase</span>
+                        <span className="text-sm">Provide accurate information</span>
                       </li>
                       <li className="flex items-start">
                         <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                        <span className="text-sm">Complete full payment for the order</span>
+                        <span className="text-sm">Complete full payment</span>
                       </li>
                       <li className="flex items-start">
                         <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                        <span className="text-sm">Not copy, distribute, or commercially exploit the materials without permission</span>
+                        <span className="text-sm">Not copy, distribute, or commercially exploit materials without authorization</span>
                       </li>
                     </ul>
                   </div>
@@ -214,43 +211,67 @@ const CompPolicy = () => {
                     All prices are listed in USD and include applicable taxes (if any).
                   </p>
                   <p className="text-gray-700">
-                    No additional fees will be charged unless clearly stated before payment.
+                    No additional fees will be charged unless clearly disclosed prior to payment.
                   </p>
                 </div>
               </div>
 
-              {/* Section 8: Limitation of Liability */}
+              {/* Section 8: Intellectual Property */}
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
-                  <Shield className="mr-2 h-5 w-5 text-gray-600" />
-                  8. Limitation of Liability
+                  <Shield className="mr-2 h-5 w-5 text-blue-600" />
+                  8. Intellectual Property
                 </h2>
-                <p className="text-gray-700 mb-2">We are not liable for:</p>
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <p className="text-gray-700">
+                    All content, materials, and platform features are the intellectual property of the Website and may not be reproduced, distributed, or used without prior written consent.
+                  </p>
+                </div>
+              </div>
+
+              {/* Section 9: Limitation of Liability */}
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
+                  <AlertTriangle className="mr-2 h-5 w-5 text-gray-600" />
+                  9. Limitation of Liability
+                </h2>
+                <p className="text-gray-700 mb-2">We shall not be liable for:</p>
                 <ul className="space-y-2 text-gray-700 mb-3 ml-4">
                   <li className="list-disc">Any indirect or consequential losses</li>
-                  <li className="list-disc">User performance outcomes (e.g., exam results)</li>
-                  <li className="list-disc">Issues caused by external factors beyond our control</li>
+                  <li className="list-disc">User performance outcomes (e.g., test results)</li>
+                  <li className="list-disc">Issues arising from external factors beyond our control</li>
                 </ul>
               </div>
 
-              {/* Section 9: Disclaimer */}
+              {/* Section 10: Disclaimer */}
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
                   <AlertTriangle className="mr-2 h-5 w-5 text-red-600" />
-                  9. Disclaimer
+                  10. Disclaimer
                 </h2>
                 <p className="text-gray-700">
-                  This website is not affiliated with, endorsed by, or officially connected to IELTS, Cambridge, or any official test provider.
+                  This Website is independently developed and is not affiliated with, endorsed by, or officially connected to any test provider or examination organization.
+                </p>
+              </div>
+
+              {/* Section 11: Termination */}
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
+                  <AlertTriangle className="mr-2 h-5 w-5 text-orange-600" />
+                  11. Termination
+                </h2>
+                <p className="text-gray-700">
+                  We reserve the right to suspend or terminate user access in cases of violation of these Terms.
                 </p>
               </div>
 
               {/* Contact Information */}
               <div className="mt-8 p-4 bg-gray-100 rounded-lg">
                 <h2 className="text-xl font-semibold text-gray-900 mb-2 flex items-center">
-                  10. Contact Information
+                  12. Contact Information
                 </h2>
                 <p className="text-gray-700 text-sm">
-                  If you have any questions regarding these Terms and Conditions, please contact us:
+                  For any questions regarding these Terms, please contact:
                 </p>
                 <div className="mt-2 space-y-1 text-sm text-gray-700">
                   <p>

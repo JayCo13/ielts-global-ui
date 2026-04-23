@@ -264,7 +264,7 @@ const HomePage = () => {
                 variants={slideRight}
                 className="inline-block mt-3 mb-4 px-3 py-1 bg-gradient-to-r from-[#c98825] to-[#e4b231] text-white text-sm font-semibold rounded-full shadow-md"
               >
-                IELTS Computer-Based Test
+                Computer-Based Test Preparation
               </motion.div>
 
               <motion.h1
@@ -272,16 +272,16 @@ const HomePage = () => {
                 className="font-extrabold tracking-tight mb-8 flex flex-col gap-1 md:gap-2"
               >
                 <motion.span variants={slideUp} className="block text-3xl sm:text-4xl md:text-5xl lg:text-[45px] leading-tight text-[#0e233a]">
-                  Prepare for the IELTS
+                  Prepare for English tests
                 </motion.span>
                 <motion.span variants={slideUp} className="block text-2xl sm:text-3xl md:text-4xl lg:text-[40px] leading-tight text-[#0e233a]">
                   on computer
                 </motion.span>
                 <motion.span variants={slideUp} className="block text-2xl sm:text-3xl md:text-4xl lg:text-[40px] leading-tight text-[#d2922d]">
-                  with high-quality,
+                  with powerful tools,
                 </motion.span>
                 <motion.span variants={slideUp} className="block text-2xl sm:text-3xl md:text-4xl lg:text-[40px] leading-tight text-[#143c51] pb-1 md:pb-2">
-                  exam-style questions.
+                  for effective practice.
                 </motion.span>
               </motion.h1>
 
@@ -289,7 +289,7 @@ const HomePage = () => {
                 variants={slideUp}
                 className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl"
               >
-                Our computer-based platform is developed by a team of highly qualified and experienced educators. It allows you to practice effectively on a computer through high-quality exercises, a realistic test environment, and intelligent tools designed to help you improve your performance with confidence.
+                Experience realistic computer-based practice with high-quality exercises, a standard interface, AI-powered scoring, and detailed performance analytics to help you improve your performance efficiently.
               </motion.p>
 
               {/* Trust indicators */}
@@ -299,15 +299,15 @@ const HomePage = () => {
               >
                 <motion.div variants={fadeIn} className="flex items-center gap-2">
                   <svg className="w-5 h-5 text-[#b4904a]" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
-                  <span>International-standard test questions with detailed explanations</span>
+                  <span>International-standard exercises with clear, detailed explanations </span>
                 </motion.div>
                 <motion.div variants={fadeIn} className="flex items-center gap-2">
                   <svg className="w-5 h-5 text-[#b4904a]" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
-                  <span>Realistic test interface</span>
+                  <span>Realistic computer-based test interface</span>
                 </motion.div>
                 <motion.div variants={fadeIn} className="flex items-center gap-2">
                   <svg className="w-5 h-5 text-[#b4904a]" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
-                  <span>Packed with useful learning support features</span>
+                  <span>Comprehensive learning support features</span>
                 </motion.div>
               </motion.div>
 
@@ -569,25 +569,20 @@ const HomePage = () => {
                 <div className="grid grid-cols-1 gap-3">
                   {[
                     {
-                      title: "Beginners preparing for IELTS.",
+                      title: "Beginners preparing for computer-based tests.",
                       desc: "Get familiar with the test format, interface, and common question types.",
                       icon: "🎯"
                     },
                     {
-                      title: "Candidates retaking a specific skill.",
+                      title: "Candidates retaking specific skills",
                       desc: "Access separate tests for each skill and focus on the areas that need improvement.",
                       icon: "🔄"
                     },
                     {
                       title: "Learners aiming to boost their IELTS score quickly",
-                      desc: "Receive detailed analysis of each answer, clear explanations, and helpful learning tools to make rapid progress.",
+                      desc: "Receive detailed analysis for each answer, clear explanations, and helpful learning tools to support rapid progress.",
                       icon: "📈"
                     },
-                    {
-                      title: "Learners who want to “study smart”",
-                      desc: "Practice high-probability question types, master frequently tested topics, and save time and effort in your preparation.",
-                      icon: "🎯"
-                    }
                   ].map((item, index) => (
                     <motion.div
                       key={index}
@@ -647,10 +642,10 @@ const HomePage = () => {
                   className="md:col-span-2"
                 >
                   <h2 className="text-2xl md:text-3xl font-bold mb-10 text-[#0f263e]">
-                    The computer-based IELTS testing system is developed by a team of highly <span className="text-[#d1942d]">qualified</span>, <span className="text-[#d1942d]">professional</span>, and <span className="text-[#d1942d]">experienced</span> teachers.
+                    Our computer-based platform is developed by a team of highly qualified and experienced educators.
                   </h2>
                   <p className="text-lg text-gray-600 mb-4 max-w-2xl">
-                    We provide a platform that allows you to practice IELTS on a computer with high-quality test questions. It offers a realistic test experience and helps you confidently achieve your target band score.
+                    It allows you to practice effectively on a computer through high-quality exercises, a realistic test environment, and intelligent tools designed to help you improve your performance with confidence.
                   </p>
                 </motion.div>
                 <motion.div

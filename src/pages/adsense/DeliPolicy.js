@@ -54,10 +54,10 @@ const DeliPolicy = () => {
                 <div className="bg-blue-50 p-4 rounded-lg mb-4">
                   <h3 className="font-semibold text-gray-900 mb-3 flex items-center">
                     <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-2">📱</span>
-                    Digital Products (IELTS practice tests, PDF materials, audio, video)
+                    All products offered on the Website are digital products, including mock tests and practice exercises with audio components.
                   </h3>
                   <p className="text-gray-700">
-                    All products offered on our website are delivered digitally. After successful payment, customers will be granted access to the purchased materials via their registered account or email.
+                    Upon successful payment, customers will be granted access to the purchased materials via their registered account or email.
                   </p>
                 </div>
               </div>

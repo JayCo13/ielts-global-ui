@@ -64,7 +64,7 @@ const Instruction = () => {
               transition={{ delay: 0.3 }}
               className="text-xl text-indigo-100 max-w-2xl mx-auto"
             >
-              Discover all the features designed to help you conquer the IELTS exam with our comprehensive learning platform.
+              Discover powerful features designed to support your computer-based test preparation and improve your performance.
             </motion.p>
           </div>
         </section>
@@ -96,7 +96,7 @@ const Instruction = () => {
                     </h3>
                     <p className="text-gray-600 leading-relaxed ml-7">
                       These are full-length tests designed to help you become familiar with the computer-based test environment. They include detailed explanations and various learning features to support your improvement.
-Users can get used to the test interface and build confidence under timed conditions. These tests are ideal for long-term preparation and can effectively replace traditional paper-based materials.
+                      Users can get used to the test interface and build confidence under timed conditions. These tests are ideal for long-term preparation and can effectively replace traditional paper-based materials.
                     </p>
                   </div>
 
@@ -108,10 +108,6 @@ Users can get used to the test interface and build confidence under timed condit
                     <p className="text-gray-600 leading-relaxed ml-7">
                       These exercises are designed to help you improve step by step, focusing on each part and question type. They allow you to build your skills and strengthen your understanding of different question formats.
                     </p>
-                    <div className="ml-7 mt-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 rounded-xl flex items-start gap-3">
-                      <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
-                      <p><strong>Note:</strong> These Focus are based on probability only. There is no guarantee that these topics will appear in your actual exam.</p>
-                    </div>
                   </div>
 
                   <div className="mt-8 bg-gray-50 rounded-2xl p-5 border border-gray-100">
@@ -157,7 +153,7 @@ Users can get used to the test interface and build confidence under timed condit
                     </h3>
                     <p className="text-gray-600 leading-relaxed ml-7">
                       These are full-length tests designed to help you become familiar with the computer-based test environment. They include detailed explanations and various learning features to support your improvement.
-Users can get used to the test interface and build confidence under timed conditions. These tests are ideal for long-term preparation and can effectively replace traditional paper-based materials.
+                      Users can get used to the test interface and build confidence under timed conditions. These tests are ideal for long-term preparation and can effectively replace traditional paper-based materials.
                     </p>
                   </div>
 
@@ -169,10 +165,6 @@ Users can get used to the test interface and build confidence under timed condit
                     <p className="text-gray-600 leading-relaxed ml-7">
                       These exercises are designed to help you improve step by step, focusing on each part and question type. They allow you to build your skills and strengthen your understanding of different question formats.
                     </p>
-                    <div className="ml-7 mt-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 rounded-xl flex items-start gap-3">
-                      <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
-                      <p><strong>Note:</strong> These Focus are based on probability only. There is no guarantee that these topics will appear in your actual exam.</p>
-                    </div>
                   </div>
 
                   <div className="mt-8 bg-gray-50 rounded-2xl p-5 border border-gray-100">
@@ -218,7 +210,7 @@ Users can get used to the test interface and build confidence under timed condit
                     </h3>
                     <p className="text-gray-600 leading-relaxed ml-7">
                       These are full-length tests designed to help you become familiar with the computer-based test environment. They include detailed explanations and various learning features to support your progress.
-After completing each test, you can use AI-powered evaluation to receive instant feedback and improve your writing based on standard scoring criteria.
+                      After completing each test, you can use AI-powered evaluation to receive instant feedback and improve your writing based on standard scoring criteria.
                     </p>
                   </div>
 
@@ -229,12 +221,9 @@ After completing each test, you can use AI-powered evaluation to receive instant
                     </h3>
                     <p className="text-gray-600 leading-relaxed ml-7">
                       These exercises are designed to help you improve step by step by focusing on specific tasks and question types. They help you build your skills and strengthen your understanding of different writing formats.
-You can also receive AI-powered feedback after completing each task to guide your improvement.
+                      You can also receive AI-powered feedback after completing each task to guide your improvement.
                     </p>
-                    <div className="ml-7 mt-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 rounded-xl flex items-start gap-3">
-                      <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
-                      <p><strong>Note:</strong> These Focus are based on probability only. There is no guarantee that these topics will appear in your actual exam.</p>
-                    </div>
+
                   </div>
 
                   <div className="mt-8 bg-gray-50 rounded-2xl p-5 border border-gray-100">
@@ -300,11 +289,6 @@ You can also receive AI-powered feedback after completing each task to guide you
 
                     <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm px-4 py-3 rounded-xl">
                       <strong className="text-emerald-700">Completely Free:</strong> This section is completely free, giving you unlimited access to speaking materials anytime.
-                    </div>
-
-                    <div className="bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 rounded-xl flex items-start gap-3">
-                      <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
-                      <p><strong>Note:</strong> These Focus are based on probability only. There is no guarantee that these topics will appear in your actual exam.</p>
                     </div>
                   </div>
                 </div>
