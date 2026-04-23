@@ -379,7 +379,6 @@ const WritingLayout = () => {
     <div className={`h-screen flex flex-col ${colorThemeClasses[colorTheme]}`}>
       <header className={`border-b border-zinc-500 px-4 py-4 flex justify-between items-center ${colorThemeClasses[colorTheme]}`}>
         <div className="flex items-center space-x-8">
-          <span className="text-red-600 font-bold text-3xl">IELTS</span>
           <div className={`text-sm ${colorThemeClasses[colorTheme]}`}>
             <div><p className="font-bold">Test taker ID</p></div>
             <div>
@@ -576,11 +575,10 @@ const WritingLayout = () => {
               Part {task.part_number}
             </div>
             <div className="flex gap-2">
-            <button
+              <button
                 onClick={handleSubmit}
-                className={`flex items-center gap-2 px-7 py-5 rounded-lg transition-colors ${
-                  colorTheme === 'black-on-white' ? 'bg-black text-white hover:bg-gray-800' : 'bg-white text-black hover:bg-gray-200'
-                }`}
+                className={`flex items-center gap-2 px-7 py-5 rounded-lg transition-colors ${colorTheme === 'black-on-white' ? 'bg-black text-white hover:bg-gray-800' : 'bg-white text-black hover:bg-gray-200'
+                  }`}
               >
                 <Check className="w-5 h-5" />
                 <span>{isForecast ? 'Submit Answer' : 'Submit Test'}</span>
@@ -631,12 +629,12 @@ const WritingLayout = () => {
           </div>
         </div>
       )}
-      
+
       <ForceLogoutDialog
-         isOpen={showForceLogoutDialog}
-         message={logoutMessage}
-         secondsRemaining={logoutCountdown}
-       />
+        isOpen={showForceLogoutDialog}
+        message={logoutMessage}
+        secondsRemaining={logoutCountdown}
+      />
     </div>
   );
 };
