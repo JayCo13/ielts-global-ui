@@ -265,28 +265,8 @@ const Instruction = () => {
 
                   <div className="space-y-5">
                     <p className="text-gray-600 leading-relaxed">
-                      Access <strong className="text-purple-700">free Speaking Focus PDFs</strong> designed to help you practice effectively and improve your speaking skills. Covering all months:
+                      Access <strong className="text-purple-700">free Speaking Focus PDFs</strong> designed to help you practice effectively and improve your speaking skills.
                     </p>
-                    <ul className="space-y-2 ml-4">
-                      {['January – April', 'May – August', 'September – December'].map((month, i) => (
-                        <li key={i} className="flex items-center gap-3 text-gray-600">
-                          <CheckCircle2 className="w-4 h-4 text-purple-500" />
-                          {month}
-                        </li>
-                      ))}
-                    </ul>
-
-                    <div className="pt-4 border-t border-gray-100">
-                      <p className="text-gray-600 mb-3">Speaking topics are updated three times per year:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {['January', 'May', 'September'].map((month, i) => (
-                          <span key={i} className="px-3 py-1 bg-purple-50 text-purple-700 rounded-lg text-sm font-medium border border-purple-100">
-                            {month}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
                     <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm px-4 py-3 rounded-xl">
                       <strong className="text-emerald-700">Completely Free:</strong> This section is completely free, giving you unlimited access to speaking materials anytime.
                     </div>

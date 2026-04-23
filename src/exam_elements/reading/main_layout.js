@@ -2033,7 +2033,6 @@ const MainLayout = () => {
         )}
         <header className={`${colorTheme === 'black-on-white' ? 'bg-white' : 'bg-black'} border-b border-zinc-500 px-4 py-4 flex justify-between items-center`}>
           <div className="flex items-center space-x-8">
-            <span className="text-red-600 font-bold text-3xl">IELTS</span>
             <div className={`${textSizeClasses[textSize]}`}>
               <div> <p className="font-bold">Test taker ID: {localStorage.getItem('username')}</p></div>
               {testDescription?.title && (
@@ -3254,10 +3253,6 @@ const MainLayout = () => {
         <footer className={`${colorTheme === 'black-on-white' ? 'bg-white' : 'bg-black'} border-t border-gray-200 p-4 w-full`}>
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center justify-between">
-              <div className="flex flex-col mr-4">
-                <span className="text-red-600 font-bold text-sm">Developed by</span>
-                <span className="text-red-600 font-bold text-lg leading-none">IELTS TA JUN</span>
-              </div>
               <div className="flex-1 flex items-center justify-center gap-6">
                 {partsToShow.map((part) => (
                   <div key={part} className="relative">
