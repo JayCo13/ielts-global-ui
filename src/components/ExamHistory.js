@@ -322,7 +322,7 @@ const ExamHistory = () => {
     improvementTrend: 0
   };
 
-  // Filter exams by search query AND sub-tab (Full Test vs Forecast)
+  // Filter exams by search query AND sub-tab (Mock Test vs Practice Exercises)
   const filteredReadingExams = readingExams.filter(exam => {
     const matchesSearch = exam.exam_title.toLowerCase().includes(readingSearchQuery.toLowerCase());
     const matchesSubTab = examSubTab === 'fullTest' ? !exam.is_forecast : exam.is_forecast;
@@ -769,7 +769,7 @@ const ExamHistory = () => {
                   Review completed {activeTab === 'reading' ? 'Reading' : 'Listening'} exams
                 </p>
               </div>
-              {/* Full Test / Forecast Sub-tabs */}
+              {/* Mock Test / Practice Exercises Sub-tabs */}
               <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
                 <button
                   onClick={() => setExamSubTab('fullTest')}
@@ -778,7 +778,7 @@ const ExamHistory = () => {
                     : 'text-gray-600 hover:text-gray-900'
                     }`}
                 >
-                  Full Test
+                  Mock Test
                 </button>
                 <button
                   onClick={() => setExamSubTab('forecast')}
@@ -787,7 +787,7 @@ const ExamHistory = () => {
                     : 'text-gray-600 hover:text-gray-900'
                     }`}
                 >
-                  Forecast
+                  Practice Exercises
                 </button>
               </div>
             </div>
@@ -845,7 +845,7 @@ const ExamHistory = () => {
                                   </div>
                                 </div>
 
-                                {/* Score Display - different for Full Test vs Forecast */}
+                                {/* Score Display - different for Mock Test vs Practice Exercises */}
                                 <div className="flex items-start space-x-3">
                                   <div className={`rounded-lg p-2.5 mt-0.5 ${examSubTab === 'forecast' ? 'bg-blue-50' : 'bg-green-50'}`}>
                                     <BarChart2 className={`w-5 h-5 ${examSubTab === 'forecast' ? 'text-blue-600' : 'text-green-600'}`} />
@@ -1001,7 +1001,7 @@ const ExamHistory = () => {
                                   </div>
                                 </div>
 
-                                {/* Score Display - different for Full Test vs Forecast */}
+                                {/* Score Display - different for Mock Test vs Practice Exercises */}
                                 <div className="flex items-start space-x-3">
                                   <div className={`rounded-lg p-2.5 mt-0.5 ${examSubTab === 'forecast' ? 'bg-orange-50' : 'bg-green-50'}`}>
                                     <BarChart2 className={`w-5 h-5 ${examSubTab === 'forecast' ? 'text-orange-600' : 'text-green-600'}`} />

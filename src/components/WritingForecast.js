@@ -246,7 +246,7 @@ const WritingForecast = () => {
                             }
                           } else {
                             if (counters[dateKey].forecast >= 2) {
-                              setAiResult({ error: 'Regular accounts can only evaluate 2 forecast essays per day.' });
+                              setAiResult({ error: 'Regular accounts can only evaluate 2 practice exercises per day.' });
                               setAiDialogOpen(true);
                               return;
                             }

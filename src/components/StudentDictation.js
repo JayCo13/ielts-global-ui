@@ -356,7 +356,7 @@ const StudentDictation = () => {
                         )
                     }));
                 }
-                toast.success(newValue ? 'Mark as important' : 'Unmark important');
+                toast.success(newValue ? 'Marked as Focus' : 'Unmarked Focus');
             }
         } catch (error) {
             toast.error('Connection error');
@@ -495,7 +495,7 @@ const StudentDictation = () => {
                                         }`}
                                 >
                                     <Star className="w-4 h-4" />
-                                    Important ({unitWords.filter(w => w.is_important).length})
+                                    Focus ({unitWords.filter(w => w.is_important).length})
                                 </button>
                             </div>
                         )}
@@ -504,7 +504,7 @@ const StudentDictation = () => {
                         {dictationStatus === 'idle' && dictationWords.length > 0 && (
                             <div className="mb-6">
                                 <h3 className="text-sm font-medium text-gray-700 mb-3">
-                                    Click a word to see meaning • Click ⭐ to mark important:
+                                    Click a word to see meaning • Click ⭐ to mark Focus:
                                 </h3>
                                 <div className="flex flex-wrap gap-2 mb-4">
                                     {dictationWords.slice((reviewPage - 1) * REVIEW_ITEMS_PER_PAGE, reviewPage * REVIEW_ITEMS_PER_PAGE).map(word => (
@@ -524,7 +524,7 @@ const StudentDictation = () => {
                                                     ? 'text-amber-500 hover:text-amber-600'
                                                     : 'text-gray-400 hover:text-amber-500'
                                                     }`}
-                                                title={word.is_important ? 'Unmark important' : 'Mark as important'}
+                                                title={word.is_important ? 'Unmark Focus' : 'Mark as Focus'}
                                             >
                                                 <Star className={`w-3.5 h-3.5 ${word.is_important ? 'fill-amber-400' : ''}`} />
                                             </button>
@@ -769,7 +769,7 @@ const StudentDictation = () => {
                                             ? 'text-amber-500 bg-amber-50 hover:bg-amber-100'
                                             : 'text-gray-400 hover:text-amber-500 hover:bg-amber-50'
                                             }`}
-                                        title={item.is_important ? 'Unmark important' : 'Mark as important'}
+                                        title={item.is_important ? 'Unmark Focus' : 'Mark as Focus'}
                                     >
                                         <Star className={`w-5 h-5 ${item.is_important ? 'fill-amber-400' : ''}`} />
                                     </button>

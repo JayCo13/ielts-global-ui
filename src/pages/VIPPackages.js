@@ -323,7 +323,7 @@ const VIPPackages = () => {
                             Home
                         </Link>
                         <ChevronRight size={16} className="text-gray-400" />
-                        <span className="text-gray-900 font-medium">VIP Packages</span>
+                        <span className="text-gray-900 font-medium">VIP packages</span>
                     </nav>
                 </div>
             </motion.div>
@@ -346,13 +346,13 @@ const VIPPackages = () => {
                         variants={item}
                         className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#34d399] to-[#10b981]"
                     >
-                        ieltscomputertest.com VIP Packages
+                        ieltscomputertest.com VIP packages
                     </motion.h1>
                     <motion.p
                         variants={item}
                         className="text-xl text-gray-500 max-w-2xl mx-auto drop-shadow-[0_2px_8px_rgba(16,185,129,0.5)]"
                     >
-                        Choose the most suitable VIP package for your IELTS journey
+                        Choose the right VIP package for your learning journey
                     </motion.p>
                 </motion.div>
 

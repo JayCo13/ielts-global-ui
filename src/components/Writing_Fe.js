@@ -172,7 +172,7 @@ const Writing_Fe = () => {
       }
     } else {
       if (counters[dateKey].full >= 1) {
-        setAiResult({ error: 'Standard accounts can only evaluate 1 full test per day.' });
+        setAiResult({ error: 'Standard accounts can only evaluate 1 mock test per day.' });
         setAiDialogOpen(true);
         return;
       }

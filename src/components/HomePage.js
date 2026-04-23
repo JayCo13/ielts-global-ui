@@ -289,7 +289,7 @@ const HomePage = () => {
                 variants={slideUp}
                 className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl"
               >
-                Experience realistic IELTS practice on computer with high-quality mock tests, a standard test interface, AI-powered scoring, and detailed analytics to help you improve your band score effectively.
+                Our computer-based platform is developed by a team of highly qualified and experienced educators. It allows you to practice effectively on a computer through high-quality exercises, a realistic test environment, and intelligent tools designed to help you improve your performance with confidence.
               </motion.p>
 
               {/* Trust indicators */}
@@ -692,10 +692,10 @@ const HomePage = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-gray-800 relative">
-                  Take mock tests at home in a realistic exam-like environment.
+                  Practice anytime, anywhere
                   <span className="absolute -left-2 top-1/2 w-1 h-6 bg-[#2b5356] -translate-y-1/2 rounded-full"></span>
                 </h3>
-                <p className="text-gray-600">Enjoy a realistic test experience with a user-friendly interface designed to reflect the computer-based exam format, helping you feel more confident on test day.</p>
+                <p className="text-gray-600">Experience a realistic exam environment with an intuitive interface that mirrors the computer-based test format.</p>
 
                 <div className="flex justify-end mt-4">
                   <span className="inline-flex items-center text-sm font-medium text-[#2b5356]">
@@ -723,11 +723,10 @@ const HomePage = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-gray-800 relative">
-                  Exam-style questions aligned with the IELTS format.
-
+                  Train with expert-designed exam-style questions
                   <span className="absolute -left-2 top-1/2 w-1 h-6 bg-[#0096b1] -translate-y-1/2 rounded-full"></span>
                 </h3>
-                <p className="text-gray-600">Practice with high-quality mock tests designed by experienced teachers, helping you prepare with confidence through a realistic exam experience.
+                <p className="text-gray-600">Access high-quality exercises created by experienced teachers to ensure effective and focused preparation.
                 </p>
 
                 <div className="flex justify-end mt-4">
@@ -756,10 +755,10 @@ const HomePage = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-gray-800 relative">
-                  Boost your chances of achieving a higher band score.
+                  Maximize your performance on test day
                   <span className="absolute -left-2 top-1/2 w-1 h-6 bg-[#eb7e37] -translate-y-1/2 rounded-full"></span>
                 </h3>
-                <p className="text-gray-600">Get familiar with a wide range of common question types and topics to improve your performance and succeed on test day.
+                <p className="text-gray-600">Master common question types and topics, and improve your skills through targeted practice.
                 </p>
 
                 <div className="flex justify-end mt-4">
@@ -790,11 +789,11 @@ const HomePage = () => {
 
               <div className="p-8 md:p-12 flex flex-col md:flex-row items-center">
                 <div className="md:w-2/3 mb-6 md:mb-0 md:pr-8">
-                  <h3 className="text-2xl md:text-3xl font-bold mb-4">Take a free mock test today!</h3>
-                  <p className="text-white/90 mb-6">Start your IELTS journey with a free mock test.</p>
+                  <h3 className="text-xl md:text-3xl font-bold mb-4">Try a free exercise today</h3>
+                  <p className="text-white/90 mb-6">Start your learning journey with a realistic practice experience.</p>
                   <div className="flex flex-col sm:flex-row gap-4">
                     <a href="/listening_list">
-                      <button className="px-6 py-3 bg-[#eb7e37] text-white font-bold rounded-lg hover:bg-[#eb7e37]/90 transition-colors shadow-lg hover:shadow-xl">Start free test</button>
+                      <button className="px-6 py-3 bg-[#eb7e37] text-white font-bold rounded-lg hover:bg-[#eb7e37]/90 transition-colors shadow-lg hover:shadow-xl">Start now</button>
                     </a>
                   </div>
                 </div>
@@ -807,12 +806,12 @@ const HomePage = () => {
                         <div className="w-3 h-3 rounded-full bg-[#0096b1]"></div>
                         <div className="w-3 h-3 rounded-full bg-[#2b5356]"></div>
                       </div>
-                      <span className="text-xs text-gray-200">IELTS Computer Test</span>
+                      <span className="text-xs text-gray-200">Computer Test Practice</span>
                     </div>
                     <div className="bg-white rounded-b-lg p-3">
                       <div className="text-gray-800 text-sm font-mono mb-2">
                         <span> </span>
-                        <span className="text-[#2b5356]">Your IELTS test is ready...</span>
+                        <span className="text-[#2b5356]">Your mock test is ready...</span>
                       </div>
                       <div className="text-gray-800 text-sm font-mono mb-2">
                         <span> </span>

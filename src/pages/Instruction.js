@@ -92,20 +92,21 @@ const Instruction = () => {
                   <div>
                     <h3 className="text-xl font-bold text-blue-900 flex items-center gap-2 mb-2">
                       <CheckCircle2 className="w-5 h-5 text-blue-500" />
-                      Full Tests
+                      Mock Tests
                     </h3>
                     <p className="text-gray-600 leading-relaxed ml-7">
-                      These are full-length tests that closely simulate the real IELTS exam. They include detailed explanations and various learning features to help users improve their listening skills. Users can also become familiar with the computer-based test interface and experience real exam pressure. These tests are ideal for long-term preparation and can effectively replace traditional paper-based materials.
+                      These are full-length tests designed to help you become familiar with the computer-based test environment. They include detailed explanations and various learning features to support your improvement.
+Users can get used to the test interface and build confidence under timed conditions. These tests are ideal for long-term preparation and can effectively replace traditional paper-based materials.
                     </p>
                   </div>
 
                   <div>
                     <h3 className="text-xl font-bold text-blue-900 flex items-center gap-2 mb-2">
                       <Sparkles className="w-5 h-5 text-blue-500" />
-                      Focus
+                      Practice Exercises
                     </h3>
                     <p className="text-gray-600 leading-relaxed ml-7">
-                      These tests are carefully selected from Full Tests and regularly updated based on the latest exam trends. They focus on question types that are likely to appear or repeat in upcoming exams. Focus tests are especially suitable for candidates planning to take the exam within the next month.
+                      These exercises are designed to help you improve step by step, focusing on each part and question type. They allow you to build your skills and strengthen your understanding of different question formats.
                     </p>
                     <div className="ml-7 mt-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 rounded-xl flex items-start gap-3">
                       <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
@@ -152,20 +153,21 @@ const Instruction = () => {
                   <div>
                     <h3 className="text-xl font-bold text-emerald-900 flex items-center gap-2 mb-2">
                       <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                      Full Tests
+                      Mock Tests
                     </h3>
                     <p className="text-gray-600 leading-relaxed ml-7">
-                      These full-length tests simulate the real IELTS exam and include detailed explanations along with helpful learning features. They help users improve reading skills, become familiar with the computer-based interface, and experience real exam conditions. These tests are ideal for long-term preparation and can replace traditional paper-based materials.
+                      These are full-length tests designed to help you become familiar with the computer-based test environment. They include detailed explanations and various learning features to support your improvement.
+Users can get used to the test interface and build confidence under timed conditions. These tests are ideal for long-term preparation and can effectively replace traditional paper-based materials.
                     </p>
                   </div>
 
                   <div>
                     <h3 className="text-xl font-bold text-emerald-900 flex items-center gap-2 mb-2">
                       <Sparkles className="w-5 h-5 text-emerald-500" />
-                      Focus
+                      Practice Exercises
                     </h3>
                     <p className="text-gray-600 leading-relaxed ml-7">
-                      These tests are selected from Full Tests and updated regularly based on the latest exam trends. They focus on questions that are likely to appear or repeat in upcoming exams. Focus tests are recommended for candidates preparing for the exam within one month.
+                      These exercises are designed to help you improve step by step, focusing on each part and question type. They allow you to build your skills and strengthen your understanding of different question formats.
                     </p>
                     <div className="ml-7 mt-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 rounded-xl flex items-start gap-3">
                       <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
@@ -212,20 +214,22 @@ const Instruction = () => {
                   <div>
                     <h3 className="text-xl font-bold text-amber-900 flex items-center gap-2 mb-2">
                       <CheckCircle2 className="w-5 h-5 text-amber-500" />
-                      Full Tests
+                      Mock Tests
                     </h3>
                     <p className="text-gray-600 leading-relaxed ml-7">
-                      These tests simulate the real IELTS Writing exam and include detailed explanations and learning features. After completing a test, users can use AI evaluation to receive instant feedback and improve their writing based on official scoring criteria.
+                      These are full-length tests designed to help you become familiar with the computer-based test environment. They include detailed explanations and various learning features to support your progress.
+After completing each test, you can use AI-powered evaluation to receive instant feedback and improve your writing based on standard scoring criteria.
                     </p>
                   </div>
 
                   <div>
                     <h3 className="text-xl font-bold text-amber-900 flex items-center gap-2 mb-2">
                       <Sparkles className="w-5 h-5 text-amber-500" />
-                      Focus
+                      Practice Exercises
                     </h3>
                     <p className="text-gray-600 leading-relaxed ml-7">
-                      These tests are selected from Full Tests and updated regularly according to the latest exam trends. They are ideal for candidates preparing for the exam within one month. Users can also receive AI evaluation and feedback after completing each test.
+                      These exercises are designed to help you improve step by step by focusing on specific tasks and question types. They help you build your skills and strengthen your understanding of different writing formats.
+You can also receive AI-powered feedback after completing each task to guide your improvement.
                     </p>
                     <div className="ml-7 mt-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 rounded-xl flex items-start gap-3">
                       <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
@@ -272,7 +276,7 @@ const Instruction = () => {
 
                   <div className="space-y-5">
                     <p className="text-gray-600 leading-relaxed">
-                      Users can access <strong className="text-purple-700">free Speaking Focus PDFs</strong> covering all months:
+                      Access <strong className="text-purple-700">free Speaking Focus PDFs</strong> designed to help you practice effectively and improve your speaking skills. Covering all months:
                     </p>
                     <ul className="space-y-2 ml-4">
                       {['January – April', 'May – August', 'September – December'].map((month, i) => (
@@ -295,7 +299,7 @@ const Instruction = () => {
                     </div>
 
                     <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm px-4 py-3 rounded-xl">
-                      <strong className="text-emerald-700">Completely Free:</strong> This section is completely free, so users always have full access to Speaking materials at any time.
+                      <strong className="text-emerald-700">Completely Free:</strong> This section is completely free, giving you unlimited access to speaking materials anytime.
                     </div>
 
                     <div className="bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 rounded-xl flex items-start gap-3">

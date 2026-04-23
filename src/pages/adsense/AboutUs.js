@@ -41,12 +41,11 @@ const AboutUs = () => {
             <div className="w-full md:w-3/4">
               <div className="space-y-8">
                 <p className="text-gray-700">
-                  <span className="font-bold text-[#e67e22]">ieltscomputertest.com</span> was founded with the mission of providing a professional computer-based IELTS preparation platform featuring high-quality, exam-style materials and a user-friendly interface. We are committed to delivering an effective learning experience, enabling learners to access IELTS practice tests conveniently and improve their band scores.
-
+                  <span className="font-bold text-[#e67e22]">ieltscomputertest.com</span> is developed by a team of highly qualified and experienced educators to deliver a professional computer-based test preparation experience with high-quality exercises and an intuitive interface. We are dedicated to providing a highly effective learning experience that allows learners to conveniently access mock tests and targeted practice exercises to improve their band scores.
                 </p>
 
                 <p className="text-gray-700">
-                  With the motto “Right trust – Breakthrough future”, we continuously improve and develop our system by integrating advanced AI technology into the learning process. Our team of experienced teachers is dedicated to supporting learners with carefully designed materials and effective study methods, helping them prepare with confidence for the IELTS exam.
+                  With the motto "Right trust – Breakthrough future", we continuously refine and develop our platform by integrating smart tools and analytics into the learning process. Our team of expert teachers is committed to offering rigorously designed exercises and proven study methods, empowering learners to prepare for the test with completely confidence.
                 </p>
               </div>
             </div>
@@ -91,13 +90,14 @@ const AboutUs = () => {
           <div className="mb-24">
             <h2 className="text-2xl font-semibold text-gray-900 mb-6">Our Team</h2>
             <p className="text-gray-700 mb-6">
-              Ieltscomputertest.com brings together a team of experienced professionals in IELTS teaching and technology development. We continuously research and update our platform to provide the most effective learning solutions for our users.
+              ieltscomputertest.com is powered by a team of highly qualified professionals in teaching and technology development. We continuously research and enhance our platform to deliver the most effective test preparation solutions for our users.
             </p>
+            <p className="text-gray-700 mb-4">Our team includes:</p>
 
             <ul className="list-disc list-inside space-y-3 text-gray-700">
-              <li>IELTS instructors with 8.0+ certification and years of teaching experience</li>
-              <li>Leading experts in AI and educational technology</li>
-              <li>Specialized IELTS content development team </li>
+              <li>Experienced instructors with a deep understanding of test formats and scoring criteria</li>
+              <li>Leading engineers in test platform and educational technology development</li>
+              <li>Dedicated content development specialists</li>
               <li>24/7 technical support and customer service team</li>
             </ul>
           </div>
