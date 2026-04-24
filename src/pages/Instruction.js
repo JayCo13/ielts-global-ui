@@ -265,7 +265,7 @@ const Instruction = () => {
 
                   <div className="space-y-5">
                     <p className="text-gray-600 leading-relaxed">
-                      Access <strong className="text-purple-700">free Speaking Focus PDFs</strong> designed to help you practice effectively and improve your speaking skills.
+                      Access <strong className="text-purple-700">free Speaking Practice PDFs</strong> designed to help you practice effectively and improve your speaking skills.
                     </p>
                     <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm px-4 py-3 rounded-xl">
                       <strong className="text-emerald-700">Completely Free:</strong> This section is completely free, giving you unlimited access to speaking materials anytime.

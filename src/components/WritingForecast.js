@@ -99,8 +99,8 @@ const WritingForecast = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Helmet>
-        <title>IELTS Writing Focus | Practice Mockup Tests</title>
-        <meta name="description" content={`Practice your IELTS Writing skills with Focus exams like ${items.slice(0, 3).map(i => i.exam_title).join(', ')}...`} />
+        <title>IELTS Writing Practice | Practice Mockup Tests</title>
+        <meta name="description" content={`Practice your IELTS Writing skills with Practice exams like ${items.slice(0, 3).map(i => i.exam_title).join(', ')}...`} />
       </Helmet>
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-4">
@@ -111,7 +111,7 @@ const WritingForecast = () => {
                 <Link to="/" className="text-gray-500 hover:text-[#0096b1]">Home</Link>
               </li>
               <li><span className="text-gray-400 mx-2">/</span></li>
-              <li><span className="text-[#0096b1] font-medium">Writing Focus</span></li>
+              <li><span className="text-[#0096b1] font-medium">Writing Practice</span></li>
             </ol>
           </nav>
           <div className="text-sm font-semibold text-red-700 mt-5">
@@ -212,7 +212,7 @@ const WritingForecast = () => {
                         }}
                         className="mt-4 w-full bg-[#0096b1] text-white py-2 rounded"
                       >
-                        Take Focus
+                        Take Practice
                       </button>
                       <button
                         onClick={() => { setSelectedPart(it); setEditDialogOpen(true); }}
@@ -255,11 +255,17 @@ const WritingForecast = () => {
                           setAiDialogOpen(true);
                           try {
                             const token = secureStorage.getItem('token') || localStorage.getItem('token');
-                            const essayResponse = await fetchWithTimeout(`${API_BASE}/student/writing/part/${it.task_id}/essay`, { headers: { 'Authorization': `Bearer ${token}` } });
-                            if (!essayResponse.ok) throw new Error('Failed to fetch essay');
-                            const essayData = await essayResponse.json();
-                            if (!essayData.essay?.answer_text) {
-                              setAiResult({ error: 'No essay content to evaluate. Please write your essay first.' });
+                            let essayData = null;
+                            try {
+                              const essayResponse = await fetchWithTimeout(`${API_BASE}/student/writing/part/${it.task_id}/essay`, { headers: { 'Authorization': `Bearer ${token}` } });
+                              if (essayResponse.ok) {
+                                essayData = await essayResponse.json();
+                              }
+                            } catch (fetchErr) {
+                              // Network error fetching essay - treat as no essay
+                            }
+                            if (!essayData?.essay?.answer_text) {
+                              setAiResult({ error: 'No essay content to evaluate. Please click "Take Practice" or "Edit" to write your essay first.' });
                               return;
                             }
                             const response = await fetchWithTimeout(`${API_BASE}/ai/evaluate-and-save/${it.task_id}`, {

@@ -508,7 +508,7 @@ const Writing_Fe = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Helmet>
-        <title>IELTS Writing Practice Tasks | Official & Focus</title>
+        <title>IELTS Writing Practice Tasks | Official & Practice</title>
         <meta name="description" content={`Practice your IELTS Writing skills. Includes tasks like ${tests.slice(0, 3).map(t => t.title).join(', ')}...`} />
       </Helmet>
       <Navbar />

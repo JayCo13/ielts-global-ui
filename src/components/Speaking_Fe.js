@@ -133,7 +133,7 @@ const Speaking_Fe = () => {
                 </h3>
                 <div className="space-y-4 mb-8">
                     <div className="flex items-center text-gray-600 bg-gray-50 py-2 px-3 rounded-lg">
-                        <span className="font-medium">Speaking Focus</span>
+                        <span className="font-medium">Speaking Practice</span>
                     </div>
                 </div>
                 <button
@@ -176,7 +176,7 @@ const Speaking_Fe = () => {
     return (
         <div className="min-h-screen bg-gray-50">
             <Helmet>
-                <title>IELTS Speaking Materials | Practice & Focus</title>
+                <title>IELTS Speaking Materials | Practice</title>
                 <meta name="description" content={`Practice your IELTS Speaking skills. Includes materials like ${materials.slice(0, 3).map(m => m.title).join(', ')}...`} />
             </Helmet>
             <Navbar />
@@ -186,7 +186,7 @@ const Speaking_Fe = () => {
                     <ol className="flex items-center space-x-2">
                         <li><Link to="/" className="text-[#0096b1] hover:text-lime-500">Home</Link></li>
                         <li><span className="text-gray-400 mx-2">/</span></li>
-                        <li><span className="text-[#0096b1] font-medium">Speaking Focus</span></li>
+                        <li><span className="text-[#0096b1] font-medium">Speaking Practice</span></li>
                     </ol>
                 </nav>
             </div>

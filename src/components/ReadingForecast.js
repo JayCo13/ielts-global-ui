@@ -139,7 +139,7 @@ const ReadingForecast = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Helmet>
-        <title>IELTS Reading Focus | Practice Mockup Test</title>
+        <title>IELTS Reading Practice | Practice Mockup Test</title>
         <meta name="description" content={`Practice your IELTS Reading skills with focus exams like ${items.slice(0, 3).map(i => i.exam_title).join(', ')}...`} />
       </Helmet>
       <Navbar />
@@ -150,12 +150,12 @@ const ReadingForecast = () => {
               <Link to="/" className="text-gray-500 hover:text-[#0096b1]">Home</Link>
             </li>
             <li><span className="text-gray-400 mx-2">/</span></li>
-            <li><span className="text-[#0096b1] font-medium">Reading Focus</span></li>
+            <li><span className="text-[#0096b1] font-medium">Reading Practice</span></li>
           </ol>
         </nav>
         <div className="inline-flex items-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg text-sm">
           <Star className="w-5 h-5 text-yellow-500" fill="currentColor" />
-          <span className="text-gray-700">= Focus</span>
+          <span className="text-gray-700">= Practice</span>
         </div>
       </div>
 
@@ -265,7 +265,7 @@ const ReadingForecast = () => {
                     })()}
                   </div>
                   <div className="mt-2 text-md text-gray-700">
-                    <span>Focus Part: </span>
+                    <span>Practice Part: </span>
                     <span className={`${(isLimitedUser && (index + indexOfFirstItem) >= 6) ? 'blur-[4px] select-none' : ''}`}>
                       {it.part_number}{it.forecast_title ? ` – ${it.forecast_title}` : ''}
                     </span>

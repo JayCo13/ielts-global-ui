@@ -44,9 +44,12 @@ class SecureStorage {
     if (!encryptedValue) return null;
     try {
       const bytes = CryptoJS.AES.decrypt(encryptedValue, this.encryptionKey);
-      return bytes.toString(CryptoJS.enc.Utf8);
+      const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+      // If decryption produced empty string, the key has rotated - return null silently
+      if (!decrypted) return null;
+      return decrypted;
     } catch (error) {
-      console.error('Decryption error:', error);
+      // Expected when session encryption key has rotated (new tab/session)
       return null;
     }
   }

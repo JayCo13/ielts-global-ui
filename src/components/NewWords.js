@@ -131,7 +131,7 @@ const NewWords = () => {
                 setVocabulary(prev => prev.map(v =>
                     v.id === id ? { ...v, is_important: !currentValue } : v
                 ));
-                toast.success(!currentValue ? 'Marked as Focus' : 'Unmarked');
+                toast.success(!currentValue ? 'Marked as Practice' : 'Unmarked');
             }
         } catch (error) {
             console.error('Error updating vocabulary:', error);
@@ -508,7 +508,7 @@ const NewWords = () => {
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
                                     <Star className={`w-5 h-5 ${filter === 'important' ? 'text-white fill-white' : 'text-amber-500 fill-amber-500'}`} />
-                                    <span className={`text-sm font-medium ${filter === 'important' ? 'text-amber-100' : 'text-amber-600'}`}>Focus</span>
+                                    <span className={`text-sm font-medium ${filter === 'important' ? 'text-amber-100' : 'text-amber-600'}`}>Practice</span>
                                 </div>
                                 <div className={`text-3xl font-bold ${filter === 'important' ? 'text-white' : 'text-gray-900'}`}>
                                     {vocabulary.filter(v => v.is_important).length}
@@ -777,7 +777,7 @@ const NewWords = () => {
                                                             ? 'text-amber-500 bg-amber-100 hover:bg-amber-200'
                                                             : 'text-gray-400 hover:text-amber-500 hover:bg-white'
                                                             }`}
-                                                        title={isImportant ? "Focus" : "Mark as Focus"}
+                                                        title={isImportant ? "Practice" : "Mark as Practice"}
                                                     >
                                                         <Star className={`w-5 h-5 ${isImportant ? 'fill-current' : ''}`} />
                                                     </button>
@@ -835,7 +835,7 @@ const NewWords = () => {
                                                         ? 'text-amber-500 bg-amber-500/10'
                                                         : 'text-gray-400 hover:text-amber-500 hover:bg-amber-50'
                                                         }`}
-                                                    title={word.is_important ? 'Unmark Focus' : 'Mark as Focus'}
+                                                    title={word.is_important ? 'Unmark Practice' : 'Mark as Practice'}
                                                 >
                                                     <Star className={`w-5 h-5 ${word.is_important ? 'fill-current' : ''}`} />
                                                 </button>
