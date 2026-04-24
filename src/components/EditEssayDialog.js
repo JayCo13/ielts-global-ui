@@ -32,7 +32,7 @@ const EditEssayDialog = ({ isOpen, onClose, taskId, partNumber }) => {
   const fetchEssay = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await fetchWithTimeout(`${API_BASE}/student/writing/part/${taskId.task_id}/essay`, {
+      const response = await fetchWithTimeout(`${API_BASE}/student/writing/tasks/${taskId.task_id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -40,8 +40,8 @@ const EditEssayDialog = ({ isOpen, onClose, taskId, partNumber }) => {
 
       if (response.ok) {
         const data = await response.json();
-        setEssay(data.essay?.answer_text || '');
-        setTestTitle(data.test_title || '');
+        setEssay(data.previous_answer?.answer_text || '');
+        setTestTitle(data.title || '');
       }
     } catch (error) {
       console.error('Error fetching essay:', error);
@@ -57,8 +57,8 @@ const EditEssayDialog = ({ isOpen, onClose, taskId, partNumber }) => {
 
     const token = localStorage.getItem('token');
     try {
-      const response = await fetchWithTimeout(`${API_BASE}/student/writing/part/${taskId.task_id}/essay`, {
-        method: 'PUT',
+      const response = await fetchWithTimeout(`${API_BASE}/student/writing/tasks/${taskId.task_id}/save-draft`, {
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

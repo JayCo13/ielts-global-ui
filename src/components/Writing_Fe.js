@@ -190,8 +190,8 @@ const Writing_Fe = () => {
     try {
       const token = secureStorage.getItem('token') || localStorage.getItem('token');
 
-      // Fetch essay data
-      const essayResponse = await fetchWithTimeout(`${API_BASE}/student/writing/part/${task.task_id}/essay`, {
+      // Fetch essay data from the correct endpoint
+      const essayResponse = await fetchWithTimeout(`${API_BASE}/student/writing/tasks/${task.task_id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -201,12 +201,14 @@ const Writing_Fe = () => {
         throw new Error('Failed to fetch essay data');
       }
 
-      const essayData = await essayResponse.json();
+      const taskData = await essayResponse.json();
 
-      if (!essayData.essay?.answer_text) {
+      if (!taskData.previous_answer?.answer_text) {
         setAiResult({ error: 'No essay text found for evaluation. Please complete the test first.' });
         return;
       }
+
+      const essayText = taskData.previous_answer.answer_text;
 
       // AI evaluation request with retry mechanism
       let retryCount = 0;
@@ -221,7 +223,7 @@ const Writing_Fe = () => {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              essay_text: essayData.essay.answer_text,
+              essay_text: essayText,
               instructions: task.instructions
             })
           });
@@ -249,7 +251,7 @@ const Writing_Fe = () => {
             evaluation_timestamp: data.evaluation_timestamp,
             band_score: data.evaluation_result.band_score,  // Changed from 'score' to 'band_score'
             word_count: data.word_count,
-            answer_text: essayData.essay.answer_text,
+            answer_text: essayText,
             evaluation_result: data.evaluation_result
           });
           setEvaluatedTasks(prev => ({ ...prev, [task.task_id]: true }));

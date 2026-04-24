@@ -185,9 +185,9 @@ const WritingLayout = () => {
 
       if (isForecast) {
         const response = await fetchWithTimeout(
-          `${API_BASE}/student/writing/part/${taskId}/essay`,
+          `${API_BASE}/student/writing/tasks/${taskId}/save-draft`,
           {
-            method: 'PUT',
+            method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',

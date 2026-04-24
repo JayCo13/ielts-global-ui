@@ -255,23 +255,24 @@ const WritingForecast = () => {
                           setAiDialogOpen(true);
                           try {
                             const token = secureStorage.getItem('token') || localStorage.getItem('token');
-                            let essayData = null;
+                            let essayText = null;
                             try {
-                              const essayResponse = await fetchWithTimeout(`${API_BASE}/student/writing/part/${it.task_id}/essay`, { headers: { 'Authorization': `Bearer ${token}` } });
-                              if (essayResponse.ok) {
-                                essayData = await essayResponse.json();
+                              const taskResponse = await fetchWithTimeout(`${API_BASE}/student/writing/tasks/${it.task_id}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                              if (taskResponse.ok) {
+                                const taskData = await taskResponse.json();
+                                essayText = taskData.previous_answer?.answer_text;
                               }
                             } catch (fetchErr) {
-                              // Network error fetching essay - treat as no essay
+                              // Network error fetching task - treat as no essay
                             }
-                            if (!essayData?.essay?.answer_text) {
+                            if (!essayText) {
                               setAiResult({ error: 'No essay content to evaluate. Please click "Take Practice" or "Edit" to write your essay first.' });
                               return;
                             }
                             const response = await fetchWithTimeout(`${API_BASE}/ai/evaluate-and-save/${it.task_id}`, {
                               method: 'POST',
                               headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ essay_text: essayData.essay.answer_text, instructions: it.instructions })
+                              body: JSON.stringify({ essay_text: essayText, instructions: it.instructions })
                             });
                             const responseText = await response.text();
                             let data;
@@ -283,7 +284,7 @@ const WritingForecast = () => {
                               evaluation_timestamp: data.evaluation_timestamp,
                               band_score: data.evaluation_result.band_score,
                               word_count: data.word_count,
-                              answer_text: essayData.essay.answer_text,
+                              answer_text: essayText,
                               evaluation_result: data.evaluation_result,
                               part_number: it.part_number
                             });

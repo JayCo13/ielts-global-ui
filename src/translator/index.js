@@ -2,3 +2,4 @@
 export { default as TranslatorDialog } from './TranslatorDialog';
 export { default as useTextSelection } from './useTextSelection';
 export { default as translatorService } from './translatorService';
+export { SUPPORTED_LANGUAGES, getLanguageByCode } from './translatorService';

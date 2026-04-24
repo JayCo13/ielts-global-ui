@@ -1,14 +1,54 @@
 import fetchWithTimeout from '../utils/fetchWithTimeout';
 
+// Supported languages for dictionary translation
+export const SUPPORTED_LANGUAGES = [
+  { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳', nativeName: 'Vietnamese' },
+  { code: 'hi', name: 'हिन्दी', flag: '🇮🇳', nativeName: 'Hindi' },
+  { code: 'zh', name: '中文', flag: '🇨🇳', nativeName: 'Chinese' },
+  { code: 'ko', name: '한국어', flag: '🇰🇷', nativeName: 'Korean' },
+  { code: 'ja', name: '日本語', flag: '🇯🇵', nativeName: 'Japanese' },
+  { code: 'ms', name: 'Bahasa Melayu', flag: '🇲🇾', nativeName: 'Malay' },
+  { code: 'id', name: 'Bahasa Indonesia', flag: '🇮🇩', nativeName: 'Indonesian' },
+  { code: 'th', name: 'ไทย', flag: '🇹🇭', nativeName: 'Thai' },
+  { code: 'tl', name: 'Filipino', flag: '🇵🇭', nativeName: 'Filipino' },
+  { code: 'bn', name: 'বাংলা', flag: '🇧🇩', nativeName: 'Bengali' },
+  { code: 'ur', name: 'اردو', flag: '🇵🇰', nativeName: 'Urdu' },
+  { code: 'ar', name: 'العربية', flag: '🇸🇦', nativeName: 'Arabic' },
+  { code: 'ru', name: 'Русский', flag: '🇷🇺', nativeName: 'Russian' },
+  { code: 'es', name: 'Español', flag: '🇪🇸', nativeName: 'Spanish' },
+  { code: 'pt', name: 'Português', flag: '🇧🇷', nativeName: 'Portuguese' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷', nativeName: 'French' },
+  { code: 'de', name: 'Deutsch', flag: '🇩🇪', nativeName: 'German' },
+  { code: 'tr', name: 'Türkçe', flag: '🇹🇷', nativeName: 'Turkish' },
+  { code: 'fa', name: 'فارسی', flag: '🇮🇷', nativeName: 'Persian' },
+  { code: 'ne', name: 'नेपाली', flag: '🇳🇵', nativeName: 'Nepali' },
+  { code: 'si', name: 'සිංහල', flag: '🇱🇰', nativeName: 'Sinhala' },
+  { code: 'my', name: 'မြန်မာ', flag: '🇲🇲', nativeName: 'Burmese' },
+  { code: 'km', name: 'ខ្មែរ', flag: '🇰🇭', nativeName: 'Khmer' },
+];
+
+// Helper to get language name by code
+export const getLanguageByCode = (code) => {
+  return SUPPORTED_LANGUAGES.find(l => l.code === code) || SUPPORTED_LANGUAGES[0];
+};
+
 class TranslatorService {
   constructor() {
-    // You should replace this with your actual Groq API key
-    // For production, consider using environment variables
     this.apiKey = process.env.REACT_APP_GROQ_API_KEY;
     this.baseUrl = 'https://api.groq.com/openai/v1/chat/completions';
   }
 
-  async translateText(text, sourceLanguage = 'English', targetLanguage = 'Vietnamese') {
+  // Get the user's saved language preference
+  getSavedLanguage() {
+    return localStorage.getItem('dictionary_language') || 'vi';
+  }
+
+  // Save the user's language preference
+  saveLanguage(langCode) {
+    localStorage.setItem('dictionary_language', langCode);
+  }
+
+  async translateText(text, sourceLanguage = 'English', targetLanguage = null) {
     try {
       if (!text || text.trim().length === 0) {
         throw new Error('Text to translate cannot be empty');
@@ -18,7 +58,12 @@ class TranslatorService {
         throw new Error('Translation service is not properly configured. Please contact support.');
       }
 
-      const prompt = `Translate the following ${sourceLanguage} text to ${targetLanguage}. Provide only the translation without any additional explanation or formatting. Consider the context and provide the most appropriate translation:
+      // Use saved language if not explicitly provided
+      const langCode = targetLanguage || this.getSavedLanguage();
+      const lang = getLanguageByCode(langCode);
+      const targetLangName = lang.nativeName;
+
+      const prompt = `Translate the following ${sourceLanguage} text to ${targetLangName}. Provide only the translation without any additional explanation or formatting. Consider the context and provide the most appropriate translation:
 
 "${text}"`;
 
@@ -33,14 +78,14 @@ class TranslatorService {
           messages: [
             {
               role: 'system',
-              content: 'You are a professional translator specializing in English to Vietnamese translation. Provide accurate, contextually appropriate translations. For IELTS exam content, maintain the academic tone and precision.'
+              content: `You are a professional translator specializing in English to ${targetLangName} translation. Provide accurate, contextually appropriate translations. For IELTS exam content, maintain the academic tone and precision.`
             },
             {
               role: 'user',
               content: prompt
             }
           ],
-          temperature: 0.3, // Lower temperature for more consistent translations
+          temperature: 0.3,
           max_tokens: 500,
           top_p: 1,
           stream: false
@@ -59,15 +104,13 @@ class TranslatorService {
       }
 
       const translation = data.choices[0].message.content.trim();
-
-      // Remove quotes if the translation is wrapped in them
       const cleanedTranslation = translation.replace(/^["']|["']$/g, '');
 
       return {
         originalText: text,
         translatedText: cleanedTranslation,
         sourceLanguage,
-        targetLanguage,
+        targetLanguage: targetLangName,
         timestamp: new Date().toISOString()
       };
 
@@ -77,7 +120,7 @@ class TranslatorService {
     }
   }
 
-  async getDetailedDefinition(word) {
+  async getDetailedDefinition(word, targetLanguage = null) {
     try {
       if (!word || word.trim().length === 0) {
         throw new Error('Word cannot be empty');
@@ -86,6 +129,11 @@ class TranslatorService {
       if (!this.apiKey) {
         throw new Error('Translation service is not properly configured.');
       }
+
+      // Use saved language if not explicitly provided
+      const langCode = targetLanguage || this.getSavedLanguage();
+      const lang = getLanguageByCode(langCode);
+      const targetLangName = lang.nativeName;
 
       const prompt = `Provide a detailed dictionary entry for the English word "${word}". Return ONLY a valid JSON object with this exact structure (no markdown, no code blocks, just raw JSON):
 {
@@ -96,12 +144,12 @@ class TranslatorService {
   },
   "meanings": [
     {
-      "partOfSpeech": "part of speech in Vietnamese (e.g., Danh từ, Động từ, Tính từ)",
+      "partOfSpeech": "part of speech in ${targetLangName}",
       "definitions": [
         {
-          "meaning": "Vietnamese translation/definition",
+          "meaning": "${targetLangName} translation/definition",
           "example": "Example sentence in English if available",
-          "exampleTrans": "Vietnamese translation of example"
+          "exampleTrans": "${targetLangName} translation of example"
         }
       ]
     }
@@ -110,8 +158,8 @@ class TranslatorService {
 
 Rules:
 - Use IPA for phonetics
-- Translate part of speech to Vietnamese (Danh từ, Động từ, Tính từ, Trạng từ, Giới từ, etc.)
-- Provide Vietnamese meanings/definitions
+- Translate part of speech to ${targetLangName}
+- Provide ${targetLangName} meanings/definitions
 - Include examples when relevant
 - Return ONLY the JSON object, no other text`;
 
@@ -126,7 +174,7 @@ Rules:
           messages: [
             {
               role: 'system',
-              content: 'You are a professional English-Vietnamese dictionary. Return ONLY valid JSON with no markdown formatting.'
+              content: `You are a professional English-${targetLangName} dictionary. Return ONLY valid JSON with no markdown formatting.`
             },
             {
               role: 'user',
