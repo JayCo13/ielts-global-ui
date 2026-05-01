@@ -12,7 +12,7 @@ const PaymentFailure = () => {
         expired_token: 'Your session has expired. Please login and try again.',
         user_not_found: 'User account not found. Please contact support.',
         package_not_found: 'The selected package is no longer available.',
-        paypal_unreachable: 'Could not connect to PayPal. Please try again later.',
+        payment_failed: 'Payment could not be processed. Please try again.',
         capture_failed: 'Payment capture was not completed. Your account was NOT charged.',
         capture_exception: 'An error occurred during payment processing. Please try again.',
         invalid_status: 'The payment order is in an unexpected state. Please create a new payment.',
@@ -41,7 +41,7 @@ const PaymentFailure = () => {
 
                         {orderId && (
                             <div className="bg-gray-50 rounded-xl p-3 mb-6 text-left">
-                                <p className="text-xs text-gray-400 mb-1">PayPal Order ID (for support):</p>
+                                <p className="text-xs text-gray-400 mb-1">Order ID (for support):</p>
                                 <code className="text-sm text-gray-700 break-all">{orderId}</code>
                             </div>
                         )}

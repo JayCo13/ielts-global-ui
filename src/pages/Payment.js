@@ -1,31 +1,28 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { ChevronRight, Home, Shield, Lock, AlertCircle, Crown } from 'lucide-react';
+import { ChevronRight, Home, Shield, Lock, AlertCircle, Crown, CreditCard, RefreshCw } from 'lucide-react';
 import { checkTokenExpiration, logout } from '../utils/authUtils';
+import API_BASE from '../config/api';
 
 /**
- * BULLETPROOF PAYMENT FLOW
- * ========================
- * 1. This page: User sees package info + PayPal buttons
- * 2. User clicks Pay → PayPal creates order (NO money moves)
- * 3. User approves on PayPal popup (still NO money moves)
- * 4. onApprove → NAVIGATE to /payment-processing (a CLEAN page with NO PayPal SDK)
- * 5. PaymentProcessing page calls backend /server-capture
- * 6. Backend captures + activates VIP atomically
- *
- * This 2-page approach guarantees PayPal SDK cannot interfere with backend calls.
+ * LEMON SQUEEZY PAYMENT FLOW
+ * ==========================
+ * 1. This page: User sees package info + "Subscribe Now" button
+ * 2. User clicks → Frontend calls backend /create-checkout
+ * 3. Backend returns checkout URL → Frontend opens LS Checkout Overlay
+ * 4. User completes payment inside overlay (never leaves the page)
+ * 5. LS sends webhook → Backend activates VIP
+ * 6. Frontend polls for completion → Redirects to success page
  */
 
 const Payment = () => {
     const [error, setError] = useState(null);
-    const [PayPalLoaded, setPayPalLoaded] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [polling, setPolling] = useState(false);
 
     const location = useLocation();
     const navigate = useNavigate();
     const { packageId, package: selectedPackage } = location.state || {};
-
-    const PayPalScriptProviderRef = useRef(null);
-    const PayPalButtonsRef = useRef(null);
 
     // Redirect if no package selected
     useEffect(() => {
@@ -34,15 +31,6 @@ const Payment = () => {
             return;
         }
     }, [packageId, selectedPackage, navigate]);
-
-    // Dynamically import PayPal SDK
-    useEffect(() => {
-        import('@paypal/react-paypal-js').then((mod) => {
-            PayPalScriptProviderRef.current = mod.PayPalScriptProvider;
-            PayPalButtonsRef.current = mod.PayPalButtons;
-            setPayPalLoaded(true);
-        });
-    }, []);
 
     // Token validation
     const validateTokenAndRedirect = () => {
@@ -64,68 +52,108 @@ const Payment = () => {
         validateTokenAndRedirect();
     }, []);
 
-    // PayPal creates the order — NO money captured
-    const createOrder = (data, actions) => {
-        if (!validateTokenAndRedirect()) return;
-        setError(null);
+    // Initialize Lemon Squeezy when the script loads
+    useEffect(() => {
+        if (window.createLemonSqueezy) {
+            window.createLemonSqueezy();
+        }
 
-        return actions.order.create({
-            purchase_units: [{
-                amount: {
-                    value: Number(selectedPackage.price).toFixed(2),
-                    currency_code: "USD"
-                },
-                description: `VIP Package: ${selectedPackage.name}`
-            }]
+        // Listen for Lemon Squeezy events
+        const handleLSEvent = (event) => {
+            if (event.detail?.event === 'Checkout.Success') {
+                // Payment completed — start polling for webhook activation
+                setPolling(true);
+                pollForActivation();
+            }
+        };
+
+        window.addEventListener('lemon-squeezy:event', handleLSEvent);
+        return () => window.removeEventListener('lemon-squeezy:event', handleLSEvent);
+    }, []);
+
+    // Poll for VIP activation (webhook may take a few seconds)
+    const pollForActivation = async () => {
+        const token = localStorage.getItem('token');
+        const maxAttempts = 15;
+        
+        for (let i = 0; i < maxAttempts; i++) {
+            try {
+                const res = await fetch(`${API_BASE}/customer/vip/subscription/status`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.is_subscribed) {
+                        // VIP activated! Navigate to success
+                        navigate('/payment-success', { state: { fromPayment: true } });
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.warn(`Poll attempt ${i + 1} failed:`, err.message);
+            }
+            
+            // Wait before next poll (increasing delay)
+            await new Promise(r => setTimeout(r, 2000 + (i * 500)));
+        }
+        
+        // After all polls, still redirect to processing page
+        navigate('/payment-processing', { 
+            state: { packageId, packageName: selectedPackage?.name } 
         });
     };
 
-    /**
-     * After user approves: save order data and redirect to processing page.
-     * Full page redirect ensures PayPal SDK is completely unloaded.
-     */
-    const onApprove = (data) => {
-        const paypalOrderId = data.orderID;
-        console.log('[PayPal] User approved order:', paypalOrderId);
+    // Create checkout and open overlay
+    const handleSubscribe = async () => {
+        if (!validateTokenAndRedirect()) return;
+        setError(null);
+        setLoading(true);
 
-        // Store payment data in sessionStorage (survives page reload)
-        sessionStorage.setItem('payment_data', JSON.stringify({
-            paypalOrderId,
-            packageId,
-            packageName: selectedPackage.name,
-        }));
+        const token = localStorage.getItem('token');
 
-        // Full page redirect to processing page (kills PayPal SDK)
-        window.location.replace(window.location.origin + '/payment-processing');
-    };
+        try {
+            const res = await fetch(`${API_BASE}/customer/vip/packages/${packageId}/create-checkout`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
 
-    const onError = (err) => {
-        console.error('PayPal error:', err);
-        setError('Payment failed. Please try again or contact support.');
-    };
+            if (res.status === 401) {
+                navigate('/login', { state: { message: 'Session expired.' } });
+                return;
+            }
 
-    const onCancel = () => {
-        setError('Payment cancelled. You can try again whenever you\'re ready.');
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.detail || 'Failed to create checkout');
+            }
+
+            const data = await res.json();
+            const checkoutUrl = data.checkout_url;
+
+            if (!checkoutUrl) {
+                throw new Error('No checkout URL received');
+            }
+
+            // Open Lemon Squeezy Checkout Overlay
+            if (window.LemonSqueezy) {
+                window.LemonSqueezy.Url.Open(checkoutUrl);
+            } else {
+                // Fallback: redirect to checkout URL
+                window.location.href = checkoutUrl;
+            }
+        } catch (err) {
+            console.error('Checkout error:', err);
+            setError(err.message || 'Failed to start payment. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (!selectedPackage) return null;
-
-    const paypalClientId = process.env.REACT_APP_PAYPAL_CLIENT_ID;
-
-    if (!paypalClientId) {
-        return (
-            <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center">
-                <div className="text-center p-8 bg-red-50 rounded-2xl border border-red-200 max-w-md">
-                    <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                    <h2 className="text-xl font-bold text-red-800 mb-2">Payment Not Configured</h2>
-                    <p className="text-red-600">PayPal is not configured yet. Please contact support.</p>
-                </div>
-            </div>
-        );
-    }
-
-    const PayPalScriptProvider = PayPalScriptProviderRef.current;
-    const PayPalButtons = PayPalButtonsRef.current;
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -156,8 +184,8 @@ const Payment = () => {
                                 <Crown className="w-6 h-6 text-white" />
                             </div>
                             <div>
-                                <h2 className="text-xl font-bold text-white">Confirm Payment</h2>
-                                <p className="text-white/80 text-sm">You are purchasing a VIP plan</p>
+                                <h2 className="text-xl font-bold text-white">Confirm Subscription</h2>
+                                <p className="text-white/80 text-sm">You are subscribing to a VIP plan</p>
                             </div>
                         </div>
                     </div>
@@ -166,7 +194,7 @@ const Payment = () => {
                             <div>
                                 <h3 className="text-lg font-bold text-gray-900">{selectedPackage.name}</h3>
                                 <p className="text-sm text-gray-500 mt-1">
-                                    Duration: {selectedPackage.duration_months} month{selectedPackage.duration_months > 1 ? 's' : ''}
+                                    Duration: {selectedPackage.duration_months} month{selectedPackage.duration_months > 1 ? 's' : ''} / billing cycle
                                 </p>
                                 {selectedPackage.description && (
                                     <p className="text-sm text-gray-600 mt-2">{selectedPackage.description}</p>
@@ -176,7 +204,21 @@ const Payment = () => {
                                 <div className="text-2xl font-extrabold text-lime-600">
                                     ${Number(selectedPackage.price).toFixed(2)}
                                 </div>
-                                <p className="text-xs text-gray-400 mt-1">USD</p>
+                                <p className="text-xs text-gray-400 mt-1">USD / month</p>
+                            </div>
+                        </div>
+
+                        {/* Subscription Info */}
+                        <div className="mt-4 bg-lime-50 rounded-xl p-4 border border-lime-100">
+                            <div className="flex items-start gap-3">
+                                <RefreshCw className="w-5 h-5 text-lime-600 mt-0.5 flex-shrink-0" />
+                                <div>
+                                    <p className="text-sm font-medium text-lime-800">Monthly Auto-Renewal</p>
+                                    <p className="text-xs text-lime-600 mt-1">
+                                        Your subscription will automatically renew each month. 
+                                        You can cancel anytime from your VIP dashboard — your access continues until the end of the billing period.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -190,49 +232,50 @@ const Payment = () => {
                     </div>
                 )}
 
-                {/* PayPal Buttons */}
-                {PayPalLoaded && PayPalScriptProvider && PayPalButtons && (
-                    <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 mb-6">
-                        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                            <Shield className="w-5 h-5 text-lime-600" />
-                            Choose Payment Method
-                        </h3>
-
-                        <PayPalScriptProvider options={{
-                            "client-id": paypalClientId,
-                            currency: "USD",
-                            intent: "capture",
-                            "enable-funding": "venmo",
-                        }}>
-                            <PayPalButtons
-                                style={{
-                                    layout: "vertical",
-                                    color: "gold",
-                                    shape: "rect",
-                                    label: "pay",
-                                    height: 50,
-                                }}
-                                createOrder={createOrder}
-                                onApprove={onApprove}
-                                onError={onError}
-                                onCancel={onCancel}
-                            />
-                        </PayPalScriptProvider>
-
-                        <p className="text-xs text-gray-400 text-center mt-4">
-                            Pay securely with PayPal, Credit/Debit Card, Venmo, or Apple Pay
-                        </p>
-                    </div>
-                )}
-
-                {/* Loading PayPal */}
-                {!PayPalLoaded && (
+                {/* Polling indicator */}
+                {polling && (
                     <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 mb-6 text-center">
                         <svg className="animate-spin h-8 w-8 text-lime-600 mx-auto mb-3" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                         </svg>
-                        <p className="text-gray-500">Loading payment options...</p>
+                        <p className="text-gray-600 font-medium">Payment completed! Activating your VIP...</p>
+                        <p className="text-sm text-gray-400 mt-1">This usually takes a few seconds</p>
+                    </div>
+                )}
+
+                {/* Subscribe Button */}
+                {!polling && (
+                    <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 mb-6">
+                        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <Shield className="w-5 h-5 text-lime-600" />
+                            Secure Payment
+                        </h3>
+
+                        <button
+                            onClick={handleSubscribe}
+                            disabled={loading}
+                            className="w-full py-4 bg-gradient-to-r from-lime-500 to-emerald-500 text-white font-bold text-lg rounded-xl hover:from-lime-600 hover:to-emerald-600 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                        >
+                            {loading ? (
+                                <>
+                                    <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                    </svg>
+                                    Creating checkout...
+                                </>
+                            ) : (
+                                <>
+                                    <CreditCard className="w-5 h-5" />
+                                    Subscribe Now — ${Number(selectedPackage.price).toFixed(2)}/mo
+                                </>
+                            )}
+                        </button>
+
+                        <p className="text-xs text-gray-400 text-center mt-4">
+                            Pay securely with Credit/Debit Card • Cancel anytime
+                        </p>
                     </div>
                 )}
 
@@ -240,7 +283,7 @@ const Payment = () => {
                 <div className="mt-6 flex justify-center">
                     <div className="flex items-center gap-2 text-xs text-gray-500">
                         <Lock className="w-4 h-4 text-lime-600" />
-                        <span>Secured by PayPal • SSL Encrypted • Server-side processing</span>
+                        <span>Secured by Lemon Squeezy • SSL Encrypted • Auto-renewable subscription</span>
                     </div>
                 </div>
             </div>

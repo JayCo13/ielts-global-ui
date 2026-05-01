@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Home, Calendar, Clock, CreditCard, Star, Layers, TrendingUp } from 'lucide-react';
+import { ChevronRight, Home, Calendar, Clock, CreditCard, Star, Layers, TrendingUp, RefreshCw, XCircle, ExternalLink } from 'lucide-react';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
 
@@ -8,6 +8,8 @@ const MyVIPPackage = () => {
     const [subscriptions, setSubscriptions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [cancellingId, setCancellingId] = useState(null);
+    const [managingBilling, setManagingBilling] = useState(false);
 
     useEffect(() => {
         fetchSubscriptions();
@@ -31,6 +33,63 @@ const MyVIPPackage = () => {
             setError(err.message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleCancelSubscription = async () => {
+        if (!window.confirm(
+            'Are you sure you want to cancel your subscription?\n\n' +
+            'Your VIP access will remain active until the end of the current billing period. ' +
+            'You will not be charged again after cancellation.'
+        )) return;
+
+        setCancellingId(true);
+        try {
+            const response = await fetchWithTimeout(`${API_BASE}/customer/vip/subscription/cancel`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || 'Failed to cancel subscription');
+            }
+
+            alert('Subscription cancelled successfully. Your VIP access will remain active until the end of the billing period.');
+            fetchSubscriptions(); // Refresh data
+        } catch (err) {
+            alert(`Error: ${err.message}`);
+        } finally {
+            setCancellingId(null);
+        }
+    };
+
+    const handleManageBilling = async () => {
+        setManagingBilling(true);
+        try {
+            const response = await fetchWithTimeout(`${API_BASE}/customer/vip/subscription/manage`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || 'Failed to get billing portal');
+            }
+
+            if (data.customer_portal_url) {
+                window.open(data.customer_portal_url, '_blank');
+            }
+        } catch (err) {
+            alert(`Error: ${err.message}`);
+        } finally {
+            setManagingBilling(false);
         }
     };
 
@@ -67,6 +126,11 @@ const MyVIPPackage = () => {
     };
 
     const vipStats = calculateTotalDays();
+
+    // Check if any active subscription has auto-renew
+    const hasAutoRenewSub = subscriptions.some(sub => sub.is_active && sub.is_auto_renew && sub.ls_subscription_id);
+    const hasCancelledSub = subscriptions.some(sub => sub.is_active && !sub.is_auto_renew && sub.cancelled_at);
+    const hasLSSub = subscriptions.some(sub => sub.ls_subscription_id);
 
     if (loading) {
         return (
@@ -194,12 +258,18 @@ const MyVIPPackage = () => {
                     <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                         <div className="flex items-center gap-3">
                             <div className="p-2.5 bg-purple-100 rounded-xl">
-                                <Clock className="w-5 h-5 text-purple-600" />
+                                <RefreshCw className="w-5 h-5 text-purple-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Expired</p>
+                                <p className="text-sm text-gray-500">Auto-Renew</p>
                                 <p className="text-lg font-bold text-gray-900">
-                                    {vipStats.lastEnd ? formatDate(vipStats.lastEnd) : 'N/A'}
+                                    {hasAutoRenewSub ? (
+                                        <span className="text-emerald-600">Active</span>
+                                    ) : hasCancelledSub ? (
+                                        <span className="text-amber-600">Cancelled</span>
+                                    ) : (
+                                        <span className="text-gray-400">N/A</span>
+                                    )}
                                 </p>
                             </div>
                         </div>
@@ -234,8 +304,44 @@ const MyVIPPackage = () => {
                     </div>
                 )}
 
-
-
+                {/* Subscription Management Buttons */}
+                {activeCount > 0 && (
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
+                        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <CreditCard className="w-5 h-5 text-indigo-600" />
+                            Subscription Management
+                        </h3>
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            {hasLSSub && (
+                                <button
+                                    onClick={handleManageBilling}
+                                    disabled={managingBilling}
+                                    className="flex-1 px-4 py-3 bg-indigo-50 text-indigo-700 rounded-xl font-medium hover:bg-indigo-100 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                                >
+                                    <ExternalLink className="w-4 h-4" />
+                                    {managingBilling ? 'Opening...' : 'Manage Billing'}
+                                </button>
+                            )}
+                            {hasAutoRenewSub && (
+                                <button
+                                    onClick={handleCancelSubscription}
+                                    disabled={cancellingId}
+                                    className="flex-1 px-4 py-3 bg-red-50 text-red-600 rounded-xl font-medium hover:bg-red-100 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                                >
+                                    <XCircle className="w-4 h-4" />
+                                    {cancellingId ? 'Cancelling...' : 'Cancel Subscription'}
+                                </button>
+                            )}
+                        </div>
+                        {hasCancelledSub && (
+                            <div className="mt-3 bg-amber-50 rounded-lg px-4 py-2 border border-amber-100">
+                                <p className="text-sm text-amber-700">
+                                    ⚠️ Your subscription has been cancelled. VIP access will remain active until the end of the current billing period.
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Quick Action Buttons */}
                 <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 mb-8 shadow-lg">
@@ -313,12 +419,23 @@ const MyVIPPackage = () => {
                                                         </div>
 
                                                         <div>
-                                                            <h4 className="font-semibold text-gray-900 text-lg flex items-center gap-2">
+                                                            <h4 className="font-semibold text-gray-900 text-lg flex items-center gap-2 flex-wrap">
                                                                 {subscription.package_name}
                                                                 {isActive && (
                                                                     <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-full">
                                                                         <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1 animate-pulse"></span>
                                                                         Active
+                                                                    </span>
+                                                                )}
+                                                                {isActive && subscription.is_auto_renew && (
+                                                                    <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 rounded-full">
+                                                                        <RefreshCw className="w-3 h-3 mr-1" />
+                                                                        Auto-renew
+                                                                    </span>
+                                                                )}
+                                                                {isActive && subscription.cancelled_at && (
+                                                                    <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-700 rounded-full">
+                                                                        Cancelling
                                                                     </span>
                                                                 )}
                                                             </h4>
