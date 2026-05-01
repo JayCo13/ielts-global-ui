@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Home, Calendar, Clock, CreditCard, Star, Layers, TrendingUp, RefreshCw, XCircle, ExternalLink } from 'lucide-react';
+import { ChevronRight, Home, Calendar, Clock, CreditCard, Star, Layers, TrendingUp, RefreshCw, XCircle, ExternalLink, CheckCircle, AlertTriangle, X } from 'lucide-react';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
 
@@ -11,6 +11,21 @@ const MyVIPPackage = () => {
     const [cancellingId, setCancellingId] = useState(null);
     const [resuming, setResuming] = useState(false);
     const [managingBilling, setManagingBilling] = useState(false);
+
+    // Modal state
+    const [modal, setModal] = useState({ open: false, type: 'alert', title: '', message: '', onConfirm: null });
+
+    const showAlert = useCallback((title, message, type = 'success') => {
+        setModal({ open: true, type: 'alert', variant: type, title, message, onConfirm: null });
+    }, []);
+
+    const showConfirm = useCallback((title, message, onConfirm) => {
+        setModal({ open: true, type: 'confirm', variant: 'warning', title, message, onConfirm });
+    }, []);
+
+    const closeModal = useCallback(() => {
+        setModal(prev => ({ ...prev, open: false }));
+    }, []);
 
     useEffect(() => {
         fetchSubscriptions();
@@ -37,13 +52,7 @@ const MyVIPPackage = () => {
         }
     };
 
-    const handleCancelSubscription = async () => {
-        if (!window.confirm(
-            'Are you sure you want to cancel your subscription?\n\n' +
-            'Your VIP access will remain active until the end of the current billing period. ' +
-            'You will not be charged again after cancellation.'
-        )) return;
-
+    const doCancelSubscription = async () => {
         setCancellingId(true);
         try {
             const response = await fetchWithTimeout(`${API_BASE}/customer/vip/subscription/cancel`, {
@@ -60,21 +69,24 @@ const MyVIPPackage = () => {
                 throw new Error(data.detail || 'Failed to cancel subscription');
             }
 
-            alert('Subscription cancelled successfully. Your VIP access will remain active until the end of the billing period.');
-            fetchSubscriptions(); // Refresh data
+            showAlert('Subscription Cancelled', 'Your VIP access will remain active until the end of the billing period.', 'success');
+            fetchSubscriptions();
         } catch (err) {
-            alert(`Error: ${err.message}`);
+            showAlert('Error', err.message, 'error');
         } finally {
             setCancellingId(null);
         }
     };
 
-    const handleResumeSubscription = async () => {
-        if (!window.confirm(
-            'Resume your subscription?\n\n' +
-            'Auto-renewal will be re-activated and you will be charged at the end of the current billing period.'
-        )) return;
+    const handleCancelSubscription = () => {
+        showConfirm(
+            'Cancel Subscription?',
+            'Your VIP access will remain active until the end of the current billing period. You will not be charged again after cancellation.',
+            doCancelSubscription
+        );
+    };
 
+    const doResumeSubscription = async () => {
         setResuming(true);
         try {
             const response = await fetchWithTimeout(`${API_BASE}/customer/vip/subscription/resume`, {
@@ -91,13 +103,21 @@ const MyVIPPackage = () => {
                 throw new Error(data.detail || 'Failed to resume subscription');
             }
 
-            alert('Subscription resumed! Auto-renewal is now active.');
+            showAlert('Subscription Resumed', 'Auto-renewal is now active. You will be charged at the end of the current billing period.', 'success');
             fetchSubscriptions();
         } catch (err) {
-            alert(`Error: ${err.message}`);
+            showAlert('Error', err.message, 'error');
         } finally {
             setResuming(false);
         }
+    };
+
+    const handleResumeSubscription = () => {
+        showConfirm(
+            'Resume Subscription?',
+            'Auto-renewal will be re-activated and you will be charged at the end of the current billing period.',
+            doResumeSubscription
+        );
     };
 
     const handleManageBilling = async () => {
@@ -522,6 +542,83 @@ const MyVIPPackage = () => {
                     )}
                 </div>
             </div>
+
+            {/* Custom Modal */}
+            {modal.open && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={closeModal}>
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+                    <div
+                        className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all animate-[modalIn_0.2s_ease-out]"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Close button */}
+                        <button
+                            onClick={closeModal}
+                            className="absolute top-4 right-4 p-1 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-100"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+
+                        {/* Icon */}
+                        <div className="flex justify-center mb-4">
+                            <div className={`w-14 h-14 rounded-full flex items-center justify-center ${
+                                modal.variant === 'success' ? 'bg-emerald-100' :
+                                modal.variant === 'error' ? 'bg-red-100' :
+                                'bg-amber-100'
+                            }`}>
+                                {modal.variant === 'success' ? (
+                                    <CheckCircle className="w-7 h-7 text-emerald-600" />
+                                ) : modal.variant === 'error' ? (
+                                    <XCircle className="w-7 h-7 text-red-600" />
+                                ) : (
+                                    <AlertTriangle className="w-7 h-7 text-amber-600" />
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Title */}
+                        <h3 className="text-xl font-bold text-gray-900 text-center mb-2">
+                            {modal.title}
+                        </h3>
+
+                        {/* Message */}
+                        <p className="text-gray-600 text-center text-sm leading-relaxed mb-6">
+                            {modal.message}
+                        </p>
+
+                        {/* Buttons */}
+                        <div className="flex gap-3">
+                            {modal.type === 'confirm' ? (
+                                <>
+                                    <button
+                                        onClick={closeModal}
+                                        className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={() => { closeModal(); modal.onConfirm?.(); }}
+                                        className={`flex-1 px-4 py-3 rounded-xl font-medium transition-colors text-white ${
+                                            modal.title.includes('Cancel')
+                                                ? 'bg-red-500 hover:bg-red-600'
+                                                : 'bg-emerald-500 hover:bg-emerald-600'
+                                        }`}
+                                    >
+                                        {modal.title.includes('Cancel') ? 'Yes, Cancel' : 'Yes, Resume'}
+                                    </button>
+                                </>
+                            ) : (
+                                <button
+                                    onClick={closeModal}
+                                    className="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors"
+                                >
+                                    OK
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

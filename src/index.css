@@ -402,6 +402,18 @@ table .inline-flex.flex-col {
   animation: type-cursor 1s step-end infinite;
 }
 
+/* Modal animation */
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 /* IELTS Highlight and Note Styles */
 .ielts-highlight,
 .ielts-highlight.bg-yellow-200 {
