@@ -267,8 +267,10 @@ const MyVIPPackage = () => {
                                         <span className="text-emerald-600">Active</span>
                                     ) : hasCancelledSub ? (
                                         <span className="text-amber-600">Cancelled</span>
-                                    ) : (
+                                    ) : vipStats.isVip ? (
                                         <span className="text-gray-400">N/A</span>
+                                    ) : (
+                                        <span className="text-red-500">Expired</span>
                                     )}
                                 </p>
                             </div>

@@ -18,7 +18,6 @@ import API_BASE from '../config/api';
 const Payment = () => {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [polling, setPolling] = useState(false);
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -61,48 +60,17 @@ const Payment = () => {
         // Listen for Lemon Squeezy events
         const handleLSEvent = (event) => {
             if (event.detail?.event === 'Checkout.Success') {
-                // Payment completed — start polling for webhook activation
-                setPolling(true);
-                pollForActivation();
+                // Payment completed — redirect to processing page
+                // PaymentProcessing will handle polling for webhook activation
+                navigate('/payment-processing', {
+                    state: { packageId, packageName: selectedPackage?.name }
+                });
             }
         };
 
         window.addEventListener('lemon-squeezy:event', handleLSEvent);
         return () => window.removeEventListener('lemon-squeezy:event', handleLSEvent);
-    }, []);
-
-    // Poll for VIP activation (webhook may take a few seconds)
-    const pollForActivation = async () => {
-        const token = localStorage.getItem('token');
-        const maxAttempts = 15;
-        
-        for (let i = 0; i < maxAttempts; i++) {
-            try {
-                const res = await fetch(`${API_BASE}/customer/vip/subscription/status`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.is_subscribed) {
-                        // VIP activated! Navigate to success
-                        navigate('/payment-success', { state: { fromPayment: true } });
-                        return;
-                    }
-                }
-            } catch (err) {
-                console.warn(`Poll attempt ${i + 1} failed:`, err.message);
-            }
-            
-            // Wait before next poll (increasing delay)
-            await new Promise(r => setTimeout(r, 2000 + (i * 500)));
-        }
-        
-        // After all polls, still redirect to processing page
-        navigate('/payment-processing', { 
-            state: { packageId, packageName: selectedPackage?.name } 
-        });
-    };
+    }, [navigate, packageId, selectedPackage]);
 
     // Create checkout and open overlay
     const handleSubscribe = async () => {
@@ -232,20 +200,8 @@ const Payment = () => {
                     </div>
                 )}
 
-                {/* Polling indicator */}
-                {polling && (
-                    <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 mb-6 text-center">
-                        <svg className="animate-spin h-8 w-8 text-lime-600 mx-auto mb-3" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                        </svg>
-                        <p className="text-gray-600 font-medium">Payment completed! Activating your VIP...</p>
-                        <p className="text-sm text-gray-400 mt-1">This usually takes a few seconds</p>
-                    </div>
-                )}
-
                 {/* Subscribe Button */}
-                {!polling && (
+                {(
                     <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 mb-6">
                         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                             <Shield className="w-5 h-5 text-lime-600" />
