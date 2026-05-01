@@ -170,9 +170,9 @@ const MyVIPPackage = () => {
         const firstStart = new Date(Math.min(...activeSubscriptions.map(s => new Date(s.start_date))));
         const lastEnd = new Date(Math.max(...activeSubscriptions.map(s => new Date(s.end_date))));
 
-        const totalDays = Math.ceil((lastEnd - firstStart) / (1000 * 60 * 60 * 24));
-        const usedDays = Math.max(0, Math.ceil((now - firstStart) / (1000 * 60 * 60 * 24)));
+        const totalDays = Math.round((lastEnd - firstStart) / (1000 * 60 * 60 * 24));
         const remainingDays = Math.max(0, Math.ceil((lastEnd - now) / (1000 * 60 * 60 * 24)));
+        const usedDays = Math.max(0, totalDays - remainingDays);
 
         return { totalDays, usedDays, remainingDays, firstStart, lastEnd };
     };
