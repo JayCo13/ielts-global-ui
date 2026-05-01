@@ -9,6 +9,7 @@ const MyVIPPackage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [cancellingId, setCancellingId] = useState(null);
+    const [resuming, setResuming] = useState(false);
     const [managingBilling, setManagingBilling] = useState(false);
 
     useEffect(() => {
@@ -65,6 +66,37 @@ const MyVIPPackage = () => {
             alert(`Error: ${err.message}`);
         } finally {
             setCancellingId(null);
+        }
+    };
+
+    const handleResumeSubscription = async () => {
+        if (!window.confirm(
+            'Resume your subscription?\n\n' +
+            'Auto-renewal will be re-activated and you will be charged at the end of the current billing period.'
+        )) return;
+
+        setResuming(true);
+        try {
+            const response = await fetchWithTimeout(`${API_BASE}/customer/vip/subscription/resume`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || 'Failed to resume subscription');
+            }
+
+            alert('Subscription resumed! Auto-renewal is now active.');
+            fetchSubscriptions();
+        } catch (err) {
+            alert(`Error: ${err.message}`);
+        } finally {
+            setResuming(false);
         }
     };
 
@@ -336,10 +368,18 @@ const MyVIPPackage = () => {
                             )}
                         </div>
                         {hasCancelledSub && (
-                            <div className="mt-3 bg-amber-50 rounded-lg px-4 py-2 border border-amber-100">
+                            <div className="mt-3 bg-amber-50 rounded-lg px-4 py-3 border border-amber-100 flex flex-col sm:flex-row items-center justify-between gap-3">
                                 <p className="text-sm text-amber-700">
-                                    ⚠️ Your subscription has been cancelled. VIP access will remain active until the end of the current billing period.
+                                    ⚠️ Your subscription has been cancelled. VIP access remains active until the end of the billing period.
                                 </p>
+                                <button
+                                    onClick={handleResumeSubscription}
+                                    disabled={resuming}
+                                    className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 transition-colors flex items-center gap-2 disabled:opacity-50 whitespace-nowrap"
+                                >
+                                    <RefreshCw className={`w-4 h-4 ${resuming ? 'animate-spin' : ''}`} />
+                                    {resuming ? 'Resuming...' : 'Resume Subscription'}
+                                </button>
                             </div>
                         )}
                     </div>
