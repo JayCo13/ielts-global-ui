@@ -172,7 +172,7 @@ const Payment = () => {
                                 <div className="text-2xl font-extrabold text-lime-600">
                                     ${Number(selectedPackage.price).toFixed(2)}
                                 </div>
-                                <p className="text-xs text-gray-400 mt-1">USD / month</p>
+                                <p className="text-xs text-gray-400 mt-1">USD / {selectedPackage.duration_months} month{selectedPackage.duration_months > 1 ? 's' : ''}</p>
                             </div>
                         </div>
 
@@ -181,9 +181,9 @@ const Payment = () => {
                             <div className="flex items-start gap-3">
                                 <RefreshCw className="w-5 h-5 text-lime-600 mt-0.5 flex-shrink-0" />
                                 <div>
-                                    <p className="text-sm font-medium text-lime-800">Monthly Auto-Renewal</p>
+                                    <p className="text-sm font-medium text-lime-800">Auto-Renewal Every {selectedPackage.duration_months} Month{selectedPackage.duration_months > 1 ? 's' : ''}</p>
                                     <p className="text-xs text-lime-600 mt-1">
-                                        Your subscription will automatically renew each month. 
+                                        Your subscription will automatically renew every {selectedPackage.duration_months} month{selectedPackage.duration_months > 1 ? 's' : ''}. 
                                         You can cancel anytime from your VIP dashboard — your access continues until the end of the billing period.
                                     </p>
                                 </div>
@@ -224,7 +224,7 @@ const Payment = () => {
                             ) : (
                                 <>
                                     <CreditCard className="w-5 h-5" />
-                                    Subscribe Now — ${Number(selectedPackage.price).toFixed(2)}/mo
+                                    Subscribe Now — ${Number(selectedPackage.price).toFixed(2)} / {selectedPackage.duration_months} mo
                                 </>
                             )}
                         </button>
