@@ -89,36 +89,44 @@ const VIPPackages = () => {
             initial="hidden"
             animate="show"
             variants={container}
-            className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-100 flex justify-center items-center"
+            className="flex justify-center items-center mb-12"
         >
-            <motion.div variants={item} className="flex flex-wrap gap-4 justify-center items-center">
-                <motion.button
-                    variants={item}
+            <motion.div variants={item} className="flex flex-wrap gap-2 justify-center items-center p-2 bg-white rounded-2xl shadow-lg border border-gray-100">
+                <button
                     onClick={() => handleFilterChange('all')}
-                    className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-300
+                    className={`relative flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-300 overflow-hidden group
                         ${activeFilter === 'all'
-                            ? 'bg-gradient-to-r from-[#34d399] to-[#10b981] text-white shadow-lg shadow-indigo-200'
-                            : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}
+                            ? 'text-white shadow-lg shadow-emerald-500/25'
+                            : 'bg-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`}
                 >
-                    <Globe className="w-5 h-5" />
-                    <span>All skills</span>
-                </motion.button>
+                    {activeFilter === 'all' && (
+                        <motion.div layoutId="filter-bg" className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-emerald-400 z-0 rounded-xl" />
+                    )}
+                    <span className="relative z-10 flex items-center gap-2 font-semibold">
+                        <Globe className="w-5 h-5" />
+                        All Skills
+                    </span>
+                </button>
                 {['listening', 'reading', 'writing', 'speaking'].map(skill => (
-                    <motion.button
+                    <button
                         key={skill}
-                        variants={item}
                         onClick={() => handleFilterChange(skill)}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-300
+                        className={`relative flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-300 overflow-hidden group
                             ${activeFilter === skill
-                                ? 'bg-gradient-to-r from-[#34d399] to-[#10b981] text-white shadow-lg shadow-indigo-200'
-                                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}
+                                ? 'text-white shadow-lg shadow-emerald-500/25'
+                                : 'bg-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`}
                     >
-                        {skill === 'listening' && <Mic className="w-5 h-5" />}
-                        {skill === 'reading' && <BookOpen className="w-5 h-5" />}
-                        {skill === 'writing' && <Lightbulb className="w-5 h-5" />}
-                        {skill === 'speaking' && <Star className="w-5 h-5" />}
-                        <span>{skillNames[skill]}</span>
-                    </motion.button>
+                        {activeFilter === skill && (
+                            <motion.div layoutId="filter-bg" className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-emerald-400 z-0 rounded-xl" />
+                        )}
+                        <span className="relative z-10 flex items-center gap-2 font-semibold">
+                            {skill === 'listening' && <Mic className="w-5 h-5" />}
+                            {skill === 'reading' && <BookOpen className="w-5 h-5" />}
+                            {skill === 'writing' && <Lightbulb className="w-5 h-5" />}
+                            {skill === 'speaking' && <Star className="w-5 h-5" />}
+                            {skillNames[skill]}
+                        </span>
+                    </button>
                 ))}
             </motion.div>
         </motion.div>
@@ -131,7 +139,9 @@ const VIPPackages = () => {
                 return {
                     gradient: 'from-[#34d399] to-[#10b981]',
                     icon: Globe,
-                    badge: 'bg-emerald-100 text-emerald-600'
+                    badge: 'bg-emerald-100 text-emerald-700 ring-emerald-500/20',
+                    shadow: 'shadow-emerald-500/30',
+                    hoverShadow: 'hover:shadow-emerald-500/40'
                 };
             }
             switch (pkg.skill_type) {
@@ -139,25 +149,33 @@ const VIPPackages = () => {
                     return {
                         gradient: 'from-blue-500 to-cyan-500',
                         icon: Mic,
-                        badge: 'bg-blue-100 text-blue-600'
+                        badge: 'bg-blue-100 text-blue-700 ring-blue-500/20',
+                        shadow: 'shadow-blue-500/30',
+                        hoverShadow: 'hover:shadow-blue-500/40'
                     };
                 case 'reading':
                     return {
                         gradient: 'from-emerald-500 to-teal-500',
                         icon: BookOpen,
-                        badge: 'bg-emerald-100 text-emerald-600'
+                        badge: 'bg-emerald-100 text-emerald-700 ring-emerald-500/20',
+                        shadow: 'shadow-emerald-500/30',
+                        hoverShadow: 'hover:shadow-emerald-500/40'
                     };
                 case 'writing':
                     return {
                         gradient: 'from-amber-500 to-orange-500',
                         icon: Lightbulb,
-                        badge: 'bg-amber-100 text-amber-600'
+                        badge: 'bg-amber-100 text-amber-700 ring-amber-500/20',
+                        shadow: 'shadow-amber-500/30',
+                        hoverShadow: 'hover:shadow-amber-500/40'
                     };
                 default:
                     return {
                         gradient: 'from-gray-500 to-slate-500',
                         icon: Crown,
-                        badge: 'bg-gray-100 text-gray-600'
+                        badge: 'bg-gray-100 text-gray-700 ring-gray-500/20',
+                        shadow: 'shadow-gray-500/30',
+                        hoverShadow: 'hover:shadow-gray-500/40'
                     };
             }
         };
@@ -170,74 +188,60 @@ const VIPPackages = () => {
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ scale: 1.02 }}
-                className="group relative overflow-hidden rounded-3xl bg-white shadow-sm hover:shadow-md transition-all duration-300 border-2"
+                whileHover={{ y: -8, scale: 1.02 }}
+                className="group relative overflow-hidden rounded-[2rem] bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] transition-all duration-500 flex flex-col h-full"
             >
-                <div className="relative p-6 space-y-4">
+                {/* Decorative background glow */}
+                <div className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl ${style.gradient} opacity-5 blur-3xl rounded-full pointer-events-none group-hover:opacity-10 transition-opacity duration-500`} />
+                
+                <div className="relative p-8 flex-grow flex flex-col">
                     {/* Header with Icon and Save button */}
-                    <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-3">
-                            <div className={`flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r ${style.gradient}`}>
-                                <Icon className="w-6 h-6 text-white" />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-xs text-gray-400">Duration:</span>
-                                <span className="text-sm text-gray-500">{pkg.duration_months} months</span>
-                            </div>
+                    <div className="flex justify-between items-start mb-6">
+                        <div className={`flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${style.gradient} shadow-lg ${style.shadow} transform group-hover:rotate-6 transition-transform duration-300`}>
+                            <Icon className="w-7 h-7 text-white" />
                         </div>
-                        <div className="text-gray-400 hover:text-gray-600 transition-colors">
-                            <img
-                                src="/img/logo-ielts.png?v=2"
-                                alt="IELTS Logo"
-                                className="w-7 h-7 object-contain"
-                            />
+                        <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide ${style.badge} ring-1 ring-inset`}>
+                            {pkg.duration_months} Months
                         </div>
                     </div>
 
                     {/* Package Name */}
-                    <h3 className="text-2xl font-bold text-gray-900 text-center">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-gray-900 group-hover:to-gray-600 transition-all duration-300">
                         {pkg.name}
                     </h3>
 
                     {/* Description */}
-                    <div className="space-y-3">
+                    <div className="space-y-4 mb-8 flex-grow">
                         {pkg.description.split('\n').map((line, index) => (
-                            <div key={index} className="flex items-start gap-3 text-gray-600 group hover:text-gray-800 transition-colors">
-                                <svg
-                                    className="w-5 h-5 mt-0.5 flex-shrink-0 text-indigo-500 group-hover:text-indigo-600 transition-colors"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                    strokeWidth={2}
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    />
-                                </svg>
-                                <span className="text-sm">{line}</span>
+                            <div key={index} className="flex items-start gap-3 text-gray-600">
+                                <div className={`mt-1 w-5 h-5 rounded-full flex items-center justify-center bg-gradient-to-br ${style.gradient} bg-opacity-10 shrink-0`}>
+                                    <svg className="w-3 h-3 text-white fill-current" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M10.28 2.28L3.989 8.575 1.695 6.28A1 1 0 00.28 7.695l3 3a1 1 0 001.414 0l7-7A1 1 0 0010.28 2.28z" />
+                                    </svg>
+                                </div>
+                                <span className="text-sm font-medium leading-relaxed">{line}</span>
                             </div>
                         ))}
                     </div>
 
                     {/* Price and Action */}
-                    <div className="flex items-center justify-between pt-6 mt-6 border-t border-gray-200">
-                        <div className="flex flex-col">
-                            <span className="text-sm font-medium text-gray-500">Package price</span>
-                            <div className={`text-2xl font-bold bg-gradient-to-r ${style.gradient} bg-clip-text text-transparent`}>
+                    <div className="mt-auto pt-6 border-t border-gray-100">
+                        <div className="flex items-baseline justify-center gap-1 mb-6">
+                            <span className="text-3xl font-extrabold text-gray-900">
                                 {new Intl.NumberFormat('en-US', {
                                     style: 'currency',
                                     currency: 'USD',
-                                    minimumFractionDigits: 2
+                                    minimumFractionDigits: 0
                                 }).format(pkg.price)}
-                            </div>
+                            </span>
+                            <span className="text-sm text-gray-500 font-medium">/ package</span>
                         </div>
                         <button
                             onClick={() => handlePurchase(pkg.package_id)}
-                            className={`px-8 py-3 bg-gradient-to-r ${style.gradient} text-white rounded-full font-medium hover:opacity-90 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50 focus:outline-none`}
+                            className={`w-full py-4 px-6 rounded-xl text-white font-bold tracking-wide bg-gradient-to-r ${style.gradient} shadow-lg ${style.shadow} ${style.hoverShadow} transform hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden group/btn`}
                         >
-                            Register Now
+                            <span className="relative z-10">Get Started</span>
+                            <div className="absolute inset-0 h-full w-full bg-white/20 -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite] skew-x-12" />
                         </button>
                     </div>
                 </div>
@@ -309,50 +313,55 @@ const VIPPackages = () => {
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="min-h-screen bg-gray-50"
+            className="min-h-screen bg-gray-50 relative overflow-hidden"
         >
+            {/* Background elements */}
+            <div className="absolute top-0 inset-x-0 h-96 bg-gradient-to-b from-gray-100 to-transparent pointer-events-none" />
+            <div className="absolute -top-40 -right-40 w-96 h-96 bg-emerald-200 rounded-full mix-blend-multiply filter blur-[128px] opacity-40 pointer-events-none" />
+            <div className="absolute top-20 -left-20 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-[128px] opacity-40 pointer-events-none" />
+
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white/80 backdrop-blur-sm sticky top-0 z-10 border-b border-gray-100"
+                className="bg-white/80 backdrop-blur-sm sticky top-0 z-10 border-b border-gray-100 shadow-sm"
             >
                 <div className="max-w-7xl mx-auto px-6 py-4">
                     <nav className="flex items-center space-x-2 text-sm">
-                        <Link to="/" className="text-gray-500 hover:text-violet-600 flex items-center transition-colors duration-300">
+                        <Link to="/" className="text-gray-500 hover:text-emerald-600 flex items-center transition-colors duration-300">
                             <Home size={16} className="mr-1" />
                             Home
                         </Link>
                         <ChevronRight size={16} className="text-gray-400" />
-                        <span className="text-gray-900 font-medium">VIP packages</span>
+                        <span className="text-gray-900 font-semibold">VIP Packages</span>
                     </nav>
                 </div>
             </motion.div>
 
-            <div className="max-w-7xl mx-auto px-6 py-12">
+            <div className="max-w-7xl mx-auto px-6 py-16 relative z-10">
                 <motion.div
                     initial="hidden"
                     animate="show"
                     variants={container}
-                    className="text-center mb-12"
+                    className="text-center mb-16 relative"
                 >
                     <motion.div
                         variants={item}
-                        whileHover={{ scale: 1.1 }}
-                        className="inline-flex items-center justify-center p-3 bg-gradient-to-r from-[#34d399] to-[#10b981] rounded-2xl shadow-lg shadow-indigo-200 mb-6"
+                        whileHover={{ scale: 1.1, rotate: 5 }}
+                        className="inline-flex items-center justify-center p-4 bg-gradient-to-r from-[#34d399] to-[#10b981] rounded-2xl shadow-xl shadow-emerald-500/30 mb-8"
                     >
-                        <Crown className="w-8 h-8 text-white" />
+                        <Crown className="w-10 h-10 text-white" />
                     </motion.div>
                     <motion.h1
                         variants={item}
-                        className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#34d399] to-[#10b981]"
+                        className="text-5xl md:text-6xl font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-emerald-800 to-gray-900 tracking-tight"
                     >
-                        ieltscomputertest.com VIP packages
+                        Unlock Your Potential
                     </motion.h1>
                     <motion.p
                         variants={item}
-                        className="text-xl text-gray-500 max-w-2xl mx-auto drop-shadow-[0_2px_8px_rgba(16,185,129,0.5)]"
+                        className="text-xl text-gray-600 max-w-2xl mx-auto font-medium leading-relaxed"
                     >
-                        Choose the right VIP package for your learning journey
+                        Choose the right premium package for your IELTS journey and reach your target band faster.
                     </motion.p>
                 </motion.div>
 
@@ -361,30 +370,38 @@ const VIPPackages = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="mb-8 bg-white/80 backdrop-blur-sm border border-emerald-100 rounded-2xl shadow-sm p-5 text-left"
+                    className="mb-12 bg-white/60 backdrop-blur-md border border-emerald-100 rounded-[2rem] shadow-lg shadow-emerald-500/5 p-6 md:p-8 text-left"
                 >
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="bg-emerald-100 p-2 rounded-xl">
-                            <Info className="w-5 h-5 text-emerald-600" />
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="bg-emerald-100/50 p-3 rounded-2xl border border-emerald-200/50">
+                            <Sparkles className="w-6 h-6 text-emerald-600" />
                         </div>
-                        <h4 className="font-bold text-gray-900 text-lg m-0">No VIP Account - Benefits</h4>
+                        <h4 className="font-bold text-gray-900 text-xl m-0 tracking-tight">Free Tier Benefits</h4>
                     </div>
-                    <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 bg-gray-50 p-2 rounded-xl border border-gray-100 text-sm">
-                        <div className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-lg shadow-sm border border-emerald-50 flex-1 justify-center whitespace-nowrap">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-                            <span className="text-gray-700">Access free <strong className="text-gray-900">Speaking</strong></span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="flex items-center gap-3 px-5 py-4 bg-white rounded-2xl shadow-sm border border-emerald-50 hover:border-emerald-100 hover:shadow-md transition-all duration-300 group">
+                            <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <Star className="w-5 h-5 text-emerald-500" />
+                            </div>
+                            <span className="text-gray-700 font-medium">Free <strong className="text-gray-900">Speaking</strong></span>
                         </div>
-                        <div className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-lg shadow-sm border border-emerald-50 flex-1 justify-center whitespace-nowrap">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-                            <span className="text-gray-700">Access free <strong className="text-gray-900">Writing</strong> (1 AI/day)</span>
+                        <div className="flex items-center gap-3 px-5 py-4 bg-white rounded-2xl shadow-sm border border-emerald-50 hover:border-emerald-100 hover:shadow-md transition-all duration-300 group">
+                            <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <Lightbulb className="w-5 h-5 text-emerald-500" />
+                            </div>
+                            <span className="text-gray-700 font-medium">Free <strong className="text-gray-900">Writing</strong> <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full ml-1">1 AI/day</span></span>
                         </div>
-                        <div className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-lg shadow-sm border border-amber-50 flex-1 justify-center whitespace-nowrap">
-                            <span className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span>
-                            <span className="text-gray-700"><strong className="text-amber-600">6 free Listening tests</strong> only</span>
+                        <div className="flex items-center gap-3 px-5 py-4 bg-white rounded-2xl shadow-sm border border-amber-50 hover:border-amber-100 hover:shadow-md transition-all duration-300 group">
+                            <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <Mic className="w-5 h-5 text-amber-500" />
+                            </div>
+                            <span className="text-gray-700 font-medium"><strong className="text-amber-600">6</strong> Listening tests</span>
                         </div>
-                        <div className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-lg shadow-sm border border-amber-50 flex-1 justify-center whitespace-nowrap">
-                            <span className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span>
-                            <span className="text-gray-700"><strong className="text-amber-600">6 free Reading tests</strong> only</span>
+                        <div className="flex items-center gap-3 px-5 py-4 bg-white rounded-2xl shadow-sm border border-amber-50 hover:border-amber-100 hover:shadow-md transition-all duration-300 group">
+                            <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <BookOpen className="w-5 h-5 text-amber-500" />
+                            </div>
+                            <span className="text-gray-700 font-medium"><strong className="text-amber-600">6</strong> Reading tests</span>
                         </div>
                     </div>
                 </motion.div>
@@ -395,7 +412,7 @@ const VIPPackages = () => {
                     initial="hidden"
                     animate="show"
                     variants={container}
-                    className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                 >
                     {currentPackages.map((pkg, index) => (
                         <PackageCard key={pkg.package_id} pkg={pkg} index={index} />

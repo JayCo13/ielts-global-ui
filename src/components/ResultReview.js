@@ -4,10 +4,7 @@ import { CheckCircle, Info, XCircle, Circle, Clock, BarChart2, ArrowLeft, Chevro
 import { toast, Toaster } from 'react-hot-toast';
 import styled from '@emotion/styled';
 import { keyframes } from '@emotion/react';
-import Lottie from 'react-lottie';
-import highAnimation from '../effect/high.json';
-import mediumAnimation from '../effect/medium.json';
-import lowAnimation from '../effect/low.json';
+
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
 
@@ -54,6 +51,20 @@ const calculateBandScore = (correctAnswers) => {
   return 0;
 }
 
+const getResultFeedback = (bandScore) => {
+  if (bandScore >= 8.5) {
+    return { image: '/result-images/8.5-9.0 You\'re truly amazing!.png', message: "You're truly amazing!" };
+  } else if (bandScore >= 7.5) {
+    return { image: '/result-images/7.5-8.0 Congratulations, well deserved!.png', message: "Congratulations, well deserved!" };
+  } else if (bandScore >= 6.0) {
+    return { image: '/result-images/6-7.0 You\'re doing great! 🌸.png', message: "You're doing great! 🌸" };
+  } else if (bandScore >= 4.5) {
+    return { image: '/result-images/4.5-5.5 Oh my god, almost there!!.png', message: "Oh my god, almost there!!" };
+  } else {
+    return { image: '/result-images/Below 4.5 dont be stress ....png', message: "Below 4.5 dont be stress ..." };
+  }
+};
+
 const ResultReview = () => {
   const [resultData, setResultData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -96,14 +107,7 @@ const ResultReview = () => {
     }
   };
   const answersPerPage = 10;
-  const lottieOptions = (animationData) => ({
-    loop: true,
-    autoplay: true,
-    animationData,
-    rendererSettings: {
-      preserveAspectRatio: 'xMidYMid slice'
-    }
-  });
+
   useEffect(() => {
     const fetchResultDetails = async () => {
       try {
@@ -603,20 +607,21 @@ const ResultReview = () => {
                   </svg>
                 </div>
                 {/* Chart icon */}
-                <div className="absolute -top-1 -right-1 w-8 h-8 rounded-full bg-lime-500 shadow-lg border-2 border-white flex items-center justify-center transform transition-all duration-300 hover:scale-110 hover:shadow-xl">
-                  {resultData.total_score >= 30 ? (
-                    <Lottie options={lottieOptions(highAnimation)} height={34} width={34} />
-                  ) : resultData.total_score >= 20 ? (
-                    <Lottie options={lottieOptions(mediumAnimation)} height={34} width={34} />
-                  ) : (
-                    <Lottie options={lottieOptions(lowAnimation)} height={34} width={34} />
-                  )}
+                <div className="absolute -top-2 -right-2 w-12 h-12 bg-white rounded-full shadow-lg border-2 border-white flex items-center justify-center transform transition-all duration-300 hover:scale-110 hover:shadow-xl overflow-hidden">
+                  <img 
+                    src={getResultFeedback(calculateBandScore(resultData.total_score)).image} 
+                    alt="Result Icon" 
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </div>
 
               {/* Status Legend */}
               <div className="flex-grow">
-                <h3 className="text-sm font-medium text-gray-900 mb-4">Status Legend</h3>
+                <h3 className="text-sm font-medium text-gray-900 mb-2">Status Legend</h3>
+                <div className="text-md font-semibold text-violet-600 mb-4 italic">
+                  "{getResultFeedback(calculateBandScore(resultData.total_score)).message}"
+                </div>
                 <div className="space-y-3">
                   <div className="flex items-center bg-green-50 p-3 rounded-lg">
                     <CheckCircle className="w-5 h-5 text-green-500 mr-3" />

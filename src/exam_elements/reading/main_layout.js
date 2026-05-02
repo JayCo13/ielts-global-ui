@@ -64,6 +64,13 @@ const MainLayout = () => {
   const [logoutMessage, setLogoutMessage] = useState('');
   const [resetKey, setResetKey] = useState(0); // Add reset key to force child component re-render
   const [vipStatus, setVipStatus] = useState(null); // VIP status state
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Vocabulary context menu state
   const [vocabMenu, setVocabMenu] = useState({ visible: false, x: 0, y: 0, selectedText: '' });
@@ -2268,16 +2275,17 @@ const MainLayout = () => {
         </div>
 
         <Split
-          className={`flex-1 flex overflow-hidden ${colorTheme === 'black-on-white' ? 'bg-white' : 'bg-black'}`}
-          sizes={[45, 55]}
-          minSize={300}
+          className={`flex-1 flex overflow-hidden ${colorTheme === 'black-on-white' ? 'bg-white' : 'bg-black'} ${isMobile ? 'flex-col' : 'flex-row'}`}
+          direction={isMobile ? 'vertical' : 'horizontal'}
+          sizes={isMobile ? [50, 50] : [45, 55]}
+          minSize={isMobile ? 150 : 300}
           gutterSize={10}
           gutterStyle={() => ({
             backgroundColor: colorTheme === 'black-on-white' ? '#e5e7eb' : '#374151'
           })}
         >
           {/* Reading Passage */}
-          <div className="border-r border-gray-300 p-4 overflow-y-auto">
+          <div className={`${isMobile ? 'border-b' : 'border-r'} border-gray-300 p-4 overflow-y-auto`}>
             <h1 className="text-3xl font-bold mb-4 text-center">{getCurrentSection()?.passages[0]?.title}</h1>
             {getCurrentSection()?.passages[0]?.content && (
               <div
@@ -3267,7 +3275,7 @@ const MainLayout = () => {
                         }`}
                     >
                       {currentPart === part ? (
-                        <div className="flex gap-1">
+                        <div className="flex flex-wrap justify-center gap-1 max-w-[80vw] md:max-w-none mx-auto">
                           {[...Array(part === 3 ? 14 : 13)].map((_, idx) => {
                             const questionNum = getQuestionRange(part).start + idx;
                             const isCompleted = isQuestionCompleted(questionNum);

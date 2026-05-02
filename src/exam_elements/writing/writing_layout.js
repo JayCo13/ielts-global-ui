@@ -42,6 +42,14 @@ const WritingLayout = () => {
   const [logoutCountdown, setLogoutCountdown] = useState(40);
   const [logoutMessage, setLogoutMessage] = useState('');
   const [sampleOpen, setSampleOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -523,12 +531,13 @@ const WritingLayout = () => {
         </div>
 
         <Split
-          sizes={[50, 50]}
-          minSize={300}
+          className={`flex-1 flex ${isMobile ? 'flex-col h-auto min-h-[calc(100vh-200px)]' : 'flex-row h-[calc(100vh-200px)]'}`}
+          direction={isMobile ? 'vertical' : 'horizontal'}
+          sizes={isMobile ? [40, 60] : [50, 50]}
+          minSize={isMobile ? 150 : 300}
           gutterSize={10}
-          className="flex-1 flex h-[calc(100vh-200px)]"
         >
-          <div className={`overflow-y-auto p-4 ${colorThemeClasses[colorTheme]}`}>
+          <div className={`overflow-y-auto p-4 ${colorThemeClasses[colorTheme]} ${isMobile ? 'border-b border-gray-200' : ''}`}>
             <div
               className={`leading-relaxed ${textSizeClasses[textSize]}`}
               dangerouslySetInnerHTML={{ __html: processInstructions(task.instructions) }}

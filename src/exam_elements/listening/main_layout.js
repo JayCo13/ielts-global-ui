@@ -514,6 +514,13 @@ const MainLayout = () => {
   const [logoutCountdown, setLogoutCountdown] = useState(40);
   const [logoutMessage, setLogoutMessage] = useState('');
   const [vipStatus, setVipStatus] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Vocabulary context menu state
   const [vocabMenu, setVocabMenu] = useState({ visible: false, x: 0, y: 0, selectedText: '' });
@@ -2824,19 +2831,19 @@ const MainLayout = () => {
             {/* Import Split component at the top of the file */}
             {showDescriptionPanel ? (
               <Split
-                className="flex split-container"
-                sizes={[50, 50]}
-                minSize={200}
+                className={`flex split-container ${isMobile ? 'flex-col' : 'flex-row'}`}
+                sizes={isMobile ? [50, 50] : [50, 50]}
+                minSize={isMobile ? 150 : 200}
                 expandToMin={false}
                 gutterSize={20}
                 gutterAlign="center"
                 snapOffset={10}
                 dragInterval={1}
-                direction="horizontal"
-                cursor="col-resize"
+                direction={isMobile ? 'vertical' : 'horizontal'}
+                cursor={isMobile ? 'row-resize' : 'col-resize'}
               >
                 {/* Exam content on the left */}
-                <div className={`overflow-y-auto ${colorTheme === 'black-on-white' ? 'bg-white' : 'bg-black'}`}>
+                <div className={`overflow-y-auto ${colorTheme === 'black-on-white' ? 'bg-white' : 'bg-black'} ${isMobile ? 'border-b border-gray-200' : ''}`}>
                   <div className={textSizeClasses[textSize]}>
                     {getCurrentSection()?.questions.map((question, index) =>
                       renderQuestionComponent(question, index)
@@ -2914,7 +2921,7 @@ const MainLayout = () => {
                         }`}
                     >
                       {currentPart === part ? (
-                        <div className="flex gap-1">
+                        <div className="flex flex-wrap justify-center gap-1 max-w-[80vw] md:max-w-none mx-auto">
                           {[...Array(10)].map((_, idx) => {
                             const questionNum = getQuestionRange(part).start + idx;
                             const isCompleted = isQuestionCompleted(questionNum);
