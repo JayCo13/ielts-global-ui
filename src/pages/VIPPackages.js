@@ -137,45 +137,89 @@ const VIPPackages = () => {
         const getPackageStyle = () => {
             if (pkg.package_type === 'all_skills') {
                 return {
-                    gradient: 'from-[#34d399] to-[#10b981]',
+                    gradient: 'from-emerald-500 to-teal-500',
+                    cardBg: 'bg-gradient-to-br from-emerald-50 via-white to-teal-50',
+                    border: 'border-emerald-200/60',
                     icon: Globe,
                     badge: 'bg-emerald-100 text-emerald-700 ring-emerald-500/20',
                     shadow: 'shadow-emerald-500/30',
-                    hoverShadow: 'hover:shadow-emerald-500/40'
+                    hoverShadow: 'hover:shadow-emerald-500/40',
+                    glowColor: 'bg-emerald-300',
+                    priceColor: 'text-emerald-700',
+                    divider: 'border-emerald-100',
+                    checkBg: 'bg-gradient-to-br from-emerald-500 to-teal-500',
                 };
             }
             switch (pkg.skill_type) {
                 case 'listening':
                     return {
                         gradient: 'from-blue-500 to-cyan-500',
+                        cardBg: 'bg-gradient-to-br from-blue-50 via-white to-cyan-50',
+                        border: 'border-blue-200/60',
                         icon: Mic,
                         badge: 'bg-blue-100 text-blue-700 ring-blue-500/20',
                         shadow: 'shadow-blue-500/30',
-                        hoverShadow: 'hover:shadow-blue-500/40'
+                        hoverShadow: 'hover:shadow-blue-500/40',
+                        glowColor: 'bg-blue-300',
+                        priceColor: 'text-blue-700',
+                        divider: 'border-blue-100',
+                        checkBg: 'bg-gradient-to-br from-blue-500 to-cyan-500',
                     };
                 case 'reading':
                     return {
-                        gradient: 'from-emerald-500 to-teal-500',
+                        gradient: 'from-violet-500 to-purple-500',
+                        cardBg: 'bg-gradient-to-br from-violet-50 via-white to-purple-50',
+                        border: 'border-violet-200/60',
                         icon: BookOpen,
-                        badge: 'bg-emerald-100 text-emerald-700 ring-emerald-500/20',
-                        shadow: 'shadow-emerald-500/30',
-                        hoverShadow: 'hover:shadow-emerald-500/40'
+                        badge: 'bg-violet-100 text-violet-700 ring-violet-500/20',
+                        shadow: 'shadow-violet-500/30',
+                        hoverShadow: 'hover:shadow-violet-500/40',
+                        glowColor: 'bg-violet-300',
+                        priceColor: 'text-violet-700',
+                        divider: 'border-violet-100',
+                        checkBg: 'bg-gradient-to-br from-violet-500 to-purple-500',
                     };
                 case 'writing':
                     return {
                         gradient: 'from-amber-500 to-orange-500',
+                        cardBg: 'bg-gradient-to-br from-amber-50 via-white to-orange-50',
+                        border: 'border-amber-200/60',
                         icon: Lightbulb,
                         badge: 'bg-amber-100 text-amber-700 ring-amber-500/20',
                         shadow: 'shadow-amber-500/30',
-                        hoverShadow: 'hover:shadow-amber-500/40'
+                        hoverShadow: 'hover:shadow-amber-500/40',
+                        glowColor: 'bg-amber-300',
+                        priceColor: 'text-amber-700',
+                        divider: 'border-amber-100',
+                        checkBg: 'bg-gradient-to-br from-amber-500 to-orange-500',
+                    };
+                case 'speaking':
+                    return {
+                        gradient: 'from-rose-500 to-pink-500',
+                        cardBg: 'bg-gradient-to-br from-rose-50 via-white to-pink-50',
+                        border: 'border-rose-200/60',
+                        icon: Star,
+                        badge: 'bg-rose-100 text-rose-700 ring-rose-500/20',
+                        shadow: 'shadow-rose-500/30',
+                        hoverShadow: 'hover:shadow-rose-500/40',
+                        glowColor: 'bg-rose-300',
+                        priceColor: 'text-rose-700',
+                        divider: 'border-rose-100',
+                        checkBg: 'bg-gradient-to-br from-rose-500 to-pink-500',
                     };
                 default:
                     return {
-                        gradient: 'from-gray-500 to-slate-500',
+                        gradient: 'from-slate-500 to-gray-500',
+                        cardBg: 'bg-gradient-to-br from-slate-50 via-white to-gray-50',
+                        border: 'border-gray-200/60',
                         icon: Crown,
                         badge: 'bg-gray-100 text-gray-700 ring-gray-500/20',
                         shadow: 'shadow-gray-500/30',
-                        hoverShadow: 'hover:shadow-gray-500/40'
+                        hoverShadow: 'hover:shadow-gray-500/40',
+                        glowColor: 'bg-gray-300',
+                        priceColor: 'text-gray-700',
+                        divider: 'border-gray-100',
+                        checkBg: 'bg-gradient-to-br from-slate-500 to-gray-500',
                     };
             }
         };
@@ -189,15 +233,19 @@ const VIPPackages = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 whileHover={{ y: -8, scale: 1.02 }}
-                className="group relative overflow-hidden rounded-[2rem] bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] transition-all duration-500 flex flex-col h-full"
+                className={`group relative overflow-hidden rounded-[2rem] ${style.cardBg} border ${style.border} shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.12)] transition-all duration-500 flex flex-col h-full`}
             >
+                {/* Colored top accent bar */}
+                <div className={`absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r ${style.gradient}`} />
+
                 {/* Decorative background glow */}
-                <div className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl ${style.gradient} opacity-5 blur-3xl rounded-full pointer-events-none group-hover:opacity-10 transition-opacity duration-500`} />
+                <div className={`absolute top-0 right-0 w-72 h-72 ${style.glowColor} opacity-[0.07] blur-3xl rounded-full pointer-events-none group-hover:opacity-[0.15] transition-opacity duration-500`} />
+                <div className={`absolute bottom-0 left-0 w-48 h-48 ${style.glowColor} opacity-[0.05] blur-3xl rounded-full pointer-events-none group-hover:opacity-[0.10] transition-opacity duration-500`} />
                 
                 <div className="relative p-8 flex-grow flex flex-col">
-                    {/* Header with Icon and Save button */}
+                    {/* Header with Icon and Badge */}
                     <div className="flex justify-between items-start mb-6">
-                        <div className={`flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${style.gradient} shadow-lg ${style.shadow} transform group-hover:rotate-6 transition-transform duration-300`}>
+                        <div className={`flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${style.gradient} shadow-lg ${style.shadow} transform group-hover:rotate-6 group-hover:scale-110 transition-all duration-300`}>
                             <Icon className="w-7 h-7 text-white" />
                         </div>
                         <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide ${style.badge} ring-1 ring-inset`}>
@@ -206,15 +254,15 @@ const VIPPackages = () => {
                     </div>
 
                     {/* Package Name */}
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-gray-900 group-hover:to-gray-600 transition-all duration-300">
+                    <h3 className={`text-2xl font-bold text-gray-900 mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:${style.gradient} transition-all duration-300`}>
                         {pkg.name}
                     </h3>
 
                     {/* Description */}
                     <div className="space-y-4 mb-8 flex-grow">
-                        {pkg.description.split('\n').map((line, index) => (
-                            <div key={index} className="flex items-start gap-3 text-gray-600">
-                                <div className={`mt-1 w-5 h-5 rounded-full flex items-center justify-center bg-gradient-to-br ${style.gradient} bg-opacity-10 shrink-0`}>
+                        {pkg.description.split('\n').map((line, idx) => (
+                            <div key={idx} className="flex items-start gap-3 text-gray-600">
+                                <div className={`mt-1 w-5 h-5 rounded-full flex items-center justify-center ${style.checkBg} shrink-0`}>
                                     <svg className="w-3 h-3 text-white fill-current" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M10.28 2.28L3.989 8.575 1.695 6.28A1 1 0 00.28 7.695l3 3a1 1 0 001.414 0l7-7A1 1 0 0010.28 2.28z" />
                                     </svg>
@@ -225,9 +273,9 @@ const VIPPackages = () => {
                     </div>
 
                     {/* Price and Action */}
-                    <div className="mt-auto pt-6 border-t border-gray-100">
+                    <div className={`mt-auto pt-6 border-t ${style.divider}`}>
                         <div className="flex items-baseline justify-center gap-1 mb-6">
-                            <span className="text-3xl font-extrabold text-gray-900">
+                            <span className={`text-3xl font-extrabold ${style.priceColor}`}>
                                 {new Intl.NumberFormat('en-US', {
                                     style: 'currency',
                                     currency: 'USD',

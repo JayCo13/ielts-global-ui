@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
-import { Search, Lock, ChevronRight, ChevronLeft, Star } from 'lucide-react';
+import { Search, Lock, ChevronRight, ChevronLeft, Star, Tag, X } from 'lucide-react';
 import secureStorage from '../utils/secureStorage';
 import ConfirmDialog from './ConfirmDialog';
 import API_BASE from '../config/api';
@@ -22,6 +22,7 @@ const ListeningForecast = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [examToRetake, setExamToRetake] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [activeQuestionType, setActiveQuestionType] = useState(null);
   const itemsPerPage = 6;
 
   useEffect(() => {
@@ -79,7 +80,8 @@ const ListeningForecast = () => {
             forecast_title: p.forecast_title || '',
             completed: !!p.completed,
             attempts_count: p.attempts_count || 0,
-            is_recommended: !!p.is_recommended
+            is_recommended: !!p.is_recommended,
+            question_types: Array.isArray(p.question_types) ? p.question_types : []
           })) : []))
           : [];
         setItems(normalized);
@@ -144,12 +146,16 @@ const ListeningForecast = () => {
     });
   };
 
+  const allQuestionTypes = [...new Set(items.flatMap(it => it.question_types || []))];
+
   const filtered = (userRole === 'customer' && !isVIP)
     ? items
-    : items.filter(it =>
-      ((it.exam_title || '').toLowerCase().includes(searchQuery.toLowerCase())) ||
-      ((it.forecast_title || '').toLowerCase().includes(searchQuery.toLowerCase()))
-    );
+    : items.filter(it => {
+      const matchesSearch = ((it.exam_title || '').toLowerCase().includes(searchQuery.toLowerCase())) ||
+        ((it.forecast_title || '').toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesType = !activeQuestionType || (it.question_types || []).includes(activeQuestionType);
+      return matchesSearch && matchesType;
+    });
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const paginated = filtered.slice(indexOfFirstItem, indexOfLastItem);
@@ -198,6 +204,38 @@ const ListeningForecast = () => {
               <Lock className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             )}
           </div>
+          {allQuestionTypes.length > 0 && (
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <Tag className="w-4 h-4 text-gray-400" />
+              {allQuestionTypes.map(qt => (
+                <button
+                  key={qt}
+                  onClick={() => {
+                    if (isVIP || userRole !== 'customer') {
+                      setActiveQuestionType(prev => prev === qt ? null : qt);
+                      setCurrentPage(1);
+                    }
+                  }}
+                  disabled={!isVIP && userRole === 'customer'}
+                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                    activeQuestionType === qt
+                      ? 'bg-[#0096b1] border-[#0096b1] text-white'
+                      : 'bg-white border-gray-200 text-gray-600 hover:border-[#0096b1] hover:text-[#0096b1]'
+                  } ${(!isVIP && userRole === 'customer') ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                >
+                  {qt}
+                </button>
+              ))}
+              {activeQuestionType && (
+                <button
+                  onClick={() => { setActiveQuestionType(null); setCurrentPage(1); }}
+                  className="px-2 py-1 rounded-full text-xs font-medium text-red-500 hover:bg-red-50 flex items-center gap-1"
+                >
+                  <X className="w-3 h-3" /> Clear
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {loading ? (
@@ -294,6 +332,15 @@ const ListeningForecast = () => {
                       {it.part_number}{it.forecast_title ? ` – ${it.forecast_title}` : ''}
                     </span>
                   </div>
+                  {(it.question_types || []).length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {it.question_types.map(qt => (
+                        <span key={qt} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-teal-50 text-teal-700 border border-teal-200">
+                          {qt}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   {(!isVIP && userRole === 'customer' && (index + indexOfFirstItem) >= 6) ? (
                     <div className="mt-4 p-3 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-between">
                       <div className="flex items-center gap-2 text-gray-700">
