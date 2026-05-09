@@ -365,53 +365,30 @@ const Writing_Fe = () => {
     setSelectedPart(null);
   };
 
-  const [sortOrder, setSortOrder] = useState('alphabet', 'latest', 'oldest');
+  const [sortOrder, setSortOrder] = useState('alphabet');
 
   const filteredTests = tests
     .filter(test => test.title.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => {
       switch (sortOrder) {
-        case 'alphabet':
-          // Split titles into text and number parts
-          const [aText, aNum] = a.title.match(/([^\d]+)(\d+)/).slice(1);
-          const [bText, bNum] = b.title.match(/([^\d]+)(\d+)/).slice(1);
-
-          // Compare text parts first
+        case 'alphabet': {
+          const aMatch = (a.title || '').match(/([^\d]+)(\d+)/);
+          const bMatch = (b.title || '').match(/([^\d]+)(\d+)/);
+          if (!aMatch || !bMatch) return (a.title || '').localeCompare(b.title || '');
+          const [, aText, aNum] = aMatch;
+          const [, bText, bNum] = bMatch;
           const textCompare = aText.localeCompare(bText);
           if (textCompare !== 0) return textCompare;
-
-          // If text parts are same, compare numbers
-          return parseInt(aNum) - parseInt(bNum);
+          return parseInt(aNum, 10) - parseInt(bNum, 10);
+        }
         case 'latest':
           return new Date(b.created_at) - new Date(a.created_at);
         case 'oldest':
           return new Date(a.created_at) - new Date(b.created_at);
         default:
-          return a.title.localeCompare(b.title);
+          return (a.title || '').localeCompare(b.title || '');
       }
     });
-  // Add the select element in the search bar div
-  <div className="flex flex-col md:flex-row gap-4 mb-8">
-    <div className="flex-1 relative">
-      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-      <input
-        type="text"
-        placeholder="Search tests..."
-        className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
-    </div>
-    <select
-      className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500"
-      value={sortOrder}
-      onChange={(e) => setSortOrder(e.target.value)}
-    >
-      <option value="alphabet">By Alphabet</option>
-      <option value="latest">Newest</option>
-      <option value="oldest">Oldest</option>
-    </select>
-  </div>
 
   const indexOfLastTest = currentPage * testsPerPage;
   const indexOfFirstTest = indexOfLastTest - testsPerPage;

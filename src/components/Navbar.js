@@ -293,14 +293,21 @@ const Navbar = () => {
                                         className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsWritingOpen(false)}
                                     >
-                                        Mock Test
+                                        Writing Full Test
                                     </Link>
                                     <Link
-                                        to="/writing_forecast"
+                                        to="/writing_forecast?part=1"
                                         className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsWritingOpen(false)}
                                     >
-                                        Practice Exercises
+                                        Writing Forecast Task 1
+                                    </Link>
+                                    <Link
+                                        to="/writing_forecast?part=2"
+                                        className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
+                                        onClick={() => setIsWritingOpen(false)}
+                                    >
+                                        Writing Forecast Task 2
                                     </Link>
                                 </motion.div>
                             )}
@@ -600,9 +607,11 @@ const Navbar = () => {
                                     { name: 'Listening – Practice Exercises', path: '/listening_forecast' },
                                     { name: 'Reading – Mock Test', path: '/reading_list' },
                                     { name: 'Reading – Practice Exercises', path: '/reading_forecast' },
-                                    { name: 'Writing', path: '/writing_list' },
+                                    { name: 'Writing Full Test', path: '/writing_list' },
+                                    { name: 'Writing Forecast Task 1', path: '/writing_forecast?part=1' },
+                                    { name: 'Writing Forecast Task 2', path: '/writing_forecast?part=2' },
                                     { name: 'Speaking', path: '/speaking_list?part=part1' },
-                                    { name: 'Dictation', path: '/dictation' },
+                                    ...(localStorage.getItem('role') === 'student' ? [{ name: 'Dictation', path: '/dictation' }] : []),
                                     { name: 'New Vocabulary', path: '/new-vocabulary' }
                                 ].map((item) => (
                                     <Link

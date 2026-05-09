@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import { Search, Lock, ChevronLeft, ChevronRight, Sparkles, CheckCircle } from 'lucide-react';
 import AIFeedbackDialog from './AiFeedbackDialog';
@@ -11,12 +11,24 @@ import { Helmet } from 'react-helmet-async';
 
 const WritingForecast = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const initialPart = (() => {
+    const sp = new URLSearchParams(location.search);
+    return sp.get('part') === '2' ? 'part2' : 'part1';
+  })();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isVIP, setIsVIP] = useState(false);
-  const [partSort, setPartSort] = useState('part1');
+  const [partSort, setPartSort] = useState(initialPart);
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    const sp = new URLSearchParams(location.search);
+    const next = sp.get('part') === '2' ? 'part2' : 'part1';
+    setPartSort(next);
+    setCurrentPage(1);
+  }, [location.search]);
   const itemsPerPage = 6;
   const userRole = localStorage.getItem('role');
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
