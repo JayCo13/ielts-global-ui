@@ -254,7 +254,7 @@ const VIPPackages = () => {
                     </div>
 
                     {/* Package Name */}
-                    <h3 className={`text-2xl font-bold text-gray-900 mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:${style.gradient} transition-all duration-300`}>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4 transition-all duration-300">
                         {pkg.name}
                     </h3>
 
