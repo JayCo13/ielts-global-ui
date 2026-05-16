@@ -272,7 +272,7 @@ const HomePage = () => {
                 className="font-extrabold tracking-tight mb-8 flex flex-col gap-1 md:gap-2"
               >
                 <motion.span variants={slideUp} className="block text-3xl sm:text-4xl md:text-5xl lg:text-[45px] leading-tight text-[#0e233a]">
-                  Prepare for English tests
+                  Prepare for IELTS tests
                 </motion.span>
                 <motion.span variants={slideUp} className="block text-2xl sm:text-3xl md:text-4xl lg:text-[40px] leading-tight text-[#0e233a]">
                   on computer
