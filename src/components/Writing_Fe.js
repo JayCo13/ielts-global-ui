@@ -444,11 +444,18 @@ const Writing_Fe = () => {
           <span className="text-gray-700 truncate">{test.title}</span>
         </h3>
 
-        {test.task1_type && (
-          <div className="mb-2">
-            <span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-[#0096b1]/10 text-[#0096b1] capitalize">
-              Task 1 · {test.task1_type}
-            </span>
+        {(test.task1_type || test.task2_type) && (
+          <div className="mb-2 flex flex-wrap gap-1">
+            {test.task1_type && (
+              <span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-[#0096b1]/10 text-[#0096b1] capitalize">
+                Task 1 · {test.task1_type}
+              </span>
+            )}
+            {test.task2_type && (
+              <span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-[#eb7e37]/10 text-[#eb7e37]">
+                Task 2 · {test.task2_type.replace(/_/g, ' ')}
+              </span>
+            )}
           </div>
         )}
 

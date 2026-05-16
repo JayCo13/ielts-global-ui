@@ -68,9 +68,11 @@ const WritingForecast = () => {
             exam_title: exam.exam_title,
             exam_id: exam.exam_id,
             instructions: p.instructions || '',
-            // Carry the Task 1 chart type through so we can sort and badge it
-            // on Part 1 entries; falls back to the exam-level value.
-            task1_type: p.task1_type || exam.task1_type || null
+            // Carry the per-part question type through so we can sort and
+            // badge it on the matching part; fall back to the exam-level
+            // aggregate values when present.
+            task1_type: p.task1_type || exam.task1_type || null,
+            task2_type: p.task2_type || exam.task2_type || null
           }));
         });
         setItems(flat);
@@ -89,17 +91,30 @@ const WritingForecast = () => {
       (it.title + ' ' + it.exam_title).toLowerCase().includes(searchQuery.toLowerCase())
     )
     : items;
-  // Primary sort: Task 1 chart type (pie → map → process → table → line → bar
-  // → mixed); items without a type fall to the end. Only meaningful in the
-  // Part 1 view since task1_type is null on Part 2 entries.
+  // Per-part question-type sort. Part 1 uses chart type (pie → map →
+  // process → table → line → bar → mixed). Part 2 uses essay flavour
+  // (agree/disagree → positive/negative → advantages outweigh disadvantages
+  // → discussion → solutions+effects → two-part mixed). Items without a
+  // type fall to the end of their list.
   const TASK1_TYPE_ORDER = ['pie', 'map', 'process', 'table', 'line', 'bar', 'mixed'];
-  const task1TypeRank = (t) => {
-    const i = TASK1_TYPE_ORDER.indexOf(t);
-    return i === -1 ? TASK1_TYPE_ORDER.length : i;
+  const TASK2_TYPE_ORDER = [
+    'agree_disagree',
+    'positive_negative',
+    'advantages_disadvantages',
+    'discussion',
+    'solutions_effects',
+    'two_part_mixed'
+  ];
+  const rank = (order, t) => {
+    const i = order.indexOf(t);
+    return i === -1 ? order.length : i;
   };
   const sorted = base
     .filter(it => partSort === 'part1' ? it.part_number === 1 : it.part_number === 2)
-    .sort((a, b) => task1TypeRank(a.task1_type) - task1TypeRank(b.task1_type));
+    .sort((a, b) => partSort === 'part1'
+      ? rank(TASK1_TYPE_ORDER, a.task1_type) - rank(TASK1_TYPE_ORDER, b.task1_type)
+      : rank(TASK2_TYPE_ORDER, a.task2_type) - rank(TASK2_TYPE_ORDER, b.task2_type)
+    );
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const paginated = sorted.slice(indexOfFirstItem, indexOfLastItem);
@@ -214,6 +229,13 @@ const WritingForecast = () => {
                     <div className="mt-2">
                       <span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-[#0096b1]/10 text-[#0096b1] capitalize">
                         Task 1 · {it.task1_type}
+                      </span>
+                    </div>
+                  )}
+                  {it.task2_type && it.part_number === 2 && (
+                    <div className="mt-2">
+                      <span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-[#eb7e37]/10 text-[#eb7e37]">
+                        Task 2 · {it.task2_type.replace(/_/g, ' ')}
                       </span>
                     </div>
                   )}
