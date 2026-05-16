@@ -12,23 +12,37 @@ import { Helmet } from 'react-helmet-async';
 const WritingForecast = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const initialPart = (() => {
-    const sp = new URLSearchParams(location.search);
-    return sp.get('part') === '2' ? 'part2' : 'part1';
-  })();
+  // URL conventions accepted: ?part=part1|part2 (preferred) or ?part=1|2 (legacy).
+  // Optional ?type=<enum value> filters within the current part.
+  const parseSearch = (search) => {
+    const sp = new URLSearchParams(search);
+    const partRaw = sp.get('part');
+    const part = (partRaw === 'part2' || partRaw === '2') ? 'part2' : 'part1';
+    return { part, type: sp.get('type') || '' };
+  };
+  const initial = parseSearch(location.search);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isVIP, setIsVIP] = useState(false);
-  const [partSort, setPartSort] = useState(initialPart);
+  const [partSort, setPartSort] = useState(initial.part);
+  const [typeFilter, setTypeFilter] = useState(initial.type);
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    const sp = new URLSearchParams(location.search);
-    const next = sp.get('part') === '2' ? 'part2' : 'part1';
-    setPartSort(next);
+    const next = parseSearch(location.search);
+    setPartSort(next.part);
+    setTypeFilter(next.type);
     setCurrentPage(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search]);
+
+  const updateUrl = (nextPart, nextType) => {
+    const sp = new URLSearchParams();
+    sp.set('part', nextPart);
+    if (nextType) sp.set('type', nextType);
+    navigate({ pathname: location.pathname, search: `?${sp.toString()}` });
+  };
   const itemsPerPage = 6;
   const userRole = localStorage.getItem('role');
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
@@ -111,10 +125,39 @@ const WritingForecast = () => {
   };
   const sorted = base
     .filter(it => partSort === 'part1' ? it.part_number === 1 : it.part_number === 2)
+    .filter(it => {
+      if (!typeFilter) return true;
+      return partSort === 'part1'
+        ? it.task1_type === typeFilter
+        : it.task2_type === typeFilter;
+    })
     .sort((a, b) => partSort === 'part1'
       ? rank(TASK1_TYPE_ORDER, a.task1_type) - rank(TASK1_TYPE_ORDER, b.task1_type)
       : rank(TASK2_TYPE_ORDER, a.task2_type) - rank(TASK2_TYPE_ORDER, b.task2_type)
     );
+
+  // Pills shown above the grid — pre-built per-part so the Part 1 view
+  // shows chart types and Part 2 shows essay flavours.
+  const PART1_PILLS = [
+    { value: '', label: 'All' },
+    { value: 'pie', label: 'Pie' },
+    { value: 'map', label: 'Map' },
+    { value: 'process', label: 'Process' },
+    { value: 'table', label: 'Table' },
+    { value: 'line', label: 'Line' },
+    { value: 'bar', label: 'Bar' },
+    { value: 'mixed', label: 'Mixed' }
+  ];
+  const PART2_PILLS = [
+    { value: '', label: 'All' },
+    { value: 'agree_disagree', label: 'Agree / Disagree' },
+    { value: 'positive_negative', label: 'Positive / Negative' },
+    { value: 'advantages_disadvantages', label: 'Advantages vs Disadvantages' },
+    { value: 'discussion', label: 'Discuss both views' },
+    { value: 'solutions_effects', label: 'Solutions / Effects' },
+    { value: 'two_part_mixed', label: 'Two-part Mixed' }
+  ];
+  const currentPills = partSort === 'part1' ? PART1_PILLS : PART2_PILLS;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const paginated = sorted.slice(indexOfFirstItem, indexOfLastItem);
@@ -185,12 +228,31 @@ const WritingForecast = () => {
             <select
               className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500"
               value={partSort}
-              onChange={(e) => setPartSort(e.target.value)}
+              onChange={(e) => updateUrl(e.target.value, '')}
             >
               <option value="part1">Part 1</option>
               <option value="part2">Part 2</option>
             </select>
           </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2 mb-6">
+          {currentPills.map(p => {
+            const active = (typeFilter || '') === p.value;
+            return (
+              <button
+                key={p.value || 'all'}
+                onClick={() => updateUrl(partSort, p.value)}
+                className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                  active
+                    ? 'bg-[#0096b1] text-white border-[#0096b1]'
+                    : 'bg-white text-gray-700 border-gray-200 hover:border-[#0096b1] hover:text-[#0096b1]'
+                }`}
+              >
+                {p.label}
+              </button>
+            );
+          })}
         </div>
 
         {loading ? (
