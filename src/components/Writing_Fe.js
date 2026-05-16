@@ -367,9 +367,20 @@ const Writing_Fe = () => {
 
   const [sortOrder, setSortOrder] = useState('alphabet');
 
+  // Primary sort: Task 1 chart type (pie → map → process → table → line → bar
+  // → mixed); tests without a type fall to the end. User's sort option below
+  // becomes the tiebreaker within each type group.
+  const TASK1_TYPE_ORDER = ['pie', 'map', 'process', 'table', 'line', 'bar', 'mixed'];
+  const task1TypeRank = (t) => {
+    const i = TASK1_TYPE_ORDER.indexOf(t);
+    return i === -1 ? TASK1_TYPE_ORDER.length : i;
+  };
+
   const filteredTests = tests
     .filter(test => test.title.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => {
+      const rankDiff = task1TypeRank(a.task1_type) - task1TypeRank(b.task1_type);
+      if (rankDiff !== 0) return rankDiff;
       switch (sortOrder) {
         case 'alphabet': {
           const aMatch = (a.title || '').match(/([^\d]+)(\d+)/);
@@ -432,6 +443,14 @@ const Writing_Fe = () => {
           <span className="text-[#0096b1] text-md italic mr-2">Test:</span>
           <span className="text-gray-700 truncate">{test.title}</span>
         </h3>
+
+        {test.task1_type && (
+          <div className="mb-2">
+            <span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-[#0096b1]/10 text-[#0096b1] capitalize">
+              Task 1 · {test.task1_type}
+            </span>
+          </div>
+        )}
 
         <div className="space-y-2 mb-4">
           {test.parts.map((task) => (

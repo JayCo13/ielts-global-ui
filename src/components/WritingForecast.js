@@ -67,7 +67,10 @@ const WritingForecast = () => {
             title: p.title || `Part ${p.part_number}`,
             exam_title: exam.exam_title,
             exam_id: exam.exam_id,
-            instructions: p.instructions || ''
+            instructions: p.instructions || '',
+            // Carry the Task 1 chart type through so we can sort and badge it
+            // on Part 1 entries; falls back to the exam-level value.
+            task1_type: p.task1_type || exam.task1_type || null
           }));
         });
         setItems(flat);
@@ -86,7 +89,17 @@ const WritingForecast = () => {
       (it.title + ' ' + it.exam_title).toLowerCase().includes(searchQuery.toLowerCase())
     )
     : items;
-  const sorted = base.filter(it => partSort === 'part1' ? it.part_number === 1 : it.part_number === 2);
+  // Primary sort: Task 1 chart type (pie → map → process → table → line → bar
+  // → mixed); items without a type fall to the end. Only meaningful in the
+  // Part 1 view since task1_type is null on Part 2 entries.
+  const TASK1_TYPE_ORDER = ['pie', 'map', 'process', 'table', 'line', 'bar', 'mixed'];
+  const task1TypeRank = (t) => {
+    const i = TASK1_TYPE_ORDER.indexOf(t);
+    return i === -1 ? TASK1_TYPE_ORDER.length : i;
+  };
+  const sorted = base
+    .filter(it => partSort === 'part1' ? it.part_number === 1 : it.part_number === 2)
+    .sort((a, b) => task1TypeRank(a.task1_type) - task1TypeRank(b.task1_type));
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const paginated = sorted.slice(indexOfFirstItem, indexOfLastItem);
@@ -197,6 +210,13 @@ const WritingForecast = () => {
                     <span>{it.title}</span>
                   </h3>
                   <div className="text-sm text-gray-600 mt-1">Exam: {it.exam_title}</div>
+                  {it.task1_type && it.part_number === 1 && (
+                    <div className="mt-2">
+                      <span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-[#0096b1]/10 text-[#0096b1] capitalize">
+                        Task 1 · {it.task1_type}
+                      </span>
+                    </div>
+                  )}
                   <div className="mt-3 text-gray-700 line-clamp-3" dangerouslySetInnerHTML={{ __html: it.instructions }} />
                   {(!isVIP && userRole === 'customer' && (index + indexOfFirstItem) >= 100) ? (
                     <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/35 hover:bg-black/45 backdrop-blur-[2px] rounded-lg transition-all">
