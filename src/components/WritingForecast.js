@@ -302,34 +302,18 @@ const WritingForecast = () => {
                     </div>
                   )}
                   <div className="mt-3 text-gray-700 line-clamp-3" dangerouslySetInnerHTML={{ __html: it.instructions }} />
-                  {(!isVIP && userRole === 'customer' && (index + indexOfFirstItem) >= 100) ? (
-                    <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/35 hover:bg-black/45 backdrop-blur-[2px] rounded-lg transition-all">
-                      <div className="w-full px-4 sm:max-w-xs text-center">
-                        <Lock className="w-10 h-10 text-white mx-auto mb-3" />
-                        <p className="text-white font-semibold mb-2 text-base sm:text-lg">Upgrade to VIP to unlock</p>
-                        <Link
-                          to="/vip-packages?type=writing"
-                          className="inline-flex items-center px-4 py-2 bg-[#0096b1] text-white rounded-lg hover:bg-[#eb7e37] transition-colors font-medium text-sm"
-                        >
-                          View packages VIP
-                          <ChevronRight className="w-4 h-4 ml-1" />
-                        </Link>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => {
-                          if (!secureStorage.getItem('token') && !localStorage.getItem('token')) {
-                            navigate('/login');
-                            return;
-                          }
-                          navigate('/writing_test_room', { state: { taskId: it.task_id, testId: it.exam_id, isForecast: true } });
-                        }}
-                        className="mt-4 w-full bg-[#0096b1] text-white py-2 rounded"
-                      >
-                        Take Practice
-                      </button>
+                  <button
+                    onClick={() => {
+                      if (!secureStorage.getItem('token') && !localStorage.getItem('token')) {
+                        navigate('/login');
+                        return;
+                      }
+                      navigate('/writing_test_room', { state: { taskId: it.task_id, testId: it.exam_id, isForecast: true } });
+                    }}
+                    className="mt-4 w-full bg-[#0096b1] text-white py-2 rounded"
+                  >
+                    Take Practice
+                  </button>
                       <button
                         onClick={() => { setSelectedPart(it); setEditDialogOpen(true); }}
                         className="mt-2 w-full bg-gray-800 text-white py-2 rounded"
@@ -420,8 +404,6 @@ const WritingForecast = () => {
                         {evaluatedMap[it.task_id] ? <CheckCircle className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
                         {aiLoading ? '...' : 'Evaluate with AI'}
                       </button>
-                    </>
-                  )}
                 </div>
               ))}
             </div>
