@@ -301,10 +301,10 @@ const WritingForecast = () => {
                       </span>
                     </div>
                   )}
-                  {/* Preview is text-only: line-clamp-3 + display:-webkit-box clips images
-                      out of view. Click "Take Practice" to see the full instructions
-                      including the chart/image. */}
-                  <div className="mt-3 text-gray-700 line-clamp-3 [&_img]:hidden" dangerouslySetInnerHTML={{ __html: it.instructions }} />
+                  {/* Show full preview (text + image). Previously line-clamp-3 was
+                      used here, but its display:-webkit-box + overflow:hidden clipped
+                      images entirely from view. Cards can grow taller now. */}
+                  <div className="mt-3 text-gray-700 [&_img]:max-w-full [&_img]:h-auto" dangerouslySetInnerHTML={{ __html: it.instructions }} />
                   <button
                     onClick={() => {
                       if (!secureStorage.getItem('token') && !localStorage.getItem('token')) {

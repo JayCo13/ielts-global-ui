@@ -554,7 +554,7 @@ const WritingLayout = () => {
         >
           <div className={`overflow-y-auto p-4 ${colorThemeClasses[colorTheme]} ${isMobile ? 'border-b border-gray-200' : ''}`}>
             <div
-              className={`leading-relaxed ${textSizeClasses[textSize]} [&_img]:max-w-full [&_img]:h-auto [&_img]:block`}
+              className={`leading-relaxed ${textSizeClasses[textSize]} [&_img]:max-w-full [&_img]:h-auto`}
               dangerouslySetInnerHTML={{ __html: processInstructions(task.instructions) }}
             />
           </div>
