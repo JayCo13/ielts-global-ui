@@ -13,8 +13,11 @@ const processInstructions = (instructions) => {
   const doc = parser.parseFromString(instructions, 'text/html');
 
   doc.querySelectorAll('img').forEach(img => {
-    if (img.src.startsWith('/')) {
-      img.src = `${API_BASE}${img.src}`;
+    // Read the raw attribute, not img.src — the getter resolves against the
+    // document base URL and will never start with '/'.
+    const rawSrc = img.getAttribute('src');
+    if (rawSrc && rawSrc.startsWith('/')) {
+      img.setAttribute('src', `${API_BASE}${rawSrc}`);
     }
   });
 
