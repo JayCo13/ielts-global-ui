@@ -301,7 +301,10 @@ const WritingForecast = () => {
                       </span>
                     </div>
                   )}
-                  <div className="mt-3 text-gray-700 line-clamp-3" dangerouslySetInnerHTML={{ __html: it.instructions }} />
+                  {/* Preview is text-only: line-clamp-3 + display:-webkit-box clips images
+                      out of view. Click "Take Practice" to see the full instructions
+                      including the chart/image. */}
+                  <div className="mt-3 text-gray-700 line-clamp-3 [&_img]:hidden" dangerouslySetInnerHTML={{ __html: it.instructions }} />
                   <button
                     onClick={() => {
                       if (!secureStorage.getItem('token') && !localStorage.getItem('token')) {

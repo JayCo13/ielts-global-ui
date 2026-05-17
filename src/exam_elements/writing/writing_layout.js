@@ -123,6 +123,18 @@ const WritingLayout = () => {
 
         if (response.ok) {
           const data = await response.json();
+          const instr = data?.instructions || '';
+          console.log('[WRITING-EXAM-DIAG] taskId:', taskId, 'instructions length:', instr.length);
+          console.log('[WRITING-EXAM-DIAG] first 120 chars:', instr.slice(0, 120));
+          console.log('[WRITING-EXAM-DIAG] last 120 chars:', instr.slice(-120));
+          const imgMatches = instr.match(/<img\b[^>]*>/gi) || [];
+          console.log('[WRITING-EXAM-DIAG] img tag count:', imgMatches.length);
+          imgMatches.forEach((tag, i) => {
+            const srcMatch = tag.match(/\bsrc=(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i);
+            const src = srcMatch ? (srcMatch[1] || srcMatch[2] || srcMatch[3]) : '(no src)';
+            console.log(`[WRITING-EXAM-DIAG] img[${i}] srcLen=${src.length}, starts="${src.slice(0, 60)}"`);
+            console.log(`[WRITING-EXAM-DIAG] img[${i}] ends="${src.slice(-60)}"`);
+          });
           setTask(data);
           setTimeLeft(data.duration * 60);
           setCurrentPartIndex(data.part_number - 1);
@@ -542,7 +554,7 @@ const WritingLayout = () => {
         >
           <div className={`overflow-y-auto p-4 ${colorThemeClasses[colorTheme]} ${isMobile ? 'border-b border-gray-200' : ''}`}>
             <div
-              className={`leading-relaxed ${textSizeClasses[textSize]}`}
+              className={`leading-relaxed ${textSizeClasses[textSize]} [&_img]:max-w-full [&_img]:h-auto [&_img]:block`}
               dangerouslySetInnerHTML={{ __html: processInstructions(task.instructions) }}
             />
           </div>
