@@ -2068,22 +2068,22 @@ const MainLayout = () => {
       />
 
       <div className={`h-screen flex flex-col ${colorThemeClasses[colorTheme]} relative`}>
-        <header className={`${colorTheme === 'black-on-white' ? 'bg-white' : 'bg-black'} border-b border-zinc-500 px-4 py-4 flex justify-between items-center`}>
-          <div className="flex items-center space-x-8">
-            <div className={`${textSizeClasses[textSize]}`}>
+        <header className={`${colorTheme === 'black-on-white' ? 'bg-white' : 'bg-black'} border-b border-zinc-500 px-2 md:px-4 py-2 md:py-4 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-0`}>
+          <div className="flex items-center space-x-4 md:space-x-8 w-full md:w-auto justify-between md:justify-start">
+            <div className={`${textSizeClasses[textSize]} text-sm md:text-base`}>
               <div> <p className="font-bold">Test taker ID: {localStorage.getItem('username')}</p></div>
               {testDescription?.title && (
                 <div className={`${colorTheme !== 'black-on-white' ? 'text-blue-400' : 'text-blue-600'} font-semibold ${textSizeClasses[textSize]}`}>
                   {testDescription.title}
                 </div>
               )}
-              <div className={`${colorTheme !== 'black-on-white' ? 'text-gray-300' : 'text-black-500'} ${textSizeClasses[textSize]}`}>
+              <div className={`hidden md:block ${colorTheme !== 'black-on-white' ? 'text-gray-300' : 'text-black-500'} ${textSizeClasses[textSize]}`}>
                 1 year, 10 months, 1 week, 1 day, 21 hours, 11 minutes remaining
               </div>
             </div>
           </div>
 
-          <div className="flex items-center space-x-4 font-bold">
+          <div className="flex items-center justify-end space-x-3 md:space-x-4 font-bold w-full md:w-auto mt-2 md:mt-0">
             {/* AI Translator button */}
             <div className="relative group">
               <button
@@ -2104,7 +2104,7 @@ const MainLayout = () => {
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-gray-900"></div>
               </div>
             </div>
-            <div className={`flex flex-col ${colorTheme !== 'black-on-white' ? 'text-white' : 'text-black-600'} p-3 bg-gray-800/30 rounded-lg w-80 ${isRetakeIncorrectMode ? 'opacity-40 pointer-events-none select-none' : ''}`}>
+            <div className={`flex flex-col ${colorTheme !== 'black-on-white' ? 'text-white' : 'text-black-600'} p-2 md:p-3 bg-gray-800/30 rounded-lg w-80 max-w-full ${isRetakeIncorrectMode ? 'opacity-40 pointer-events-none select-none' : ''}`}>
               {/* Progress bar — disabled in retake mode */}
               <div className="flex items-center space-x-2 mb-3">
                 <span className="text-xs min-w-[40px] text-center">
@@ -2522,7 +2522,7 @@ const MainLayout = () => {
                         </button>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-12">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-12">
                         <div className="space-y-8">
                           <h3 className="font-semibold text-2xl mb-6">Color Theme</h3>
                           <div className="space-y-4">
@@ -2832,10 +2832,10 @@ const MainLayout = () => {
             {showDescriptionPanel ? (
               <Split
                 className={`flex split-container ${isMobile ? 'flex-col' : 'flex-row'}`}
-                sizes={isMobile ? [50, 50] : [50, 50]}
+                sizes={isMobile ? [40, 60] : [50, 50]}
                 minSize={isMobile ? 150 : 200}
                 expandToMin={false}
-                gutterSize={20}
+                gutterSize={isMobile ? 10 : 20}
                 gutterAlign="center"
                 snapOffset={10}
                 dragInterval={1}

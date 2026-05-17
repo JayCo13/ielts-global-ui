@@ -2038,9 +2038,9 @@ const MainLayout = () => {
             </button>
           </div>
         )}
-        <header className={`${colorTheme === 'black-on-white' ? 'bg-white' : 'bg-black'} border-b border-zinc-500 px-4 py-4 flex justify-between items-center`}>
-          <div className="flex items-center space-x-8">
-            <div className={`${textSizeClasses[textSize]}`}>
+        <header className={`${colorTheme === 'black-on-white' ? 'bg-white' : 'bg-black'} border-b border-zinc-500 px-2 md:px-4 py-2 md:py-4 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-0`}>
+          <div className="flex items-center space-x-4 md:space-x-8 w-full md:w-auto justify-between md:justify-start">
+            <div className={`${textSizeClasses[textSize]} text-sm md:text-base`}>
               <div> <p className="font-bold">Test taker ID: {localStorage.getItem('username')}</p></div>
               {testDescription?.title && (
                 <div className={`${colorTheme !== 'black-on-white' ? 'text-blue-400' : 'text-blue-600'} font-semibold ${textSizeClasses[textSize]}`}>
@@ -2053,7 +2053,7 @@ const MainLayout = () => {
             </div>
           </div>
 
-          <div className="flex items-center space-x-4 font-medium">
+          <div className="flex items-center justify-end space-x-3 md:space-x-4 font-medium w-full md:w-auto mt-2 md:mt-0">
             <div
               className="relative"
               onMouseEnter={() => setWifiStatus(prev => ({ ...prev, showTooltip: true }))}
@@ -2180,7 +2180,7 @@ const MainLayout = () => {
                         </button>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-12">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-12">
                         <div className="space-y-8">
                           <h3 className="font-semibold text-2xl mb-6">Color Theme</h3>
                           <div className="space-y-4">
@@ -2277,7 +2277,7 @@ const MainLayout = () => {
         <Split
           className={`flex-1 flex overflow-hidden ${colorTheme === 'black-on-white' ? 'bg-white' : 'bg-black'} ${isMobile ? 'flex-col' : 'flex-row'}`}
           direction={isMobile ? 'vertical' : 'horizontal'}
-          sizes={isMobile ? [50, 50] : [45, 55]}
+          sizes={isMobile ? [40, 60] : [45, 55]}
           minSize={isMobile ? 150 : 300}
           gutterSize={10}
           gutterStyle={() => ({
