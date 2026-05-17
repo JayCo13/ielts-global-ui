@@ -1314,12 +1314,12 @@ const MainLayout = () => {
   const [showClearDataDialog, setShowClearDataDialog] = useState(false);
   // State for exit alert dialog
   const [showExitAlert, setShowExitAlert] = useState(false);
-  // Monitor changes to audioUrl and load the audio when URL changes
-  useEffect(() => {
-    if (audioUrl && audioRef.current) {
-      audioRef.current.load();
-    }
-  }, [audioUrl]);
+  // Note: a previous useEffect here called audioRef.current.load() on every
+  // audioUrl change, but the useEffect at line ~1369 below ALSO sets the src
+  // and calls load() on the same trigger. The duplicate call aborted the
+  // first load()'s buffering connection (causing the TTFB spike and the
+  // "loading is slow then overloading" symptom). The useEffect below is the
+  // single source of truth for src+load now.
 
   useEffect(() => {
     if (audioRef.current) {
@@ -2047,7 +2047,13 @@ const MainLayout = () => {
 
       <audio
         ref={audioRef}
-        preload="auto"
+        // preload="metadata" instead of "auto" — AudioControl already
+        // downloads the per-part audio as a blob, so preload="auto" here
+        // caused the same R2 file to be fetched twice in parallel (once
+        // via AudioControl's fetch+blob, once via the browser's native
+        // preload of this element). Metadata-only avoids the duplicate
+        // download but still populates onLoadedMetadata for the duration.
+        preload="metadata"
         onLoadedMetadata={() => {
           if (audioRef.current) {
             const duration = audioRef.current.duration;
