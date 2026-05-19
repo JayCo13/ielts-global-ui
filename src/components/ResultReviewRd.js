@@ -4,6 +4,10 @@ import { CheckCircle, XCircle, Circle, Clock, BarChart2, ArrowLeft, ChevronLeft,
 import { toast, Toaster } from 'react-hot-toast';
 import styled from '@emotion/styled';
 import { keyframes } from '@emotion/react';
+import Lottie from 'react-lottie';
+import highAnimation from '../effect/high.json';
+import mediumAnimation from '../effect/medium.json';
+import lowAnimation from '../effect/low.json';
 
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
@@ -98,6 +102,14 @@ const ResultReview = () => {
   };
   const answersPerPage = 10;
 
+  const lottieOptions = (animationData) => ({
+    loop: true,
+    autoplay: true,
+    animationData,
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice'
+    }
+  });
 
   useEffect(() => {
     const fetchResultDetails = async () => {
@@ -286,23 +298,29 @@ const ResultReview = () => {
         </div>
 
         <div className="bg-white rounded-lg shadow-sm p-8 mb-6">
-          <div className="flex justify-center items-center mb-5">
-            <h1
-              className="relative text-3xl font-bold text-center animate-fade-in
-                bg-gradient-to-r from-lime-600 to-emerald-600 bg-clip-text text-transparent
-                hover:scale-105 transform transition-transform duration-300"
-            >
-              Test Results
-              <span className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-1 
-                bg-gradient-to-r from-lime-500 to-emerald-500 rounded-full
-                animate-pulse"></span>
-            </h1>
-          </div>
-          <div className='flex flex-col items-center mb-6'>
-            <div className="text-2xl font-bold text-center text-green-600">
-              Band Score: {calculateBandScore(resultData.total_score)}
-            </div>
-          </div>
+          {/* Band Result Banner — image + big band number, stacked on mobile, side-by-side on desktop */}
+          {(() => {
+            const band = calculateBandScore(resultData.total_score);
+            const { image, message } = getResultFeedback(band);
+            return (
+              <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-8">
+                <img
+                  src={image}
+                  alt={message}
+                  className="w-full max-w-sm rounded-2xl object-contain"
+                  style={{ maxHeight: 220 }}
+                />
+                <div className="flex flex-col text-center md:text-left">
+                  <h2 className="text-xl md:text-2xl font-medium text-gray-600 mb-2">
+                    {message}
+                  </h2>
+                  <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-lime-600 to-emerald-600 bg-clip-text text-transparent drop-shadow-sm">
+                    Band {band}
+                  </h1>
+                </div>
+              </div>
+            );
+          })()}
           {/* Description Dialog */}
           {showDescription && testDescription && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto p-4">
@@ -408,22 +426,22 @@ const ResultReview = () => {
                     </text>
                   </svg>
                 </div>
-                {/* Chart icon */}
-                <div className="absolute -top-2 -right-2 w-12 h-12 bg-white rounded-full shadow-lg border-2 border-white flex items-center justify-center transform transition-all duration-300 hover:scale-110 hover:shadow-xl overflow-hidden">
-                  <img 
-                    src={getResultFeedback(calculateBandScore(resultData.total_score)).image} 
-                    alt="Result Icon" 
-                    className="w-full h-full object-cover"
-                  />
+                {/* Score-tier Lottie indicator (high / medium / low). The hero banner
+                    above already shows the friendly message, so this is icon-only. */}
+                <div className="absolute -top-1 -right-1 w-8 h-8 rounded-full bg-lime-500 shadow-lg border-2 border-white flex items-center justify-center transform transition-all duration-300 hover:scale-110 hover:shadow-xl">
+                  {resultData.total_score >= 30 ? (
+                    <Lottie options={lottieOptions(highAnimation)} height={34} width={34} />
+                  ) : resultData.total_score >= 20 ? (
+                    <Lottie options={lottieOptions(mediumAnimation)} height={34} width={34} />
+                  ) : (
+                    <Lottie options={lottieOptions(lowAnimation)} height={34} width={34} />
+                  )}
                 </div>
               </div>
 
               {/* Status Legend */}
               <div className="flex-grow">
-                <h3 className="text-sm font-medium text-gray-900 mb-2">Status Legend</h3>
-                <div className="text-md font-semibold text-violet-600 mb-4 italic">
-                  "{getResultFeedback(calculateBandScore(resultData.total_score)).message}"
-                </div>
+                <h3 className="text-sm font-medium text-gray-900 mb-4">Status Legend</h3>
                 <div className="space-y-3">
                   <div className="flex items-center bg-green-50 p-3 rounded-lg">
                     <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
