@@ -25,8 +25,39 @@ const ReadingForecast = () => {
   useEffect(() => {
     const fetchUserRole = async () => {
       let token = secureStorage.getItem('token') || localStorage.getItem('token');
+      if (!token) {
+        // No token at all — public/SEO view.
+        setUserRole('guest');
+        return;
+      }
       let userId = secureStorage.getItem('user_id') || localStorage.getItem('user_id');
-      if (!token || !userId) { setUserRole('guest'); return; }
+      // SECURITY: token present + user_id missing means we lost the secureStorage
+      // encryption key (tab close) or hit a Google OAuth path that didn't
+      // persist user_id. Recover via /student/profile instead of falling back
+      // to userRole='guest', which bypassed the no-VIP filter and exposed
+      // paid content to non-VIP customers.
+      if (!userId) {
+        try {
+          const profileRes = await fetchWithTimeout(`${API_BASE}/student/profile`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (profileRes.ok) {
+            const profile = await profileRes.json();
+            userId = profile.user_id;
+            if (userId) {
+              localStorage.setItem('user_id', String(userId));
+              try { secureStorage.setItem('user_id', String(userId)); } catch (e) { /* ok */ }
+            }
+            setUserRole(profile.role || 'customer');
+            return;
+          }
+          navigate('/login');
+          return;
+        } catch (e) {
+          navigate('/login');
+          return;
+        }
+      }
       try {
         const res = await fetchWithTimeout(`${API_BASE}/student/user-role/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } });
         if (res.ok) { const data = await res.json(); setUserRole(data.role); } else if (res.status === 401) { navigate('/login'); }

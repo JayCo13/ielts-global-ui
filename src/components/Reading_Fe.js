@@ -69,16 +69,45 @@ const Reading_Fe = () => {
   useEffect(() => {
     const fetchUserRole = async () => {
       const token = localStorage.getItem('token');
+      if (!token) {
+        // No token at all — public/SEO view, fetchData handles it.
+        setUserRole('guest');
+        return;
+      }
       // Try to get user_id from secureStorage first, then fall back to localStorage
       let userId = secureStorage.getItem('user_id');
       if (!userId) {
         userId = localStorage.getItem('user_id');
       }
 
-      if (!token || !userId) {
-        setUserRole('guest');
-        return;
+      // SECURITY: if token is present but user_id is missing (typically after
+      // a tab close drops the secureStorage encryption key, or after a Google
+      // OAuth flow that didn't persist user_id), recover the real role via
+      // /student/profile. The previous fallback set userRole='guest' which
+      // bypassed the no-VIP filter and let non-VIP customers see paid content.
+      if (!userId) {
+        try {
+          const profileRes = await fetchWithTimeout(`${API_BASE}/student/profile`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (profileRes.ok) {
+            const profile = await profileRes.json();
+            userId = profile.user_id;
+            if (userId) {
+              localStorage.setItem('user_id', String(userId));
+              try { secureStorage.setItem('user_id', String(userId)); } catch (e) { /* ok */ }
+            }
+            setUserRole(profile.role || 'customer');
+            return;
+          }
+          navigate('/login');
+          return;
+        } catch (e) {
+          navigate('/login');
+          return;
+        }
       }
+
       try {
         const response = await fetchWithTimeout(`${API_BASE}/student/user-role/${userId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
