@@ -144,28 +144,53 @@ const LoginForm = () => {
     const username = urlParams.get('username');
     const email = urlParams.get('email');
     const role = urlParams.get('role');
+    const userIdParam = urlParams.get('user_id');
     const error = urlParams.get('error');
 
     if (token) {
-      try {
-        // Store user data directly from URL params
-        localStorage.setItem('token', token);
-        localStorage.setItem('role', role); // Store role for badge display
-        localStorage.setItem('email', email); // Store email
-        secureStorage.setItem('username', username);
-        secureStorage.setItem('email', email);
+      (async () => {
+        try {
+          // Store user data directly from URL params
+          localStorage.setItem('token', token);
+          localStorage.setItem('role', role); // Store role for badge display
+          localStorage.setItem('email', email); // Store email
+          secureStorage.setItem('username', username);
+          secureStorage.setItem('email', email);
 
-        // Start status ping
-        startStatusPing();
+          // SECURITY: persist user_id. Without it the listing/forecast pages
+          // would silently fall back to a permissive 'guest' role on the next
+          // page load and bypass the no-VIP filter. If the OAuth redirect URL
+          // includes user_id we use it directly; otherwise recover via the
+          // /student/profile endpoint with the freshly-issued token.
+          let userId = userIdParam;
+          if (!userId) {
+            try {
+              const profileRes = await fetch(`${API_BASE}/student/profile`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+              });
+              if (profileRes.ok) {
+                const profile = await profileRes.json();
+                userId = profile.user_id;
+              }
+            } catch (_) { /* fall through */ }
+          }
+          if (userId) {
+            localStorage.setItem('user_id', String(userId));
+            try { secureStorage.setItem('user_id', String(userId)); } catch (_) { /* ok */ }
+          }
 
-        // Clear URL parameters
-        window.history.replaceState({}, document.title, window.location.pathname);
+          // Start status ping
+          startStatusPing();
 
-        // Redirect to dashboard
-        navigate('/');
-      } catch (e) {
-        setErrors(prev => ({ ...prev, account: 'Failed to process Google login. Please try again.' }));
-      }
+          // Clear URL parameters
+          window.history.replaceState({}, document.title, window.location.pathname);
+
+          // Redirect to dashboard
+          navigate('/');
+        } catch (e) {
+          setErrors(prev => ({ ...prev, account: 'Failed to process Google login. Please try again.' }));
+        }
+      })();
     } else if (error) {
       setErrors(prev => ({ ...prev, account: 'Google login failed: ' + error }));
     }
