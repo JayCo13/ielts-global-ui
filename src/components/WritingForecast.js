@@ -25,6 +25,10 @@ const WritingForecast = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isVIP, setIsVIP] = useState(false);
+  // Any active VIP subscription (any skill/package) unlocks the 6/day AI
+  // grading quota — separate from `isVIP`, which gates the writing-only search
+  // feature. A Listening/Reading-only VIP must still get the 6 credits.
+  const [hasVipCredits, setHasVipCredits] = useState(false);
   const [partSort, setPartSort] = useState(initial.part);
   const [typeFilter, setTypeFilter] = useState(initial.type);
   const [currentPage, setCurrentPage] = useState(1);
@@ -72,6 +76,9 @@ const WritingForecast = () => {
             vipData.package_type === 'all_skills' || (vipData.package_type === 'single_skill' && vipData.skill_type === 'writing')
           );
           setIsVIP(hasAccess);
+          // Grading quota is unlocked by ANY active subscription, not just
+          // writing-access ones.
+          setHasVipCredits(vipData.is_subscribed === true);
         }
         const flat = [];
         forecastData.forEach(exam => {
@@ -173,11 +180,11 @@ const WritingForecast = () => {
     const dateKey = `${vn.getUTCFullYear()}-${String(vn.getUTCMonth() + 1).padStart(2, '0')}-${String(vn.getUTCDate()).padStart(2, '0')}`;
     const storeKey = `aiEvalCounters:${usernameKey}`;
     const counters = JSON.parse(localStorage.getItem(storeKey) || '{}');
-    const isVipOrStudent = isVIP || role === 'student';
+    const isVipOrStudent = hasVipCredits || role === 'student';
     const limit = isVipOrStudent ? 6 : 2;
     const used = isVipOrStudent ? (counters[dateKey]?.total || 0) : (counters[dateKey]?.forecast || 0);
     setAiRemaining(Math.max(0, limit - used));
-  }, [isVIP, aiDialogOpen, aiLoading]);
+  }, [hasVipCredits, aiDialogOpen, aiLoading]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -335,7 +342,7 @@ const WritingForecast = () => {
                           const storeKey = `aiEvalCounters:${usernameKey}`;
                           const counters = JSON.parse(localStorage.getItem(storeKey) || '{}');
                           if (!counters[dateKey]) counters[dateKey] = { full: 0, forecast: 0, total: 0 };
-                          const isVipOrStudent = isVIP || role === 'student';
+                          const isVipOrStudent = hasVipCredits || role === 'student';
                           if (aiRemaining <= 0) {
                             setAiResult({ error: 'You have reached the daily AI evaluation limit.' });
                             setAiDialogOpen(true);

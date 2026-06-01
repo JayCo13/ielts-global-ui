@@ -22,6 +22,10 @@ const Writing_Fe = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [username, setUsername] = useState('');
   const [isVIP, setIsVIP] = useState(false);
+  // Any active VIP subscription (any skill/package) unlocks the 6/day AI
+  // grading quota — separate from `isVIP`, which gates writing-only features
+  // (sort options). A Listening/Reading-only VIP must still get the 6 credits.
+  const [hasVipCredits, setHasVipCredits] = useState(false);
   const [accountStatus, setAccountStatus] = useState(null);
   const dropdownRef = useRef(null);
   const testsPerPage = 6;
@@ -111,6 +115,9 @@ const Writing_Fe = () => {
             );
 
             setIsVIP(hasWritingAccess);
+            // Grading quota is unlocked by ANY active subscription, not just
+            // writing-access ones (see banner copy).
+            setHasVipCredits(subscriptionData.is_subscribed === true);
             const mapped = testsData.map(exam => ({
               id: exam.exam_id,
               title: exam.title,
@@ -142,11 +149,11 @@ const Writing_Fe = () => {
     const dateKey = `${vn.getUTCFullYear()}-${String(vn.getUTCMonth() + 1).padStart(2, '0')}-${String(vn.getUTCDate()).padStart(2, '0')}`;
     const storeKey = `aiEvalCounters:${usernameKey}`;
     const counters = JSON.parse(localStorage.getItem(storeKey) || '{}');
-    const isVipOrStudent = isVIP || role === 'student';
+    const isVipOrStudent = hasVipCredits || role === 'student';
     const limit = isVipOrStudent ? 6 : 1;
     const used = isVipOrStudent ? (counters[dateKey]?.total || 0) : (counters[dateKey]?.full || 0);
     setAiRemaining(Math.max(0, limit - used));
-  }, [isVIP, aiDialogOpen, aiLoading]);
+  }, [hasVipCredits, aiDialogOpen, aiLoading]);
 
   const handleAIFeedback = async (task) => {
     if (!task.is_completed) {
@@ -163,7 +170,7 @@ const Writing_Fe = () => {
     const storeKey = `aiEvalCounters:${usernameKey}`;
     const counters = JSON.parse(localStorage.getItem(storeKey) || '{}');
     if (!counters[dateKey]) counters[dateKey] = { full: 0, forecast: 0, total: 0 };
-    const isVipOrStudent = isVIP || role === 'student';
+    const isVipOrStudent = hasVipCredits || role === 'student';
     if (isVipOrStudent) {
       if (counters[dateKey].total >= 6) {
         setAiResult({ error: 'You have exceeded the daily AI evaluation limit (6).' });
