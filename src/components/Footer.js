@@ -45,7 +45,7 @@ const Footer = () => {
                                 variants={fadeInUp}
                             >
                                 <h3 className="text-gray-900 uppercase text-md font-medium mb-4 relative inline-block">
-                                    Mock Test
+                                    Full Test
                                     <span className="absolute -bottom-1 left-0 w-1/2 h-0.5 bg-gradient-to-r from-[#2b5356]/10 to-[#2b5356]"></span>
                                 </h3>
                                 <ul className="space-y-3">

@@ -199,14 +199,14 @@ const Navbar = () => {
                                         className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsReadingOpen(false)}
                                     >
-                                        Mock Tests
+                                        Full Test
                                     </Link>
                                     <Link
                                         to="/reading_forecast"
                                         className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsReadingOpen(false)}
                                     >
-                                        Practice Exercises
+                                        Forecast
                                     </Link>
                                 </motion.div>
                             )}
@@ -246,14 +246,14 @@ const Navbar = () => {
                                         className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsListeningOpen(false)}
                                     >
-                                        Mock Tests
+                                        Full Test
                                     </Link>
                                     <Link
                                         to="/listening_forecast"
                                         className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsListeningOpen(false)}
                                     >
-                                        Practice Exercises
+                                        Forecast
                                     </Link>
                                 </motion.div>
                             )}
@@ -603,10 +603,10 @@ const Navbar = () => {
                             <div className="flex flex-col space-y-1">
                                 {[
                                     { name: 'Home', path: '/' },
-                                    { name: 'Listening – Mock Tests', path: '/listening_list' },
-                                    { name: 'Listening – Practice Exercises', path: '/listening_forecast' },
-                                    { name: 'Reading – Mock Tests', path: '/reading_list' },
-                                    { name: 'Reading – Practice Exercises', path: '/reading_forecast' },
+                                    { name: 'Listening – Full Test', path: '/listening_list' },
+                                    { name: 'Listening – Forecast', path: '/listening_forecast' },
+                                    { name: 'Reading – Full Test', path: '/reading_list' },
+                                    { name: 'Reading – Forecast', path: '/reading_forecast' },
                                     { name: 'Writing Full Test', path: '/writing_list' },
                                     { name: 'Writing Forecast Task 1', path: '/writing_forecast?part=1' },
                                     { name: 'Writing Forecast Task 2', path: '/writing_forecast?part=2' },

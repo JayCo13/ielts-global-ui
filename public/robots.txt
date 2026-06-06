@@ -63,3 +63,9 @@ User-agent: Google-Extended
 Allow: /
 
 Sitemap: https://ieltscomputertest.com/sitemap.xml
+
+# Dynamic per-test sitemap (auto-includes every active exam, generated live by
+# the backend from the DB — new admin tests appear automatically). Served at
+# <BACKEND_PUBLIC_URL>/public/sitemap-exams.xml. Uncomment with your real API
+# host, OR submit that URL directly in Google Search Console. Example:
+# Sitemap: https://api.ieltscomputertest.com/public/sitemap-exams.xml
