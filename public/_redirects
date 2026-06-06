@@ -1,2 +1,7 @@
-/api/*  https://double-hetti-jaydenco1-dee125d7.koyeb.app/:splat  200
-/*      /index.html   200
+/api/*      https://double-hetti-jaydenco1-dee125d7.koyeb.app/:splat         200
+# SEO landing pages + dynamic exam sitemap, proxied from the backend so they are
+# served under the main domain (keeps canonical/link equity on ieltscomputertest.com).
+# Backend must set PUBLIC_SEO_BASE_URL=https://ieltscomputertest.com so its
+# canonical/sitemap URLs match this host. Must come BEFORE the SPA catch-all.
+/public/*   https://double-hetti-jaydenco1-dee125d7.koyeb.app/public/:splat  200
+/*          /index.html   200
