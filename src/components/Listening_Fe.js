@@ -7,7 +7,7 @@ import { checkTokenExpiration } from '../utils/authUtils';
 import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
-import { Helmet } from 'react-helmet-async';
+import Seo from './Seo';
 
 const Listening_Fe = () => {
   // Helper to strip HTML tags from part titles (they may contain rich text HTML)
@@ -384,10 +384,11 @@ const Listening_Fe = () => {
   }
   return (
     <div className="min-h-screen bg-gray-50">
-      <Helmet>
-        <title>IELTS Listening Practice Tests | Official & Practice</title>
-        <meta name="description" content={`Practice your IELTS Listening skills. Includes tests like ${tests.slice(0, 3).map(t => t.title).join(', ')}... and many more parts!`} />
-      </Helmet>
+      <Seo
+        title="IELTS Listening Practice Tests | Official & Practice"
+        description={`Practice your IELTS Listening skills. Includes tests like ${tests.slice(0, 3).map(t => t.title).join(', ')}... and many more parts!`}
+        path="/listening_list"
+      />
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-4">
         <nav className="flex" aria-label="Breadcrumb">

@@ -1,4 +1,65 @@
+# robots.txt for ieltscomputertest.com
+# Default: allow everything, then carve out private / thin / in-exam routes
 User-agent: *
+Allow: /
+
+# Auth & account pages (no SEO value, avoid duplicate/thin content)
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /auth-callback
+Disallow: /profile
+
+# In-exam rooms & result/review pages (require auth, not indexable)
+Disallow: /listening_test_room
+Disallow: /reading_test_room
+Disallow: /speaking_test_room
+Disallow: /writing_test_room
+Disallow: /writing_forecast_view
+Disallow: /result_review
+Disallow: /result_review_rd
+Disallow: /exam-history
+Disallow: /new-vocabulary
+Disallow: /dictation
+
+# Payment / subscription flow (transient, user-specific)
+Disallow: /payment
+Disallow: /payment-processing
+Disallow: /payment-success
+Disallow: /payment-failure
+Disallow: /payment-cancel
+Disallow: /transaction-status
+Disallow: /vip-confirmation
+Disallow: /my-vip-package
+
+# Explicitly welcome major search crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Explicitly welcome AI answer-engine crawlers (GEO / get cited by LLMs)
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
 Allow: /
 
 Sitemap: https://ieltscomputertest.com/sitemap.xml

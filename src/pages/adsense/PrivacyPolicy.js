@@ -4,6 +4,7 @@ import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { ArrowLeft } from 'lucide-react';
 import { Player } from '@lottiefiles/react-lottie-player';
+import Seo from '../../components/Seo';
 
 const PrivacyPolicy = () => {
   const fadeIn = {
@@ -17,6 +18,11 @@ const PrivacyPolicy = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col w-full">
+      <Seo
+        title="Privacy Policy | ieltscomputertest.com"
+        description="How ieltscomputertest.com collects, uses and protects your personal data when you practice IELTS online."
+        path="/privacy-policy"
+      />
       <Navbar />
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <motion.div

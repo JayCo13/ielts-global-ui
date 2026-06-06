@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import Seo from '../../components/Seo';
 
 const Permission = () => {
   const fadeIn = {
@@ -15,6 +16,11 @@ const Permission = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
+      <Seo
+        title="Business Information | ieltscomputertest.com"
+        description="Business information and contact details for ieltscomputertest.com IELTS online practice."
+        path="/permission"
+      />
       <Navbar />
       {/* Custom Footer with Business Information */}
       <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-12">

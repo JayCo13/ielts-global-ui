@@ -4,7 +4,7 @@ import { Play, Search, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
 import Navbar from './Navbar';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
-import { Helmet } from 'react-helmet-async';
+import Seo from './Seo';
 
 const toAbsoluteUrl = (u) => (u && u.startsWith('/')) ? `${API_BASE}${u}` : u;
 
@@ -175,10 +175,11 @@ const Speaking_Fe = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Helmet>
-                <title>IELTS Speaking Materials | Practice</title>
-                <meta name="description" content={`Practice your IELTS Speaking skills. Includes materials like ${materials.slice(0, 3).map(m => m.title).join(', ')}...`} />
-            </Helmet>
+            <Seo
+                title="IELTS Speaking Materials | Practice"
+                description={`Practice your IELTS Speaking skills. Includes materials like ${materials.slice(0, 3).map(m => m.title).join(', ')}...`}
+                path="/speaking_list"
+            />
             <Navbar />
 
             <div className="max-w-7xl mx-auto px-4 py-4">

@@ -41,8 +41,33 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "postbuild": "react-snap || echo 'react-snap prerender skipped (non-fatal) — falling back to client-side render'",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "reactSnap": {
+    "inlineCss": false,
+    "puppeteerArgs": ["--no-sandbox", "--disable-setuid-sandbox"],
+    "skipThirdPartyRequests": true,
+    "include": [
+      "/",
+      "/listening_list",
+      "/reading_list",
+      "/writing_list",
+      "/speaking_list",
+      "/listening_forecast",
+      "/reading_forecast",
+      "/writing_forecast",
+      "/instruction",
+      "/achievements",
+      "/about",
+      "/privacy-policy",
+      "/payment-policy",
+      "/refund-policy",
+      "/comp-policy",
+      "/deli-policy",
+      "/permission"
+    ]
   },
   "eslintConfig": {
     "extends": [
@@ -67,6 +92,7 @@
     "@testing-library/react": "^16.3.0",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.0",
+    "react-snap": "^1.23.0",
     "tailwindcss": "^3.4.17"
   }
 }

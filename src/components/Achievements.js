@@ -5,6 +5,7 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
+import Seo from './Seo';
 
 const Achievements = () => {
     const [selectedImage, setSelectedImage] = useState(null);
@@ -130,6 +131,11 @@ const Achievements = () => {
 
     return (
         <div>
+            <Seo
+                title="Student Achievements & IELTS Results | ieltscomputertest.com"
+                description="See real IELTS band scores and achievements from students who practiced online with ieltscomputertest.com."
+                path="/achievements"
+            />
             <Navbar />
             <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen py-6">
                 {/* Desktop Layout - Custom Image Grid with Text Area */}

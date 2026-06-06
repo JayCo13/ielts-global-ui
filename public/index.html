@@ -6,36 +6,19 @@
   <link rel="icon" type="image/png" sizes="48x48" href="/img/48.png?v=3" />
   <link rel="icon" type="image/png" sizes="192x192" href="/img/192.png?v=3" />
   <link rel="icon" type="image/png" sizes="384x384" href="/img/384.png?v=3" />
-  <link rel="canonical" href="https://ieltscomputertest.com" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#1e40af" />
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
   <meta name="googlebot" content="index, follow" />
 
-  <!-- Enhanced SEO Meta Tags -->
-  <meta name="description"
-    content="IELTS Computer-Based Test Practice - ieltscomputertest.com. Practice IELTS online with a 100% real-exam interface. IELTS Listening, Reading, Writing, Speaking tests. Improve your IELTS score effectively." />
+  <!-- Site-wide meta. Per-page title, description, canonical, Open Graph and
+       Twitter tags are managed by the <Seo> component (react-helmet-async) so
+       each route gets unique values — do NOT hardcode those here, or every page
+       would emit a duplicate canonical/OG pointing at the homepage. -->
   <meta name="keywords"
     content="IELTS computer test, ieltscomputertest, ieltscomputertest.com, IELTS practice, IELTS online, IELTS test online, IELTS listening, IELTS reading, IELTS writing, IELTS speaking, IELTS preparation, IELTS mock test" />
   <meta name="author" content="ieltscomputertest.com" />
   <meta name="language" content="English" />
-
-  <!-- Open Graph Meta Tags for Social Media -->
-  <meta property="og:title"
-    content="IELTS Computer-Based Test Practice - ieltscomputertest.com | Practice IELTS Online" />
-  <meta property="og:description"
-    content="Practice IELTS online with a 100% real-exam interface. IELTS Listening, Reading, Writing, Speaking tests. Improve your IELTS score effectively." />
-  <meta property="og:image" content="https://ieltscomputertest.com/img/logo-ielts.png" />
-  <meta property="og:url" content="https://ieltscomputertest.com" />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="ieltscomputertest.com" />
-  <meta property="og:locale" content="en_US" />
-
-  <!-- Twitter Card Meta Tags -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="IELTS Computer-Based Test Practice - ieltscomputertest.com" />
-  <meta name="twitter:description" content="Practice IELTS online with a 100% real-exam interface" />
-  <meta name="twitter:image" content="https://ieltscomputertest.com/img/logo-ielts.png" />
 
   <!-- Structured Data for SEO -->
   <script type="application/ld+json">
@@ -43,7 +26,7 @@
       "@context": "https://schema.org",
       "@type": "EducationalOrganization",
       "name": "ieltscomputertest.com",
-      "alternateName": "IELTS Computer-Based Test Practice",
+      "alternateName": ["IELTS Computer Test", "IELTS Computer-Based Test Practice"],
       "url": "https://ieltscomputertest.com",
       "logo": "https://ieltscomputertest.com/img/logo-ielts.png",
       "description": "Practice IELTS online with a 100% real-exam interface. IELTS Listening, Reading, Writing, Speaking tests.",
@@ -62,12 +45,30 @@
     }
     </script>
 
+  <!-- Structured Data: WebSite (site identity for search engines) -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "ieltscomputertest.com",
+      "alternateName": ["IELTS Computer Test", "IELTS Computer-Based Test Practice"],
+      "url": "https://ieltscomputertest.com",
+      "description": "Practice IELTS online with a 100% real-exam interface. IELTS Listening, Reading, Writing and Speaking tests with up-to-date forecast exams.",
+      "inLanguage": "en",
+      "publisher": {
+        "@type": "EducationalOrganization",
+        "name": "ieltscomputertest.com",
+        "logo": "https://ieltscomputertest.com/img/logo-ielts.png"
+      }
+    }
+    </script>
+
   <!-- Apple Touch Icon -->
   <link rel="apple-touch-icon" href="/img/192.png?v=3" />
   <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
 
   <!-- Enhanced Title -->
-  <title>IELTS Computer-Based Test Practice - ieltscomputertest.com | Practice IELTS Online</title>
+  <title>IELTS Computer Test – Practice IELTS Online Free | ieltscomputertest.com</title>
 </head>
 
 <body>

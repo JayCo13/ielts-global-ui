@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { FileText, ShoppingCart, RefreshCw, Shield, Users, DollarSign, Settings, AlertTriangle } from 'lucide-react';
+import Seo from '../../components/Seo';
 
 const CompPolicy = () => {
   const fadeIn = {
@@ -16,6 +17,11 @@ const CompPolicy = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col w-full">
+      <Seo
+        title="Terms and Conditions | ieltscomputertest.com"
+        description="The terms and conditions governing the use of ieltscomputertest.com IELTS practice services."
+        path="/comp-policy"
+      />
       <Navbar />
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <motion.div

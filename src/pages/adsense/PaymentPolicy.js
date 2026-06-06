@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { CreditCard } from 'lucide-react';
+import Seo from '../../components/Seo';
 
 const PaymentPolicy = () => {
   const fadeIn = {
@@ -16,6 +17,11 @@ const PaymentPolicy = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col w-full">
+      <Seo
+        title="Payment Policy | ieltscomputertest.com"
+        description="Payment terms for ieltscomputertest.com VIP plans and IELTS practice subscriptions."
+        path="/payment-policy"
+      />
       <Navbar />
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <motion.div

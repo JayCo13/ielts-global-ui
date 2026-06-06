@@ -6,7 +6,7 @@ import { canAccessExam } from '../utils/examAccess';
 import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
-import { Helmet } from 'react-helmet-async';
+import Seo from './Seo';
 
 const Reading_Fe = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -374,10 +374,11 @@ const Reading_Fe = () => {
   }
   return (
     <div className="min-h-screen bg-gray-50">
-      <Helmet>
-        <title>IELTS Reading Practice Tests | Official Mockup Test</title>
-        <meta name="description" content={`Practice your IELTS Reading skills. Includes tests like ${tests.slice(0, 3).map(t => t.title).join(', ')}...`} />
-      </Helmet>
+      <Seo
+        title="IELTS Reading Practice Tests | Official Mockup Test"
+        description={`Practice your IELTS Reading skills. Includes tests like ${tests.slice(0, 3).map(t => t.title).join(', ')}...`}
+        path="/reading_list"
+      />
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-4">
         <nav className="flex" aria-label="Breadcrumb">

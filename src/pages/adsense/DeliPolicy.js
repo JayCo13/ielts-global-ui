@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { Truck, Clock, Globe, FileText, AlertTriangle } from 'lucide-react';
+import Seo from '../../components/Seo';
 
 const DeliPolicy = () => {
   const fadeIn = {
@@ -16,6 +17,11 @@ const DeliPolicy = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col w-full">
+      <Seo
+        title="Delivery Policy | ieltscomputertest.com"
+        description="Delivery policy for ieltscomputertest.com digital IELTS practice subscriptions and services."
+        path="/deli-policy"
+      />
       <Navbar />
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <motion.div

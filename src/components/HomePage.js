@@ -14,6 +14,7 @@ import 'swiper/css/effect-coverflow';
 import CircularGallery, { Card } from './CircularGallery';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
+import Seo from './Seo';
 
 const heroImages = [
   '/img/hp1.webp',
@@ -230,6 +231,56 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
+      <Seo
+        path="/"
+        jsonLd={[
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Course',
+            name: 'IELTS Computer-Based Test Practice',
+            description:
+              'Practice IELTS online with a 100% real-exam interface. Full IELTS Listening, Reading, Writing and Speaking tests plus up-to-date forecast exams.',
+            provider: {
+              '@type': 'EducationalOrganization',
+              name: 'ieltscomputertest.com',
+              sameAs: 'https://ieltscomputertest.com',
+            },
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: [
+              {
+                '@type': 'Question',
+                name: 'Can I practice the IELTS computer-based test online for free?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text:
+                    'Yes. ieltscomputertest.com lets you practice IELTS Listening, Reading, Writing and Speaking online with a 100% real-exam computer-based interface.',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'What is an IELTS forecast test?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text:
+                    'IELTS forecast tests are predicted exams compiled from the most recent question trends. Tests marked with a star are Highly Forecast — the ones most likely to appear in the upcoming real exam.',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'Does the practice interface match the real IELTS on computer exam?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text:
+                    'Yes. The interface mirrors the official IELTS on computer format for Listening, Reading and Writing, so you practice in the exact environment of the real test.',
+                },
+              },
+            ],
+          },
+        ]}
+      />
 
       <Navbar />
       <main className="flex-1 flex flex-col items-center justify-center">
@@ -264,7 +315,7 @@ const HomePage = () => {
                 variants={slideRight}
                 className="inline-block mt-3 mb-4 px-3 py-1 bg-gradient-to-r from-[#c98825] to-[#e4b231] text-white text-sm font-semibold rounded-full shadow-md"
               >
-                Computer-Based Test Preparation
+                IELTS Computer Test Preparation
               </motion.div>
 
               <motion.h1
@@ -272,10 +323,10 @@ const HomePage = () => {
                 className="font-extrabold tracking-tight mb-8 flex flex-col gap-1 md:gap-2"
               >
                 <motion.span variants={slideUp} className="block text-3xl sm:text-4xl md:text-5xl lg:text-[45px] leading-tight text-[#0e233a]">
-                  Prepare for IELTS tests
+                  Practice the IELTS Computer Test
                 </motion.span>
                 <motion.span variants={slideUp} className="block text-2xl sm:text-3xl md:text-4xl lg:text-[40px] leading-tight text-[#0e233a]">
-                  on computer
+                  on a real exam interface
                 </motion.span>
                 <motion.span variants={slideUp} className="block text-2xl sm:text-3xl md:text-4xl lg:text-[40px] leading-tight text-[#d2922d]">
                   with powerful tools,

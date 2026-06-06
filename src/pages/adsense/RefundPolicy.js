@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { RefreshCw, Mail, MessageCircle } from 'lucide-react';
+import Seo from '../../components/Seo';
 
 const RefundPolicy = () => {
   const fadeIn = {
@@ -16,6 +17,11 @@ const RefundPolicy = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col w-full">
+      <Seo
+        title="Refund Policy | ieltscomputertest.com"
+        description="Refund policy for ieltscomputertest.com VIP IELTS practice subscriptions."
+        path="/refund-policy"
+      />
       <Navbar />
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <motion.div

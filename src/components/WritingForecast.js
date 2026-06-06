@@ -7,7 +7,7 @@ import EditEssayDialog from './EditEssayDialog';
 import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
-import { Helmet } from 'react-helmet-async';
+import Seo from './Seo';
 
 const WritingForecast = () => {
   const navigate = useNavigate();
@@ -188,10 +188,21 @@ const WritingForecast = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Helmet>
-        <title>IELTS Writing Practice | Practice Mockup Tests</title>
-        <meta name="description" content={`Practice your IELTS Writing skills with Practice exams like ${items.slice(0, 3).map(i => i.exam_title).join(', ')}...`} />
-      </Helmet>
+      <Seo
+        title="IELTS Writing Forecast 2026 | Predicted IELTS Writing Tasks"
+        description={`Practice IELTS Writing with the latest forecast tasks${items.length ? ` like ${items.slice(0, 3).map(i => i.exam_title).join(', ')}` : ''}. A star marks Highly Forecast tasks most likely to appear in the real exam.`}
+        path="/writing_forecast"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'ItemList',
+          name: 'IELTS Writing Forecast Tasks',
+          itemListElement: items.slice(0, 20).map((i, idx) => ({
+            '@type': 'ListItem',
+            position: idx + 1,
+            name: i.exam_title,
+          })),
+        }}
+      />
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
@@ -283,7 +294,7 @@ const WritingForecast = () => {
             ))}
           </div>
         ) : sorted.length === 0 ? (
-          <div className="p-8 text-center text-gray-600">No focus items to display</div>
+          <div className="p-8 text-center text-gray-600">No forecast items to display</div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

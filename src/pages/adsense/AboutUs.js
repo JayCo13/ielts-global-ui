@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import Seo from '../../components/Seo';
 
 const AboutUs = () => {
   const fadeIn = {
@@ -15,6 +16,11 @@ const AboutUs = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
+      <Seo
+        title="About Us | ieltscomputertest.com"
+        description="Learn about ieltscomputertest.com — helping students worldwide practice IELTS online with a 100% real computer-based exam interface for Listening, Reading, Writing and Speaking."
+        path="/about"
+      />
       <Navbar />
       <main className="flex-1 container mx-auto px-4 py-12 max-w-6xl">
         <motion.div

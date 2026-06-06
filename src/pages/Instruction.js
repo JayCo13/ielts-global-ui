@@ -4,6 +4,7 @@ import { Headphones, BookOpen, PenTool, Mic, BookA, Info, CheckCircle2, ChevronR
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import Seo from '../components/Seo';
 
 const Instruction = () => {
   useEffect(() => {
@@ -25,6 +26,11 @@ const Instruction = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
+      <Seo
+        title="How to Practice IELTS Online | Instructions | ieltscomputertest.com"
+        description="Step-by-step instructions for practicing IELTS Listening, Reading, Writing and Speaking on ieltscomputertest.com with a real computer-based exam interface."
+        path="/instruction"
+      />
       <Navbar />
 
       {/* Breadcrumb & Navigation */}

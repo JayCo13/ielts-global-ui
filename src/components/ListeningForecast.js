@@ -6,7 +6,7 @@ import secureStorage from '../utils/secureStorage';
 import ConfirmDialog from './ConfirmDialog';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
-import { Helmet } from 'react-helmet-async';
+import Seo from './Seo';
 
 const ListeningForecast = () => {
   const navigate = useNavigate();
@@ -191,10 +191,21 @@ const ListeningForecast = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Helmet>
-        <title>IELTS Listening Practice | Practice Mockup Test</title>
-        <meta name="description" content={`Practice your IELTS Listening skills with focus exams like ${items.slice(0, 3).map(i => i.exam_title).join(', ')}...`} />
-      </Helmet>
+      <Seo
+        title="IELTS Listening Forecast 2026 | Predicted IELTS Listening Tests"
+        description={`Practice IELTS Listening with the latest forecast exams${items.length ? ` like ${items.slice(0, 3).map(i => i.exam_title).join(', ')}` : ''}. A star marks Highly Forecast tests most likely to appear in the real exam.`}
+        path="/listening_forecast"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'ItemList',
+          name: 'IELTS Listening Forecast Tests',
+          itemListElement: items.slice(0, 20).map((i, idx) => ({
+            '@type': 'ListItem',
+            position: idx + 1,
+            name: i.exam_title,
+          })),
+        }}
+      />
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
         <nav className="flex" aria-label="Breadcrumb">
@@ -208,7 +219,7 @@ const ListeningForecast = () => {
         </nav>
         <div className="inline-flex items-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg text-sm">
           <Star className="w-5 h-5 text-yellow-500" fill="currentColor" />
-          <span className="text-gray-700">= Focus</span>
+          <span className="text-gray-700">= Highly Forecast</span>
         </div>
       </div>
 
