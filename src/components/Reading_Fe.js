@@ -530,7 +530,7 @@ const Reading_Fe = () => {
                         <div className="shrink-0 font-bold bg-blue-100 text-blue-700 px-2.5 py-1 rounded text-xs mr-3 uppercase tracking-wider group-hover:bg-blue-200 transition-colors">
                           Part {partNum}
                         </div>
-                        <span className={`text-sm font-medium text-gray-700 line-clamp-1 leading-relaxed ${(!isVIP && userRole === 'customer' && (index + indexOfFirstTest) >= 6) ? 'blur-[4px] select-none' : ''}`}>
+                        <span className="text-sm font-medium text-gray-700 line-clamp-1 leading-relaxed">
                           {title}
                         </span>
                       </div>
