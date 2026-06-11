@@ -3258,10 +3258,10 @@ const MainLayout = () => {
           </div>
         </Split>
 
-        <footer className={`${colorTheme === 'black-on-white' ? 'bg-white' : 'bg-black'} border-t border-gray-200 p-4 w-full`}>
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="flex items-center justify-between">
-              <div className="flex-1 flex items-center justify-center gap-6">
+        <footer className={`${colorTheme === 'black-on-white' ? 'bg-white' : 'bg-black'} border-t border-gray-200 p-2 md:p-4 w-full`}>
+          <div className="max-w-7xl mx-auto px-2 md:px-4">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex-1 flex items-center justify-center gap-2 md:gap-6 overflow-x-auto md:overflow-visible">
                 {partsToShow.map((part) => (
                   <div key={part} className="relative">
                     <button
@@ -3269,13 +3269,13 @@ const MainLayout = () => {
                         if (isForecastMode && part !== currentPart) return;
                         setCurrentPart(part);
                       }}
-                      className={`px-4 py-2 text-lg rounded-lg font-bold transition-colors ${currentPart === part
+                      className={`px-2 md:px-4 py-1 md:py-2 text-sm md:text-lg rounded-lg font-bold transition-colors ${currentPart === part
                         ? `${colorTheme === 'black-on-white' ? 'bg-white-100 text-black-600' : 'bg-gray-800 text-white'}`
                         : `hover:${colorTheme === 'black-on-white' ? 'bg-gray-100' : 'bg-gray-800'} text-black-600`
                         }`}
                     >
                       {currentPart === part ? (
-                        <div className="flex flex-wrap justify-center gap-1 max-w-[80vw] md:max-w-none mx-auto">
+                        <div className="flex flex-nowrap md:flex-wrap justify-start md:justify-center gap-1 max-w-[55vw] md:max-w-none mx-auto overflow-x-auto md:overflow-visible">
                           {[...Array(part === 3 ? 14 : 13)].map((_, idx) => {
                             const questionNum = getQuestionRange(part).start + idx;
                             const isCompleted = isQuestionCompleted(questionNum);
@@ -3521,7 +3521,7 @@ const MainLayout = () => {
                           })}
                         </div>
                       ) : (
-                        <span>Part {part} ({Object.keys(studentAnswers).filter(id => {
+                        <span className="whitespace-nowrap">Part {part} ({Object.keys(studentAnswers).filter(id => {
                           const qRange = getQuestionRange(part);
                           const questionIds = examData?.sections[part - 1]?.questions
                             .filter(q => q.question_type === 'fill_in_blank' || q.question_type === 'multiple_choice')
@@ -3534,11 +3534,11 @@ const MainLayout = () => {
                   </div>
                 ))}
               </div>
-              <div className="ml-6 flex space-x-4">
+              <div className="ml-2 md:ml-6 flex space-x-2 md:space-x-4">
                 {!location.state?.fromResultReview && !isRetakeIncorrectMode && (
                   <button
                     onClick={handleSubmitExam}
-                    className={`px-6 py-4 rounded-lg text-lg font-bold transition-colors
+                    className={`px-3 py-2 md:px-6 md:py-4 rounded-lg text-sm md:text-lg font-bold transition-colors whitespace-nowrap
                       ${colorTheme === 'black-on-white'
                         ? 'bg-black text-white hover:bg-gray-600'
                         : colorTheme === 'white-on-black'

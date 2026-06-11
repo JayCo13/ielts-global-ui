@@ -6,6 +6,11 @@ import fetchWithTimeout from '../../utils/fetchWithTimeout';
 
 const toAbsoluteUrl = (u) => (u && u.startsWith('/')) ? `${API_BASE}${u}` : u;
 
+// Mobile browsers (iOS Safari especially) render inline PDFs as a single,
+// non-scrollable first page. Route them through the Google Docs viewer,
+// which paginates properly; desktop keeps the native PDF viewer.
+const isMobilePdfViewer = typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
 const SpeakingLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -82,9 +87,27 @@ const SpeakingLayout = () => {
           )}
         </div>
 
-        <div className="bg-white rounded-xl shadow-md h-[90vh] p-4 mt-4">
+        <div className="bg-white rounded-xl shadow-md h-[80vh] md:h-[90vh] p-4 mt-4">
           {pdfUrl ? (
-            <iframe src={pdfUrl} title="Speaking PDF" className="w-full h-full border rounded" />
+            isMobilePdfViewer ? (
+              <div className="w-full h-full flex flex-col">
+                <iframe
+                  src={`https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`}
+                  title="Speaking PDF"
+                  className="w-full flex-1 border rounded"
+                />
+                <a
+                  href={pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 text-center text-lime-600 font-bold underline"
+                >
+                  Open PDF in new tab
+                </a>
+              </div>
+            ) : (
+              <iframe src={pdfUrl} title="Speaking PDF" className="w-full h-full border rounded" />
+            )
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-500">No PDF available</div>
           )}

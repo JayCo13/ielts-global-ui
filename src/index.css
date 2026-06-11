@@ -57,6 +57,17 @@
   height: 100% !important;
 }
 
+/* Vertical gutter (mobile split: passage on top, questions below).
+   Without this override the generic .gutter height:100% rule turns the
+   divider into a giant gray/white block covering the screen on phones. */
+.gutter.gutter-vertical {
+  cursor: row-resize;
+  width: 100% !important;
+  height: 10px !important;
+  flex-shrink: 0;
+  background-color: #6b7280 !important;
+}
+
 .gutter.gutter-horizontal {
   cursor: col-resize;
   width: 1px !important;

@@ -10,6 +10,12 @@ import './FloatingNotification.css';
 import API_BASE from '../config/api';
 // Remove ImagePreviewModal import as we're creating our own
 
+// Notification image URLs can be absolute (Cloudflare R2 upload) or relative
+// (/static/... fallback). Only prepend API_BASE for relative paths — naively
+// concatenating breaks R2 URLs (API_BASE + https://pub-...r2.dev/...).
+const resolveNotificationImageUrl = (url) =>
+  url && /^https?:\/\//i.test(url) ? url : `${API_BASE}${url}`;
+
 // Create a new NotificationImageModal component for full screen display
 const NotificationImageModal = ({ isOpen, onClose, imageUrl }) => {
   if (!isOpen) return null;
@@ -182,7 +188,7 @@ const NotificationItem = ({ notification }) => {
   return (
     <div className="flex flex-col items-center text-center">
       <div className="flex flex-col">
-        <p className={`font-medium
+        <p className={`font-medium whitespace-pre-line
           ${type === 'update' ? 'text-green-700' : ''}
           ${type === 'announcement' ? 'text-blue-700' : ''}
           ${type === 'maintenance' ? 'text-orange-700' : ''}
@@ -192,8 +198,8 @@ const NotificationItem = ({ notification }) => {
             className="relative cursor-pointer"
             onClick={handleImageClick}
           >
-            <img 
-              src={`${API_BASE}${image_url}`}
+            <img
+              src={resolveNotificationImageUrl(image_url)}
               alt="Notification image"
               className="rounded-lg w-full max-w-[600px] max-h-[50vh] object-contain mx-auto transition-transform duration-300 hover:scale-105"
             /> 
@@ -209,7 +215,7 @@ const NotificationItem = ({ notification }) => {
       <NotificationImageModal 
         isOpen={isImageModalOpen}
         onClose={() => setIsImageModalOpen(false)}
-        imageUrl={image_url ? `${API_BASE}${image_url}` : ''}
+        imageUrl={image_url ? resolveNotificationImageUrl(image_url) : ''}
       />
     </div>
   );

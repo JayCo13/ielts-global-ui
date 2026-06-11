@@ -275,15 +275,20 @@ const ListeningTest = ({
           // Save note to component state
           setNotes(prev => [...prev, noteData]);
 
-          // Add click handler to show note
+          // Add click handler to show note. Read the latest text from
+          // localStorage at click time — capturing noteData.text in the
+          // closure shows stale text after the note has been edited, which
+          // made edits look like they never saved.
           span.addEventListener('click', (e) => {
             e.stopPropagation();
             e.preventDefault();
+            const latestNotes = JSON.parse(localStorage.getItem('ielts-notes') || '[]');
+            const latestNote = latestNotes.find(n => n.id === noteId);
             setNoteDialog({
               visible: true,
               x: e.clientX,
               y: e.clientY,
-              text: noteData.text,
+              text: latestNote ? latestNote.text : noteData.text,
               selection: null,
               noteId: noteId,
               range: null
@@ -2381,11 +2386,21 @@ const ListeningTest = ({
     if (!highlightMenu.range || !highlightMenu.selection) return;
 
     try {
+      // IDP/BC-style two-level highlight: a selection made on top of an existing
+      // level-1 highlight becomes a level-2 (pink) highlight.
+      const rangeStartEl = highlightMenu.range.startContainer.nodeType === Node.ELEMENT_NODE
+        ? highlightMenu.range.startContainer
+        : highlightMenu.range.startContainer.parentElement;
+      const parentHighlight = rangeStartEl?.closest?.('[data-highlight="true"]');
+      const highlightLevel = parentHighlight ? 2 : 1;
+
       // Create a new span element for the highlight
       const span = document.createElement('span');
-      span.className = colorTheme === 'black-on-white' ? 'ielts-highlight bg-yellow-200' :
-        colorTheme === 'white-on-black' ? 'ielts-highlight bg-blue-800' : 'ielts-highlight bg-blue-900';
+      span.className = highlightLevel === 2
+        ? 'ielts-highlight ielts-highlight-l2'
+        : 'ielts-highlight ielts-highlight-l1';
       span.setAttribute('data-highlight', 'true');
+      span.setAttribute('data-level', highlightLevel.toString());
       span.setAttribute('data-part', currentPart.toString());
       span.setAttribute('data-timestamp', new Date().getTime());
 
@@ -2393,8 +2408,17 @@ const ListeningTest = ({
       const highlightId = `highlight-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
       span.setAttribute('id', highlightId);
 
-      // Apply the highlight
-      highlightMenu.range.surroundContents(span);
+      // Apply the highlight. surroundContents() throws when the selection
+      // crosses an element boundary (e.g. partially over an existing
+      // highlight) — fall back to extract + wrap so highlight-on-highlight
+      // works like IDP/BC.
+      try {
+        highlightMenu.range.surroundContents(span);
+      } catch (wrapError) {
+        const fragment = highlightMenu.range.extractContents();
+        span.appendChild(fragment);
+        highlightMenu.range.insertNode(span);
+      }
 
       // Generate a unique signature for this highlight position
       const range = highlightMenu.range;
@@ -2417,6 +2441,7 @@ const ListeningTest = ({
         id: highlightId,
         text: highlightMenu.selection,
         part: currentPart,
+        level: highlightLevel,
         timestamp: timestamp,
         signature: signature,
         rangeInfo: rangeInfo,
@@ -2462,20 +2487,6 @@ const ListeningTest = ({
       removeHighlight(el.id);
     });
     setHighlightMenu(prev => ({ ...prev, visible: false }));
-  };
-
-  const handleCopy = () => {
-    if (highlightMenu.selection) {
-      navigator.clipboard.writeText(highlightMenu.selection)
-        .then(() => {
-          setHighlightMenu(prev => ({ ...prev, visible: false }));
-          // Clear the selection
-          window.getSelection().removeAllRanges();
-        })
-        .catch(err => {
-          console.error('Failed to copy: ', err);
-        });
-    }
   };
 
   const removeHighlight = (highlightId) => {
@@ -2528,6 +2539,16 @@ const ListeningTest = ({
         cursor: default;
         display: inline;
         border-radius: 2px;
+      }
+      /* IDP/BC-style highlight colors (2026-06 update):
+         level 1 = "mắm tôm" dark maroon, level 2 (on top of level 1) = "hồng cánh sen" pink */
+      .ielts-highlight-l1 {
+        background-color: #76323F;
+        color: #FFFFFF;
+      }
+      .ielts-highlight-l2 {
+        background-color: #EC4899;
+        color: #FFFFFF;
       }
     `;
     document.head.appendChild(style);
@@ -2641,7 +2662,11 @@ const ListeningTest = ({
       setTimeout(() => {
         // Get saved highlights from localStorage to ensure we have the latest
         const savedHighlights = JSON.parse(localStorage.getItem('ielts-highlights') || '[]');
-        const examHighlights = savedHighlights.filter(h => h.examId === examData?.exam_id);
+        const examHighlights = savedHighlights
+          .filter(h => h.examId === examData?.exam_id)
+          // Restore level-1 highlights before level-2 so a pink (l2) highlight
+          // can nest inside its underlying maroon (l1) highlight.
+          .sort((a, b) => ((a.level || 1) - (b.level || 1)) || (a.timestamp - b.timestamp));
 
         // Restore highlights
         if (examHighlights.length > 0) {
@@ -2733,17 +2758,27 @@ const ListeningTest = ({
                 range.setStart(bestMatch.textNode, bestMatch.highlightIndex);
                 range.setEnd(bestMatch.textNode, bestMatch.highlightIndex + highlight.text.length);
 
-                // Check if this text is already highlighted
+                // Check if this text is already highlighted/noted. A level-2
+                // highlight legitimately lives INSIDE a level-1 highlight, so
+                // only skip it when nested in a note or another l2 span.
+                const restoreLevel = highlight.level || 1;
                 const existingHighlight = range.commonAncestorContainer.parentElement;
-                if (existingHighlight && (existingHighlight.hasAttribute('data-highlight') || existingHighlight.hasAttribute('data-note'))) {
-                  return; // Skip if already highlighted or noted
+                if (existingHighlight) {
+                  const inNote = existingHighlight.hasAttribute('data-note');
+                  const inHighlight = existingHighlight.hasAttribute('data-highlight');
+                  const parentLevel = parseInt(existingHighlight.getAttribute('data-level') || '1', 10);
+                  if (inNote || (inHighlight && (restoreLevel === 1 || parentLevel === 2))) {
+                    return; // Skip if already highlighted or noted
+                  }
                 }
 
                 // Create highlight span
                 const span = document.createElement('span');
-                span.className = colorTheme === 'black-on-white' ? 'ielts-highlight bg-yellow-200' :
-                  colorTheme === 'white-on-black' ? 'ielts-highlight bg-blue-800' : 'ielts-highlight bg-blue-900';
+                span.className = restoreLevel === 2
+                  ? 'ielts-highlight ielts-highlight-l2'
+                  : 'ielts-highlight ielts-highlight-l1';
                 span.setAttribute('data-highlight', 'true');
+                span.setAttribute('data-level', restoreLevel.toString());
                 span.setAttribute('data-part', highlight.part.toString());
                 span.setAttribute('data-timestamp', highlight.timestamp);
 
@@ -2882,15 +2917,19 @@ const ListeningTest = ({
                       offset: noteIndex
                     }));
 
-                    // Add click handler to show note
+                    // Add click handler to show note. Read the latest text from
+                    // localStorage at click time — the closure would otherwise
+                    // show stale text after the note has been edited.
                     span.addEventListener('click', (e) => {
                       e.stopPropagation();
                       e.preventDefault();
+                      const latestNotes = JSON.parse(localStorage.getItem('ielts-notes') || '[]');
+                      const latestNote = latestNotes.find(n => n.id === note.id);
                       setNoteDialog({
                         visible: true,
                         x: e.clientX,
                         y: e.clientY,
-                        text: note.text,
+                        text: latestNote ? latestNote.text : note.text,
                         selection: null,
                         noteId: note.id,
                         range: null
@@ -3161,39 +3200,30 @@ const ListeningTest = ({
                 </button>
               </>
             ) : (
-              /* Normal mode: text selected, right-clicked */
-              <>
+              /* Normal mode: text selected — horizontal IDP/BC-style menu (Note | Highlight, no Copy) */
+              <div className="flex flex-row items-stretch">
+                <button
+                  onClick={handleAddNote}
+                  className={`px-4 py-2 text-xs ${colorTheme === 'black-on-white' ? 'hover:bg-gray-100 text-gray-700' : 'hover:bg-gray-700 text-gray-200'} flex flex-col items-center gap-1 transition-colors`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Note
+                </button>
                 <button
                   onClick={handleHighlight}
-                  className={`px-4 py-2.5 text-left text-sm ${colorTheme === 'black-on-white' ? 'hover:bg-yellow-50 text-gray-700' : 'hover:bg-gray-700 text-gray-200'} flex items-center gap-2 transition-colors`}
+                  className={`px-4 py-2 text-xs ${colorTheme === 'black-on-white' ? 'hover:bg-gray-100 text-gray-700' : 'hover:bg-gray-700 text-gray-200'} flex flex-col items-center gap-1 transition-colors`}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-500" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M18.5 1.5l4 4L9 19l-4 1 1-4L18.5 1.5zM2 24h20v-2H2v2z" />
                   </svg>
                   Highlight
                 </button>
-                <button
-                  onClick={handleCopy}
-                  className={`px-4 py-2.5 text-left text-sm ${colorTheme === 'black-on-white' ? 'hover:bg-gray-100 text-gray-700' : 'hover:bg-gray-700 text-gray-200'} flex items-center gap-2 transition-colors`}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                  Copy
-                </button>
-                <button
-                  onClick={handleAddNote}
-                  className={`px-4 py-2.5 text-left text-sm ${colorTheme === 'black-on-white' ? 'hover:bg-gray-100 text-gray-700' : 'hover:bg-gray-700 text-gray-200'} flex items-center gap-2 transition-colors`}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  Add Note
-                </button>
                 {isTranslatorEnabled && (
                   <button
                     onClick={handleTranslate}
-                    className={`px-4 py-2.5 text-left text-sm ${colorTheme === 'black-on-white' ? 'hover:bg-gray-100 text-gray-700' : 'hover:bg-gray-700 text-gray-200'} flex items-center gap-2 transition-colors`}
+                    className={`px-4 py-2 text-xs ${colorTheme === 'black-on-white' ? 'hover:bg-gray-100 text-gray-700' : 'hover:bg-gray-700 text-gray-200'} flex flex-col items-center gap-1 transition-colors`}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
@@ -3201,7 +3231,7 @@ const ListeningTest = ({
                     Translate
                   </button>
                 )}
-              </>
+              </div>
             )}
           </div>
         </div>
