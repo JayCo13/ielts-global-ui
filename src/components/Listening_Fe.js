@@ -532,16 +532,19 @@ const Listening_Fe = () => {
                   {[1, 2, 3, 4].map((partNum) => {
                     const rawTitle = (test.partTitles && test.partTitles[partNum]) ? test.partTitles[partNum] : '';
                     const title = stripHtmlTags(rawTitle) || 'Empty title';
+                    // Blur part titles on locked tests for no-VIP customers so the
+                    // topic of paid tests isn't readable (keep the free first 6 visible).
+                    const isLocked = !isVIP && userRole === 'customer' && (index + indexOfFirstTest) >= 6;
                     return (
                       <div
                         key={partNum}
                         className="group flex flex-row items-center bg-white border border-gray-100 shadow-sm rounded-lg p-2.5 transition-all hover:border-lime-200 hover:bg-lime-50/50"
-                        title={title}
+                        title={isLocked ? undefined : title}
                       >
                         <div className="shrink-0 font-bold bg-lime-100 text-lime-700 px-2.5 py-1 rounded text-xs mr-3 uppercase tracking-wider group-hover:bg-lime-200 transition-colors">
                           Part {partNum}
                         </div>
-                        <span className="text-sm font-medium text-gray-700 line-clamp-1 leading-relaxed">
+                        <span className={`text-sm font-medium text-gray-700 line-clamp-1 leading-relaxed ${isLocked ? 'blur-sm select-none pointer-events-none' : ''}`}>
                           {title}
                         </span>
                       </div>
