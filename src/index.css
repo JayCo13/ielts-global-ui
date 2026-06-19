@@ -426,15 +426,33 @@ table .inline-flex.flex-col {
 }
 
 /* IELTS Highlight and Note Styles */
-.ielts-highlight,
-.ielts-highlight.bg-yellow-200 {
-  background-color: yellow !important;
-  color: #000000 !important;
+.ielts-highlight {
   display: inline !important;
   cursor: pointer !important;
   position: relative !important;
   z-index: 10 !important;
   pointer-events: auto !important;
+}
+
+/* IDP/BC-style two-level highlight colors (2026-06 update):
+   level 1 = "mắm tôm" dark maroon, level 2 (on top of level 1) = "hồng cánh sen" pink.
+   Defined here with !important so they win over the base .ielts-highlight rule
+   for both the passage and the questions column. */
+.ielts-highlight.ielts-highlight-l1 {
+  background-color: #76323F !important;
+  color: #ffffff !important;
+}
+
+.ielts-highlight.ielts-highlight-l2 {
+  background-color: #EC4899 !important;
+  color: #ffffff !important;
+}
+
+/* Legacy highlights saved before the two-level update (no level class). */
+.ielts-highlight:not(.ielts-highlight-l1):not(.ielts-highlight-l2),
+.ielts-highlight.bg-yellow-200 {
+  background-color: #76323F !important;
+  color: #ffffff !important;
 }
 
 .ielts-highlight.bg-blue-800 {
