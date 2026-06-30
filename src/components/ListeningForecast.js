@@ -176,7 +176,13 @@ const ListeningForecast = () => {
 
   const allQuestionTypes = [...new Set(items.flatMap(it => it.question_types || []))];
 
-  const filtered = (userRole === 'customer' && !isVIP)
+  // A "limited" user sees gated/blurred content: non-VIP customers AND guests
+  // (no token). Students/admins are never limited. Guests must be gated at least
+  // as strictly as a non-VIP customer — otherwise the public/SEO view leaks paid
+  // part names. '' (role not yet fetched) is treated as limited: safe default.
+  const isLimitedUser = !isVIP && userRole !== 'student' && userRole !== 'admin';
+
+  const filtered = isLimitedUser
     ? items
     : items.filter(it => {
       const matchesSearch = ((it.exam_title || '').toLowerCase().includes(searchQuery.toLowerCase())) ||
@@ -229,17 +235,17 @@ const ListeningForecast = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder={!isVIP && userRole === 'customer' ? "Search is VIP only..." : "Search Practice..."}
-              className={`w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500 ${(!isVIP && userRole === 'customer') ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+              placeholder={isLimitedUser ? "Search is VIP only..." : "Search Practice..."}
+              className={`w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500 ${isLimitedUser ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               value={searchQuery}
               onChange={(e) => {
-                if (isVIP || userRole !== 'customer') {
+                if (!isLimitedUser) {
                   setSearchQuery(e.target.value);
                 }
               }}
-              disabled={!isVIP && userRole === 'customer'}
+              disabled={isLimitedUser}
             />
-            {!isVIP && userRole === 'customer' && (
+            {isLimitedUser && (
               <Lock className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             )}
           </div>
@@ -250,17 +256,17 @@ const ListeningForecast = () => {
                 <button
                   key={qt}
                   onClick={() => {
-                    if (isVIP || userRole !== 'customer') {
+                    if (!isLimitedUser) {
                       setActiveQuestionType(prev => prev === qt ? null : qt);
                       setCurrentPage(1);
                     }
                   }}
-                  disabled={!isVIP && userRole === 'customer'}
+                  disabled={isLimitedUser}
                   className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
                     activeQuestionType === qt
                       ? 'bg-[#0096b1] border-[#0096b1] text-white'
                       : 'bg-white border-gray-200 text-gray-600 hover:border-[#0096b1] hover:text-[#0096b1]'
-                  } ${(!isVIP && userRole === 'customer') ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                  } ${isLimitedUser ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                 >
                   {qt}
                 </button>
@@ -297,7 +303,7 @@ const ListeningForecast = () => {
                       <span className="truncate max-w-[70%] inline-block align-bottom" title={it.exam_title}>{it.exam_title}</span>
                     </h3>
                     {(() => {
-                      const canShowHistory = (isVIP || userRole !== 'customer' || (index + indexOfFirstItem) < 6);
+                      const canShowHistory = (!isLimitedUser || (index + indexOfFirstItem) < 6);
                       if (!canShowHistory) return null;
                       return (
                         <div className="relative" ref={el => examHistoryRefs.current[`${it.exam_id}-${it.part_number}`] = el}>
@@ -367,7 +373,7 @@ const ListeningForecast = () => {
                   </div>
                   <div className="mt-2 text-md text-gray-700">
                     <span>Practice Part: </span>
-                    <span className={`${(!isVIP && userRole === 'customer' && (index + indexOfFirstItem) >= 6) ? 'blur-[4px] select-none' : ''}`}>
+                    <span className={`${(isLimitedUser && (index + indexOfFirstItem) >= 6) ? 'blur-[4px] select-none' : ''}`}>
                       {it.part_number}{it.forecast_title ? ` – ${it.forecast_title}` : ''}
                     </span>
                   </div>
@@ -380,7 +386,7 @@ const ListeningForecast = () => {
                       ))}
                     </div>
                   )}
-                  {(!isVIP && userRole === 'customer' && (index + indexOfFirstItem) >= 6) ? (
+                  {(isLimitedUser && (index + indexOfFirstItem) >= 6) ? (
                     <div className="mt-4 p-3 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-between">
                       <div className="flex items-center gap-2 text-gray-700">
                         <Lock className="w-5 h-5 text-[#0096b1]" />

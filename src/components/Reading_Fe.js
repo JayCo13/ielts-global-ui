@@ -311,6 +311,12 @@ const Reading_Fe = () => {
 
   const [sortOrder, setSortOrder] = useState('alphabet', 'latest', 'oldest');
 
+  // A "limited" user sees gated/blurred content: non-VIP customers AND guests
+  // (no token). Students/admins are never limited. Guests must be gated at least
+  // as strictly as a non-VIP customer — otherwise the public/SEO view leaks paid
+  // part titles. '' (role not yet fetched) is treated as limited: safe default.
+  const isLimitedUser = !isVIP && userRole !== 'student' && userRole !== 'admin';
+
   const filteredTests = tests
     .filter(test => {
       const query = searchQuery.toLowerCase();
@@ -406,18 +412,18 @@ const Reading_Fe = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder={!isVIP && userRole === 'customer' ? "Search only for VIP..." : "Search tests..."}
-              className={`w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500 ${!isVIP && userRole === 'customer' ? 'bg-gray-100 cursor-not-allowed' : ''
+              placeholder={isLimitedUser ? "Search only for VIP..." : "Search tests..."}
+              className={`w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500 ${isLimitedUser ? 'bg-gray-100 cursor-not-allowed' : ''
                 }`}
               value={searchQuery}
               onChange={(e) => {
-                if (isVIP || userRole !== 'customer') {
+                if (!isLimitedUser) {
                   setSearchQuery(e.target.value);
                 }
               }}
-              disabled={!isVIP && userRole === 'customer'}
+              disabled={isLimitedUser}
             />
-            {!isVIP && userRole === 'customer' && (
+            {isLimitedUser && (
               <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             )}
           </div>
@@ -440,7 +446,7 @@ const Reading_Fe = () => {
           {currentTests.map((test, index) => (
             <div
               key={test.id}
-              className={`bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg hover:border-blue-200 transition-all duration-300 flex flex-col relative ${examHistoryDropdowns[test.id] ? 'z-50' : 'z-10'} ${!isVIP && userRole === 'customer' && (index + indexOfFirstTest) >= 6 ? 'opacity-80' : ''
+              className={`bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg hover:border-blue-200 transition-all duration-300 flex flex-col relative ${examHistoryDropdowns[test.id] ? 'z-50' : 'z-10'} ${isLimitedUser && (index + indexOfFirstTest) >= 6 ? 'opacity-80' : ''
                 }`}
             >
               {/* Card Body */}
@@ -451,7 +457,7 @@ const Reading_Fe = () => {
                     {test.title}
                   </h3>
                   {/* History Dropdown */}
-                  {test.isCompleted && (isVIP || userRole !== 'customer' || (index + indexOfFirstTest) < 6) && (
+                  {test.isCompleted && (!isLimitedUser || (index + indexOfFirstTest) < 6) && (
                     <div className="relative z-20 shrink-0" ref={el => examHistoryRefs.current[test.id] = el}>
                       <button
                         onClick={() => toggleExamHistoryDropdown(test.id)}
@@ -523,7 +529,7 @@ const Reading_Fe = () => {
                     const title = (test.partTitles && test.partTitles[partNum]) ? test.partTitles[partNum] : 'Empty title';
                     // Blur part titles on locked tests for no-VIP customers so the
                     // topic of paid tests isn't readable (keep the free first 6 visible).
-                    const isLocked = !isVIP && userRole === 'customer' && (index + indexOfFirstTest) >= 6;
+                    const isLocked = isLimitedUser && (index + indexOfFirstTest) >= 6;
                     return (
                       <div
                         key={partNum}
@@ -544,7 +550,7 @@ const Reading_Fe = () => {
               </div>
 
               {/* Card Footer */}
-              {(!isVIP && userRole === 'customer' && (index + indexOfFirstTest) >= 6) ? (
+              {(isLimitedUser && (index + indexOfFirstTest) >= 6) ? (
                 <div className="px-5 py-4 bg-gray-50 border-t border-gray-100 rounded-b-2xl relative overflow-hidden group">
                   <div className="relative flex items-center justify-between">
                     <div className="flex items-center space-x-2 text-gray-600">
