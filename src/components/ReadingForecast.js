@@ -283,7 +283,7 @@ const ReadingForecast = () => {
                   <div className="flex items-start justify-between gap-3 pr-6">
                     <h3 className="text-lg font-semibold text-gray-800">
                       <span className="text-[#0096b1] font-medium mr-2">Original Test:</span>
-                      <span className="truncate max-w-[70%] inline-block align-bottom" title={it.exam_title}>{it.exam_title}</span>
+                      <span className={`truncate max-w-[70%] inline-block align-bottom ${(isLimitedUser && (index + indexOfFirstItem) >= 6) ? 'blur-[4px] select-none' : ''}`} title={(isLimitedUser && (index + indexOfFirstItem) >= 6) ? undefined : it.exam_title}>{it.exam_title}</span>
                     </h3>
                     {(() => {
                       const hasHistory = it.attempts_count > 0;
