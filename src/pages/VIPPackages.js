@@ -276,9 +276,9 @@ const VIPPackages = () => {
                     <div className={`mt-auto pt-6 border-t ${style.divider}`}>
                         <div className="flex items-baseline justify-center gap-1 mb-6">
                             <span className={`text-3xl font-extrabold ${style.priceColor}`}>
-                                {new Intl.NumberFormat('en-US', {
+                                {new Intl.NumberFormat('vi-VN', {
                                     style: 'currency',
-                                    currency: 'USD',
+                                    currency: 'VND',
                                     minimumFractionDigits: 0
                                 }).format(pkg.price)}
                             </span>

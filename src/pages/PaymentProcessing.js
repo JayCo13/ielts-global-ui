@@ -4,8 +4,9 @@ import { AlertCircle, CheckCircle, RefreshCw, Lock } from 'lucide-react';
 import API_BASE from '../config/api';
 
 /**
- * PaymentProcessing — Polls for VIP activation after Lemon Squeezy payment.
- * Used when the checkout overlay closes or user is redirected here.
+ * PaymentProcessing — Polls for VIP activation after a PayOS payment.
+ * This is the PayOS return_url target: the user lands here after paying and we
+ * poll /subscription/status until the webhook has activated their VIP.
  */
 const PaymentProcessing = () => {
     const [status, setStatus] = useState('processing');
@@ -88,7 +89,7 @@ const PaymentProcessing = () => {
                         )}
                         <div className="mt-6 flex items-center justify-center gap-2 text-xs text-gray-400">
                             <Lock className="w-3 h-3" />
-                            <span>Secured by Lemon Squeezy • SSL Encrypted</span>
+                            <span>Secured by PayOS • SSL Encrypted</span>
                         </div>
                     </div>
                 )}
