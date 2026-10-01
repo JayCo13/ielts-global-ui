@@ -183,6 +183,8 @@ const MyVIPPackage = () => {
     const hasAutoRenewSub = subscriptions.some(sub => sub.is_active && sub.is_auto_renew && sub.ls_subscription_id);
     const hasCancelledSub = subscriptions.some(sub => sub.is_active && !sub.is_auto_renew && sub.cancelled_at);
     const hasLSSub = subscriptions.some(sub => sub.ls_subscription_id);
+    // LS store suspended (2026-07): its API rejects cancel/resume, so hide those buttons
+    const lsSelfServiceDisabled = true;
 
     if (loading) {
         return (
@@ -376,7 +378,7 @@ const MyVIPPackage = () => {
                                     {managingBilling ? 'Opening...' : 'Manage Billing'}
                                 </button>
                             )}
-                            {hasAutoRenewSub && (
+                            {!lsSelfServiceDisabled && hasAutoRenewSub && (
                                 <button
                                     onClick={handleCancelSubscription}
                                     disabled={cancellingId}
@@ -392,14 +394,16 @@ const MyVIPPackage = () => {
                                 <p className="text-sm text-amber-700">
                                     ⚠️ Your subscription has been cancelled. VIP access remains active until the end of the billing period.
                                 </p>
-                                <button
-                                    onClick={handleResumeSubscription}
-                                    disabled={resuming}
-                                    className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 transition-colors flex items-center gap-2 disabled:opacity-50 whitespace-nowrap"
-                                >
-                                    <RefreshCw className={`w-4 h-4 ${resuming ? 'animate-spin' : ''}`} />
-                                    {resuming ? 'Resuming...' : 'Resume Subscription'}
-                                </button>
+                                {!lsSelfServiceDisabled && (
+                                    <button
+                                        onClick={handleResumeSubscription}
+                                        disabled={resuming}
+                                        className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 transition-colors flex items-center gap-2 disabled:opacity-50 whitespace-nowrap"
+                                    >
+                                        <RefreshCw className={`w-4 h-4 ${resuming ? 'animate-spin' : ''}`} />
+                                        {resuming ? 'Resuming...' : 'Resume Subscription'}
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>
