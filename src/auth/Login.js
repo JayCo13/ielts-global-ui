@@ -273,6 +273,8 @@ const LoginForm = () => {
           setErrors(prev => ({ ...prev, username: 'Username does not exist' }));
         } else if (data.detail === "Incorrect password") {
           setErrors(prev => ({ ...prev, password: 'Incorrect password' }));
+        } else if (data.detail === "Incorrect username or password") {
+          setErrors(prev => ({ ...prev, password: 'Incorrect username or password' }));
         } else if (data.detail === "This account has been blocked") {
           setWarningMessage('Invalid account.');
           setShowWarning(true);

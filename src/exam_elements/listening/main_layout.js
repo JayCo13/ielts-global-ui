@@ -950,8 +950,10 @@ const MainLayout = () => {
           console.error('Error resolving audio URL:', error);
         }
       } else {
-        // Full test: backend combines and streams audio directly
-        setAudioUrl(`${API_BASE}/student/exam/${examId}/audio`);
+        // Full test: backend combines and streams audio directly. Native <audio>
+        // can't send an Authorization header, so the token goes in ?token=.
+        const token = localStorage.getItem('token');
+        setAudioUrl(`${API_BASE}/student/exam/${examId}/audio?token=${encodeURIComponent(token || '')}`);
       }
     };
 

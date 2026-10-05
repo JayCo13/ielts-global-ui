@@ -1,4 +1,5 @@
 import fetchWithTimeout from '../utils/fetchWithTimeout';
+import API_BASE from '../config/api';
 
 // Supported languages for dictionary translation
 export const SUPPORTED_LANGUAGES = [
@@ -33,9 +34,15 @@ export const getLanguageByCode = (code) => {
 };
 
 class TranslatorService {
-  constructor() {
-    this.apiKey = process.env.REACT_APP_GROQ_API_KEY;
-    this.baseUrl = 'https://api.groq.com/openai/v1/chat/completions';
+  // Translation/dictionary go through OUR backend (/student/translate,
+  // /student/dictionary). The Groq key lives server-side only and is never
+  // shipped in this bundle — see app/routes/student/translate_routes.py.
+  _authHeaders() {
+    const token = localStorage.getItem('token');
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
   }
 
   // Get the user's saved language preference
@@ -54,65 +61,23 @@ class TranslatorService {
         throw new Error('Text to translate cannot be empty');
       }
 
-      if (!this.apiKey) {
-        throw new Error('Translation service is not properly configured. Please contact support.');
-      }
-
       // Use saved language if not explicitly provided
       const langCode = targetLanguage || this.getSavedLanguage();
-      const lang = getLanguageByCode(langCode);
-      const targetLangName = lang.nativeName;
+      const targetLangName = getLanguageByCode(langCode).nativeName;
 
-      const prompt = `Translate the following ${sourceLanguage} text to ${targetLangName}. Provide only the translation without any additional explanation or formatting. Consider the context and provide the most appropriate translation:
-
-"${text}"`;
-
-      const response = await fetchWithTimeout(this.baseUrl, {
+      const response = await fetchWithTimeout(`${API_BASE}/student/translate`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
-          messages: [
-            {
-              role: 'system',
-              content: `You are a professional translator specializing in English to ${targetLangName} translation. Provide accurate, contextually appropriate translations. For IELTS exam content, maintain the academic tone and precision.`
-            },
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          temperature: 0.3,
-          max_tokens: 500,
-          top_p: 1,
-          stream: false
-        })
+        headers: this._authHeaders(),
+        body: JSON.stringify({ text, sourceLanguage, targetLanguage: targetLangName }),
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(`Translation failed: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+        throw new Error(`Translation failed: ${response.status} - ${errorData.detail || 'Unknown error'}`);
       }
 
-      const data = await response.json();
-
-      if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-        throw new Error('Invalid response format from translation service');
-      }
-
-      const translation = data.choices[0].message.content.trim();
-      const cleanedTranslation = translation.replace(/^["']|["']$/g, '');
-
-      return {
-        originalText: text,
-        translatedText: cleanedTranslation,
-        sourceLanguage,
-        targetLanguage: targetLangName,
-        timestamp: new Date().toISOString()
-      };
+      // Backend already returns { originalText, translatedText, sourceLanguage, targetLanguage, timestamp }.
+      return await response.json();
 
     } catch (error) {
       console.error('Translation error:', error);
@@ -126,83 +91,21 @@ class TranslatorService {
         throw new Error('Word cannot be empty');
       }
 
-      if (!this.apiKey) {
-        throw new Error('Translation service is not properly configured.');
-      }
-
       // Use saved language if not explicitly provided
       const langCode = targetLanguage || this.getSavedLanguage();
-      const lang = getLanguageByCode(langCode);
-      const targetLangName = lang.nativeName;
+      const targetLangName = getLanguageByCode(langCode).nativeName;
 
-      const prompt = `Provide a detailed dictionary entry for the English word "${word}". Return ONLY a valid JSON object with this exact structure (no markdown, no code blocks, just raw JSON):
-{
-  "word": "${word}",
-  "phonetics": {
-    "uk": "/phonetic transcription UK/",
-    "us": "/phonetic transcription US/"
-  },
-  "meanings": [
-    {
-      "partOfSpeech": "part of speech in ${targetLangName}",
-      "definitions": [
-        {
-          "meaning": "${targetLangName} translation/definition",
-          "example": "Example sentence in English if available",
-          "exampleTrans": "${targetLangName} translation of example"
-        }
-      ]
-    }
-  ]
-}
-
-Rules:
-- Use IPA for phonetics
-- Translate part of speech to ${targetLangName}
-- Provide ${targetLangName} meanings/definitions
-- Include examples when relevant
-- Return ONLY the JSON object, no other text`;
-
-      const response = await fetchWithTimeout(this.baseUrl, {
+      const response = await fetchWithTimeout(`${API_BASE}/student/dictionary`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
-          messages: [
-            {
-              role: 'system',
-              content: `You are a professional English-${targetLangName} dictionary. Return ONLY valid JSON with no markdown formatting.`
-            },
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          temperature: 0.2,
-          max_tokens: 1000,
-          top_p: 1,
-          stream: false
-        })
+        headers: this._authHeaders(),
+        body: JSON.stringify({ word, targetLanguage: targetLangName }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
         throw new Error(`Dictionary lookup failed: ${response.status}`);
       }
 
-      const data = await response.json();
-      const content = data.choices[0].message.content.trim();
-
-      // Parse JSON, handling potential markdown code blocks
-      let jsonStr = content;
-      if (content.includes('```')) {
-        jsonStr = content.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
-      }
-
-      return JSON.parse(jsonStr);
+      return await response.json();
 
     } catch (error) {
       console.error('Dictionary lookup error:', error);
@@ -225,11 +128,8 @@ Rules:
 
   // Method to validate API key format (basic validation)
   validateApiKey() {
-    if (!this.apiKey) {
-      return false;
-    }
-    // Basic format check for Groq API keys (they typically start with 'gsk_')
-    return this.apiKey.startsWith('gsk_') && this.apiKey.length > 20;
+    // The key now lives server-side; the client has nothing to validate.
+    return true;
   }
 }
 
