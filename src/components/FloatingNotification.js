@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination } from 'swiper/modules';
-import {Bell, ZoomIn, X} from 'lucide-react';
+import { Autoplay } from 'swiper/modules';
+import {Bell, ZoomIn, X, ChevronLeft, ChevronRight} from 'lucide-react';
 import { createPortal } from 'react-dom';
 import 'swiper/css';
-import 'swiper/css/pagination';
 import './FloatingNotification.css';
 import API_BASE from '../config/api';
 // Remove ImagePreviewModal import as we're creating our own
@@ -40,12 +39,22 @@ const NotificationImageModal = ({ isOpen, onClose, imageUrl }) => {
   );
 };
 
+// Slides loop, so slide 0 sits next to the last one. Plain subtraction would treat
+// them as the furthest apart and drop the image right where the user is looking.
+const ringDistance = (i, active, n) => {
+  const d = Math.abs(i - active);
+  return Math.min(d, n - d);
+};
+
 const FloatingNotification = ({ notifications = [], onClose }) => {
   const [isVisible, setIsVisible] = useState(true);
+  const [swiper, setSwiper] = useState(null);
+  const [active, setActive] = useState(0);
 
   useEffect(() => {
     // Reset visibility when new notifications arrive
     setIsVisible(true);
+    setActive(0);
   }, [notifications]);
 
   const handleClose = () => {
@@ -64,32 +73,28 @@ const FloatingNotification = ({ notifications = [], onClose }) => {
     }
   }, [isVisible, notifications]);
 
-  // Group notifications by day
-  const groupedNotifications = {};
-  notifications.forEach(notification => {
-    // Extract date from notification (assuming there's a created_at field)
-    const date = notification.created_at ?
-      new Date(notification.created_at).toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      }) : 'Today';
-
-    if (!groupedNotifications[date]) {
-      groupedNotifications[date] = [];
-    }
-    groupedNotifications[date].push(notification);
-  });
-
-  // Convert grouped notifications to array for Swiper
-  const notificationGroups = Object.entries(groupedNotifications).map(([date, items]) => ({
-    date,
-    items
+  // One slide per notification, each carrying its own date (VN fix). This used to
+  // be two nested carousels (days outside, items within a day inside), which left
+  // nothing sensible for prev/next to drive — the arrows would step days while an
+  // inner autoplay moved items on its own. A flat list makes "3/7" and the arrows
+  // mean exactly one thing.
+  const items = notifications.map((n) => ({
+    ...n,
+    date: n.created_at
+      ? new Date(n.created_at).toLocaleDateString('en-GB', {
+          day: '2-digit', month: '2-digit', year: 'numeric',
+        })
+      : 'Today',
   }));
+  const many = items.length > 1;
 
   return (
     <AnimatePresence>
-      {isVisible && notifications.length > 0 && (
+      {isVisible && items.length > 0 && (
+        // z-[1000], not z-50: the floating icons on the right are z-[999] and sit
+        // exactly where the "next" arrow lands, which buried it. No
+        // -translate-x-1/2 here: paired with `right-3` it dragged the box a further
+        // half-width to the left.
         <motion.div
           initial={{ y: -100, opacity: 0, scale: 0.95 }}
           animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -100,74 +105,86 @@ const FloatingNotification = ({ notifications = [], onClose }) => {
             damping: 25,
             mass: 0.5
           }}
-          className="fixed top-40 right-3 -translate-x-1/2 z-50 pointer-events-auto w-full max-w-[90vw] sm:max-w-md px-4"
+          className="fixed top-40 right-3 z-[1000] pointer-events-auto w-full max-w-[90vw] sm:max-w-md px-4"
         >
-          <div className="bg-white rounded-xl shadow-lg border-2 border-blue-200 p-4 min-w-[300px] max-w-md relative">
-            <button
-              onClick={handleClose}
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors duration-200 rounded-full p-1 hover:bg-gray-100 focus:outline-none z-10"
-              aria-label="Close notification"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
+          <div className="bg-white rounded-xl shadow-lg border-2 border-blue-200 min-w-[300px] max-w-md overflow-hidden">
+
+            {/* Header: date, position in the list, close button */}
+            <div className="flex items-center justify-between gap-2 px-4 py-2.5 bg-blue-50 border-b border-blue-100">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 min-w-0">
+                <Bell className="shrink-0" size={14} strokeWidth={3} />
+                <span className="truncate">Notification: {items[active]?.date}</span>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                {many && (
+                  <span className="text-[11px] font-semibold tabular-nums text-gray-500">
+                    {active + 1}/{items.length}
+                  </span>
+                )}
+                <button
+                  onClick={handleClose}
+                  className="text-gray-400 hover:text-gray-600 transition-colors duration-200 rounded-full p-1 hover:bg-gray-100 focus:outline-none"
+                  aria-label="Close notification"
+                >
+                  <X size={18} strokeWidth={2.5} />
+                </button>
+              </div>
+            </div>
+
+            <div className="relative">
+              <Swiper
+                modules={[Autoplay]}
+                spaceBetween={24}
+                slidesPerView={1}
+                autoHeight
+                autoplay={{
+                  delay: 8000,
+                  // Once someone uses the arrows the carousel stops moving under
+                  // them — they are reading, not browsing.
+                  disableOnInteraction: true,
+                  pauseOnMouseEnter: true,
+                }}
+                loop={many}
+                onSwiper={setSwiper}
+                onSlideChange={(sw) => setActive(sw.realIndex)}
+                className="notification-swiper"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+                {items.map((notification, index) => (
+                  <SwiperSlide key={`notification-${index}`}>
+                    <div className={many ? 'px-8 py-3' : 'px-4 py-3'}>
+                      {/* Swiper keeps every slide mounted; mounting every full-size
+                          image exhausted iOS Safari's per-tab memory and crashed the
+                          tab. Only the visible slide and its neighbours load images. */}
+                      <NotificationItem
+                        notification={notification}
+                        showImage={ringDistance(index, active, items.length) <= 1}
+                      />
+                    </div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
 
-            <Swiper
-              modules={[Autoplay, Pagination]}
-              spaceBetween={30}
-              slidesPerView={1}
-              pagination={{
-                clickable: true,
-                dynamicBullets: true
-              }}
-              autoplay={{
-                delay: 8000,
-                disableOnInteraction: false
-              }}
-              loop={notificationGroups.length > 1}
-              className="notification-swiper"
-            >
-              {notificationGroups.map((group, groupIndex) => (
-                <SwiperSlide key={`group-${groupIndex}`}>
-                  <div className="notification-date text-xs text-gray-500 mb-3"> <Bell className="inline-block size-4" strokeWidth={3} /> Notification: {group.date}</div>
-
-                  {group.items.length > 1 ? (
-                    <Swiper
-                      modules={[Autoplay]}
-                      spaceBetween={20}
-                      slidesPerView={1}
-                      autoplay={{
-                        delay: 5000,
-                        disableOnInteraction: false
-                      }}
-                      loop={group.items.length > 1}
-                      nested={true}
-                      className="nested-notification-swiper"
-                    >
-                      {group.items.map((notification, index) => (
-                        <SwiperSlide key={`notification-${index}`}>
-                          <NotificationItem notification={notification} />
-                        </SwiperSlide>
-                      ))}
-                    </Swiper>
-                  ) : (
-                    <NotificationItem notification={group.items[0]} />
-                  )}
-                </SwiperSlide>
-              ))}
-            </Swiper>
+              {many && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => swiper?.slidePrev()}
+                    aria-label="Previous notification"
+                    className="absolute left-1 top-1/2 -translate-y-1/2 z-10 grid place-items-center w-7 h-7 rounded-full bg-white/95 text-blue-600 shadow ring-1 ring-black/5 hover:bg-blue-600 hover:text-white transition-colors"
+                  >
+                    <ChevronLeft size={18} strokeWidth={2.5} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => swiper?.slideNext()}
+                    aria-label="Next notification"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 z-10 grid place-items-center w-7 h-7 rounded-full bg-white/95 text-blue-600 shadow ring-1 ring-black/5 hover:bg-blue-600 hover:text-white transition-colors"
+                  >
+                    <ChevronRight size={18} strokeWidth={2.5} />
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </motion.div>
       )}
@@ -176,43 +193,44 @@ const FloatingNotification = ({ notifications = [], onClose }) => {
 };
 
 // Extracted notification item component
-const NotificationItem = ({ notification }) => {
+const NotificationItem = ({ notification, showImage = true }) => {
   const { content, type = 'announcement', image_url } = notification;
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-  
+
   const handleImageClick = (e) => {
     e.stopPropagation(); // Stop event propagation
     setIsImageModalOpen(true);
   };
-  
+
   return (
-    <div className="flex flex-col items-center text-center">
-      <div className="flex flex-col">
-        <p className={`font-medium whitespace-pre-line
-          ${type === 'update' ? 'text-green-700' : ''}
-          ${type === 'announcement' ? 'text-blue-700' : ''}
-          ${type === 'maintenance' ? 'text-orange-700' : ''}
-        `}>{content}</p>
-        {image_url && (
-          <div 
-            className="relative cursor-pointer"
-            onClick={handleImageClick}
-          >
-            <img
-              src={resolveNotificationImageUrl(image_url)}
-              alt="Notification image"
-              className="rounded-lg w-full max-w-[600px] max-h-[50vh] object-contain mx-auto transition-transform duration-300 hover:scale-105"
-            /> 
-            <div className="absolute inset-0 flex flex-col items-center justify-center rounded-lg">
-              <ZoomIn className="text-white absolute top-2 right-2 bg-black bg-opacity-40 p-1 rounded-full" size={24} strokeWidth={3}/>
-            </div>
- 
+    <div className="flex flex-col">
+      {/* Announcements are authored with real line breaks; keep them, left-aligned,
+          and scroll long text inside the card instead of growing past the screen. */}
+      <p className={`font-medium whitespace-pre-line break-words text-left leading-relaxed max-h-[40vh] overflow-y-auto
+        ${type === 'update' ? 'text-green-700' : ''}
+        ${type === 'announcement' ? 'text-blue-700' : ''}
+        ${type === 'maintenance' ? 'text-orange-700' : ''}
+      `}>{content}</p>
+      {image_url && showImage && (
+        <div
+          className="relative cursor-pointer mt-3"
+          onClick={handleImageClick}
+        >
+          <img
+            src={resolveNotificationImageUrl(image_url)}
+            alt="Notification image"
+            loading="lazy"
+            decoding="async"
+            className="rounded-lg w-full max-w-[600px] max-h-[50vh] object-contain mx-auto transition-transform duration-300 hover:scale-105"
+          />
+          <div className="absolute inset-0 flex flex-col items-center justify-center rounded-lg">
+            <ZoomIn className="text-white absolute top-2 right-2 bg-black bg-opacity-40 p-1 rounded-full" size={24} strokeWidth={3}/>
           </div>
-        )}
-      </div>
-      
+        </div>
+      )}
+
       {/* Use our new NotificationImageModal for full screen display */}
-      <NotificationImageModal 
+      <NotificationImageModal
         isOpen={isImageModalOpen}
         onClose={() => setIsImageModalOpen(false)}
         imageUrl={image_url ? resolveNotificationImageUrl(image_url) : ''}
