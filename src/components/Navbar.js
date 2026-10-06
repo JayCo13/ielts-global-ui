@@ -77,6 +77,12 @@ const Navbar = () => {
         }
     };
 
+    // Dictation access is granted per account (admin toggle), so it can't be
+    // derived from the role alone.
+    const [canDictation, setCanDictation] = useState(
+        localStorage.getItem('can_dictation') === '1' || localStorage.getItem('role') === 'student'
+    );
+
     const fetchUserProfile = async () => {
         try {
             const profileResponse = await fetchWithTimeout(`${API_BASE}/student/profile`);
@@ -89,6 +95,8 @@ const Navbar = () => {
                 if (profileData.role) {
                     localStorage.setItem('role', profileData.role);
                 }
+                localStorage.setItem('can_dictation', profileData.can_dictation ? '1' : '0');
+                setCanDictation(!!profileData.can_dictation);
             }
         } catch (error) {
             if (error.name !== 'AbortError') {
@@ -365,7 +373,7 @@ const Navbar = () => {
                                     >
                                         New Words
                                     </Link>
-                                    {localStorage.getItem('role') === 'student' ? (
+                                    {canDictation ? (
                                         <Link
                                             to="/dictation"
                                             className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
@@ -611,7 +619,7 @@ const Navbar = () => {
                                     { name: 'Writing Forecast Task 1', path: '/writing_forecast?part=1' },
                                     { name: 'Writing Forecast Task 2', path: '/writing_forecast?part=2' },
                                     { name: 'Speaking', path: '/speaking_list?part=part1' },
-                                    ...(localStorage.getItem('role') === 'student' ? [{ name: 'Dictation', path: '/dictation' }] : []),
+                                    ...(canDictation ? [{ name: 'Dictation', path: '/dictation' }] : []),
                                     { name: 'New Vocabulary', path: '/new-vocabulary' }
                                 ].map((item) => (
                                     <Link
