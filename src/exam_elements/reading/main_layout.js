@@ -12,6 +12,7 @@ import ConfirmDialog from '../../components/ConfirmDialog';
 import ForceLogoutDialog from '../../components/ForceLogoutDialog';
 import { TranslatorDialog, useTextSelection } from '../../translator';
 import API_BASE from '../../config/api';
+import ErrorReportModal from '../../components/ErrorReportModal';
 import fetchWithTimeout from '../../utils/fetchWithTimeout';
 
 const MainLayout = () => {
@@ -45,6 +46,7 @@ const MainLayout = () => {
   const [isTranslatorEnabled, setIsTranslatorEnabled] = useState(false);
   const [showExitAlert, setShowExitAlert] = useState(false);
   const [showClearDataDialog, setShowClearDataDialog] = useState(false);
+  const [showErrorReport, setShowErrorReport] = useState(false);
   const menuRef = useRef(null);
   const [wifiStatus, setWifiStatus] = useState({
     isConnected: true,
@@ -3605,6 +3607,12 @@ const MainLayout = () => {
                         Retake Incorrect
                       </button>
                       <button
+                        onClick={() => setShowErrorReport(true)}
+                        className="px-6 py-4 rounded-lg text-lg font-bold transition-colors border-2 border-[#0096b1] text-[#0096b1] bg-white hover:bg-[#0096b1] hover:text-white"
+                      >
+                        Report an Error
+                      </button>
+                      <button
                         onClick={() => setShowClearDataDialog(true)}
                         className={`px-6 py-4 rounded-lg text-lg font-bold transition-colors
                           ${colorTheme === 'black-on-white'
@@ -3623,6 +3631,14 @@ const MainLayout = () => {
             </div>
           </div>
         </footer>
+        <ErrorReportModal
+          open={showErrorReport}
+          onClose={() => setShowErrorReport(false)}
+          examId={examId}
+          resultId={resultId}
+          skill="reading"
+          examTitle={examData?.exam_title}
+        />
 
       </div>
       <ExplanationModal

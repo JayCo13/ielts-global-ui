@@ -7,6 +7,7 @@ import { Player } from '@lottiefiles/react-lottie-player';
 import TranscriptModal from '../../components/TranscriptModal';
 import AlertForm from '../../components/AlertForm';
 import ConfirmDialog from '../../components/ConfirmDialog';
+import ErrorReportModal from '../../components/ErrorReportModal';
 import ForceLogoutDialog from '../../components/ForceLogoutDialog';
 import Split from 'react-split';
 import { TranslatorDialog, useTextSelection } from '../../translator';
@@ -509,6 +510,7 @@ const MainLayout = () => {
   const [showRetakeDialog, setShowRetakeDialog] = useState(false);
   const [showRetakeResult, setShowRetakeResult] = useState(false);
   const [showRetakeConfirm, setShowRetakeConfirm] = useState(false);
+  const [showErrorReport, setShowErrorReport] = useState(false);
   const [retakeScore, setRetakeScore] = useState({ correct: 0, total: 0, details: [] });
   const [showForceLogoutDialog, setShowForceLogoutDialog] = useState(false);
   const [logoutCountdown, setLogoutCountdown] = useState(40);
@@ -3128,6 +3130,12 @@ const MainLayout = () => {
                         Retake Incorrect Questions
                       </button>
                       <button
+                        onClick={() => setShowErrorReport(true)}
+                        className="px-6 py-2 rounded-lg font-medium transition-colors border-2 border-[#0096b1] text-[#0096b1] bg-white hover:bg-[#0096b1] hover:text-white"
+                      >
+                        Report an Error
+                      </button>
+                      <button
                         onClick={() => setShowClearDataDialog(true)}
                         className={`px-6 py-2 rounded-lg font-medium transition-colors
                           ${colorTheme === 'black-on-white'
@@ -3145,6 +3153,14 @@ const MainLayout = () => {
               </div>
             </div>
           </div>
+          <ErrorReportModal
+            open={showErrorReport}
+            onClose={() => setShowErrorReport(false)}
+            examId={examId}
+            resultId={resultId}
+            skill="listening"
+            examTitle={examData?.exam_title}
+          />
           {!location.state?.fromResultReview && (
             <TranscriptModal
               isOpen={showDescription}
