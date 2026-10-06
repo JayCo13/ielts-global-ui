@@ -210,9 +210,8 @@ const HOF_SKILLS = [
   { key: 'listening', label: 'Listening' },
   { key: 'reading', label: 'Reading' },
   { key: 'writing', label: 'Writing' },
-  // VN also has a Speaking board (graded full Speaking tests). The global app has no
-  // Speaking test attempts yet, so the tab is left out; the backend still supports
-  // ?skill=speaking.
+  // Speaking board: graded full Speaking tests, ranked by average band.
+  { key: 'speaking', label: 'Speaking' },
 ];
 
 // pageSize > 0 turns on client-side pagination (result page). Left 0 → the compact
