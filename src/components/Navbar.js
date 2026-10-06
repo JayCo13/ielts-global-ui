@@ -283,10 +283,10 @@ const Navbar = () => {
                         onMouseLeave={() => setIsWritingOpen(false)}
                     >
                         <button
-                            className={`relative px-5 py-2.5 rounded-lg text-lg font-bold transition-all duration-200 ${isActive('/writing_list') || isActive('/writing_forecast') ? (isScrolled ? 'text-white bg-white/10 border border-white/20 shadow-sm' : 'text-white bg-[#ffffff]/10') : 'text-[#aea091] hover:bg-white/10 hover:text-white'}`}
+                            className={`relative px-5 py-2.5 rounded-lg text-lg font-bold transition-all duration-200 ${isActive('/writing_list') || isActive('/writing_forecast') || isActive('/writing_custom') ? (isScrolled ? 'text-white bg-white/10 border border-white/20 shadow-sm' : 'text-white bg-[#ffffff]/10') : 'text-[#aea091] hover:bg-white/10 hover:text-white'}`}
                         >
                             Writing
-                            {(isActive('/writing_list') || isActive('/writing_forecast')) && (
+                            {(isActive('/writing_list') || isActive('/writing_forecast') || isActive('/writing_custom')) && (
                                 <motion.span
                                     layoutId="navbar-indicator"
                                     className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#b4904a] mx-4"
@@ -325,6 +325,13 @@ const Navbar = () => {
                                         onClick={() => setIsWritingOpen(false)}
                                     >
                                         Writing Forecast Task 2
+                                    </Link>
+                                    <Link
+                                        to="/writing_custom"
+                                        className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
+                                        onClick={() => setIsWritingOpen(false)}
+                                    >
+                                        Custom Tasks
                                     </Link>
                                 </motion.div>
                             )}
@@ -642,6 +649,7 @@ const Navbar = () => {
                                     { name: 'Writing Full Test', path: '/writing_list' },
                                     { name: 'Writing Forecast Task 1', path: '/writing_forecast?part=1' },
                                     { name: 'Writing Forecast Task 2', path: '/writing_forecast?part=2' },
+                                    { name: 'Writing Custom Tasks', path: '/writing_custom' },
                                     { name: 'Speaking', path: '/speaking_list?part=part1' },
                                     ...(canDictation ? [{ name: 'Dictation', path: '/dictation' }] : []),
                                     { name: 'New Vocabulary', path: '/new-vocabulary' }

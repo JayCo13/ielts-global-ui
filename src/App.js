@@ -48,6 +48,7 @@ import Permission from './pages/adsense/Permission';
 import Instruction from './pages/Instruction';
 import ResultsOverview from './pages/ResultsOverview';
 import WritingReview from './components/WritingReview';
+import WritingCustom from './components/WritingCustom';
 import NotFoundPage from './pages/NotFoundPage';
 import NewWords from './components/NewWords';
 import StudentDictation from './components/StudentDictation';
@@ -124,6 +125,7 @@ function App() {
             <Route path="/writing_test_room" element={<WritingLayout />} />
             <Route path="/writing_forecast_view" element={<WritingForecastLayout />} />
             <Route path="/writing_review" element={<WritingReview />} />
+            <Route path="/writing_custom" element={<WritingCustom />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/exam-history" element={<ExamHistory />} />
             <Route path="/results-overview" element={<ResultsOverview />} />
