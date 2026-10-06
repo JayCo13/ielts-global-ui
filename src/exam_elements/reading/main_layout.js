@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { BookOpenText, Menu, Bell, Bot, Plus } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
@@ -22,8 +22,26 @@ import { saveExamAnnotations } from '../../utils/annotations';
 const MainLayout = () => {
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const location = useLocation();
-  const [currentPart, setCurrentPart] = useState((location.state && location.state.forecastPart) ? location.state.forecastPart : 1);
-  const isForecastMode = !!(location.state && location.state.forecastPart);
+  // location.state is lost on a full page reload — persist the exam identity so
+  // reloading (or navigating back) into the exam room restores it instead of
+  // hanging on "Loading exam..." forever (VN fix).
+  const navState = useMemo(() => {
+    const s = location.state;
+    if (s && s.examId) {
+      try {
+        const { examId, resultId, forecastPart, fromResultReview, mode } = s;
+        sessionStorage.setItem('reading_room_nav', JSON.stringify({ examId, resultId, forecastPart, fromResultReview, mode }));
+      } catch (e) { /* ignore */ }
+      return s;
+    }
+    try {
+      const saved = sessionStorage.getItem('reading_room_nav');
+      if (saved) return JSON.parse(saved);
+    } catch (e) { /* ignore */ }
+    return s || {};
+  }, [location.state]);
+  const [currentPart, setCurrentPart] = useState(navState.forecastPart ? navState.forecastPart : 1);
+  const isForecastMode = !!navState.forecastPart;
   const partsToShow = isForecastMode ? [currentPart] : [1, 2, 3];
   const [examData, setExamData] = useState(null);
   const [answers, setAnswers] = useState({});
@@ -37,14 +55,14 @@ const MainLayout = () => {
   const [notes, setNotes] = useState({});
   const [answerData, setAnswerData] = useState(null); // Store answer data for review mode
   const navigate = useNavigate();
-  const { examId, resultId } = location.state || {};
-  const isReviewMode = location?.state?.fromResultReview;
-  const isRetakeIncorrectMode = location?.state?.retakeIncorrectMode;
-  const incorrectQuestions = location?.state?.incorrectQuestions || [];
-  const retakeAnswerData = location?.state?.answerData;
+  const { examId, resultId } = navState;
+  const isReviewMode = navState.fromResultReview;
+  const isRetakeIncorrectMode = navState.retakeIncorrectMode;
+  const incorrectQuestions = navState.incorrectQuestions || [];
+  const retakeAnswerData = navState.answerData;
   // Full-test mode: 'exam' (Mock Exam — 60' timer + auto-submit + Ctrl+F blocked)
   // vs 'practice' (no timer). Forecast keeps its timer; anything unset = practice.
-  const examMode = location?.state?.mode;
+  const examMode = navState.mode;
   const isExamMode = examMode === 'exam' && !isForecastMode;
   // Count tab switches while taking the test (not in review / retake mode).
   const tabSwitches = useTabSwitchCount(!!examId && !isReviewMode && !isRetakeIncorrectMode);
@@ -164,7 +182,7 @@ const MainLayout = () => {
     });
 
     // Get locate data for this question from detailedAnswers
-    const isReviewMode = location?.state?.fromResultReview;
+    const isReviewMode = navState.fromResultReview;
     let questionData = null;
 
     if (isReviewMode && answerData) {
@@ -242,149 +260,88 @@ const MainLayout = () => {
     }
   };
 
-  // Helper function to highlight text in an element
+  // Helper function to highlight text in an element.
+  // Robust across existing highlight/note spans: match the locate phrase over
+  // the element's concatenated text (whitespace-insensitive) and wrap each
+  // overlapping text-node slice on its own. Plain light background only — no
+  // bold, no per-character wrapping — to avoid the "split characters / random
+  // bold" bug over already-highlighted text.
   const highlightTextInElement = (element, searchText) => {
-    const walker = document.createTreeWalker(
-      element,
-      NodeFilter.SHOW_TEXT,
-      null,
-      false
-    );
+    if (!searchText || !searchText.trim()) return false;
 
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
     const textNodes = [];
     let node;
     while (node = walker.nextNode()) {
       textNodes.push(node);
     }
+    if (textNodes.length === 0) return false;
 
-    // Build a map of text content with node positions
-    let fullText = '';
-    const nodeMap = [];
-
-    textNodes.forEach(textNode => {
-      const text = textNode.textContent;
-      const startPos = fullText.length;
-      fullText += text;
-      const endPos = fullText.length;
-
-      nodeMap.push({
-        node: textNode,
-        startPos,
-        endPos,
-        text
-      });
-    });
-
-    let found = false;
-    const lowerFullText = fullText.toLowerCase();
-    const lowerSearchText = searchText.toLowerCase();
-
-    // Try exact match first across the full reconstructed text
-    const matchIndex = lowerFullText.indexOf(lowerSearchText);
-    if (matchIndex !== -1) {
-      const matchStart = matchIndex;
-      const matchEnd = matchIndex + searchText.length;
-
-      // Find which nodes contain the match
-      const affectedNodes = nodeMap.filter(nodeInfo =>
-        nodeInfo.startPos < matchEnd && nodeInfo.endPos > matchStart
-      );
-
-      if (affectedNodes.length > 0) {
-        // Process nodes from last to first to avoid DOM position issues
-        for (let i = affectedNodes.length - 1; i >= 0; i--) {
-          const nodeInfo = affectedNodes[i];
-          const nodeStart = Math.max(0, matchStart - nodeInfo.startPos);
-          const nodeEnd = Math.min(nodeInfo.text.length, matchEnd - nodeInfo.startPos);
-
-          if (nodeStart < nodeEnd) {
-            const beforeText = nodeInfo.text.substring(0, nodeStart);
-            const matchText = nodeInfo.text.substring(nodeStart, nodeEnd);
-            const afterText = nodeInfo.text.substring(nodeEnd);
-
-            const fragment = document.createDocumentFragment();
-
-            if (beforeText) {
-              fragment.appendChild(document.createTextNode(beforeText));
-            }
-
-            const highlight = document.createElement('span');
-            highlight.className = 'locate-highlight';
-            highlight.style.backgroundColor = '#ffeb3b';
-            highlight.style.padding = '2px 4px';
-            highlight.style.borderRadius = '3px';
-            highlight.style.fontWeight = 'bold';
-            highlight.style.boxShadow = '0 0 0 2px #ffc107';
-            highlight.textContent = matchText;
-            fragment.appendChild(highlight);
-
-            if (afterText) {
-              fragment.appendChild(document.createTextNode(afterText));
-            }
-
-            nodeInfo.node.parentNode.replaceChild(fragment, nodeInfo.node);
-
-            // Scroll to the first highlighted part
-            if (i === 0) {
-              setTimeout(() => {
-                highlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              }, 100);
-            }
-          }
-        }
-        found = true;
-      }
-    }
-
-    // If exact match not found, try partial matching with key words
-    if (!found) {
-      const keywords = searchText.split(' ').filter(word => word.length > 3);
-      if (keywords.length > 0) {
-        const matchedKeywords = keywords.filter(keyword =>
-          lowerFullText.includes(keyword.toLowerCase())
-        );
-
-        if (matchedKeywords.length >= Math.min(2, keywords.length)) {
-          // Find the best matching section by looking for nodes that contain multiple keywords
-          let bestNode = null;
-          let bestScore = 0;
-
-          for (const nodeInfo of nodeMap) {
-            const nodeText = nodeInfo.text.toLowerCase();
-            const nodeKeywords = matchedKeywords.filter(keyword =>
-              nodeText.includes(keyword.toLowerCase())
-            );
-
-            if (nodeKeywords.length > bestScore) {
-              bestScore = nodeKeywords.length;
-              bestNode = nodeInfo;
-            }
-          }
-
-          if (bestNode && bestScore > 0) {
-            const highlight = document.createElement('span');
-            highlight.className = 'locate-highlight';
-            highlight.style.backgroundColor = '#ffeb3b';
-            highlight.style.padding = '2px 4px';
-            highlight.style.borderRadius = '3px';
-            highlight.style.fontWeight = 'bold';
-            highlight.style.boxShadow = '0 0 0 2px #ffc107';
-            highlight.textContent = bestNode.text;
-
-            bestNode.node.parentNode.replaceChild(highlight, bestNode.node);
-
-            // Scroll to the highlighted text
-            setTimeout(() => {
-              highlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
-
-            found = true;
-          }
+    // Whitespace-collapsed, lower-cased copy of the full text + a map from each
+    // clean-char index back to its origin (which text node + offset).
+    let clean = '';
+    const map = [];
+    let prevSpace = false;
+    for (let ni = 0; ni < textNodes.length; ni++) {
+      const t = textNodes[ni].textContent;
+      for (let oi = 0; oi < t.length; oi++) {
+        const ch = t[oi];
+        if (/\s/.test(ch)) {
+          if (prevSpace) continue;
+          clean += ' ';
+          map.push({ nodeIndex: ni, offset: oi });
+          prevSpace = true;
+        } else {
+          clean += ch.toLowerCase();
+          map.push({ nodeIndex: ni, offset: oi });
+          prevSpace = false;
         }
       }
     }
 
-    return found;
+    const cleanSearch = searchText.replace(/\s+/g, ' ').trim().toLowerCase();
+    if (!cleanSearch) return false;
+
+    const idx = clean.indexOf(cleanSearch);
+    if (idx === -1) return false;
+
+    const startOrigin = map[idx];
+    const endOrigin = map[idx + cleanSearch.length - 1];
+    const startNodeIndex = startOrigin.nodeIndex;
+    const startOffset = startOrigin.offset;
+    const endNodeIndex = endOrigin.nodeIndex;
+    const endOffset = endOrigin.offset + 1; // exclusive
+
+    let firstHighlight = null;
+    for (let ni = startNodeIndex; ni <= endNodeIndex; ni++) {
+      const textNode = textNodes[ni];
+      const len = textNode.textContent.length;
+      const from = ni === startNodeIndex ? startOffset : 0;
+      const to = ni === endNodeIndex ? endOffset : len;
+      if (from >= to) continue;
+
+      try {
+        const range = document.createRange();
+        range.setStart(textNode, from);
+        range.setEnd(textNode, to);
+        const span = document.createElement('span');
+        span.className = 'locate-highlight';
+        span.style.backgroundColor = '#ffeb3b';
+        span.style.borderRadius = '2px';
+        range.surroundContents(span);
+        if (!firstHighlight) firstHighlight = span;
+      } catch (err) {
+        // Skip a slice that can't be wrapped cleanly rather than corrupt the DOM.
+      }
+    }
+
+    if (firstHighlight) {
+      setTimeout(() => {
+        firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+      return true;
+    }
+    return false;
   };
 
   useEffect(() => {
@@ -466,7 +423,7 @@ const MainLayout = () => {
     const handlePopState = (e) => {
       e.preventDefault();
       // If in review mode, clear data and navigate away
-      if (location.state?.fromResultReview || isRetakeIncorrectMode) {
+      if (navState.fromResultReview || isRetakeIncorrectMode) {
         clearExamData();
       } else {
         setShowExitAlert(true);
@@ -700,6 +657,12 @@ const MainLayout = () => {
 
     setVocabMenu({ visible: false, x: 0, y: 0, selectedText: '' });
   };
+  // Let students leave the test room WITHOUT submitting: submitting a half-done
+  // attempt just to get out pollutes their results and the monthly ranking (VN fix).
+  const handleExitWithoutSubmit = () => {
+    setShowExitAlert(false);
+    clearExamData();
+  };
   // Handle confirm exit
   const handleConfirmExit = () => {
     setShowExitAlert(false);
@@ -865,8 +828,8 @@ const MainLayout = () => {
         let data = null;
 
         // First, try to use answerData passed from result review page
-        if (location.state?.answerData) {
-          data = location.state.answerData;
+        if (navState.answerData) {
+          data = navState.answerData;
           console.log('Using answerData from location.state:', data);
         }
         // If not available, fetch from API using resultId
@@ -917,7 +880,7 @@ const MainLayout = () => {
     };
 
     handleAnswerData();
-  }, [isReviewMode, resultId, location.state?.answerData]);
+  }, [isReviewMode, resultId, navState.answerData]);
 
   // Initialize retake incorrect mode — pre-fill correct answers and previously answered wrong ones
   useEffect(() => {
@@ -1698,7 +1661,7 @@ const MainLayout = () => {
         const headingText = headingDiv.textContent;
 
         // Check if we're in review mode
-        const isReviewMode = location?.state?.fromResultReview;
+        const isReviewMode = navState.fromResultReview;
 
         // Make the option draggable only if not in review mode
         option.setAttribute('draggable', isReviewMode ? 'false' : 'true');
@@ -1734,7 +1697,7 @@ const MainLayout = () => {
         // Add drag start event listener to the new element
         currentOption.addEventListener('dragstart', (e) => {
           // Check if we're in review mode
-          const isReviewMode = location?.state?.fromResultReview;
+          const isReviewMode = navState.fromResultReview;
           if (isReviewMode) {
             e.preventDefault();
             return;
@@ -2402,6 +2365,7 @@ const MainLayout = () => {
                         newDropArea.style.minHeight = '5px';
                         newDropArea.style.padding = '10px';
                         newDropArea.style.width = '550px';
+                        newDropArea.style.maxWidth = '100%';
                         newDropArea.style.display = 'flex';
                         newDropArea.style.alignItems = 'center';
                         newDropArea.style.justifyContent = 'center';
@@ -2425,7 +2389,7 @@ const MainLayout = () => {
                           });
 
                           // Check if we're in review mode and get validation data
-                          const isReviewMode = location?.state?.fromResultReview;
+                          const isReviewMode = navState.fromResultReview;
                           let validation = null;
 
                           if (isReviewMode && answerData) {
@@ -2594,7 +2558,7 @@ const MainLayout = () => {
                           // Make the dropped heading draggable for repositioning (only if not in review mode)
                           headingElement.addEventListener('dragstart', (dragEvent) => {
                             // Check if we're in review mode
-                            const isReviewMode = location?.state?.fromResultReview;
+                            const isReviewMode = navState.fromResultReview;
                             if (isReviewMode) {
                               dragEvent.preventDefault();
                               return;
@@ -2608,7 +2572,7 @@ const MainLayout = () => {
                           // Add double-click event listener to remove the heading (only if not in review mode)
                           headingElement.addEventListener('dblclick', () => {
                             // Check if we're in review mode
-                            const isReviewMode = location?.state?.fromResultReview;
+                            const isReviewMode = navState.fromResultReview;
                             if (isReviewMode) {
                               return; // Prevent removal in review mode
                             }
@@ -2657,7 +2621,7 @@ const MainLayout = () => {
                           newDropArea.appendChild(headingElement);
                         } else {
                           // Check if we're in review mode and get validation data
-                          const isReviewMode = location?.state?.fromResultReview;
+                          const isReviewMode = navState.fromResultReview;
                           let validation = null;
 
                           if (isReviewMode && answerData?.detailed_answers) {
@@ -2763,7 +2727,7 @@ const MainLayout = () => {
                           e.preventDefault();
 
                           // Check if we're in review mode
-                          const isReviewMode = location?.state?.fromResultReview;
+                          const isReviewMode = navState.fromResultReview;
                           if (isReviewMode) {
                             return;
                           }
@@ -2795,7 +2759,7 @@ const MainLayout = () => {
                           newDropArea.style.borderColor = 'rgb(154, 154, 154)';
 
                           // Check if we're in review mode
-                          const isReviewMode = location?.state?.fromResultReview;
+                          const isReviewMode = navState.fromResultReview;
                           if (isReviewMode) {
                             return;
                           }
@@ -2890,7 +2854,7 @@ const MainLayout = () => {
                             }
 
                             // Check if we're in review mode and get validation data
-                            const isReviewMode = location?.state?.fromResultReview;
+                            const isReviewMode = navState.fromResultReview;
                             let validation = null;
 
                             if (isReviewMode && answerData?.detailed_answers) {
@@ -3032,7 +2996,7 @@ const MainLayout = () => {
                             // Make the dropped heading draggable for repositioning (only if not in review mode)
                             headingElement.addEventListener('dragstart', (dragEvent) => {
                               // Check if we're in review mode
-                              const isReviewMode = location?.state?.fromResultReview;
+                              const isReviewMode = navState.fromResultReview;
                               if (isReviewMode) {
                                 dragEvent.preventDefault();
                                 return;
@@ -3046,7 +3010,7 @@ const MainLayout = () => {
                             // Add double-click event listener to remove the heading (only if not in review mode)
                             headingElement.addEventListener('dblclick', () => {
                               // Check if we're in review mode
-                              const isReviewMode = location?.state?.fromResultReview;
+                              const isReviewMode = navState.fromResultReview;
                               if (isReviewMode) {
                                 return; // Prevent removal in review mode
                               }
@@ -3207,7 +3171,7 @@ const MainLayout = () => {
                                 // Add drag start event listener (only if not in review mode)
                                 headingElement.addEventListener('dragstart', (dragEvent) => {
                                   // Check if we're in review mode
-                                  const isReviewMode = location?.state?.fromResultReview;
+                                  const isReviewMode = navState.fromResultReview;
                                   if (isReviewMode) {
                                     dragEvent.preventDefault();
                                     return;
@@ -3239,7 +3203,7 @@ const MainLayout = () => {
                                 // Add double-click event listener to remove the heading (only if not in review mode)
                                 headingElement.addEventListener('dblclick', () => {
                                   // Check if we're in review mode
-                                  const isReviewMode = location?.state?.fromResultReview;
+                                  const isReviewMode = navState.fromResultReview;
                                   if (isReviewMode) {
                                     return; // Prevent removal in review mode
                                   }
@@ -3430,7 +3394,7 @@ const MainLayout = () => {
                                           // Add drag start event listener (only if not in review mode)
                                           headingElement.addEventListener('dragstart', (dragEvent) => {
                                             // Check if we're in review mode
-                                            const isReviewMode = location?.state?.fromResultReview;
+                                            const isReviewMode = navState.fromResultReview;
                                             if (isReviewMode) {
                                               dragEvent.preventDefault();
                                               return;
@@ -3444,7 +3408,7 @@ const MainLayout = () => {
                                           // Add double-click event listener to remove the heading (only if not in review mode)
                                           headingElement.addEventListener('dblclick', () => {
                                             // Check if we're in review mode
-                                            const isReviewMode = location?.state?.fromResultReview;
+                                            const isReviewMode = navState.fromResultReview;
                                             if (isReviewMode) {
                                               return; // Prevent removal in review mode
                                             }
@@ -3589,7 +3553,7 @@ const MainLayout = () => {
                 ))}
               </div>
               <div className="ml-2 md:ml-6 flex space-x-2 md:space-x-4">
-                {!location.state?.fromResultReview && !isRetakeIncorrectMode && (
+                {!navState.fromResultReview && !isRetakeIncorrectMode && (
                   <button
                     onClick={handleSubmitExam}
                     className={`px-3 py-2 md:px-6 md:py-4 rounded-lg text-sm md:text-lg font-bold transition-colors whitespace-nowrap
@@ -3611,7 +3575,7 @@ const MainLayout = () => {
                     Submit Retake
                   </button>
                 )}
-                {location.state?.fromResultReview && !isRetakeIncorrectMode && (
+                {navState.fromResultReview && !isRetakeIncorrectMode && (
                   <div className="flex flex-col space-y-2">
                     <div className="flex space-x-4">
                       <button
@@ -3730,7 +3694,10 @@ const MainLayout = () => {
         onClose={handleCancelExit}
         onConfirm={handleConfirmExit}
         title="Warning: Leaving the exam"
-        message="If you leave during the exam, your answers will be submitted automatically."
+        message="Choose “Submit” to grade your answers now, or “Exit without submitting” to leave the test room — an unfinished attempt is not graded and does not count towards your results."
+        confirmLabel="Submit"
+        secondaryLabel="Exit without submitting"
+        onSecondary={handleExitWithoutSubmit}
       />
       <AlertForm
         open={showClearDataDialog}

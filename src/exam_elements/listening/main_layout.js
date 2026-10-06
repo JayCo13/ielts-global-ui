@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { BookOpenText, Bell, Menu, Volume2, Volume1, VolumeX, Play, Pause, Rewind, FastForward, Bot, Gauge, ChevronDown, Plus } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
@@ -485,7 +485,25 @@ const MainLayout = () => {
   const audioRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const { examId } = location.state || {};
+  // location.state is lost on a full page reload — persist the exam identity so
+  // reloading (or navigating back) into the exam room restores it instead of
+  // hanging on "Loading exam..." forever (VN fix).
+  const navState = useMemo(() => {
+    const s = location.state;
+    if (s && s.examId) {
+      try {
+        const { examId, resultId, forecastPart, fromResultReview, mode } = s;
+        sessionStorage.setItem('listening_room_nav', JSON.stringify({ examId, resultId, forecastPart, fromResultReview, mode }));
+      } catch (e) { /* ignore */ }
+      return s;
+    }
+    try {
+      const saved = sessionStorage.getItem('listening_room_nav');
+      if (saved) return JSON.parse(saved);
+    } catch (e) { /* ignore */ }
+    return s || {};
+  }, [location.state]);
+  const { examId } = navState;
   const [showVolumeControl, setShowVolumeControl] = useState(false);
   const [volume, setVolume] = useState(1);
   const [showSpeedControl, setShowSpeedControl] = useState(false);
@@ -534,16 +552,16 @@ const MainLayout = () => {
   const vocabMenuRef = useRef(null);
 
   // Initialize translator
-  const isReviewMode = location?.state?.fromResultReview;
-  const isRetakeIncorrectMode = location?.state?.retakeIncorrectMode;
-  const incorrectQuestions = location?.state?.incorrectQuestions || [];
-  const correctQuestions = location?.state?.correctQuestions || [];
-  const retakeAnswerData = location?.state?.answerData;
-  const forecastPartFromNav = location?.state?.forecastPart;
-  const resultId = location?.state?.resultId;
+  const isReviewMode = navState.fromResultReview;
+  const isRetakeIncorrectMode = navState.retakeIncorrectMode;
+  const incorrectQuestions = navState.incorrectQuestions || [];
+  const correctQuestions = navState.correctQuestions || [];
+  const retakeAnswerData = navState.answerData;
+  const forecastPartFromNav = navState.forecastPart;
+  const resultId = navState.resultId;
   // Mock Exam ('exam'): after the audio ends, a 2-minute window then auto-submit.
   // Practice / forecast / unset: no auto-submit.
-  const examMode = location?.state?.mode;
+  const examMode = navState.mode;
   const isExamMode = examMode === 'exam' && !forecastPartFromNav;
   // Count tab switches while taking the test (not in review / retake mode).
   const tabSwitches = useTabSwitchCount(!!examId && !isReviewMode && !isRetakeIncorrectMode);
@@ -666,157 +684,120 @@ const MainLayout = () => {
     }
   };
 
-  // Helper function to highlight text in an element
-  const highlightTextInElement = (element, searchText) => {
-    const walker = document.createTreeWalker(
-      element,
-      NodeFilter.SHOW_TEXT,
-      null,
-      false
-    );
+  // Transcripts and the admin-authored `locate` phrase routinely disagree on curly vs
+  // straight quotes and dash width, which used to make an otherwise exact phrase miss.
+  const normaliseChar = (ch) => {
+    if (ch === '\u2018' || ch === '\u2019') return "'";
+    if (ch === '\u201C' || ch === '\u201D') return '"';
+    if (ch === '\u2013' || ch === '\u2014') return '-';
+    return ch.toLowerCase();
+  };
 
+  // Locate the phrase in the transcript. Exact match first; if the authored phrase has
+  // drifted from the transcript (an extra word, different punctuation), fall back to the
+  // longest contiguous run of its words that IS present — never wider than that run, so
+  // the highlight can't swallow a whole paragraph the way the old keyword fallback did.
+  const findPhrase = (haystack, needle) => {
+    const exact = haystack.indexOf(needle);
+    if (exact !== -1) return { idx: exact, length: needle.length };
+
+    const words = needle.split(' ').filter(Boolean);
+    const MIN_WORDS = 4;
+    for (let len = words.length - 1; len >= MIN_WORDS; len--) {
+      for (let start = 0; start + len <= words.length; start++) {
+        const sub = words.slice(start, start + len).join(' ');
+        const at = haystack.indexOf(sub);
+        if (at !== -1) return { idx: at, length: sub.length };
+      }
+    }
+    return null;
+  };
+
+  // Helper function to highlight text in an element.
+  // Robust across existing highlight/note spans: match the locate phrase over
+  // the transcript's concatenated text (whitespace-insensitive) and wrap each
+  // overlapping text-node slice on its own. Plain light background only — no
+  // bold, no per-character wrapping — to avoid the "split characters / random
+  // bold" bug over already-highlighted text.
+  const highlightTextInElement = (element, searchText) => {
+    if (!searchText || !searchText.trim()) return false;
+
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
     const textNodes = [];
     let node;
     while (node = walker.nextNode()) {
       textNodes.push(node);
     }
+    if (textNodes.length === 0) return false;
 
-    // Build a map of text content with node positions
-    let fullText = '';
-    const nodeMap = [];
-
-    textNodes.forEach(textNode => {
-      const text = textNode.textContent;
-      const startPos = fullText.length;
-      fullText += text;
-      const endPos = fullText.length;
-
-      nodeMap.push({
-        node: textNode,
-        startPos,
-        endPos,
-        text
-      });
-    });
-
-    let found = false;
-    const lowerFullText = fullText.toLowerCase();
-    const lowerSearchText = searchText.toLowerCase();
-
-    // Try exact match first across the full reconstructed text
-    const matchIndex = lowerFullText.indexOf(lowerSearchText);
-    if (matchIndex !== -1) {
-      const matchStart = matchIndex;
-      const matchEnd = matchIndex + searchText.length;
-
-      // Find which nodes contain the match
-      const affectedNodes = nodeMap.filter(nodeInfo =>
-        nodeInfo.startPos < matchEnd && nodeInfo.endPos > matchStart
-      );
-
-      if (affectedNodes.length > 0) {
-        // Process nodes from last to first to avoid DOM position issues
-        for (let i = affectedNodes.length - 1; i >= 0; i--) {
-          const nodeInfo = affectedNodes[i];
-          const nodeStart = Math.max(0, matchStart - nodeInfo.startPos);
-          const nodeEnd = Math.min(nodeInfo.text.length, matchEnd - nodeInfo.startPos);
-
-          if (nodeStart < nodeEnd) {
-            const beforeText = nodeInfo.text.substring(0, nodeStart);
-            const matchText = nodeInfo.text.substring(nodeStart, nodeEnd);
-            const afterText = nodeInfo.text.substring(nodeEnd);
-
-            const fragment = document.createDocumentFragment();
-
-            if (beforeText) {
-              fragment.appendChild(document.createTextNode(beforeText));
-            }
-
-            const highlight = document.createElement('span');
-            highlight.className = 'locate-highlight';
-            highlight.style.backgroundColor = '#ffeb3b';
-            highlight.style.padding = '4px 6px';
-            highlight.style.borderRadius = '4px';
-            highlight.style.fontWeight = 'bold';
-            highlight.style.boxShadow = '0 0 0 2px #ffc107';
-            highlight.style.lineHeight = '2';
-            highlight.style.display = 'inline';
-            highlight.style.boxDecorationBreak = 'clone';
-            highlight.style.webkitBoxDecorationBreak = 'clone';
-            highlight.textContent = matchText;
-            fragment.appendChild(highlight);
-
-            if (afterText) {
-              fragment.appendChild(document.createTextNode(afterText));
-            }
-
-            nodeInfo.node.parentNode.replaceChild(fragment, nodeInfo.node);
-
-            // Scroll to the first highlighted part
-            if (i === 0) {
-              setTimeout(() => {
-                highlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              }, 100);
-            }
-          }
-        }
-        found = true;
-      }
-    }
-
-    // If exact match not found, try partial matching with key words
-    if (!found) {
-      const keywords = searchText.split(' ').filter(word => word.length > 3);
-      if (keywords.length > 0) {
-        const matchedKeywords = keywords.filter(keyword =>
-          lowerFullText.includes(keyword.toLowerCase())
-        );
-
-        if (matchedKeywords.length >= Math.min(2, keywords.length)) {
-          // Find the best matching section by looking for nodes that contain multiple keywords
-          let bestNode = null;
-          let bestScore = 0;
-
-          for (const nodeInfo of nodeMap) {
-            const nodeText = nodeInfo.text.toLowerCase();
-            const nodeKeywords = matchedKeywords.filter(keyword =>
-              nodeText.includes(keyword.toLowerCase())
-            );
-
-            if (nodeKeywords.length > bestScore) {
-              bestScore = nodeKeywords.length;
-              bestNode = nodeInfo;
-            }
-          }
-
-          if (bestNode && bestScore > 0) {
-            const highlight = document.createElement('span');
-            highlight.className = 'locate-highlight';
-            highlight.style.backgroundColor = '#ffeb3b';
-            highlight.style.padding = '4px 6px';
-            highlight.style.borderRadius = '4px';
-            highlight.style.fontWeight = 'bold';
-            highlight.style.boxShadow = '0 0 0 2px #ffc107';
-            highlight.style.lineHeight = '2';
-            highlight.style.display = 'inline';
-            highlight.style.boxDecorationBreak = 'clone';
-            highlight.style.webkitBoxDecorationBreak = 'clone';
-            highlight.textContent = bestNode.text;
-
-            bestNode.node.parentNode.replaceChild(highlight, bestNode.node);
-
-            // Scroll to the highlighted text
-            setTimeout(() => {
-              highlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
-
-            found = true;
-          }
+    // Whitespace-collapsed, lower-cased copy of the full text + a map from each
+    // clean-char index back to its origin (which text node + offset).
+    let clean = '';
+    const map = [];
+    let prevSpace = false;
+    for (let ni = 0; ni < textNodes.length; ni++) {
+      const t = textNodes[ni].textContent;
+      for (let oi = 0; oi < t.length; oi++) {
+        const ch = t[oi];
+        if (/\s/.test(ch)) {
+          if (prevSpace) continue;
+          clean += ' ';
+          map.push({ nodeIndex: ni, offset: oi });
+          prevSpace = true;
+        } else {
+          clean += normaliseChar(ch);
+          map.push({ nodeIndex: ni, offset: oi });
+          prevSpace = false;
         }
       }
     }
 
-    return found;
+    const cleanSearch = Array.from(searchText.replace(/\s+/g, ' ').trim())
+      .map(normaliseChar)
+      .join('');
+    if (!cleanSearch) return false;
+
+    const match = findPhrase(clean, cleanSearch);
+    if (!match) return false;
+
+    const { idx, length } = match;
+    const startOrigin = map[idx];
+    const endOrigin = map[idx + length - 1];
+    const startNodeIndex = startOrigin.nodeIndex;
+    const startOffset = startOrigin.offset;
+    const endNodeIndex = endOrigin.nodeIndex;
+    const endOffset = endOrigin.offset + 1; // exclusive
+
+    let firstHighlight = null;
+    for (let ni = startNodeIndex; ni <= endNodeIndex; ni++) {
+      const textNode = textNodes[ni];
+      const len = textNode.textContent.length;
+      const from = ni === startNodeIndex ? startOffset : 0;
+      const to = ni === endNodeIndex ? endOffset : len;
+      if (from >= to) continue;
+
+      try {
+        const range = document.createRange();
+        range.setStart(textNode, from);
+        range.setEnd(textNode, to);
+        const span = document.createElement('span');
+        span.className = 'locate-highlight';
+        span.style.backgroundColor = '#ffeb3b';
+        span.style.borderRadius = '2px';
+        range.surroundContents(span);
+        if (!firstHighlight) firstHighlight = span;
+      } catch (err) {
+        // Skip a slice that can't be wrapped cleanly rather than corrupt the DOM.
+      }
+    }
+
+    if (firstHighlight) {
+      setTimeout(() => {
+        firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+      return true;
+    }
+    return false;
   };
 
   // Update handleAnswerChange to also mark questions as completed
@@ -1264,6 +1245,12 @@ const MainLayout = () => {
     }
   };
 
+  // Let students leave the test room WITHOUT submitting: submitting a half-done
+  // attempt just to get out pollutes their results and the monthly ranking (VN fix).
+  const handleExitWithoutSubmit = () => {
+    setShowExitAlert(false);
+    clearExamData();
+  };
   // Handle confirm exit
   const handleConfirmExit = () => {
     setShowExitAlert(false);
@@ -2005,7 +1992,7 @@ const MainLayout = () => {
     // Handle popstate event (browser back button)
     const handlePopState = (e) => {
       // If in review mode, clear data and navigate away
-      if (location.state?.fromResultReview) {
+      if (navState.fromResultReview) {
         clearExamData();
       } else {
         setShowExitAlert(true);
@@ -2024,7 +2011,7 @@ const MainLayout = () => {
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [location.state?.fromResultReview]);
+  }, [navState.fromResultReview]);
 
   // Update the useEffect for WiFi status
   useEffect(() => {
@@ -2141,7 +2128,7 @@ const MainLayout = () => {
             audioRef.current.playbackRate = playbackSpeed;
 
             // If in view-only mode, disable audio controls
-            if (location.state?.fromResultReview) {
+            if (navState.fromResultReview) {
               audioRef.current.controls = false;
             }
           }
@@ -2227,16 +2214,16 @@ const MainLayout = () => {
                       [&::-moz-range-thumb]:shadow
                       [&::-moz-range-thumb]:opacity-100
                       [&::-moz-range-thumb]:relative
-                      [&::-moz-range-thumb]:z-20 ${location.state?.fromResultReview ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      [&::-moz-range-thumb]:z-20 ${navState.fromResultReview ? 'opacity-50 cursor-not-allowed' : ''}`}
                     onChange={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      if (audioRef.current && !location.state?.fromResultReview) {
+                      if (audioRef.current && !navState.fromResultReview) {
                         const newTime = parseFloat(e.target.value);
                         audioRef.current.currentTime = newTime;
                       }
                     }}
-                    disabled={location.state?.fromResultReview}
+                    disabled={navState.fromResultReview}
                   />
                   {/* Visible thumb */}
                   <div
@@ -2263,8 +2250,8 @@ const MainLayout = () => {
                         : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300'
                       } 
                       backdrop-blur-sm shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400/50
-                      ${location.state?.fromResultReview ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    disabled={location.state?.fromResultReview}
+                      ${navState.fromResultReview ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    disabled={navState.fromResultReview}
                   >
                     <Gauge className="w-3.5 h-3.5" />
                     <span className="text-xs font-medium">{playbackSpeed}×</span>
@@ -2285,7 +2272,7 @@ const MainLayout = () => {
                           <button
                             key={speed}
                             onClick={() => {
-                              if (!location.state?.fromResultReview) {
+                              if (!navState.fromResultReview) {
                                 setPlaybackSpeed(speed);
                                 if (audioRef.current) {
                                   audioRef.current.playbackRate = speed;
@@ -2304,8 +2291,8 @@ const MainLayout = () => {
                                   : 'hover:bg-gray-100 text-gray-600'
                                 )
                               }
-                              ${location.state?.fromResultReview ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            disabled={location.state?.fromResultReview}
+                              ${navState.fromResultReview ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            disabled={navState.fromResultReview}
                           >
                             <span className="font-medium">{speed}× Speed</span>
                             {playbackSpeed === speed && (
@@ -2331,14 +2318,14 @@ const MainLayout = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      if (audioRef.current && !location.state?.fromResultReview) {
+                      if (audioRef.current && !navState.fromResultReview) {
                         const newTime = Math.max(0, audioRef.current.currentTime - 10);
                         audioRef.current.currentTime = newTime;
                       }
                     }}
-                    className={`p-1 rounded hover:bg-gray-400 flex items-center ${location.state?.fromResultReview ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`p-1 rounded hover:bg-gray-400 flex items-center ${navState.fromResultReview ? 'opacity-50 cursor-not-allowed' : ''}`}
                     title="Rewind 10 seconds"
-                    disabled={location.state?.fromResultReview}
+                    disabled={navState.fromResultReview}
                   >
                     <Rewind className="w-4 h-4 transform" />
                     <span className="ml-1 text-xs">10s</span>
@@ -2348,7 +2335,7 @@ const MainLayout = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      if (audioRef.current && !location.state?.fromResultReview) {
+                      if (audioRef.current && !navState.fromResultReview) {
                         if (audioRef.current.paused) {
                           setIsPlayLoading(true);
                           audioRef.current.play()
@@ -2379,8 +2366,8 @@ const MainLayout = () => {
                         }
                       }
                     }}
-                    className={`p-1 rounded hover:bg-gray-400 ${location.state?.fromResultReview || isPlayLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    disabled={location.state?.fromResultReview || isPlayLoading}
+                    className={`p-1 rounded hover:bg-gray-400 ${navState.fromResultReview || isPlayLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    disabled={navState.fromResultReview || isPlayLoading}
                   >
                     {isPlayLoading && !isAudioPlaying ? (
                       <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -2395,7 +2382,7 @@ const MainLayout = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      if (audioRef.current && !location.state?.fromResultReview) {
+                      if (audioRef.current && !navState.fromResultReview) {
                         const newTime = Math.min(
                           audioRef.current.duration || 0,
                           audioRef.current.currentTime + 10
@@ -2403,9 +2390,9 @@ const MainLayout = () => {
                         audioRef.current.currentTime = newTime;
                       }
                     }}
-                    className={`p-1 rounded hover:bg-gray-400 flex items-center ${location.state?.fromResultReview ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`p-1 rounded hover:bg-gray-400 flex items-center ${navState.fromResultReview ? 'opacity-50 cursor-not-allowed' : ''}`}
                     title="Forward 10 seconds"
-                    disabled={location.state?.fromResultReview}
+                    disabled={navState.fromResultReview}
                   >
                     <span className="mr-1 text-xs">10s</span>
                     <FastForward className="w-4 h-4 transform rotate-95" />
@@ -2416,7 +2403,7 @@ const MainLayout = () => {
                 {/* Volume control on right */}
                 <div
                   className="relative"
-                  onMouseEnter={() => !location.state?.fromResultReview && setShowVolumeControl(true)}
+                  onMouseEnter={() => !navState.fromResultReview && setShowVolumeControl(true)}
                   onMouseLeave={() => {
                     // Add a small delay before hiding to prevent accidental hiding
                     setTimeout(() => {
@@ -2427,7 +2414,7 @@ const MainLayout = () => {
                   }}
                 >
                   <div
-                    className={`p-1 rounded hover:bg-gray-400 flex items-center ${location.state?.fromResultReview ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                    className={`p-1 rounded hover:bg-gray-400 flex items-center ${navState.fromResultReview ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                   >
                     {volume === 0 ? (
                       <VolumeX className="w-4 h-4" />
@@ -2444,15 +2431,15 @@ const MainLayout = () => {
                     >
                       <div className="flex items-center space-x-2">
                         <button
-                          className={`p-1 rounded hover:bg-gray-500 ${location.state?.fromResultReview ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          className={`p-1 rounded hover:bg-gray-500 ${navState.fromResultReview ? 'opacity-50 cursor-not-allowed' : ''}`}
                           onClick={() => {
-                            if (!location.state?.fromResultReview) {
+                            if (!navState.fromResultReview) {
                               const newVolume = volume === 0 ? 0.5 : 0;
                               setVolume(newVolume);
                               if (audioRef.current) audioRef.current.volume = newVolume;
                             }
                           }}
-                          disabled={location.state?.fromResultReview}
+                          disabled={navState.fromResultReview}
                         >
                           {volume === 0 ? <Volume1 className="w-3 h-3" /> : <VolumeX className="w-3 h-3" />}
                         </button>
@@ -2491,15 +2478,15 @@ const MainLayout = () => {
                               [&::-moz-range-thumb]:bg-white
                               [&::-moz-range-thumb]:opacity-100
                               [&::-moz-range-thumb]:relative
-                              [&::-moz-range-thumb]:z-20 ${location.state?.fromResultReview ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                              [&::-moz-range-thumb]:z-20 ${navState.fromResultReview ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                             onChange={(e) => {
-                              if (!location.state?.fromResultReview) {
+                              if (!navState.fromResultReview) {
                                 const newVolume = parseFloat(e.target.value);
                                 setVolume(newVolume);
                                 if (audioRef.current) audioRef.current.volume = newVolume;
                               }
                             }}
-                            disabled={location.state?.fromResultReview}
+                            disabled={navState.fromResultReview}
                           />
 
                           {/* Visible thumb */}
@@ -2908,7 +2895,7 @@ const MainLayout = () => {
           </div>
         )}
 
-        {(location.state?.fromResultReview || isRetakeIncorrectMode) ? (
+        {(navState.fromResultReview || isRetakeIncorrectMode) ? (
           <div className="flex-1 overflow-hidden relative">
             {/* Import Split component at the top of the file */}
             {showDescriptionPanel ? (
@@ -3176,7 +3163,7 @@ const MainLayout = () => {
                 )}
               </div>
               <div className="ml-6 flex gap-2">
-                {!location.state?.fromResultReview && (
+                {!navState.fromResultReview && (
                   <button
                     onClick={handleSubmitExam}
                     className={`px-6 py-2 rounded-lg font-medium transition-colors
@@ -3192,7 +3179,7 @@ const MainLayout = () => {
                     {isRetakeIncorrectMode ? 'Submit' : 'Submit'}
                   </button>
                 )}
-                {location.state?.fromResultReview && (
+                {navState.fromResultReview && (
                   <div className="flex flex-col space-y-2">
                     <div className="flex space-x-4">
                       <button
@@ -3259,7 +3246,7 @@ const MainLayout = () => {
               </div>
             </div>
           )}
-          {!location.state?.fromResultReview && (
+          {!navState.fromResultReview && (
             <TranscriptModal
               isOpen={showDescription}
               onClose={() => setShowDescription(false)}
@@ -3272,7 +3259,7 @@ const MainLayout = () => {
         </footer>
 
         {/* Overlay rendered on top if not started */}
-        {!isAudioStarted && !location.state?.fromResultReview && !isRetakeIncorrectMode && (
+        {!isAudioStarted && !navState.fromResultReview && !isRetakeIncorrectMode && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[10000]">
             <div className="text-center max-w-2xl p-8 bg-white rounded-lg shadow-sm">
               <h2 className="text-2xl font-bold mb-4">Audio Instructions</h2>
@@ -3309,7 +3296,10 @@ const MainLayout = () => {
         onClose={handleCancelExit}
         onConfirm={handleConfirmExit}
         title="Exit Test Warning"
-        message="If you exit the test during the test, the test will be submitted automatically."
+        message="Choose “Submit” to grade your answers now, or “Exit without submitting” to leave the test room — an unfinished attempt is not graded and does not count towards your results."
+        confirmLabel="Submit"
+        secondaryLabel="Exit without submitting"
+        onSecondary={handleExitWithoutSubmit}
       />
       {/* Clear Data Confirmation Dialog */}
       <AlertForm

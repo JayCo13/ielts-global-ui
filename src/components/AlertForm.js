@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
 import Button from './Button';
 
-const AlertForm = ({ open, onClose, onConfirm, title, message }) => {
+/**
+ * Shared warning dialog.
+ *
+ * `secondaryLabel`/`onSecondary` add ONE optional third choice in the middle —
+ * the exam rooms use it for "Exit without submitting" (VN fix) so students can
+ * leave without pushing an unfinished attempt into their results. Without
+ * those props the dialog keeps its original two buttons. `confirmLabel` /
+ * `busyLabel` override the confirm button text.
+ */
+const AlertForm = ({ open, onClose, onConfirm, title, message,
+                     confirmLabel, busyLabel, secondaryLabel, onSecondary }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!open) return null;
@@ -24,7 +34,7 @@ const AlertForm = ({ open, onClose, onConfirm, title, message }) => {
           {message || 'Are you sure you want to leave this page? Your progress will be lost.'}
         </div>
         
-        <div className="flex justify-between gap-4 mt-6">
+        <div className="flex flex-wrap justify-between gap-3 mt-6">
           <Button
             onClick={onClose}
             variant="outlined"
@@ -33,6 +43,16 @@ const AlertForm = ({ open, onClose, onConfirm, title, message }) => {
           >
             Cancel
           </Button>
+          {secondaryLabel && (
+            <Button
+              onClick={onSecondary}
+              variant="outlined"
+              className="flex-1 px-6 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg"
+              disabled={isSubmitting}
+            >
+              {secondaryLabel}
+            </Button>
+          )}
           <Button
             onClick={handleConfirm}
             variant="contained"
@@ -40,7 +60,7 @@ const AlertForm = ({ open, onClose, onConfirm, title, message }) => {
             disabled={isSubmitting}
             autoFocus
           >
-            {isSubmitting ? 'Submitting...' : 'Confirm'}
+            {isSubmitting ? (busyLabel || 'Submitting...') : (confirmLabel || 'Confirm')}
           </Button>
         </div>
       </div>
