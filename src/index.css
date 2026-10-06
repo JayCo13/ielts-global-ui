@@ -471,9 +471,12 @@ table .inline-flex.flex-col {
   border-bottom: 2px solid #10b981 !important;
   position: relative !important;
   cursor: pointer !important;
-  padding: 2px 4px !important;
-  border-radius: 3px !important;
-  display: inline-block !important;
+  /* inline + no padding so adding a note does not push the surrounding
+     text around, and a note spanning several lines (one span per text node)
+     wraps like normal text (VN fix). */
+  padding: 0 !important;
+  border-radius: 2px !important;
+  display: inline !important;
   color: #000000 !important;
   border: 1px solid #10b981 !important;
   z-index: 10 !important;
@@ -501,4 +504,21 @@ table .inline-flex.flex-col {
   justify-content: center !important;
   font-size: 12px !important;
   z-index: 11 !important;
+}
+
+/* Locate/search highlight (the search icon on a question) uses a yellow
+   background. Force black text so it stays readable when it lands on a
+   coloured user highlight, which forces white text (VN fix). */
+.locate-highlight {
+  color: #000000 !important;
+}
+
+/* iPad/iOS: suppress the native long-press callout over the exam text so only
+   our own Highlight / Note menu shows. Text stays selectable so highlighting
+   still works (VN fix). */
+#reading-passage-content,
+#ielts-content-area {
+  -webkit-touch-callout: none;
+  -webkit-user-select: text;
+  user-select: text;
 }

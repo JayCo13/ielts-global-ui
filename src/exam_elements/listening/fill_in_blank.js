@@ -13,6 +13,193 @@ import {
   getThemeStyles
 } from './utils/examUtils';
 
+// ── Highlight helpers (shared by create + restore) ──────────────────────────
+// A text node is safe to wrap only if it has visible (non-whitespace) content
+// AND its parent is not a table-structural element. Wrapping the whitespace
+// between cells (a direct child of tr/table/tbody) inserts a <span> where the
+// table grammar forbids one, which shatters the table layout.
+function isWrappableTextNode(textNode) {
+  if (!textNode || !textNode.textContent || !textNode.textContent.trim()) return false;
+  const p = textNode.parentElement;
+  if (p && /^(TABLE|TBODY|THEAD|TFOOT|TR|COLGROUP|COL)$/.test(p.tagName)) return false;
+  return true;
+}
+
+// Wrap EACH text node a note's range touches in its own note span (one shared
+// data-note-id). Safe across line breaks and table cells (never drops content,
+// never inserts into table structure).
+function wrapRangeInNoteGroup(range, { noteId, part, timestamp }) {
+  const spans = [];
+  const sc = range.startContainer, so = range.startOffset;
+  const ec = range.endContainer, eo = range.endOffset;
+  const makeSpan = (i) => {
+    const s = document.createElement('span');
+    s.className = 'highlighted-text with-note';
+    s.style.backgroundColor = '#d1fae5';
+    s.style.borderBottom = '2px solid #10b981';
+    s.style.cursor = 'pointer';
+    s.setAttribute('data-note', 'true');
+    s.setAttribute('data-note-id', noteId);
+    s.setAttribute('data-part', String(part));
+    s.setAttribute('data-timestamp', String(timestamp));
+    if (i === 0) {
+      s.setAttribute('id', `note-${noteId}`);
+      s.style.position = 'relative';
+    }
+    return s;
+  };
+  const wrapTextNode = (textNode, startOff, endOff) => {
+    if (startOff >= endOff) return;
+    if (!isWrappableTextNode(textNode)) return;
+    const r = document.createRange();
+    r.setStart(textNode, startOff);
+    r.setEnd(textNode, endOff);
+    const s = makeSpan(spans.length);
+    surroundOrExtract(r, s, spans);
+  };
+  const root = range.commonAncestorContainer;
+  if (root.nodeType === Node.TEXT_NODE) {
+    wrapTextNode(root, so, eo);
+  } else {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    const touched = [];
+    let tn;
+    while ((tn = walker.nextNode())) {
+      if (tn.textContent && tn.textContent.length && range.intersectsNode(tn)) touched.push(tn);
+    }
+    touched.forEach((node) => {
+      wrapTextNode(node, node === sc ? so : 0, node === ec ? eo : node.textContent.length);
+    });
+  }
+  return spans;
+}
+
+// Attach the note-indicator (📝) to the first span and wire the click handler
+// onto every span so clicking any line opens the note.
+function decorateNoteSpans(spans, noteId, onOpen) {
+  if (!spans.length) return;
+  const indicator = document.createElement('span');
+  indicator.className = 'note-indicator';
+  indicator.style.cssText = 'position:absolute;top:-8px;right:-8px;background-color:#6ee7b7;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:12px;';
+  indicator.setAttribute('contenteditable', 'false');
+  indicator.innerHTML = '📝';
+  spans[0].appendChild(indicator);
+  spans.forEach((s) => {
+    s.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      onOpen(e, noteId);
+    });
+  });
+}
+
+// surroundContents() on a single-text-node range should never throw, but keep
+// the extractContents() + wrap fallback (global IDP/BC behaviour) so an odd DOM
+// can never make a highlight silently fail.
+function surroundOrExtract(r, s, spans) {
+  try {
+    r.surroundContents(s);
+    spans.push(s);
+  } catch (e) {
+    try {
+      const fragment = r.extractContents();
+      s.appendChild(fragment);
+      r.insertNode(s);
+      spans.push(s);
+    } catch (e2) { /* skip node */ }
+  }
+}
+
+// Wrap every text node a range touches in its own span sharing one group id, so
+// a selection crossing line/paragraph boundaries never loses text.
+function wrapRangeInHighlightGroup(range, { groupId, level, part, timestamp, className }) {
+  const cls = className || (level === 2 ? 'ielts-highlight ielts-highlight-l2' : 'ielts-highlight ielts-highlight-l1');
+  const spans = [];
+  const sc = range.startContainer, so = range.startOffset;
+  const ec = range.endContainer, eo = range.endOffset;
+  const makeSpan = (i) => {
+    const s = document.createElement('span');
+    s.className = cls;
+    s.setAttribute('data-highlight', 'true');
+    s.setAttribute('data-level', String(level || 1));
+    s.setAttribute('data-part', String(part));
+    s.setAttribute('data-timestamp', String(timestamp));
+    s.setAttribute('data-highlight-group', groupId);
+    s.setAttribute('id', i === 0 ? groupId : `${groupId}-${i}`);
+    return s;
+  };
+  const wrapTextNode = (textNode, startOff, endOff) => {
+    if (startOff >= endOff) return;
+    if (!isWrappableTextNode(textNode)) return;
+    const r = document.createRange();
+    r.setStart(textNode, startOff);
+    r.setEnd(textNode, endOff);
+    const s = makeSpan(spans.length);
+    surroundOrExtract(r, s, spans);
+  };
+  const root = range.commonAncestorContainer;
+  if (root.nodeType === Node.TEXT_NODE) {
+    wrapTextNode(root, so, eo);
+  } else {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    const touched = [];
+    let tn;
+    while ((tn = walker.nextNode())) {
+      if (tn.textContent && tn.textContent.length && range.intersectsNode(tn)) touched.push(tn);
+    }
+    touched.forEach((node) => {
+      wrapTextNode(node, node === sc ? so : 0, node === ec ? eo : node.textContent.length);
+    });
+  }
+  return spans;
+}
+
+// Locate a (possibly multi-node) range for `text` inside `scope`, tolerant of
+// whitespace / line-break differences. Returns a Range or null.
+function findCrossNodeRange(scope, text, contextBefore) {
+  if (!scope || !text) return null;
+  const walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT, null, false);
+  let full = '';
+  const map = [];
+  let n;
+  while ((n = walker.nextNode())) {
+    const t = n.textContent;
+    for (let k = 0; k < t.length; k++) { full += t[k]; map.push({ node: n, offset: k }); }
+  }
+  const normalize = (str) => {
+    let norm = ''; const idx = []; let prevWs = false;
+    for (let i = 0; i < str.length; i++) {
+      const c = str[i];
+      if (/\s/.test(c)) { if (!prevWs) { norm += ' '; idx.push(i); prevWs = true; } }
+      else { norm += c; idx.push(i); prevWs = false; }
+    }
+    return { norm, idx };
+  };
+  const { norm: fullNorm, idx: fullIdx } = normalize(full);
+  const target = normalize(text).norm.trim();
+  if (!target) return null;
+  const ctx = contextBefore ? normalize(contextBefore).norm.trim() : '';
+  let pos = -1, from = 0;
+  while (true) {
+    const p = fullNorm.indexOf(target, from);
+    if (p === -1) break;
+    if (pos === -1) pos = p;
+    if (ctx) {
+      const before = fullNorm.slice(Math.max(0, p - 24), p);
+      if (before.includes(ctx.slice(-Math.min(ctx.length, 20)))) { pos = p; break; }
+      from = p + 1;
+    } else break;
+  }
+  if (pos === -1) return null;
+  const startPt = map[fullIdx[pos]];
+  const lastPt = map[fullIdx[pos + target.length - 1]];
+  if (!startPt || !lastPt) return null;
+  const range = document.createRange();
+  range.setStart(startPt.node, startPt.offset);
+  range.setEnd(lastPt.node, lastPt.offset + 1);
+  return range;
+}
+
 const ListeningTest = ({
   question,
   onAnswerChange,
@@ -56,6 +243,11 @@ const ListeningTest = ({
 
 
   const [mainText, setMainText] = useState('');
+  // Re-trigger for the review-mode highlight/note re-restore (see observer effect
+  // below): the React-built question area is re-rendered from mainText and wipes
+  // manually-applied spans, so we re-apply them when they go missing.
+  const [restoreNonce, setRestoreNonce] = useState(0);
+  const reRestoreAttemptsRef = useRef(0);
   const [inputs, setInputs] = useState({});
   const [questionMap, setQuestionMap] = useState({});
   const [multipleChoiceQuestions, setMultipleChoiceQuestions] = useState([]);
@@ -167,18 +359,18 @@ const ListeningTest = ({
       return;
     }
 
-    if (highlightMenu.selection) {
-      // Store the selection properly
-      const selection = window.getSelection();
-      const range = selection.getRangeAt(0);
-
+    // Use the range captured when the menu opened (highlightMenu.range), NOT a
+    // fresh window.getSelection(): on iPad, tapping "Add Note" collapses the live
+    // selection first, so getRangeAt(0) would be empty — which is why Add Note
+    // "didn't work" on iPad while Highlight (which reuses the stored range) did.
+    if (highlightMenu.range) {
       setNoteDialog({
         visible: true,
         x: highlightMenu.x,
         y: highlightMenu.y + 40,
         text: '',
-        selection: selection,
-        range: range.cloneRange() // Store a clone of the range
+        selection: highlightMenu.selection,
+        range: highlightMenu.range.cloneRange() // snapshot clone
       });
       setHighlightMenu(prev => ({ ...prev, visible: false }));
     }
@@ -219,43 +411,30 @@ const ListeningTest = ({
           // Generate signature
           const signature = `${contextBefore}|${selectedText}|${contextAfter}`;
 
-          const span = document.createElement('span');
-          span.className = 'highlighted-text with-note';
-          span.style.backgroundColor = '#d1fae5';
-          span.style.borderBottom = '2px solid #10b981';
-          span.style.position = 'relative';
-          span.style.cursor = 'pointer';
-
-          // Store note data
           const noteId = Date.now().toString();
-          span.dataset.noteId = noteId;
-          span.setAttribute('data-note', 'true');
-          span.setAttribute('data-part', currentPart.toString());
-          span.setAttribute('data-timestamp', noteId);
-          span.setAttribute('data-signature', signature);
 
-          // Create note indicator
-          const noteIndicator = document.createElement('span');
-          noteIndicator.className = 'note-indicator';
-          noteIndicator.style.position = 'absolute';
-          noteIndicator.style.top = '-8px';
-          noteIndicator.style.right = '-8px';
-          noteIndicator.style.backgroundColor = '#6ee7b7';
-          noteIndicator.style.borderRadius = '50%';
-          noteIndicator.style.width = '16px';
-          noteIndicator.style.height = '16px';
-          noteIndicator.style.display = 'flex';
-          noteIndicator.style.alignItems = 'center';
-          noteIndicator.style.justifyContent = 'center';
-          noteIndicator.style.fontSize = '12px';
-          noteIndicator.innerHTML = '📝';
-          span.appendChild(noteIndicator);
+          const openNote = (e, id) => {
+            const latest = JSON.parse(localStorage.getItem('ielts-notes') || '[]').find(n => n.id === id);
+            setNoteDialog({
+              visible: true,
+              x: e.clientX,
+              y: e.clientY,
+              text: latest ? latest.text : noteDialog.text,
+              selection: null,
+              noteId: id,
+              range: null
+            });
+          };
 
-          // Create a new range with only text nodes
-          const textContent = range.cloneContents();
-          span.appendChild(textContent);
-          range.deleteContents();
-          range.insertNode(span);
+          // Wrap each text node the selection touches (safe across line breaks
+          // and table cells — never deletes content or breaks table structure)
+          const spans = wrapRangeInNoteGroup(range, { noteId, part: currentPart, timestamp: noteId });
+          if (!spans.length) {
+            setNoteDialog(prev => ({ ...prev, visible: false }));
+            return;
+          }
+          spans.forEach((s) => s.setAttribute('data-signature', signature));
+          decorateNoteSpans(spans, noteId, openNote);
 
           // Save note to localStorage
           const noteData = {
@@ -273,27 +452,7 @@ const ListeningTest = ({
           localStorage.setItem('ielts-notes', JSON.stringify(savedNotes));
 
           // Save note to component state
-          setNotes(prev => [...prev, noteData]);
-
-          // Add click handler to show note. Read the latest text from
-          // localStorage at click time — capturing noteData.text in the
-          // closure shows stale text after the note has been edited, which
-          // made edits look like they never saved.
-          span.addEventListener('click', (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            const latestNotes = JSON.parse(localStorage.getItem('ielts-notes') || '[]');
-            const latestNote = latestNotes.find(n => n.id === noteId);
-            setNoteDialog({
-              visible: true,
-              x: e.clientX,
-              y: e.clientY,
-              text: latestNote ? latestNote.text : noteData.text,
-              selection: null,
-              noteId: noteId,
-              range: null
-            });
-          });
+          setNotes(prev => (Array.isArray(prev) ? [...prev, noteData] : [noteData]));
         } catch (error) {
           console.error('Error while creating note:', error);
         }
@@ -327,13 +486,17 @@ const ListeningTest = ({
       return;
     }
 
-    const span = document.querySelector(`[data-note-id="${noteId}"]`);
-    if (span) {
-      const parent = span.parentNode;
-      while (span.firstChild) {
-        parent.insertBefore(span.firstChild, span);
-      }
-      parent.removeChild(span);
+    const spans = document.querySelectorAll(`[data-note-id="${noteId}"]`);
+    if (spans.length) {
+      spans.forEach((span) => {
+        span.querySelectorAll('.note-indicator').forEach((ind) => ind.remove());
+        const parent = span.parentNode;
+        if (!parent) return;
+        while (span.firstChild) {
+          parent.insertBefore(span.firstChild, span);
+        }
+        parent.removeChild(span);
+      });
 
       // Remove note from state
       setNotes(prev => prev.filter(note => note.id !== noteId));
@@ -2302,7 +2465,7 @@ const ListeningTest = ({
         selection: null,
         range: null,
         clearMode: true,
-        clickedHighlightId: highlightEl.id
+        clickedHighlightId: (highlightEl.getAttribute("data-highlight-group") || highlightEl.id)
       });
       return;
     }
@@ -2318,7 +2481,7 @@ const ListeningTest = ({
           x: e.clientX,
           y: e.clientY,
           selection: selectionText,
-          range: range,
+          range: range.cloneRange(),
           clearMode: false,
           clickedHighlightId: null
         });
@@ -2327,6 +2490,39 @@ const ListeningTest = ({
   };
 
   // Right-click context menu handler (YouPass-style)
+  // Touch (iPad/mobile): onMouseUp never fires. Show our highlight menu from the
+  // selection rect (touch coords are unreliable) so highlighting works on iPad.
+  const handleTouchEnd = (e) => {
+    if (location?.state?.fromResultReview) return;
+    const touch = e.changedTouches && e.changedTouches[0];
+    const tx = touch ? touch.clientX : 0;
+    const ty = touch ? touch.clientY : 0;
+
+    const highlightEl = e.target.closest && e.target.closest('[data-highlight="true"]');
+    if (highlightEl && window.getSelection().toString().trim().length === 0) {
+      setHighlightMenu({ visible: true, x: tx, y: ty, selection: null, range: null, clearMode: true, clickedHighlightId: (highlightEl.getAttribute("data-highlight-group") || highlightEl.id) });
+      return;
+    }
+
+    setTimeout(() => {
+      const selection = window.getSelection();
+      const selectionText = selection.toString().trim();
+      if (selectionText.length > 0) {
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        setHighlightMenu({
+          visible: true,
+          x: rect.left + Math.min(rect.width / 2, 80),
+          y: rect.bottom + 8,
+          selection: selectionText,
+          range: range.cloneRange(),
+          clearMode: false,
+          clickedHighlightId: null
+        });
+      }
+    }, 80);
+  };
+
   const handleContextMenu = (e) => {
     // Don't allow in review mode
     if (location?.state?.fromResultReview) {
@@ -2347,7 +2543,7 @@ const ListeningTest = ({
         selection: null,
         range: null,
         clearMode: true,
-        clickedHighlightId: highlightEl.id
+        clickedHighlightId: (highlightEl.getAttribute("data-highlight-group") || highlightEl.id)
       });
       return;
     }
@@ -2363,7 +2559,7 @@ const ListeningTest = ({
         x: e.clientX,
         y: e.clientY,
         selection: selectionText,
-        range: range,
+        range: range.cloneRange(),
         clearMode: false,
         clickedHighlightId: null
       });
@@ -2394,31 +2590,25 @@ const ListeningTest = ({
       const parentHighlight = rangeStartEl?.closest?.('[data-highlight="true"]');
       const highlightLevel = parentHighlight ? 2 : 1;
 
-      // Create a new span element for the highlight
-      const span = document.createElement('span');
-      span.className = highlightLevel === 2
-        ? 'ielts-highlight ielts-highlight-l2'
-        : 'ielts-highlight ielts-highlight-l1';
-      span.setAttribute('data-highlight', 'true');
-      span.setAttribute('data-level', highlightLevel.toString());
-      span.setAttribute('data-part', currentPart.toString());
-      span.setAttribute('data-timestamp', new Date().getTime());
+      const timestamp = new Date().getTime();
+      const highlightId = `highlight-${timestamp}-${Math.random().toString(36).substring(2, 9)}`;
 
-      // Create a unique ID for this highlight
-      const highlightId = `highlight-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-      span.setAttribute('id', highlightId);
-
-      // Apply the highlight. surroundContents() throws when the selection
-      // crosses an element boundary (e.g. partially over an existing
-      // highlight) — fall back to extract + wrap so highlight-on-highlight
-      // works like IDP/BC.
-      try {
-        highlightMenu.range.surroundContents(span);
-      } catch (wrapError) {
-        const fragment = highlightMenu.range.extractContents();
-        span.appendChild(fragment);
-        highlightMenu.range.insertNode(span);
+      // Wrap EACH text node the selection touches (one shared group id). A range
+      // crossing a line/paragraph makes surroundContents throw and the old
+      // extract+insert fallback dropped text — per-text-node wrapping never loses
+      // content.
+      const spans = wrapRangeInHighlightGroup(highlightMenu.range, {
+        groupId: highlightId,
+        level: highlightLevel,
+        part: currentPart,
+        timestamp,
+      });
+      if (!spans.length) {
+        setHighlightMenu(prev => ({ ...prev, visible: false }));
+        window.getSelection().removeAllRanges();
+        return;
       }
+      const span = spans[0]; // anchor for signature below
 
       // Generate a unique signature for this highlight position
       const range = highlightMenu.range;
@@ -2436,7 +2626,6 @@ const ListeningTest = ({
       };
 
       // Save highlight to local storage with signature and rangeInfo
-      const timestamp = new Date().getTime();
       const highlightData = {
         id: highlightId,
         text: highlightMenu.selection,
@@ -2495,34 +2684,32 @@ const ListeningTest = ({
       return;
     }
 
-    const highlightElement = document.getElementById(highlightId);
-    if (highlightElement) {
-      // Get the parent node
-      const parent = highlightElement.parentNode;
+    // A multi-line highlight is several spans sharing one data-highlight-group;
+    // resolve the group from the clicked id, then unwrap ALL its spans.
+    const clickedEl = document.getElementById(highlightId);
+    const group = (clickedEl && clickedEl.getAttribute('data-highlight-group')) || highlightId;
+    const scope = document.getElementById('ielts-content-area') || document;
+    let groupEls = Array.from(scope.querySelectorAll(`[data-highlight-group="${group}"]`));
+    if (!groupEls.length && clickedEl) groupEls = [clickedEl];
 
-      // Create a document fragment to hold the highlight's children
+    groupEls.forEach((el) => {
+      const parent = el.parentNode;
+      if (!parent) return;
       const fragment = document.createDocumentFragment();
+      while (el.firstChild) fragment.appendChild(el.firstChild);
+      parent.replaceChild(fragment, el);
+      if (parent.normalize) parent.normalize();
+    });
 
-      // Move all children from the highlight to the fragment
-      while (highlightElement.firstChild) {
-        fragment.appendChild(highlightElement.firstChild);
-      }
-
-      // Replace the highlight with its children
-      parent.replaceChild(fragment, highlightElement);
-
-      // Update the highlights array
-      setHighlights(prev => prev.filter(h => h.id !== highlightId));
-
-      // Remove from localStorage - use the ID directly
+    if (groupEls.length) {
+      setHighlights(prev => prev.filter(h => h.id !== group));
       const savedHighlights = JSON.parse(localStorage.getItem('ielts-highlights') || '[]');
+      // Check both id and timestamp-based matching for backward compatibility
+      // (highlights saved by the older engine may carry no id).
+      const groupTimestamp = String(group).split('-')[1];
       const updatedHighlights = savedHighlights.filter(h => {
-        // Check both id and timestamp-based matching for backward compatibility
-        if (h.id === highlightId) return false;
-
-        // Fallback to timestamp matching if IDs don't match
-        const highlightTimestamp = highlightId.split('-')[1];
-        return h.timestamp?.toString() !== highlightTimestamp;
+        if (h.id === group) return false;
+        return h.timestamp?.toString() !== groupTimestamp;
       });
       localStorage.setItem('ielts-highlights', JSON.stringify(updatedHighlights));
     }
@@ -2652,6 +2839,42 @@ const ListeningTest = ({
     }
   }, [examData?.exam_id]); // Remove currentPart from dependencies as we want to load all notes once
 
+  // Review mode re-renders the React-built question area (#ielts-content-area)
+  // from mainText and wipes the manually-applied highlight/note spans (listening
+  // has no static passage, so ALL highlights live here). Re-trigger the restore
+  // whenever an expected span goes missing; capped to avoid an endless loop on a
+  // genuinely un-matchable highlight.
+  useEffect(() => { reRestoreAttemptsRef.current = 0; }, [currentPart, examData?.exam_id]);
+  useEffect(() => {
+    if (!isReviewMode || !examData?.exam_id) return;
+    const contentArea = document.getElementById('ielts-content-area');
+    if (!contentArea) return;
+    let timer;
+    const check = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (reRestoreAttemptsRef.current >= 12) return;
+        try {
+          const hs = JSON.parse(localStorage.getItem('ielts-highlights') || '[]')
+            .filter(h => h.examId === examData.exam_id && h.part === currentPart)
+            .map(h => h.id || `highlight-${h.timestamp}`);
+          const ns = JSON.parse(localStorage.getItem('ielts-notes') || '[]')
+            .filter(n => n.examId === examData.exam_id && n.part === currentPart && n.id);
+          const hMissing = hs.some(id => !contentArea.querySelector(`#${CSS.escape(id)}`) &&
+            !contentArea.querySelector(`[data-highlight-group="${id}"]`));
+          const nMissing = ns.some(n => !contentArea.querySelector(`[data-note-id="${n.id}"]`));
+          if (hMissing || nMissing) {
+            reRestoreAttemptsRef.current += 1;
+            setRestoreNonce(v => v + 1);
+          }
+        } catch (e) { /* ignore */ }
+      }, 180);
+    };
+    const observer = new MutationObserver(check);
+    observer.observe(contentArea, { childList: true, subtree: true });
+    return () => { observer.disconnect(); clearTimeout(timer); };
+  }, [isReviewMode, examData?.exam_id, currentPart]);
+
   // Add this new function to restore highlights and notes to DOM
   useEffect(() => {
     const restoreHighlightsAndNotesToDOM = () => {
@@ -2772,7 +2995,7 @@ const ListeningTest = ({
                   }
                 }
 
-                // Create highlight span
+                // Create highlight span (preserve the saved level: 2 = pink re-highlight)
                 const span = document.createElement('span');
                 span.className = restoreLevel === 2
                   ? 'ielts-highlight ielts-highlight-l2'
@@ -2785,6 +3008,7 @@ const ListeningTest = ({
                 // Use existing ID or generate a new one
                 const highlightId = highlight.id || `highlight-${highlight.timestamp}-${Math.random().toString(36).substring(2, 9)}`;
                 span.setAttribute('id', highlightId);
+                span.setAttribute('data-highlight-group', highlightId);
 
                 // Store context information to help with future restoration
                 if (!highlight.rangeInfo) {
@@ -2816,6 +3040,24 @@ const ListeningTest = ({
                 console.warn('Could not restore highlight:', error);
               }
             }
+
+            // Multi-line fallback: text spans several nodes (crosses a line/
+            // paragraph) so no single-node match — locate a cross-node range and
+            // wrap each text node in a shared group.
+            if (potentialMatches.length === 0) {
+              try {
+                const ctxBefore = highlight.rangeInfo?.contextBefore || '';
+                const multiRange = findCrossNodeRange(contentArea, highlight.text, ctxBefore);
+                if (multiRange) {
+                  wrapRangeInHighlightGroup(multiRange, {
+                    groupId: highlight.id || `highlight-${highlight.timestamp}-${Math.random().toString(36).substring(2, 9)}`,
+                    level: highlight.level === 2 ? 2 : 1,
+                    part: highlight.part,
+                    timestamp: highlight.timestamp,
+                  });
+                }
+              } catch (e) { console.warn('Multi-line highlight restore failed:', e); }
+            }
           });
         }
 
@@ -2826,121 +3068,52 @@ const ListeningTest = ({
             if (note.part !== currentPart) return;
 
             // Skip if this note is already rendered in the DOM
-            const existingNoteEl = contentArea.querySelector(`[data-note-id="${note.id}"]`);
-            if (existingNoteEl) return;
+            if (contentArea.querySelector(`[data-note-id="${note.id}"]`)) return;
 
-            // Find text nodes that match the note text
-            const walker = document.createTreeWalker(
-              contentArea,
-              NodeFilter.SHOW_TEXT,
-              null,
-              false
-            );
+            const openNote = (e, id) => {
+              const latest = JSON.parse(localStorage.getItem('ielts-notes') || '[]').find(n => n.id === id);
+              setNoteDialog({
+                visible: true,
+                x: e.clientX,
+                y: e.clientY,
+                text: latest ? latest.text : note.text,
+                selection: null,
+                noteId: id,
+                range: null
+              });
+            };
+            const applyRange = (range) => {
+              const existing = range.startContainer.parentElement;
+              if (existing && existing.closest && existing.closest('[data-note="true"]')) return false;
+              const spans = wrapRangeInNoteGroup(range, { noteId: note.id, part: note.part, timestamp: note.timestamp });
+              if (!spans.length) return false;
+              spans.forEach((s) => s.setAttribute('data-signature', note.signature || ''));
+              decorateNoteSpans(spans, note.id, openNote);
+              return true;
+            };
 
-            // Keep track of which notes we've already restored
-            const processedNotes = new Set();
-
+            // Fast path: exact match inside a single text node.
+            const walker = document.createTreeWalker(contentArea, NodeFilter.SHOW_TEXT, null, false);
             let textNode;
-            while (textNode = walker.nextNode()) {
-              const text = textNode.textContent;
-              const noteIndex = text.indexOf(note.selectedText);
+            let done = false;
+            while (!done && (textNode = walker.nextNode())) {
+              const idx = textNode.textContent.indexOf(note.selectedText);
+              if (idx === -1) continue;
+              try {
+                const range = document.createRange();
+                range.setStart(textNode, idx);
+                range.setEnd(textNode, idx + note.selectedText.length);
+                if (applyRange(range)) done = true;
+              } catch (error) { /* try next node / fallback */ }
+            }
 
-              // Skip if text not found
-              if (noteIndex === -1) continue;
-
-              {
-                // Generate signature for current position
-                const contextBefore = text.slice(Math.max(0, noteIndex - 20), noteIndex);
-                const contextAfter = text.slice(noteIndex + note.selectedText.length, Math.min(text.length, noteIndex + note.selectedText.length + 20));
-                const currentSignature = `${contextBefore}|${note.selectedText}|${contextAfter}`;
-
-                // Check if signatures match (preferred), or fallback to simple text match
-                const isSignatureMatch = !note.signature || note.signature === currentSignature;
-
-                // Only process this note if we haven't already restored it
-                // and if the signature matches (or no signature was saved)
-                if (isSignatureMatch && !processedNotes.has(note.id)) {
-                  try {
-                    // Create range for the found text
-                    const range = document.createRange();
-                    range.setStart(textNode, noteIndex);
-                    range.setEnd(textNode, noteIndex + note.selectedText.length);
-
-                    // Check if this text is already noted or highlighted
-                    const existingElement = range.commonAncestorContainer.parentElement;
-                    if (existingElement && (existingElement.hasAttribute('data-note') || existingElement.hasAttribute('data-highlight'))) {
-                      continue; // Skip if already noted or highlighted
-                    }
-
-                    // Create note span
-                    const span = document.createElement('span');
-                    span.className = 'highlighted-text with-note';
-                    span.style.backgroundColor = '#d1fae5';
-                    span.style.borderBottom = '2px solid #10b981';
-                    span.style.position = 'relative';
-                    span.style.cursor = 'pointer';
-                    span.setAttribute('data-note', 'true');
-                    span.setAttribute('data-part', note.part.toString());
-                    span.setAttribute('data-timestamp', note.timestamp);
-                    span.setAttribute('data-signature', note.signature);
-                    span.dataset.noteId = note.id;
-
-                    // Create note indicator
-                    const noteIndicator = document.createElement('span');
-                    noteIndicator.className = 'note-indicator';
-                    noteIndicator.style.position = 'absolute';
-                    noteIndicator.style.top = '-8px';
-                    noteIndicator.style.right = '-8px';
-                    noteIndicator.style.backgroundColor = '#6ee7b7';
-                    noteIndicator.style.borderRadius = '50%';
-                    noteIndicator.style.width = '16px';
-                    noteIndicator.style.height = '16px';
-                    noteIndicator.style.display = 'flex';
-                    noteIndicator.style.alignItems = 'center';
-                    noteIndicator.style.justifyContent = 'center';
-                    noteIndicator.style.fontSize = '12px';
-                    noteIndicator.innerHTML = '📝';
-                    span.appendChild(noteIndicator);
-
-                    // Apply the note - preserving the original content including blank spaces
-                    const rangeContents = range.cloneContents();
-                    span.appendChild(rangeContents);
-                    range.deleteContents();
-                    range.insertNode(span);
-
-                    // Mark this note as processed
-                    processedNotes.add(note.id);
-
-                    // Store the exact position information
-                    span.setAttribute('data-position', JSON.stringify({
-                      textContent: text,
-                      offset: noteIndex
-                    }));
-
-                    // Add click handler to show note. Read the latest text from
-                    // localStorage at click time — the closure would otherwise
-                    // show stale text after the note has been edited.
-                    span.addEventListener('click', (e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      const latestNotes = JSON.parse(localStorage.getItem('ielts-notes') || '[]');
-                      const latestNote = latestNotes.find(n => n.id === note.id);
-                      setNoteDialog({
-                        visible: true,
-                        x: e.clientX,
-                        y: e.clientY,
-                        text: latestNote ? latestNote.text : note.text,
-                        selection: null,
-                        noteId: note.id,
-                        range: null
-                      });
-                    });
-
-                    break; // Found and noted, move to next note
-                  } catch (error) {
-                    console.warn('Could not restore note:', error);
-                  }
-                }
+            // Fallback: the selection spans a line break / table cells.
+            if (!done) {
+              try {
+                const range = findCrossNodeRange(contentArea, note.selectedText, '');
+                if (range) applyRange(range);
+              } catch (error) {
+                console.warn('Could not restore multi-line note:', error);
               }
             }
           });
@@ -2952,7 +3125,7 @@ const ListeningTest = ({
     if (mainText && (highlights.length > 0 || notes.length > 0)) {
       restoreHighlightsAndNotesToDOM();
     }
-  }, [highlights, notes, mainText, currentPart, colorTheme, examData?.exam_id]);
+  }, [highlights, notes, mainText, currentPart, colorTheme, examData?.exam_id, restoreNonce]);
 
   // Effect to apply retake mode styling
   useEffect(() => {
@@ -3159,6 +3332,7 @@ const ListeningTest = ({
         id="ielts-content-area"
         onContextMenu={handleContextMenu}
         onMouseUp={handleTextSelection}
+        onTouchEnd={handleTouchEnd}
       >
         {renderContent()}
       </div>
