@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
-import { Search, Lock, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { Search, Lock, ChevronLeft, ChevronRight, Sparkles, History } from 'lucide-react';
 import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
 import Seo from './Seo';
@@ -48,6 +48,29 @@ const WritingForecast = () => {
   const itemsPerPage = 6;
   const userRole = localStorage.getItem('role');
   const isLoggedIn = !!(secureStorage.getItem('token') || localStorage.getItem('token'));
+  // VN port: per-part attempt history dropdown.
+  const [histOpen, setHistOpen] = useState(null);   // `${exam_id}-${part_number}`
+  const [histData, setHistData] = useState({});
+  const [histLoading, setHistLoading] = useState({});
+  const openHist = async (examId, partNumber) => {
+    const key = `${examId}-${partNumber}`;
+    if (histOpen === key) { setHistOpen(null); return; }
+    setHistOpen(key);
+    if (histData[key] !== undefined) return;
+    setHistLoading((p) => ({ ...p, [key]: true }));
+    try {
+      const token = secureStorage.getItem('token') || localStorage.getItem('token');
+      const r = await fetch(`${API_BASE}/student/writing/forecast-history/${examId}/${partNumber}`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      const data = r.ok ? await r.json() : [];
+      setHistData((p) => ({ ...p, [key]: data }));
+    } catch (e) {
+      setHistData((p) => ({ ...p, [key]: [] }));
+    } finally {
+      setHistLoading((p) => ({ ...p, [key]: false }));
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -85,7 +108,8 @@ const WritingForecast = () => {
             task2_type: p.task2_type || exam.task2_type || null,
             difficulty_label: p.difficulty_label || null,
             forecast_level: p.forecast_level || null,
-            occurrence_count: p.occurrence_count || 0
+            occurrence_count: p.occurrence_count || 0,
+            band: p.band ?? null   // this user's AI band (VN port)
           }));
         });
         setItems(flat);
@@ -304,10 +328,52 @@ const WritingForecast = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {paginated.map((it, index) => (
                 <div key={it.task_id} className="bg-white rounded-lg shadow border border-gray-100 p-4 relative">
-                  <h3 className="text-lg font-semibold text-gray-800">
+                  <div className="flex items-start justify-between gap-2">
+                  <h3 className="text-lg font-semibold text-gray-800 min-w-0">
                     <span className="text-[#0096b1] italic mr-2">Writing:</span>
                     <span>{it.title}</span>
                   </h3>
+                  {isLoggedIn && it.band != null && (() => {
+                    const key = `${it.exam_id}-${it.part_number}`;
+                    return (
+                      <div className="relative shrink-0">
+                        {histOpen === key && <div className="fixed inset-0 z-40" onClick={() => setHistOpen(null)} />}
+                        <button onClick={() => openHist(it.exam_id, it.part_number)} title="Writing attempt history"
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200">
+                          <History className="w-4 h-4" /> History
+                          <ChevronRight className={`w-3.5 h-3.5 transition-transform ${histOpen === key ? 'rotate-90' : ''}`} />
+                        </button>
+                        {histOpen === key && (() => {
+                          const attempts = histData[key] || [];
+                          const versions = [{ key: 'cur', label: 'Current attempt', band: it.band }];
+                          attempts.forEach((a) => versions.push({ key: `a${a.attempt_number}`, label: `Attempt ${a.attempt_number}`, band: a.band, date: a.created_at, attempt_number: a.attempt_number }));
+                          return (
+                            <div className="absolute right-0 mt-2 w-60 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden text-left">
+                              <div className="p-3 border-b border-gray-50 bg-gray-50/50"><h4 className="text-sm font-semibold text-gray-700">Attempt history</h4></div>
+                              <div className="max-h-56 overflow-y-auto">
+                                {histLoading[key] ? (
+                                  <div className="p-6 text-center"><div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#0096b1] mx-auto" /></div>
+                                ) : (<>
+                                  {versions.slice(0, 3).map((v) => (
+                                    <button key={v.key} onClick={() => { setHistOpen(null); navigate('/writing_review', { state: { testId: it.exam_id, isForecast: true, partNumber: it.part_number, attemptNumber: v.attempt_number } }); }}
+                                      className="w-full p-3 text-left hover:bg-[#0096b1]/5 border-b border-gray-50 transition-colors">
+                                      <div className="flex justify-between items-center">
+                                        <span className="text-sm font-semibold text-gray-700">{v.label}</span>
+                                        {v.band != null ? <span className="text-base font-bold text-[#0096b1] bg-[#0096b1]/10 px-2.5 py-1 rounded">Band {v.band}</span> : <span className="text-xs text-gray-400">Not graded</span>}
+                                      </div>
+                                      {v.date && <div className="text-xs text-gray-400 mt-0.5">{new Date(v.date).toLocaleDateString()}</div>}
+                                    </button>
+                                  ))}
+                                  <button onClick={() => { setHistOpen(null); navigate('/exam-history'); }} className="w-full text-center p-3 block text-sm font-semibold text-[#0096b1] hover:bg-[#0096b1]/5 transition-colors">View all history</button>
+                                </>)}
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    );
+                  })()}
+                  </div>
                   <div className="text-sm text-gray-600 mt-1">Exam: {it.exam_title}</div>
                   {(it.difficulty_label || it.forecast_level) && (
                     <div className="mt-2 flex items-center gap-2">
@@ -333,17 +399,23 @@ const WritingForecast = () => {
                       used here, but its display:-webkit-box + overflow:hidden clipped
                       images entirely from view. Cards can grow taller now. */}
                   <div className="mt-3 text-gray-700 [&_img]:max-w-full [&_img]:h-auto" dangerouslySetInnerHTML={{ __html: it.instructions }} />
+                  {it.band != null && (
+                    <div className="mt-3 flex items-center justify-center gap-2 rounded-lg bg-[#0096b1]/5 border border-[#0096b1]/20 py-1.5">
+                      <span className="text-xs text-gray-500">Your band:</span>
+                      <span className="text-lg font-extrabold text-[#0096b1]">{it.band}</span>
+                    </div>
+                  )}
                   <button
                     onClick={() => {
                       if (!secureStorage.getItem('token') && !localStorage.getItem('token')) {
                         navigate('/login');
                         return;
                       }
-                      navigate('/writing_test_room', { state: { taskId: it.task_id, testId: it.exam_id, isForecast: true } });
+                      navigate('/writing_test_room', { state: { taskId: it.task_id, testId: it.exam_id, isForecast: true, partNumber: it.part_number } });
                     }}
-                    className="mt-4 w-full bg-[#0096b1] text-white py-2 rounded"
+                    className={`mt-4 w-full text-white py-2 rounded ${it.band != null ? 'bg-[#eb7e37] hover:bg-[#d66e2a]' : 'bg-[#0096b1]'}`}
                   >
-                    Take Practice
+                    {it.band != null ? 'Retake' : 'Take Practice'}
                   </button>
                   {isLoggedIn && (
                     <button

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Play, Search, ChevronLeft, ChevronRight, Sparkles, RotateCw, Bot, Lock } from 'lucide-react';
+import { Play, Search, ChevronLeft, ChevronRight, Sparkles, RotateCw, Bot, Lock, History } from 'lucide-react';
 import ConfirmDialog from './ConfirmDialog';
+import TestModeDialog from './TestModeDialog';
 import Navbar from './Navbar';
 import { create } from 'framer-motion/m';
 import { checkExamAccess } from '../utils/examAccess';
@@ -30,6 +31,11 @@ const Writing_Fe = () => {
   const testsPerPage = 6;
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedTest, setSelectedTest] = useState(null);
+  // VN port: Practice / Mock Exam picker + per-card attempt history.
+  const [modeForTest, setModeForTest] = useState(null);
+  const [histOpen, setHistOpen] = useState(null);   // test_id whose history dropdown is open
+  const [histData, setHistData] = useState({});     // test_id -> attempts
+  const [histLoading, setHistLoading] = useState({});
 
   useEffect(() => {
     const handleScroll = () => {
@@ -115,7 +121,8 @@ const Writing_Fe = () => {
               parts: exam.parts,
               is_completed: exam.is_completed,
               difficultyAvg: exam.difficulty_avg ?? null,
-              occurrenceSum: exam.occurrence_sum || 0
+              occurrenceSum: exam.occurrence_sum || 0,
+              overall_band: exam.overall_band ?? null
             }));
             setTests(mapped);
           }
@@ -159,14 +166,33 @@ const Writing_Fe = () => {
       setSelectedTest(test);
       setDialogOpen(true);
     } else {
-      navigate(`/writing_test_room`, {
-        state: {
-          taskId: test.parts[0].task_id,
-          testId: test.test_id,
-          testTitle: test.title
-        }
-      });
+      setModeForTest(test);   // pick Practice / Mock Exam first (VN port)
     }
+  };
+
+  const startTestWithMode = (mode) => {
+    const test = modeForTest;
+    setModeForTest(null);
+    if (test) navigate(`/writing_test_room`, {
+      state: { taskId: test.parts[0].task_id, testId: test.test_id, testTitle: test.title, mode }
+    });
+  };
+
+  // VN port: per-card history dropdown (current graded version + past attempts).
+  const openHist = async (testId) => {
+    if (histOpen === testId) { setHistOpen(null); return; }
+    setHistOpen(testId);
+    if (histData[testId]) return;
+    setHistLoading((prev) => ({ ...prev, [testId]: true }));
+    try {
+      const token = secureStorage.getItem('token') || localStorage.getItem('token');
+      const r = await fetchWithTimeout(`${API_BASE}/student/writing/test/${testId}/attempts`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = r.ok ? await r.json() : [];
+      setHistData((prev) => ({ ...prev, [testId]: data }));
+    } catch (e) { setHistData((prev) => ({ ...prev, [testId]: [] })); }
+    finally { setHistLoading((prev) => ({ ...prev, [testId]: false })); }
   };
 
   const handleConfirmReset = async () => {
@@ -191,13 +217,9 @@ const Writing_Fe = () => {
           setTests(updatedTests);
         }
 
-        navigate(`/writing_test_room`, {
-          state: {
-            taskId: selectedTest.parts[0].task_id,
-            testId: selectedTest.test_id,
-            testTitle: selectedTest.title
-          }
-        });
+        // The previous attempt is now a version in History; pick a mode for the retake.
+        setHistData((prev) => { const next = { ...prev }; delete next[selectedTest.test_id]; return next; });
+        setModeForTest(selectedTest);
       }
     } catch (error) {
       console.error('Error resetting test:', error);
@@ -291,10 +313,62 @@ const Writing_Fe = () => {
       className="bg-white rounded-lg shadow hover:shadow-md transition-all duration-300 border border-gray-100 p-2 relative"
     >
       <div className="p-4">
-        <h3 className="text-xl font-semibold text-gray-800 mb-2 flex items-center">
+        <div className="flex items-center justify-between gap-2 mb-2">
+        <h3 className="text-xl font-semibold text-gray-800 flex items-center min-w-0">
           <span className="text-[#0096b1] text-md italic mr-2">Test:</span>
           <span className="text-gray-700 truncate">{test.title}</span>
         </h3>
+          {(test.is_completed || test.overall_band != null) && (
+            <div className="relative shrink-0">
+              {histOpen === test.test_id && <div className="fixed inset-0 z-40" onClick={() => setHistOpen(null)} />}
+              <button onClick={() => openHist(test.test_id)} title="Writing attempt history"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200">
+                <History className="w-4 h-4" /> History
+                <ChevronRight className={`w-3.5 h-3.5 transition-transform ${histOpen === test.test_id ? 'rotate-90' : ''}`} />
+              </button>
+              {histOpen === test.test_id && (() => {
+                const attempts = histData[test.test_id] || [];
+                const versions = [];
+                if (test.is_completed) versions.push({ key: 'cur', label: 'Current attempt', overall: test.overall_band });
+                attempts.forEach((a) => versions.push({ key: `a${a.attempt_number}`, label: `Attempt ${a.attempt_number}`, overall: a.overall_band, date: a.created_at, attempt_number: a.attempt_number }));
+                return (
+                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden text-left">
+                    <div className="p-3 border-b border-gray-50 bg-gray-50/50">
+                      <h4 className="text-sm font-semibold text-gray-700">Attempt history</h4>
+                    </div>
+                    <div className="max-h-56 overflow-y-auto">
+                      {histLoading[test.test_id] ? (
+                        <div className="p-6 text-center"><div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#0096b1] mx-auto" /></div>
+                      ) : versions.length > 0 ? (
+                        <>
+                          {versions.slice(0, 3).map((v) => (
+                            <button key={v.key}
+                              onClick={() => { setHistOpen(null); navigate('/writing_review', { state: { testId: test.test_id, isForecast: false, attemptNumber: v.attempt_number } }); }}
+                              className="w-full p-3 text-left hover:bg-[#0096b1]/5 border-b border-gray-50 transition-colors">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-semibold text-gray-700">{v.label}</span>
+                                {v.overall != null
+                                  ? <span className="text-base font-bold text-[#0096b1] bg-[#0096b1]/10 px-2.5 py-1 rounded">Band {v.overall}</span>
+                                  : <span className="text-xs text-gray-400">Not graded</span>}
+                              </div>
+                              {v.date && <div className="text-xs text-gray-400 mt-0.5">{new Date(v.date).toLocaleDateString()}</div>}
+                            </button>
+                          ))}
+                          <button onClick={() => { setHistOpen(null); navigate('/exam-history'); }}
+                            className="w-full text-center p-3 block text-sm font-semibold text-[#0096b1] hover:bg-[#0096b1]/5 transition-colors">
+                            View all history
+                          </button>
+                        </>
+                      ) : (
+                        <div className="p-4 text-center text-gray-500 text-sm">No attempts yet.</div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+        </div>
 
         {(test.task1_type || test.task2_type) && (
           <div className="mb-2 flex flex-wrap gap-1">
@@ -308,6 +382,13 @@ const Writing_Fe = () => {
                 Task 2 · {test.task2_type.replace(/_/g, ' ')}
               </span>
             )}
+          </div>
+        )}
+
+        {test.overall_band != null && (
+          <div className="mb-3 flex items-center justify-center gap-2 rounded-lg bg-[#0096b1]/5 border border-[#0096b1]/20 py-1.5">
+            <span className="text-xs text-gray-500">Writing Overall:</span>
+            <span className="text-lg font-extrabold text-[#0096b1]">{test.overall_band}</span>
           </div>
         )}
 
@@ -444,9 +525,11 @@ const Writing_Fe = () => {
           </button>
         </div>
 
+        <TestModeDialog open={!!modeForTest} skill="writing" onSelect={startTestWithMode} onClose={() => setModeForTest(null)} />
+
         <ConfirmDialog
           isOpen={dialogOpen}
-          message="Starting a new attempt will delete your previous answers. Are you sure you want to continue?"
+          message="Retaking starts a new attempt. Your previous result is kept and you can review it in History. Do you want to continue?"
           onConfirm={handleConfirmReset}
           onCancel={() => {
             setDialogOpen(false);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Clock, BarChart2, ChevronRight, Search, ChevronLeft, Trophy, Target, TrendingUp, BookOpen, Award, Calendar, Headphones, FileText, Lock } from 'lucide-react';
+import { Clock, BarChart2, ChevronRight, Search, ChevronLeft, Trophy, Target, TrendingUp, BookOpen, Award, Calendar, Headphones, FileText, Lock, PenLine } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, defs } from 'recharts';
 import Navbar from './Navbar';
 import API_BASE from '../config/api';
@@ -44,6 +44,10 @@ const ExamHistory = () => {
   const [vipLoading, setVipLoading] = useState(true);
   const [chartPeriod, setChartPeriod] = useState('weekly'); // 'weekly' or 'monthly'
   const [examSubTab, setExamSubTab] = useState('fullTest'); // 'fullTest' or 'forecast'
+  // VN port: AI-graded Writing history (/student/writing/history).
+  const [writingExams, setWritingExams] = useState([]);
+  const [writingSearchQuery, setWritingSearchQuery] = useState('');
+  const [currentWritingPage, setCurrentWritingPage] = useState(1);
   const examsPerPage = 3;
   const navigate = useNavigate();
 
@@ -130,6 +134,16 @@ const ExamHistory = () => {
     };
 
     fetchExamHistory();
+
+    const fetchWritingHistory = async () => {
+      try {
+        const res = await fetchWithTimeout(`${API_BASE}/student/writing/history`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        if (res.ok) setWritingExams(await res.json());
+      } catch (e) { /* ignore */ }
+    };
+    fetchWritingHistory();
   }, []);
 
   const handleViewReadingDetails = async (exam) => {
@@ -334,6 +348,19 @@ const ExamHistory = () => {
     const matchesSubTab = examSubTab === 'fullTest' ? !exam.is_forecast : exam.is_forecast;
     return matchesSearch && matchesSubTab;
   });
+
+  // Writing history: filter by sub-tab (Mock Test = non-forecast incl. custom tasks;
+  // Practice Exercises = forecast) + search.
+  const filteredWritingExams = writingExams.filter((exam) => {
+    const matchesSearch = (exam.title || '').toLowerCase().includes(writingSearchQuery.toLowerCase());
+    const matchesSubTab = examSubTab === 'fullTest' ? !exam.is_forecast : exam.is_forecast;
+    return matchesSearch && matchesSubTab;
+  });
+  const indexOfLastWritingExam = currentWritingPage * examsPerPage;
+  const indexOfFirstWritingExam = indexOfLastWritingExam - examsPerPage;
+  const currentWritingExams = filteredWritingExams.slice(indexOfFirstWritingExam, indexOfLastWritingExam);
+  const totalWritingPages = Math.ceil(filteredWritingExams.length / examsPerPage);
+  const bandColor = (sc) => { const n = Number(sc) || 0; return n >= 6.5 ? 'text-green-600' : n >= 5 ? 'text-amber-600' : 'text-red-600'; };
 
   const indexOfLastReadingExam = currentReadingPage * examsPerPage;
   const indexOfFirstReadingExam = indexOfLastReadingExam - examsPerPage;
@@ -575,9 +602,25 @@ const ExamHistory = () => {
                   {listeningStats.totalExams}
                 </span>
               </button>
+              <button
+                onClick={() => setActiveTab('writing')}
+                className={`flex items-center gap-2 px-4 sm:px-6 py-3 rounded-lg text-sm sm:text-base font-semibold transition-all duration-300 ${activeTab === 'writing'
+                  ? 'bg-[#0096b1] text-white shadow-lg'
+                  : 'text-gray-600 hover:text-[#0096b1]'
+                  }`}
+              >
+                <PenLine className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Writing</span>
+                <span className={`ml-1 px-2 py-0.5 rounded-full text-xs ${activeTab === 'writing' ? 'bg-[#33b3c7] text-white' : 'bg-gray-200 text-gray-600'
+                  }`}>
+                  {writingExams.length}
+                </span>
+              </button>
             </div>
           </div>
 
+          {/* Reading/Listening stats + chart (Writing has its own band cards below) */}
+          {activeTab !== 'writing' && (<>
           {/* Selected Skill Stats Card */}
           <div className={`rounded-2xl p-6 text-white shadow-lg mb-8 transition-all duration-300 ${activeTab === 'reading'
             ? 'bg-gradient-to-br from-blue-500 to-blue-700'
@@ -724,6 +767,7 @@ const ExamHistory = () => {
               )}
             </div>
           </div>
+          </>)}
         </div>
 
         {/* Tabbed Exams Section */}
@@ -763,10 +807,10 @@ const ExamHistory = () => {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900">
-                  Exam History {activeTab === 'reading' ? 'Reading' : 'Listening'}
+                  Exam History {{ reading: 'Reading', listening: 'Listening', writing: 'Writing' }[activeTab]}
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Review completed {activeTab === 'reading' ? 'Reading' : 'Listening'} exams
+                  Review completed {{ reading: 'Reading', listening: 'Listening', writing: 'Writing' }[activeTab]} exams
                 </p>
               </div>
               {/* Mock Test / Practice Exercises Sub-tabs */}
@@ -1100,6 +1144,75 @@ const ExamHistory = () => {
                             <ChevronRight className="w-4 h-4" />
                           </button>
                         </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+            {/* Writing Tab Content (VN port) */}
+            {activeTab === 'writing' && (
+              <>
+                <div className="flex justify-end mb-6">
+                  <div className="relative w-full sm:w-64">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="text"
+                      placeholder="Search Writing tests..."
+                      className="pl-12 pr-4 py-3 border border-gray-200 rounded-xl w-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#0096b1] focus:border-transparent"
+                      value={writingSearchQuery}
+                      onChange={(e) => { setWritingSearchQuery(e.target.value); setCurrentWritingPage(1); }}
+                    />
+                  </div>
+                </div>
+                {currentWritingExams.length === 0 ? (
+                  <div className="text-center py-12">
+                    <PenLine className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-500 text-lg">No AI-graded Writing yet</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {currentWritingExams.map((exam) => (
+                        <div key={exam.test_id} className="border border-gray-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all flex flex-col">
+                          <div className="flex items-start justify-between gap-2 mb-2">
+                            <div>
+                              <div className="flex items-center gap-1.5 mb-1">
+                                {exam.is_custom && <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#eb7e37]/10 text-[#eb7e37]">Custom</span>}
+                                {exam.is_forecast && <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">Forecast</span>}
+                              </div>
+                              <h3 className="font-bold text-gray-800 leading-snug">{exam.title}</h3>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <div className={`text-2xl font-extrabold ${bandColor(exam.overall_band)}`}>{exam.overall_band ?? '—'}</div>
+                              <div className="text-[10px] text-gray-400">Overall</div>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-4 gap-1 text-center my-2">
+                            {[['TR', exam.tr], ['CC', exam.cc], ['LR', exam.lr], ['GRA', exam.gra]].map(([k, v]) => (
+                              <div key={k} className="bg-gray-50 rounded-lg py-1">
+                                <div className="text-[10px] text-gray-400 font-semibold">{k}</div>
+                                <div className={`text-sm font-bold ${bandColor(v)}`}>{v ?? '—'}</div>
+                              </div>
+                            ))}
+                          </div>
+                          {exam.evaluated_at && <div className="text-xs text-gray-400 flex items-center gap-1 mb-3"><Calendar className="w-3.5 h-3.5" />{new Date(exam.evaluated_at).toLocaleDateString()}</div>}
+                          <button onClick={() => navigate('/writing_review', { state: { testId: exam.test_id, isForecast: exam.is_forecast } })}
+                            className="mt-auto inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold bg-[#0096b1] text-white hover:bg-[#007a90]">
+                            View evaluation <ChevronRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    {totalWritingPages > 1 && (
+                      <div className="flex items-center justify-center gap-2 mt-6">
+                        <button disabled={currentWritingPage === 1} onClick={() => setCurrentWritingPage((pg) => Math.max(1, pg - 1))} className="p-2 rounded-lg border border-gray-200 disabled:opacity-40"><ChevronLeft className="w-4 h-4" /></button>
+                        {getPaginationNumbers(totalWritingPages, currentWritingPage).map((n, i) => (
+                          typeof n === 'number'
+                            ? <button key={i} onClick={() => setCurrentWritingPage(n)} className={`w-9 h-9 rounded-lg text-sm font-semibold ${currentWritingPage === n ? 'bg-[#0096b1] text-white' : 'border border-gray-200 text-gray-600'}`}>{n}</button>
+                            : <span key={i} className="px-1 text-gray-400">…</span>
+                        ))}
+                        <button disabled={currentWritingPage === totalWritingPages} onClick={() => setCurrentWritingPage((pg) => Math.min(totalWritingPages, pg + 1))} className="p-2 rounded-lg border border-gray-200 disabled:opacity-40"><ChevronRight className="w-4 h-4" /></button>
                       </div>
                     )}
                   </>
