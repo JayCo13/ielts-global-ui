@@ -15,11 +15,22 @@ const ERROR_TYPES = [
   { key: 'other', label: 'Other' },
 ];
 
+// Writing has no answer key or question numbers: same backend keys, writing wording,
+// no question-number inputs (mirrors the VN writing report options).
+const WRITING_ERROR_TYPES = [
+  { key: 'mis_graded', label: 'AI score seems inaccurate', descPlaceholder: 'Details: which criterion or comment looks wrong and why.' },
+  { key: 'wrong_answer', label: 'Task prompt content is wrong', descPlaceholder: 'Details: what is wrong in the prompt or the image.' },
+  { key: 'spelling', label: 'Spelling mistake', descPlaceholder: 'Details: which word/phrase is wrong and what it should be.' },
+  { key: 'ui', label: 'Display / UI problem', descPlaceholder: 'Details: where it happens and what is wrong (e.g. broken layout, hidden text, button not working...).' },
+  { key: 'other', label: 'Other' },
+];
+
 /**
  * Report-an-error modal, filed from the exam Review screen.
- * Props: open, onClose, examId, resultId, skill ('reading'|'listening'), examTitle.
+ * Props: open, onClose, examId, resultId, skill ('reading'|'listening'|'writing'), examTitle.
  */
 const ErrorReportModal = ({ open, onClose, examId, resultId, skill, examTitle }) => {
+  const errorTypes = skill === 'writing' ? WRITING_ERROR_TYPES : ERROR_TYPES;
   const [selected, setSelected] = useState([]);
   const [wrongQuestions, setWrongQuestions] = useState('');
   const [misGradedQuestions, setMisGradedQuestions] = useState('');
@@ -57,7 +68,7 @@ const ErrorReportModal = ({ open, onClose, examId, resultId, skill, examTitle })
     // Fold the per-type details (spelling / ui) into the description so
     // the admin sees structured detail without a backend schema change.
     const descParts = [];
-    ERROR_TYPES.forEach((t) => {
+    errorTypes.forEach((t) => {
       if (t.descPlaceholder && selected.includes(t.key) && (typeInfo[t.key] || '').trim()) {
         descParts.push(`[${t.label}] ${typeInfo[t.key].trim()}`);
       }
@@ -78,8 +89,8 @@ const ErrorReportModal = ({ open, onClose, examId, resultId, skill, examTitle })
           skill: skill || null,
           exam_title: examTitle || null,
           error_types: selected,
-          wrong_answer_questions: selected.includes('wrong_answer') ? wrongQuestions.trim() || null : null,
-          mis_graded_questions: selected.includes('mis_graded') ? misGradedQuestions.trim() || null : null,
+          wrong_answer_questions: (skill !== 'writing' && selected.includes('wrong_answer')) ? wrongQuestions.trim() || null : null,
+          mis_graded_questions: (skill !== 'writing' && selected.includes('mis_graded')) ? misGradedQuestions.trim() || null : null,
           description: fullDescription,
         }),
       });
@@ -117,7 +128,7 @@ const ErrorReportModal = ({ open, onClose, examId, resultId, skill, examTitle })
         <div className="px-6 py-4">
           <p className="mb-3 text-sm text-gray-500">Select the type of problem you found:</p>
           <div className="space-y-2">
-            {ERROR_TYPES.map((t) => {
+            {errorTypes.map((t) => {
               const checked = selected.includes(t.key);
               return (
                 <div key={t.key}>

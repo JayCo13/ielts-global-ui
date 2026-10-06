@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import CustomRichTextEditor from './CustomRichTextEditor';
 import Leaderboard from './Leaderboard';
+import ErrorReportModal from './ErrorReportModal';
 import { TranslatorDialog } from '../translator';
 import API_BASE from '../config/api';
 
@@ -172,6 +173,7 @@ export default function WritingReview() {
   const [assistPos, setAssistPos] = useState({ x: 0, y: 0 });
   const assistInited = useRef(false);
   const dragOffset = useRef({ x: 0, y: 0 });
+  const [reportOpen, setReportOpen] = useState(false);   // shared ErrorReportModal (skill 'writing')
   const [assistSel, setAssistSel] = useState('');
   const [assistErrors, setAssistErrors] = useState(null);
   const [assistLoading, setAssistLoading] = useState(false);
@@ -741,6 +743,7 @@ export default function WritingReview() {
                   <div className="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden py-1">
                     <button onClick={() => { setOptMenuOpen(false); setNewWordsConfirm(true); }} className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"><BookOpen className="w-4 h-4 text-gray-500" /> New Words</button>
                     {!isForecast && <button onClick={() => { setOptMenuOpen(false); setLeaderOpen(true); }} className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"><Trophy className="w-4 h-4 text-gray-500" /> Leaderboard</button>}
+                    <button onClick={() => { setOptMenuOpen(false); setReportOpen(true); }} className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"><Flag className="w-4 h-4 text-gray-500" /> Report an error</button>
                   </div>
                 </>
               )}
@@ -1130,6 +1133,15 @@ export default function WritingReview() {
           </div>
         </div>
       )}
+
+      {/* Report an error — shared modal, skill 'writing' */}
+      <ErrorReportModal
+        open={reportOpen}
+        onClose={() => setReportOpen(false)}
+        examId={testId}
+        skill="writing"
+        examTitle={part?.part_number ? `Writing Task ${part.part_number}` : 'Writing Test'}
+      />
 
       {/* End review — confirm modal */}
       {endConfirm && (
