@@ -13,6 +13,23 @@ import Seo from './Seo';
 import ForecastStars, { ForecastLegend } from './ForecastStars';
 import DifficultyBadge from './DifficultyBadge';
 
+// Map a /student/writing/tasks row to the shape the list renders and sorts by.
+// Used for the initial load AND the refill after a retake, so both keep
+// task1_type/task2_type (type badges + Task 1 sort) and the difficulty fields.
+const mapStudentWritingTest = (exam) => ({
+  id: exam.exam_id,
+  title: exam.title,
+  created_at: exam.created_at,
+  test_id: exam.test_id,
+  parts: exam.parts,
+  is_completed: exam.is_completed,
+  task1_type: exam.task1_type ?? null,
+  task2_type: exam.task2_type ?? null,
+  difficultyAvg: exam.difficulty_avg ?? null,
+  occurrenceSum: exam.occurrence_sum || 0,
+  overall_band: exam.overall_band ?? null
+});
+
 const Writing_Fe = () => {
   const navigate = useNavigate();
   const [tests, setTests] = useState([]);
@@ -78,7 +95,9 @@ const Writing_Fe = () => {
               created_at: new Date().toISOString(), // Fallback since it's not provided by public API
               test_id: exam.exam_id,
               parts: exam.parts,
-              is_completed: false
+              is_completed: false,
+              task1_type: exam.task1_type ?? null,
+              task2_type: exam.task2_type ?? null
             }));
             setTests(mapped);
           }
@@ -113,18 +132,7 @@ const Writing_Fe = () => {
             );
 
             setIsVIP(hasWritingAccess);
-            const mapped = testsData.map(exam => ({
-              id: exam.exam_id,
-              title: exam.title,
-              created_at: exam.created_at,
-              test_id: exam.test_id,
-              parts: exam.parts,
-              is_completed: exam.is_completed,
-              difficultyAvg: exam.difficulty_avg ?? null,
-              occurrenceSum: exam.occurrence_sum || 0,
-              overall_band: exam.overall_band ?? null
-            }));
-            setTests(mapped);
+            setTests(testsData.map(mapStudentWritingTest));
           }
         }
       } catch (error) {
@@ -214,7 +222,9 @@ const Writing_Fe = () => {
 
         if (testsResponse.ok) {
           const updatedTests = await testsResponse.json();
-          setTests(updatedTests);
+          // Same shape as the initial load — raw API rows lack the camelCase
+          // difficulty/occurrence fields the cards and sort rely on.
+          setTests(updatedTests.map(mapStudentWritingTest));
         }
 
         // The previous attempt is now a version in History; pick a mode for the retake.
