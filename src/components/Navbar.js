@@ -16,6 +16,8 @@ const Navbar = () => {
     const [username, setUsername] = useState(localStorage.getItem('username'));
     const dropdownRef = useRef(null);
     const mobileMenuRef = useRef(null);
+    const navRef = useRef(null);
+    const [menuMaxHeight, setMenuMaxHeight] = useState('80vh');
     const navigate = useNavigate();
     const location = useLocation();
     const [isSpeakingOpen, setIsSpeakingOpen] = useState(false);
@@ -122,6 +124,22 @@ const Navbar = () => {
         }
     }, []);
 
+    // Size the open mobile menu to exactly the space below the navbar so its
+    // last item (Sign out) is always reachable, whatever the navbar height or
+    // mobile browser chrome (VN fix).
+    useEffect(() => {
+        if (!isMobileMenuOpen) return;
+        const computeMenuHeight = () => {
+            const navEl = navRef.current;
+            if (!navEl) return;
+            const bottom = navEl.getBoundingClientRect().bottom;
+            setMenuMaxHeight(`${Math.max(160, window.innerHeight - bottom - 8)}px`);
+        };
+        computeMenuHeight();
+        window.addEventListener('resize', computeMenuHeight);
+        return () => window.removeEventListener('resize', computeMenuHeight);
+    }, [isMobileMenuOpen]);
+
     const handleSignOut = () => {
         localStorage.removeItem('email');
         localStorage.removeItem('username');
@@ -143,6 +161,7 @@ const Navbar = () => {
 
     return (
         <motion.nav
+            ref={navRef}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -636,7 +655,8 @@ const Navbar = () => {
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="md:hidden bg-white w-full absolute top-full left-0 border-t border-gray-100 shadow-lg z-40"
+                        style={{ maxHeight: menuMaxHeight }}
+                        className="md:hidden bg-white w-full absolute top-full left-0 border-t border-gray-100 shadow-lg z-40 overflow-y-auto overscroll-contain"
                     >
                         <div className="max-w-7xl mx-auto px-4 py-2">
                             <div className="flex flex-col space-y-1">
