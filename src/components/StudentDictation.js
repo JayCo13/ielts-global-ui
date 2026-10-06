@@ -102,16 +102,21 @@ const StudentDictation = () => {
     useEffect(() => {
         const loadVoices = () => {
             const voices = window.speechSynthesis.getVoices();
-            const englishVoices = voices.filter(v => v.lang.startsWith('en'));
+            const englishVoices = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
 
-            // Sort by preferred list order, then take top 10
-            const sorted = [...englishVoices].sort((a, b) => {
-                const aIdx = PREFERRED_VOICES.findIndex(p => a.name.includes(p));
-                const bIdx = PREFERRED_VOICES.findIndex(p => b.name.includes(p));
-                const aRank = aIdx >= 0 ? aIdx : 999;
-                const bRank = bIdx >= 0 ? bIdx : 999;
-                return aRank - bRank;
-            });
+            // Rank: prefer en-US then en-GB (standard IELTS accents), then a
+            // known good-quality voice name, then network voices (on Android the
+            // natural "Google" voices are network / !localService). Fixes Android
+            // devices picking a non-English or low-quality voice (VN fix).
+            const rank = (v) => {
+                const lang = (v.lang || '').replace('_', '-').toLowerCase();
+                const langScore = lang.startsWith('en-us') ? 0 : lang.startsWith('en-gb') ? 1 : 2;
+                const nameIdx = PREFERRED_VOICES.findIndex(p => v.name.includes(p));
+                const nameScore = nameIdx >= 0 ? nameIdx : 50;
+                const netScore = v.localService ? 1 : 0;
+                return langScore * 1000 + nameScore * 10 + netScore;
+            };
+            const sorted = [...englishVoices].sort((a, b) => rank(a) - rank(b));
 
             const curated = sorted.slice(0, 10);
             setAvailableVoices(curated.length > 0 ? curated : voices.slice(0, 10));
@@ -130,7 +135,12 @@ const StudentDictation = () => {
     // Get the selected voice object
     const getSelectedVoice = () => {
         const voices = window.speechSynthesis.getVoices();
-        return voices.find(v => v.voiceURI === selectedVoiceURI) || voices.find(v => v.lang.startsWith('en')) || voices[0];
+        const isEn = (v) => v.lang && v.lang.toLowerCase().startsWith('en');
+        const isEnUs = (v) => v.lang && v.lang.replace('_', '-').toLowerCase().startsWith('en-us');
+        return voices.find(v => v.voiceURI === selectedVoiceURI && isEn(v))
+            || voices.find(isEnUs)
+            || voices.find(isEn)
+            || voices[0];
     };
 
     // Shuffle array utility
@@ -225,6 +235,7 @@ const StudentDictation = () => {
                 }
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.voice = voice;
+                utterance.lang = (voice && voice.lang) || 'en-US';   // force English so a non-English system voice isn't used
                 utterance.rate = rateOverride !== undefined ? rateOverride : speechRate;
                 utterance.onend = resolve;
                 utterance.onerror = resolve;
@@ -278,6 +289,7 @@ const StudentDictation = () => {
         // When repeating, use the first speech text (normal pronunciation)
         const utterance = new SpeechSynthesisUtterance(getFirstSpeechText(currentWord.word));
         utterance.voice = voice;
+        utterance.lang = (voice && voice.lang) || 'en-US';
         utterance.rate = speechRate;
         synth.speak(utterance);
     };
@@ -620,6 +632,7 @@ const StudentDictation = () => {
                                                 const voice = getSelectedVoice();
                                                 const utterance = new SpeechSynthesisUtterance('This is a preview of the selected voice');
                                                 utterance.voice = voice;
+                                                utterance.lang = (voice && voice.lang) || 'en-US';
                                                 utterance.rate = speechRate;
                                                 synth.speak(utterance);
                                             }}
@@ -693,6 +706,13 @@ const StudentDictation = () => {
                                         <input
                                             ref={el => inputRefs.current[word.word_id] = el}
                                             type="text"
+                                            lang="en"
+                                            inputMode="text"
+                                            autoComplete="off"
+                                            autoCorrect="off"
+                                            autoCapitalize="none"
+                                            spellCheck={false}
+                                            data-gramm="false"
                                             value={userAnswers[word.word_id] || ''}
                                             onChange={(e) => handleAnswerChange(word.word_id, e.target.value)}
                                             placeholder="Type what you hear..."
