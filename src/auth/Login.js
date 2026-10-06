@@ -124,7 +124,21 @@ const LoginForm = () => {
   const [warningMessage, setWarningMessage] = useState('');
   const [warningCountdownTime, setWarningCountdownTime] = useState(30);
   const [showPassword, setShowPassword] = useState(false);
+  const [infoMessage, setInfoMessage] = useState('');
   const navigate = useNavigate();
+
+  // Pre-fill the username after a successful registration (stashed by
+  // Register.js in sessionStorage, read once) and greet the user (VN fix).
+  useEffect(() => {
+    try {
+      const u = sessionStorage.getItem('postRegisterUsername');
+      if (u) {
+        setFormData(prev => ({ ...prev, username: u }));
+        setInfoMessage('Registration successful! Log in to continue.');
+        sessionStorage.removeItem('postRegisterUsername');
+      }
+    } catch (e) { /* sessionStorage unavailable — skip prefill */ }
+  }, []);
 
   // Update Google login handler to use the new endpoint
   const handleGoogleLogin = async () => {
@@ -341,6 +355,11 @@ const LoginForm = () => {
                 <h1 className="text-2xl font-bold text-lime-500 mb-8 text-center">Login Ieltscomputertest.com</h1>
 
                 <form className="space-y-6" onSubmit={handleSubmit}>
+                  {infoMessage && (
+                    <div className="bg-lime-50 border border-lime-200 text-lime-700 px-4 py-3 rounded-lg text-sm">
+                      {infoMessage}
+                    </div>
+                  )}
                   {/* Username field */}
                   <div className="space-y-2">
                     <label className="block text-gray-500 font-bold mb-1">Username</label>

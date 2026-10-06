@@ -309,6 +309,10 @@ const Register = () => {
         // Show success message
         setRegistrationSuccess(true);
 
+        // Stash the username so /login can pre-fill it (survives the redirect
+        // reliably, unlike router state) — VN fix.
+        try { sessionStorage.setItem('postRegisterUsername', formData.username); } catch (e) { /* ignore */ }
+
         // Redirect to login after 3 seconds
         setTimeout(() => {
           navigate('/login');
