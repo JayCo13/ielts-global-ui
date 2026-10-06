@@ -621,7 +621,7 @@ const StudentDictation = () => {
                                             <div className="flex justify-between text-xs text-gray-400 mt-1">
                                                 <span>Slow (0.5x)</span>
                                                 <span>Normal (1.0x)</span>
-                                                <span>Nhanh (2.0x)</span>
+                                                <span>Fast (2.0x)</span>
                                             </div>
                                         </div>
                                         {/* Preview Button */}
