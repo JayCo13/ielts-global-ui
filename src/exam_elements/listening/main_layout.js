@@ -2902,7 +2902,7 @@ const MainLayout = () => {
               <Split
                 className={`flex split-container ${isMobile ? 'flex-col' : 'flex-row'}`}
                 sizes={isMobile ? [40, 60] : [50, 50]}
-                minSize={isMobile ? 150 : 200}
+                minSize={isMobile ? 90 : 200}
                 expandToMin={false}
                 gutterSize={isMobile ? 10 : 20}
                 gutterAlign="center"
@@ -2976,7 +2976,9 @@ const MainLayout = () => {
           </div>
         )}
 
-        <footer className={`${colorTheme === 'black-on-white' ? 'bg-white' : 'bg-black'} border-t border-gray-200 p-4 w-full`}>
+        {/* Mobile review: cap the footer so the transcript pane above is not
+            squeezed off-screen (VN fix). */}
+        <footer className={`${colorTheme === 'black-on-white' ? 'bg-white' : 'bg-black'} border-t border-gray-200 p-4 w-full shrink-0 ${isMobile && (navState.fromResultReview || isRetakeIncorrectMode) ? 'max-h-[38vh] overflow-y-auto' : ''}`}>
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center justify-between">
               <div className="flex-1 flex items-center justify-center gap-6">
