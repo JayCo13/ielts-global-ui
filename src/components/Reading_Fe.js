@@ -7,10 +7,12 @@ import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
 import Seo from './Seo';
+import TestModeDialog from './TestModeDialog';
 
 const Reading_Fe = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [testToRetake, setTestToRetake] = useState(null);
+  const [modeForTest, setModeForTest] = useState(null); // full test pending mode choice
   const [isVIP, setIsVIP] = useState(false);
   const [accountStatus, setAccountStatus] = useState(null);
   const [correctAnswers, setCorrectAnswers] = useState(0);
@@ -205,7 +207,13 @@ const Reading_Fe = () => {
       navigate('/login');
       return;
     }
-    navigate(`/reading_test_room`, { state: { examId: test.id } });
+    setModeForTest(test);   // pick Practice / Mock Exam first
+  };
+
+  const startTestWithMode = (mode) => {
+    const test = modeForTest;
+    setModeForTest(null);
+    if (test) navigate(`/reading_test_room`, { state: { examId: test.id, mode } });
   };
 
   const handleRetakeTest = (test) => {
@@ -227,7 +235,7 @@ const Reading_Fe = () => {
         // Clear highlights and notes from previous attempt
         localStorage.removeItem('ielts-highlights');
         localStorage.removeItem('ielts-notes');
-        navigate(`/reading_test_room`, { state: { examId: testToRetake.id } });
+        setModeForTest(testToRetake);   // let them pick Practice / Mock Exam for the retake
       } else {
         alert('Failed to reset the test. Please try again.');
       }
@@ -647,6 +655,8 @@ const Reading_Fe = () => {
           </div>
         </div>
       )}
+
+      <TestModeDialog open={!!modeForTest} skill="reading" onSelect={startTestWithMode} onClose={() => setModeForTest(null)} />
     </div>
   );
 };

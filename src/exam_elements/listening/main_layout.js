@@ -13,6 +13,9 @@ import Split from 'react-split';
 import { TranslatorDialog, useTextSelection } from '../../translator';
 import API_BASE from '../../config/api';
 import fetchWithTimeout from '../../utils/fetchWithTimeout';
+import useExamHeartbeat from '../../utils/useExamHeartbeat';
+import useTabSwitchCount from '../../utils/useTabSwitchCount';
+import { saveExamAnnotations } from '../../utils/annotations';
 
 // Audio Control Component
 const AudioControl = ({ examId, currentPart, colorTheme, isReviewMode }) => {
@@ -536,6 +539,26 @@ const MainLayout = () => {
   const retakeAnswerData = location?.state?.answerData;
   const forecastPartFromNav = location?.state?.forecastPart;
   const resultId = location?.state?.resultId;
+  // Mock Exam ('exam'): after the audio ends, a 2-minute window then auto-submit.
+  // Practice / forecast / unset: no auto-submit.
+  const examMode = location?.state?.mode;
+  const isExamMode = examMode === 'exam' && !forecastPartFromNav;
+  // Count tab switches while taking the test (not in review / retake mode).
+  const tabSwitches = useTabSwitchCount(!!examId && !isReviewMode && !isRetakeIncorrectMode);
+  // Exam-room heartbeat: lets the submit record this attempt's tab switches.
+  useExamHeartbeat({
+    enabled: !!examId && !isReviewMode && !isRetakeIncorrectMode,
+    skill: 'listening',
+    examId,
+    title: examData?.exam_title || testDescription?.title,
+    questionsDone: Object.values(studentAnswers).filter(v => v && String(v).trim() !== '').length,
+    // Forecast = 1 part (10 questions); full test = actual total (question_map) or 40.
+    totalQuestions: forecastPartFromNav ? 10
+      : (examData?.question_map ? Object.keys(examData.question_map).length : 40),
+    lastQuestion: currentQuestion,
+    part: currentPart,
+    tabSwitches,
+  });
   const {
     selectedText,
     selectionPosition,
@@ -1156,8 +1179,13 @@ const MainLayout = () => {
     }
 
     try {
-      const forecastParam = isForecastSession && currentPart ? `?forecast_part=${currentPart}` : '';
-      const response = await fetchWithTimeout(`${API_BASE}/student/exam/${examId}/submit${forecastParam}`, {
+      const params = new URLSearchParams();
+      if (isForecastSession && currentPart) params.set('forecast_part', currentPart);
+      if (examMode) params.set('mode', examMode);
+      const elapsed = getElapsedSeconds();
+      if (elapsed != null) params.set('time_taken', String(elapsed));
+      const qs = params.toString() ? `?${params.toString()}` : '';
+      const response = await fetchWithTimeout(`${API_BASE}/student/exam/${examId}/submit${qs}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -1168,10 +1196,14 @@ const MainLayout = () => {
 
       if (response.ok) {
         const result = await response.json();
+        sessionStorage.removeItem(examStartKey);
         // Keep all stored data for review
         // localStorage data (ielts-answers, ielts-highlights, ielts-notes, current-exam-session) is preserved
         // No DOM manipulation to remove highlights
         // State variables are preserved for review
+
+        // Persist this attempt's highlights/notes so review can restore them later
+        await saveExamAnnotations(result.result_id, examId);
 
         navigate('/result_review', { state: { resultId: result.result_id, examId: examId, forecastPart: isForecastSession ? currentPart : undefined } });
       } else if (response.status === 409) {
@@ -1207,6 +1239,7 @@ const MainLayout = () => {
   // Function to clear all exam data after review
   const clearExamData = () => {
     // Clear localStorage data
+    sessionStorage.removeItem(examStartKey);
     localStorage.removeItem('ielts-answers');
     localStorage.removeItem('ielts-highlights');
     localStorage.removeItem('ielts-notes');
@@ -1316,6 +1349,22 @@ const MainLayout = () => {
 
   // State for clear data confirmation dialog
   const [showClearDataDialog, setShowClearDataDialog] = useState(false);
+
+  // Track elapsed time ("time taken"). The start stamp is persisted in
+  // sessionStorage so a reload mid-test doesn't reset the clock.
+  const examStartKey = `exam-start-${examId}`;
+  useEffect(() => {
+    if (!examId || isReviewMode || isRetakeIncorrectMode) return;
+    if (!sessionStorage.getItem(examStartKey)) {
+      sessionStorage.setItem(examStartKey, Date.now().toString());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [examId, isReviewMode, isRetakeIncorrectMode]);
+  const getElapsedSeconds = () => {
+    const start = parseInt(sessionStorage.getItem(examStartKey) || '0', 10);
+    if (!start) return null;
+    return Math.max(0, Math.floor((Date.now() - start) / 1000));
+  };
   // State for exit alert dialog
   const [showExitAlert, setShowExitAlert] = useState(false);
   // Note: a previous useEffect here called audioRef.current.load() on every
@@ -1430,6 +1479,27 @@ const MainLayout = () => {
       return () => clearInterval(timer);
     }
   }, [isAudioStarted, totalTestLength, isForecastSession, currentPart]);
+
+  // Mock Exam: once the audio finishes (submission period begins), give the
+  // student 2 minutes to check/fill answers, then auto-submit. Not in
+  // practice/forecast/review mode. The ref always points at the latest
+  // handleSubmitExam so answers typed during the 2-minute window are included.
+  const submitExamRef = useRef(null);
+  submitExamRef.current = handleSubmitExam;
+  const autoSubmitArmed = isExamMode && isSubmissionPeriod && !isReviewMode && !isRetakeIncorrectMode;
+  const autoSubmittedRef = useRef(false);
+  useEffect(() => {
+    if (!autoSubmitArmed) return;
+    const timer = setInterval(() => {
+      setSubmissionTimeRemaining(prev => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [autoSubmitArmed]);
+  useEffect(() => {
+    if (!autoSubmitArmed || submissionTimeRemaining > 0 || autoSubmittedRef.current) return;
+    autoSubmittedRef.current = true;
+    if (submitExamRef.current) submitExamRef.current();
+  }, [autoSubmitArmed, submissionTimeRemaining]);
 
   // Add this helper function
   const formatTime = (seconds) => {

@@ -14,6 +14,9 @@ import { TranslatorDialog, useTextSelection } from '../../translator';
 import API_BASE from '../../config/api';
 import ErrorReportModal from '../../components/ErrorReportModal';
 import fetchWithTimeout from '../../utils/fetchWithTimeout';
+import useExamHeartbeat from '../../utils/useExamHeartbeat';
+import useTabSwitchCount from '../../utils/useTabSwitchCount';
+import { saveExamAnnotations } from '../../utils/annotations';
 
 const MainLayout = () => {
   const [currentQuestion, setCurrentQuestion] = useState(1);
@@ -38,6 +41,42 @@ const MainLayout = () => {
   const isRetakeIncorrectMode = location?.state?.retakeIncorrectMode;
   const incorrectQuestions = location?.state?.incorrectQuestions || [];
   const retakeAnswerData = location?.state?.answerData;
+  // Full-test mode: 'exam' (Mock Exam — 60' timer + auto-submit + Ctrl+F blocked)
+  // vs 'practice' (no timer). Forecast keeps its timer; anything unset = practice.
+  const examMode = location?.state?.mode;
+  const isExamMode = examMode === 'exam' && !isForecastMode;
+  // Count tab switches while taking the test (not in review / retake mode).
+  const tabSwitches = useTabSwitchCount(!!examId && !isReviewMode && !isRetakeIncorrectMode);
+  // Exam-room heartbeat: lets the submit record this attempt's tab switches.
+  useExamHeartbeat({
+    enabled: !!examId && !isReviewMode && !isRetakeIncorrectMode,
+    skill: 'reading',
+    examId,
+    title: examData?.exam_title || testDescription?.title,
+    questionsDone: Object.values(studentAnswers).filter(v => v && String(v).trim() !== '').length,
+    // Forecast = 1 passage (13/13/14 questions); full test = actual total (question_map) or 40.
+    totalQuestions: isForecastMode ? ([13, 13, 14][currentPart - 1] || 13)
+      : (examData?.question_map ? Object.keys(examData.question_map).length : 40),
+    lastQuestion: currentQuestion,
+    part: currentPart,
+    tabSwitches,
+  });
+
+  // Track elapsed time ("time taken"). The start stamp is persisted in
+  // sessionStorage so a reload mid-test doesn't reset the clock.
+  const examStartKey = `exam-start-${examId}`;
+  useEffect(() => {
+    if (!examId || isReviewMode || isRetakeIncorrectMode) return;
+    if (!sessionStorage.getItem(examStartKey)) {
+      sessionStorage.setItem(examStartKey, Date.now().toString());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [examId, isReviewMode, isRetakeIncorrectMode]);
+  const getElapsedSeconds = () => {
+    const start = parseInt(sessionStorage.getItem(examStartKey) || '0', 10);
+    if (!start) return null;
+    return Math.max(0, Math.floor((Date.now() - start) / 1000));
+  };
   // Add new state variables for settings
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isBellOpen, setIsBellOpen] = useState(false);
@@ -374,7 +413,9 @@ const MainLayout = () => {
   const [timeLeft, setTimeLeft] = useState(60 * 60); // 60 minutes for reading test
 
   useEffect(() => {
-    if (timeLeft === null || isReviewMode || isRetakeIncorrectMode) return; // Disable timer in review/retake mode
+    // Timer + auto-submit only in Mock Exam mode (and forecast); disabled in
+    // review/retake and in Practice mode.
+    if (timeLeft === null || isReviewMode || isRetakeIncorrectMode || !(isExamMode || isForecastMode)) return;
 
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -388,7 +429,7 @@ const MainLayout = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft, isReviewMode]);
+  }, [timeLeft, isReviewMode, isExamMode]);
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -480,6 +521,11 @@ const MainLayout = () => {
 
     // Prevent keyboard shortcuts for saving and screenshots only
     const handleKeyDown = (e) => {
+      // Block Ctrl+F search only in Mock Exam mode
+      if (isExamMode && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
+        e.preventDefault();
+        return false;
+      }
       // Allow Ctrl+C, Ctrl+X, Ctrl+A, Ctrl+V (copy, cut, select all, paste)
       // Only prevent Ctrl+S, Ctrl+P (save, print)
       if ((e.ctrlKey || e.metaKey) && ['s', 'p'].includes(e.key.toLowerCase())) {
@@ -1041,6 +1087,7 @@ const MainLayout = () => {
 
   const clearExamData = () => {
     // Clear all stored data
+    sessionStorage.removeItem(examStartKey);
     localStorage.removeItem('ielts-answers');
 
     // Clear highlights and notes for all parts
@@ -1192,11 +1239,14 @@ const MainLayout = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ answers: answersByNumber })
+        body: JSON.stringify({ answers: answersByNumber, mode: examMode, time_taken: getElapsedSeconds() })
       });
 
       if (response.ok) {
         const result = await response.json();
+        sessionStorage.removeItem(examStartKey);
+        // Persist this attempt's highlights/notes so review can restore them later
+        await saveExamAnnotations(result.result_id, examId);
         navigate('/result_review_rd', { state: { resultId: result.result_id, examId: examId, forecastPart: isForecastMode ? currentPart : undefined } });
       } else if (response.status === 409) {
         // Handle multi-device detection
@@ -2050,7 +2100,7 @@ const MainLayout = () => {
                 </div>
               )}
               <div className={`${colorTheme !== 'black-on-white' ? 'text-gray-300' : 'text-black-500'} ${textSizeClasses[textSize]}`}>
-                {isReviewMode ? 'Review Mode' : `${formatTime(timeLeft)} remaining`}
+                {isReviewMode ? 'Review Mode' : (isExamMode || isForecastMode) ? `${formatTime(timeLeft)} remaining` : 'Practice · no time limit'}
               </div>
             </div>
           </div>
