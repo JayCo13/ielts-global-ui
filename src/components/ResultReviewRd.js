@@ -11,6 +11,7 @@ import lowAnimation from '../effect/low.json';
 
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
+import { computeTypeStats, formatDuration } from '../utils/questionTypeStats';
 
 const circumference = 2 * Math.PI * 45;
 const fadeIn = keyframes`
@@ -463,6 +464,7 @@ const ResultReview = () => {
             <div className="bg-gray-50 rounded-lg p-6">
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
+                  <div className="flex gap-8">
                   <div className="items-center text-lg text-gray-700">
                     <h3 className="text-sm font-medium text-gray-900 mb-2">Completion Date</h3>
                     <div className='flex items-center'>
@@ -475,6 +477,16 @@ const ResultReview = () => {
                         })}
                       </span>
                     </div>
+                  </div>
+                  {formatDuration(resultData.time_taken) && (
+                    <div className="items-center text-lg text-gray-700">
+                      <h3 className="text-sm font-medium text-gray-900 mb-2">Time Taken</h3>
+                      <div className='flex items-center'>
+                        <Clock className="w-5 h-5 mr-3 text-[#0096b1]" />
+                        <span>{formatDuration(resultData.time_taken)}</span>
+                      </div>
+                    </div>
+                  )}
                   </div>
                   <button
                     onClick={() => setShowWarningDialog(true)}
@@ -511,6 +523,51 @@ const ResultReview = () => {
             </div>
           </div>
         </div>
+
+        {/* Detailed data table — stats by question type */}
+        {(() => {
+          const typeStats = computeTypeStats(resultData.detailed_answers);
+          if (!typeStats.length) return null;
+          return (
+            <div className="bg-white rounded-lg shadow-sm p-6 overflow-hidden mb-6">
+              <h2 className="text-xl font-semibold mb-4">Results by Question Type</h2>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200 text-sm">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Question type</th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-green-600 uppercase tracking-wider">Correct</th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-red-500 uppercase tracking-wider">Wrong</th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Skipped</th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-[#0096b1] uppercase tracking-wider">Accuracy</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-100">
+                    {typeStats.map((row) => (
+                      <tr key={row.type} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 font-medium text-gray-800">{row.type}</td>
+                        <td className="px-4 py-3 text-center text-gray-700">{row.total}</td>
+                        <td className="px-4 py-3 text-center text-green-600 font-semibold">{row.correct}</td>
+                        <td className="px-4 py-3 text-center text-red-500 font-semibold">{row.wrong}</td>
+                        <td className="px-4 py-3 text-center text-gray-500">{row.blank}</td>
+                        <td className="px-4 py-3 text-center">
+                          <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${
+                            row.accuracy >= 70 ? 'bg-green-100 text-green-700'
+                              : row.accuracy >= 40 ? 'bg-amber-100 text-amber-700'
+                                : 'bg-red-100 text-red-600'
+                          }`}>
+                            {row.accuracy}%
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          );
+        })()}
 
         <div className="bg-white rounded-lg shadow-sm p-6 overflow-hidden">
           <div className="flex justify-between items-center mb-6">

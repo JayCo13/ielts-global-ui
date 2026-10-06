@@ -11,6 +11,8 @@ import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
 import Seo from './Seo';
+import ForecastStars, { ForecastLegend } from './ForecastStars';
+import DifficultyBadge from './DifficultyBadge';
 
 const Writing_Fe = () => {
   const navigate = useNavigate();
@@ -124,7 +126,9 @@ const Writing_Fe = () => {
               created_at: exam.created_at,
               test_id: exam.test_id,
               parts: exam.parts,
-              is_completed: exam.is_completed
+              is_completed: exam.is_completed,
+              difficultyAvg: exam.difficulty_avg ?? null,
+              occurrenceSum: exam.occurrence_sum || 0
             }));
             setTests(mapped);
           }
@@ -403,6 +407,16 @@ const Writing_Fe = () => {
           return new Date(b.created_at) - new Date(a.created_at);
         case 'oldest':
           return new Date(a.created_at) - new Date(b.created_at);
+        case 'forecast':
+          return (b.occurrenceSum || 0) - (a.occurrenceSum || 0);
+        case 'difficulty': {
+          // Easy first = higher average band; unclassified tests go last.
+          const av = a.difficultyAvg, bv = b.difficultyAvg;
+          if (av == null && bv == null) return 0;
+          if (av == null) return 1;
+          if (bv == null) return -1;
+          return bv - av;
+        }
         default:
           return (a.title || '').localeCompare(b.title || '');
       }
@@ -469,7 +483,11 @@ const Writing_Fe = () => {
         <div className="space-y-2 mb-4">
           {test.parts.map((task) => (
             <div key={task.task_id} className="flex items-center justify-between text-sm text-gray-600 bg-gray-50 py-1.5 px-2 rounded">
-              <span>Part {task.part_number}</span>
+              <span className="flex items-center gap-2">
+                Part {task.part_number}
+                <DifficultyBadge label={task.difficulty_label} />
+                <ForecastStars level={task.forecast_level} />
+              </span>
               <div className="flex items-center gap-2">
                 <span className="text-md">{task.word_limit} words</span>
                 {test.is_completed && (
@@ -562,12 +580,16 @@ const Writing_Fe = () => {
             <option value="alphabet">By Alphabet</option>
             {(isVIP || localStorage.getItem('role') === 'student') && (
               <>
+                <option value="forecast">By forecast (most likely first)</option>
+                <option value="difficulty">By difficulty (easiest first)</option>
                 <option value="latest">Newest</option>
                 <option value="oldest">Oldest</option>
               </>
             )}
           </select>
         </div>
+
+        <div className="mb-4"><ForecastLegend /></div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {currentTests.map((test, index) => renderTestCard(test, index))}

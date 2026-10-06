@@ -8,6 +8,8 @@ import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
 import Seo from './Seo';
+import ForecastStars, { ForecastLegend } from './ForecastStars';
+import DifficultyBadge from './DifficultyBadge';
 
 const WritingForecast = () => {
   const navigate = useNavigate();
@@ -93,7 +95,10 @@ const WritingForecast = () => {
             // badge it on the matching part; fall back to the exam-level
             // aggregate values when present.
             task1_type: p.task1_type || exam.task1_type || null,
-            task2_type: p.task2_type || exam.task2_type || null
+            task2_type: p.task2_type || exam.task2_type || null,
+            difficulty_label: p.difficulty_label || null,
+            forecast_level: p.forecast_level || null,
+            occurrence_count: p.occurrence_count || 0
           }));
         });
         setItems(flat);
@@ -223,6 +228,7 @@ const WritingForecast = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="mb-4"><ForecastLegend /></div>
         <div className="flex gap-4 mb-8">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -305,6 +311,12 @@ const WritingForecast = () => {
                     <span>{it.title}</span>
                   </h3>
                   <div className="text-sm text-gray-600 mt-1">Exam: {it.exam_title}</div>
+                  {(it.difficulty_label || it.forecast_level) && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <DifficultyBadge label={it.difficulty_label} />
+                      <ForecastStars level={it.forecast_level} />
+                    </div>
+                  )}
                   {it.task1_type && it.part_number === 1 && (
                     <div className="mt-2">
                       <span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-[#0096b1]/10 text-[#0096b1] capitalize">

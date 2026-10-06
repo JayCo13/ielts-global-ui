@@ -6,6 +6,8 @@ import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
 import Seo from './Seo';
+import ForecastStars, { ForecastLegend } from './ForecastStars';
+import DifficultyBadge from './DifficultyBadge';
 
 const ReadingForecast = () => {
   const navigate = useNavigate();
@@ -95,7 +97,10 @@ const ReadingForecast = () => {
             attempts_count: p.attempts_count || 0,
             completed: !!p.completed,
             is_recommended: !!p.is_recommended,
-            question_types: Array.isArray(p.question_types) ? p.question_types : []
+            question_types: Array.isArray(p.question_types) ? p.question_types : [],
+            forecast_level: p.forecast_level || null,
+            difficulty_label: p.difficulty_label || null,
+            occurrence_count: p.occurrence_count || 0
           }));
         });
         setItems(flat);
@@ -215,6 +220,7 @@ const ReadingForecast = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="mb-4"><ForecastLegend /></div>
         <div className="mb-8">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -356,6 +362,8 @@ const ReadingForecast = () => {
                     <span className={`${(isLimitedUser && (index + indexOfFirstItem) >= 6) ? 'blur-[4px] select-none' : ''}`}>
                       {it.part_number}{it.forecast_title ? ` – ${it.forecast_title}` : ''}
                     </span>
+                    <DifficultyBadge label={it.difficulty_label} className="ml-2 align-middle" />
+                    <ForecastStars level={it.forecast_level} className="ml-2" />
                   </div>
                   {(it.question_types || []).length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1">

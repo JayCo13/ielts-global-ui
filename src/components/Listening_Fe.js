@@ -9,6 +9,8 @@ import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
 import Seo from './Seo';
 import TestModeDialog from './TestModeDialog';
+import ForecastStars, { ForecastLegend } from './ForecastStars';
+import DifficultyBadge from './DifficultyBadge';
 
 const Listening_Fe = () => {
   // Helper to strip HTML tags from part titles (they may contain rich text HTML)
@@ -164,7 +166,12 @@ const Listening_Fe = () => {
               totalMarks: exam.total_score,
               isCompleted: exam.is_completed || false,
               correctAnswers: exam.is_completed ? correctAnswers : 0,
-              partTitles: exam.part_titles || {}
+              partTitles: exam.part_titles || {},
+              partForecastLevel: exam.part_forecast_level || {},
+              partDifficulty: exam.part_difficulty || {},
+              difficultyAvg: exam.difficulty_avg ?? null,
+              occurrenceSum: exam.occurrence_sum || 0,
+              questionTypes: exam.question_types || []
             })));
           }
         } else {
@@ -199,7 +206,12 @@ const Listening_Fe = () => {
               totalMarks: exam.total_score,
               isCompleted: exam.is_completed || false,
               correctAnswers: exam.is_completed ? correctAnswers : 0,
-              partTitles: exam.part_titles || {}
+              partTitles: exam.part_titles || {},
+              partForecastLevel: exam.part_forecast_level || {},
+              partDifficulty: exam.part_difficulty || {},
+              difficultyAvg: exam.difficulty_avg ?? null,
+              occurrenceSum: exam.occurrence_sum || 0,
+              questionTypes: exam.question_types || []
             })));
           } else if (testsResponse.status === 401 || subscriptionResponse.status === 401) {
             navigate('/login');
@@ -362,6 +374,16 @@ const Listening_Fe = () => {
           return new Date(b.created_at) - new Date(a.created_at);
         case 'oldest':
           return new Date(a.created_at) - new Date(b.created_at);
+        case 'forecast':
+          return (b.occurrenceSum || 0) - (a.occurrenceSum || 0);
+        case 'difficulty': {
+          // Easy first = higher avg %; unclassified tests go last.
+          const av = a.difficultyAvg, bv = b.difficultyAvg;
+          if (av == null && bv == null) return 0;
+          if (av == null) return 1;
+          if (bv == null) return -1;
+          return bv - av;
+        }
         default:
           return a.title.localeCompare(b.title);
       }
@@ -453,12 +475,16 @@ const Listening_Fe = () => {
             <option value="alphabet">By Alphabet</option>
             {(isVIP || userRole === 'student') && (
               <>
+                <option value="forecast">By forecast (most likely first)</option>
+                <option value="difficulty">By difficulty (easiest first)</option>
                 <option value="latest">Newest</option>
                 <option value="oldest">Oldest</option>
               </>
             )}
           </select>
         </div>
+
+        <div className="mb-4"><ForecastLegend /></div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {currentTests.map((test, index) => (
@@ -558,9 +584,11 @@ const Listening_Fe = () => {
                         <div className="shrink-0 font-bold bg-lime-100 text-lime-700 px-2.5 py-1 rounded text-xs mr-3 uppercase tracking-wider group-hover:bg-lime-200 transition-colors">
                           Part {partNum}
                         </div>
-                        <span className={`text-sm font-medium text-gray-700 line-clamp-1 leading-relaxed ${isLocked ? 'blur-sm select-none pointer-events-none' : ''}`}>
+                        <span className={`text-sm font-medium text-gray-700 line-clamp-1 leading-relaxed flex-1 ${isLocked ? 'blur-sm select-none pointer-events-none' : ''}`}>
                           {title}
                         </span>
+                        <DifficultyBadge label={test.partDifficulty?.[partNum]} className="ml-2 shrink-0" />
+                        <ForecastStars level={test.partForecastLevel?.[partNum]} className="ml-2 shrink-0" />
                       </div>
                     );
                   })}

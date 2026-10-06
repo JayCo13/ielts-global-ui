@@ -46,6 +46,7 @@ import RefundPolicy from './pages/adsense/RefundPolicy';
 import AnnouncementDetail from './pages/AnnouncementDetail';
 import Permission from './pages/adsense/Permission';
 import Instruction from './pages/Instruction';
+import ResultsOverview from './pages/ResultsOverview';
 import NotFoundPage from './pages/NotFoundPage';
 import NewWords from './components/NewWords';
 import StudentDictation from './components/StudentDictation';
@@ -123,6 +124,7 @@ function App() {
             <Route path="/writing_forecast_view" element={<WritingForecastLayout />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/exam-history" element={<ExamHistory />} />
+            <Route path="/results-overview" element={<ResultsOverview />} />
             <Route path="/result_review" element={<ResultReview />} />
             <Route path="/result_review_rd" element={<ResultReviewRd />} />
             <Route path="/vip-packages" element={<VIPPackages />} />
