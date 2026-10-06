@@ -15,6 +15,7 @@ import CircularGallery, { Card } from './CircularGallery';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
 import Seo from './Seo';
+import AnnouncementsSection from './AnnouncementsSection';
 
 const heroImages = [
   '/img/hp1.webp',
@@ -510,6 +511,9 @@ const HomePage = () => {
               </defs>
             </svg>
           </div>
+
+          {/* Latest News (managed from admin /announcements) */}
+          <AnnouncementsSection />
 
           {/* VIP Members Feedback Slider */}
           {feedbackImages.length > 0 && (

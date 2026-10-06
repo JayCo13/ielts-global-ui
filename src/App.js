@@ -43,6 +43,7 @@ import PaymentPolicy from './pages/adsense/PaymentPolicy';
 import CompPolicy from './pages/adsense/CompPolicy';
 import DeliPolicy from './pages/adsense/DeliPolicy';
 import RefundPolicy from './pages/adsense/RefundPolicy';
+import AnnouncementDetail from './pages/AnnouncementDetail';
 import Permission from './pages/adsense/Permission';
 import Instruction from './pages/Instruction';
 import NotFoundPage from './pages/NotFoundPage';
@@ -99,6 +100,7 @@ function App() {
           <Route path="/comp-policy" element={<CompPolicy />} />
           <Route path="/deli-policy" element={<DeliPolicy />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
+          <Route path="/news/:id" element={<AnnouncementDetail />} />
           <Route path="/permission" element={<Permission />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-failure" element={<PaymentFailure />} />
