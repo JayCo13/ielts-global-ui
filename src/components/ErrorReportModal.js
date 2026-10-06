@@ -9,8 +9,9 @@ const ERROR_TYPES = [
   { key: 'mis_graded', label: 'Answer graded incorrectly', needsQuestions: 'graded' },
   { key: 'spelling', label: 'Spelling mistake', descPlaceholder: 'Details: which word/phrase is wrong and what it should be.' },
   { key: 'audio', label: 'Audio problem' },
-  // 'audio_cue' (replay jumps to the wrong spot) is re-enabled together with
-  // listening audio alignment, which global does not have yet.
+  // Timestamps for most questions are matched automatically, so a few land on the wrong
+  // moment. The question number is what makes a report actionable.
+  { key: 'audio_cue', label: 'Replay jumps to the wrong spot', descPlaceholder: 'Which question numbers jump to the wrong spot (e.g. 12, 15) — the correct minute helps too.' },
   { key: 'ui', label: 'Display / UI problem', descPlaceholder: 'Details: where it happens and what is wrong (e.g. broken layout, hidden text, button not working...).' },
   { key: 'other', label: 'Other' },
 ];

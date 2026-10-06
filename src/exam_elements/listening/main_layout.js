@@ -638,6 +638,73 @@ const MainLayout = () => {
     }
   }, [forecastPartFromNav]);
 
+  // ── Replay the audio snippet holding the answer (ported from VN; additive) ──
+  // Deliberately self-contained: no change to handleSearchClick, to the locate icon's
+  // condition, or to AudioControl. If anything here fails the review screen behaves
+  // exactly as it did before.
+  const [audioCues, setAudioCues] = useState({});
+
+  useEffect(() => {
+    if (!isReviewMode || !examId || !currentPart) { setAudioCues({}); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(
+          `${API_BASE}/student/listening/exam/${examId}/part/${currentPart}/audio-cues`,
+          { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled) setAudioCues(data.cues || {});
+      } catch (e) { /* optional feature — stay quiet */ }
+    })();
+    return () => { cancelled = true; };
+  }, [isReviewMode, examId, currentPart]);
+
+  const cueFor = (questionNumber) => {
+    if (!isReviewMode || !answerData) return null;
+    const q = answerData.find(a => a.question_number === questionNumber);
+    return q ? (audioCues[String(q.question_id)] || null) : null;
+  };
+
+  const handlePlayCue = (questionNumber) => {
+    const cue = cueFor(questionNumber);
+    // The review player lives inside AudioControl; reach it through the DOM rather than
+    // threading a ref through that component.
+    const audio = document.querySelector('.audio-control audio');
+    if (!cue) return;
+    if (!audio) {
+      // The player lives in the transcript panel; if it's collapsed there is nothing to
+      // drive, so say why instead of appearing broken.
+      toast('Open the Transcript panel to replay this part', { duration: 2500 });
+      return;
+    }
+    try {
+      const stopAt = () => {
+        if (audio.currentTime >= cue.end) {
+          audio.pause();
+          audio.removeEventListener('timeupdate', stopAt);
+        }
+      };
+      const seekAndPlay = () => {
+        audio.addEventListener('timeupdate', stopAt);
+        audio.currentTime = cue.start;
+        const started = audio.play();
+        if (started && started.catch) started.catch(() => {});
+        const mmss = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+        toast.success(`Replaying from ${mmss(cue.start)}`, { duration: 1800 });
+      };
+      // Seeking before the browser knows the duration silently snaps back to 0, so the
+      // student would hear the recording from the top instead of their answer. Wait for
+      // metadata when it isn't there yet.
+      if (audio.readyState >= 1) {
+        seekAndPlay();
+      } else {
+        audio.addEventListener('loadedmetadata', seekAndPlay, { once: true });
+        if (audio.networkState === 3 /* NETWORK_NO_SOURCE */) audio.load();
+      }
+    } catch (e) { /* never let a replay break the review screen */ }
+  };
+
   // Function to handle search/locate icon click - highlights text in transcript
   const handleSearchClick = (questionNumber) => {
     // Remove any existing highlights first
@@ -656,6 +723,10 @@ const MainLayout = () => {
     );
 
     const locateText = questionData?.locate;
+
+    // Same click also replays the moment the answer is spoken. Kept as a separate,
+    // self-contained call so the highlight below behaves exactly as it always has.
+    handlePlayCue(questionNumber);
 
     if (locateText) {
       // Find the transcript panel container
@@ -1718,6 +1789,8 @@ const MainLayout = () => {
           answerData={answerData}
           forecastMode={isReviewMode && (forecastParts[currentPart] || (forecastPartFromNav === currentPart))}
           onSearchClick={handleSearchClick}
+          onPlayCueClick={handlePlayCue}
+          hasAudioCue={(qNum) => !!cueFor(qNum)}
           onExplainClick={handleExplainClick}
           isReviewMode={isReviewMode}
           retakeIncorrectMode={isRetakeIncorrectMode}

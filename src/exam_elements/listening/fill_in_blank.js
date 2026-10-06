@@ -216,6 +216,8 @@ const ListeningTest = ({
   answerData,
   forecastMode,
   onSearchClick,
+  onPlayCueClick,
+  hasAudioCue,
   onExplainClick,
   isReviewMode: isReviewModeProp,
   retakeIncorrectMode,
@@ -1120,7 +1122,7 @@ const ListeningTest = ({
             {/* Locate and Explain icons in review mode */}
             {isReviewMode && validation.evaluation && (
               <span className="ml-2 inline-flex items-center gap-1">
-                {validation.locate && onSearchClick && (
+                {(validation.locate || (hasAudioCue && hasAudioCue(parseInt(qNum) <= 10 ? ((currentPart - 1) * 10) + parseInt(qNum) : parseInt(qNum)))) && onSearchClick && (
                   <button
                     type="button"
                     onClick={(e) => {
@@ -1542,7 +1544,7 @@ const ListeningTest = ({
               {/* Locate and Explain icons for multiple choice */}
               {isReviewMode && validation.evaluation && (
                 <span className="inline-flex items-center gap-1 ml-2">
-                  {validation.locate && onSearchClick && (
+                  {(validation.locate || (hasAudioCue && hasAudioCue(parseInt(q.number)))) && onSearchClick && (
                     <button
                       onClick={() => onSearchClick(parseInt(q.number))}
                       className="p-1 rounded hover:bg-blue-100 transition-colors"
@@ -1662,7 +1664,7 @@ const ListeningTest = ({
                   const qNum = s.startNum + idx;
                   const validation = getAnswerValidation(qNum.toString());
                   if (!validation || !validation.evaluation) return null;
-                  const hasLocate = validation.locate && onSearchClick;
+                  const hasLocate = (validation.locate || (hasAudioCue && hasAudioCue(parseInt(qNum)))) && onSearchClick;
                   const hasExplain = validation.explanation && onExplainClick;
                   if (!hasLocate && !hasExplain) return null;
                   return (
@@ -1839,7 +1841,7 @@ const ListeningTest = ({
                           const validation = getAnswerValidation(questionNum?.toString());
                           const localIsReviewMode = location.state?.fromResultReview;
                           if (!localIsReviewMode || !validation || !validation.evaluation) return null;
-                          const hasLocate = validation.locate && onSearchClick;
+                          const hasLocate = (validation.locate || (hasAudioCue && hasAudioCue(parseInt(questionNum)))) && onSearchClick;
                           const hasExplain = validation.explanation && onExplainClick;
                           if (!hasLocate && !hasExplain) return null;
                           return (
@@ -2061,7 +2063,7 @@ const ListeningTest = ({
                       {/* Locate and Explain icons for drag-drop */}
                       {isReviewMode && validation && validation.evaluation && (
                         <span className="inline-flex items-center gap-1 ml-2">
-                          {validation.locate && onSearchClick && (
+                          {(validation.locate || (hasAudioCue && hasAudioCue(parseInt(questionNum)))) && onSearchClick && (
                             <button
                               onClick={() => onSearchClick(questionNum)}
                               className="p-1 rounded hover:bg-blue-100 transition-colors"
@@ -2249,7 +2251,7 @@ const ListeningTest = ({
                   {/* Locate and Explain icons */}
                   {isReviewMode && validation.evaluation && (
                     <span className="ml-2 inline-flex items-center gap-1">
-                      {validation.locate && onSearchClick && (
+                      {(validation.locate || (hasAudioCue && hasAudioCue(parseInt(qNum) <= 10 ? ((currentPart - 1) * 10) + parseInt(qNum) : parseInt(qNum)))) && onSearchClick && (
                         <button
                           type="button"
                           onClick={(e) => {
