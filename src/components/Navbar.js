@@ -5,6 +5,7 @@ import { logout } from '../utils/authUtils';
 import { motion, AnimatePresence } from 'framer-motion';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
+import TopPerformerBadge from './TopPerformerBadge';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -83,6 +84,11 @@ const Navbar = () => {
         localStorage.getItem('can_dictation') === '1' || localStorage.getItem('role') === 'student'
     );
 
+    // Top Performer badge (per-skill Top-10 counts from /student/profile).
+    const [isTopPerformer, setIsTopPerformer] = useState(false);
+    const [readTop10, setReadTop10] = useState(0);
+    const [listenTop10, setListenTop10] = useState(0);
+
     const fetchUserProfile = async () => {
         try {
             const profileResponse = await fetchWithTimeout(`${API_BASE}/student/profile`);
@@ -91,6 +97,9 @@ const Navbar = () => {
             if (profileResponse.ok && profileData) {
                 setUserEmail(profileData.email);
                 setUsername(profileData.username);
+                setIsTopPerformer(!!profileData.is_top_performer);
+                setReadTop10(profileData.read_top10_count || 0);
+                setListenTop10(profileData.listen_top10_count || 0);
                 // Sync role from server to localStorage to prevent tampering
                 if (profileData.role) {
                     localStorage.setItem('role', profileData.role);
@@ -504,6 +513,12 @@ const Navbar = () => {
                                                     </div>
                                                     <div className="flex flex-col">
                                                         <span className="font-medium text-gray-800">{username}</span>
+                                                        {isTopPerformer && (
+                                                            <div className="flex flex-wrap gap-1 mt-0.5">
+                                                                {readTop10 > 0 && <TopPerformerBadge count={readTop10} skill="reading" size="xs" />}
+                                                                {listenTop10 > 0 && <TopPerformerBadge count={listenTop10} skill="listening" size="xs" />}
+                                                            </div>
+                                                        )}
                                                         <span className="text-xs text-gray-500">
                                                             {localStorage.getItem('role') === 'student' ? 'Student Account' : userEmail}
                                                         </span>
@@ -651,6 +666,12 @@ const Navbar = () => {
                                                 <User size={16} className="text-white" />
                                             </div>
                                             <span className="font-medium">{username}</span>
+                                            {isTopPerformer && (
+                                                <span className="flex flex-wrap gap-1">
+                                                    {readTop10 > 0 && <TopPerformerBadge count={readTop10} skill="reading" size="xs" />}
+                                                    {listenTop10 > 0 && <TopPerformerBadge count={listenTop10} skill="listening" size="xs" />}
+                                                </span>
+                                            )}
                                         </div>
 
                                         <Link

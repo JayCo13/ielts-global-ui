@@ -13,6 +13,7 @@ import ForceLogoutDialog from '../../components/ForceLogoutDialog';
 import { TranslatorDialog, useTextSelection } from '../../translator';
 import API_BASE from '../../config/api';
 import ErrorReportModal from '../../components/ErrorReportModal';
+import Leaderboard from '../../components/Leaderboard';
 import fetchWithTimeout from '../../utils/fetchWithTimeout';
 import useExamHeartbeat from '../../utils/useExamHeartbeat';
 import useTabSwitchCount from '../../utils/useTabSwitchCount';
@@ -86,6 +87,7 @@ const MainLayout = () => {
   const [showExitAlert, setShowExitAlert] = useState(false);
   const [showClearDataDialog, setShowClearDataDialog] = useState(false);
   const [showErrorReport, setShowErrorReport] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const menuRef = useRef(null);
   const [wifiStatus, setWifiStatus] = useState({
     isConnected: true,
@@ -3662,6 +3664,14 @@ const MainLayout = () => {
                       >
                         Report an Error
                       </button>
+                      {!isForecastMode && (
+                        <button
+                          onClick={() => setShowLeaderboard(true)}
+                          className="px-6 py-4 rounded-lg text-lg font-bold transition-colors border-2 border-[#eb7e37] text-[#eb7e37] bg-white hover:bg-[#eb7e37] hover:text-white"
+                        >
+                          Ranking
+                        </button>
+                      )}
                       <button
                         onClick={() => setShowClearDataDialog(true)}
                         className={`px-6 py-4 rounded-lg text-lg font-bold transition-colors
@@ -3689,6 +3699,24 @@ const MainLayout = () => {
           skill="reading"
           examTitle={examData?.exam_title}
         />
+        {showLeaderboard && (
+          <div className="fixed inset-0 z-[10001] flex items-center justify-center bg-black bg-opacity-50 p-4" onClick={() => setShowLeaderboard(false)}>
+            <div className="w-full max-w-lg max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+              <div className="flex justify-end mb-2 shrink-0">
+                <button
+                  onClick={() => setShowLeaderboard(false)}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white text-gray-800 text-sm font-bold shadow-lg ring-1 ring-black/5 hover:bg-[#eb7e37] hover:text-white hover:shadow-xl transition-all"
+                >
+                  Close
+                  <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-600 text-xs leading-none">✕</span>
+                </button>
+              </div>
+              <div className="overflow-y-auto min-h-0">
+                <Leaderboard examId={examId} />
+              </div>
+            </div>
+          </div>
+        )}
 
       </div>
       <ExplanationModal

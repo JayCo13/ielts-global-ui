@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
 } from 'recharts';
-import { TrendingUp, TrendingDown, Minus, BookOpen, Headphones, PenLine, Mic } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, BookOpen, Headphones, PenLine } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Seo from '../components/Seo';
 import API_BASE from '../config/api';
@@ -14,7 +14,8 @@ const SKILLS = [
   { key: 'reading', label: 'Reading', unit: 'accuracy', Icon: BookOpen },
   { key: 'listening', label: 'Listening', unit: 'accuracy', Icon: Headphones },
   { key: 'writing', label: 'Writing', unit: 'band', Icon: PenLine },
-  { key: 'speaking', label: 'Speaking', unit: 'band', Icon: Mic },
+  // VN also shows a Speaking tab fed by graded Speaking test attempts; the global app
+  // has no such attempts yet, so the tab is hidden (backend still returns the data).
 ];
 
 const accTone = (a) => (a >= 70 ? 'text-green-600' : a >= 40 ? 'text-amber-600' : 'text-red-500');

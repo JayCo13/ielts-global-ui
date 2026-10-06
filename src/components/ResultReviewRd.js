@@ -12,6 +12,7 @@ import lowAnimation from '../effect/low.json';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
 import { computeTypeStats, formatDuration } from '../utils/questionTypeStats';
+import Leaderboard from './Leaderboard';
 
 const circumference = 2 * Math.PI * 45;
 const fadeIn = keyframes`
@@ -676,6 +677,9 @@ const ResultReview = () => {
             </div>
           </div>
         </div>
+
+        {/* Leaderboard — full tests only, after the data table + question review */}
+        {!forecastPart && examId && <Leaderboard examId={examId} pageSize={20} />}
       </div>
     </div>
   );
