@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
-import { Search, Lock, ChevronLeft, ChevronRight, Sparkles, CheckCircle } from 'lucide-react';
-import AIFeedbackDialog from './AiFeedbackDialog';
-import EditEssayDialog from './EditEssayDialog';
+import { Search, Lock, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
-import fetchWithTimeout from '../utils/fetchWithTimeout';
 import Seo from './Seo';
 import ForecastStars, { ForecastLegend } from './ForecastStars';
 import DifficultyBadge from './DifficultyBadge';
@@ -27,10 +24,9 @@ const WritingForecast = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isVIP, setIsVIP] = useState(false);
-  // Any active VIP subscription (any skill/package) unlocks the 6/day AI
-  // grading quota — separate from `isVIP`, which gates the writing-only search
-  // feature. A Listening/Reading-only VIP must still get the 6 credits.
-  const [hasVipCredits, setHasVipCredits] = useState(false);
+  // AI grading quota now comes from the server (/ai/writing/quota), which applies
+  // the global rule: ANY active VIP subscription (any package) counts as VIP.
+  const [aiQuota, setAiQuota] = useState(null);
   const [partSort, setPartSort] = useState(initial.part);
   const [typeFilter, setTypeFilter] = useState(initial.type);
   const [currentPage, setCurrentPage] = useState(1);
@@ -51,13 +47,7 @@ const WritingForecast = () => {
   };
   const itemsPerPage = 6;
   const userRole = localStorage.getItem('role');
-  const [aiDialogOpen, setAiDialogOpen] = useState(false);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiResult, setAiResult] = useState(null);
-  const [evaluatedMap, setEvaluatedMap] = useState({});
-  const [aiRemaining, setAiRemaining] = useState(0);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [selectedPart, setSelectedPart] = useState(null);
+  const isLoggedIn = !!(secureStorage.getItem('token') || localStorage.getItem('token'));
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,9 +68,6 @@ const WritingForecast = () => {
             vipData.package_type === 'all_skills' || (vipData.package_type === 'single_skill' && vipData.skill_type === 'writing')
           );
           setIsVIP(hasAccess);
-          // Grading quota is unlocked by ANY active subscription, not just
-          // writing-access ones.
-          setHasVipCredits(vipData.is_subscribed === true);
         }
         const flat = [];
         forecastData.forEach(exam => {
@@ -175,21 +162,20 @@ const WritingForecast = () => {
   const paginated = sorted.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(sorted.length / itemsPerPage) || 1;
 
+  // Authoritative Writing-AI grade quota from the server (Gemini engine,
+  // /ai/writing/quota). Replaces the old per-browser localStorage counters.
   useEffect(() => {
-    const role = localStorage.getItem('role');
-    const usernameKey = localStorage.getItem('username') || 'unknown';
-    const now = new Date();
-    const nowUtcMs = now.getTime() + (now.getTimezoneOffset() * 60000);
-    const vnMs = nowUtcMs + (7 * 60 * 60 * 1000);
-    const vn = new Date(vnMs);
-    const dateKey = `${vn.getUTCFullYear()}-${String(vn.getUTCMonth() + 1).padStart(2, '0')}-${String(vn.getUTCDate()).padStart(2, '0')}`;
-    const storeKey = `aiEvalCounters:${usernameKey}`;
-    const counters = JSON.parse(localStorage.getItem(storeKey) || '{}');
-    const isVipOrStudent = hasVipCredits || role === 'student';
-    const limit = isVipOrStudent ? 6 : 2;
-    const used = isVipOrStudent ? (counters[dateKey]?.total || 0) : (counters[dateKey]?.forecast || 0);
-    setAiRemaining(Math.max(0, limit - used));
-  }, [hasVipCredits, aiDialogOpen, aiLoading]);
+    const token = secureStorage.getItem('token') || localStorage.getItem('token');
+    if (!token) return;
+    (async () => {
+      try {
+        const r = await fetch(`${API_BASE}/ai/writing/quota`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (r.ok) setAiQuota(await r.json());
+      } catch (e) { /* ignore */ }
+    })();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -210,7 +196,7 @@ const WritingForecast = () => {
       />
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
           <nav className="flex" aria-label="Breadcrumb">
             <ol className="flex items-center space-x-2">
               <li>
@@ -220,10 +206,22 @@ const WritingForecast = () => {
               <li><span className="text-[#0096b1] font-medium">Writing Practice</span></li>
             </ol>
           </nav>
-          <div className="text-sm font-semibold text-red-700 mt-5">
-            <p>* Upgrade to VIP Listening and Reading to unlock 6 more free AI Writing evaluations per day *</p>
-            <p>* Free AI evaluation remaining today: {aiRemaining} *</p>
-          </div>
+          {aiQuota && (aiQuota.is_vip ? (
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#0096b1]/25 bg-[#0096b1]/5 px-4 py-2 self-start sm:self-auto">
+              <Sparkles className="w-4 h-4 text-[#0096b1] shrink-0" />
+              <span className="text-sm text-gray-600">AI evaluations this month</span>
+              <span className="text-sm font-bold text-[#0096b1] tabular-nums">{aiQuota.remaining}/{aiQuota.limit}</span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#eb7e37]/30 bg-gradient-to-r from-[#0096b1]/5 to-[#eb7e37]/10 px-4 py-2 self-start sm:self-auto">
+              <Sparkles className="w-4 h-4 text-[#eb7e37] shrink-0" />
+              <span className="text-sm text-gray-600">Free AI evaluations today</span>
+              <span className="text-base font-extrabold text-[#eb7e37] tabular-nums">
+                {aiQuota.remaining}<span className="text-gray-400 font-semibold text-sm">/{aiQuota.limit}</span>
+              </span>
+              <Link to="/vip-packages" className="text-xs font-bold text-[#0096b1] hover:underline">Upgrade to VIP</Link>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -347,96 +345,16 @@ const WritingForecast = () => {
                   >
                     Take Practice
                   </button>
-                      <button
-                        onClick={() => { setSelectedPart(it); setEditDialogOpen(true); }}
-                        className="mt-2 w-full bg-gray-800 text-white py-2 rounded"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={async () => {
-                          const role = localStorage.getItem('role');
-                          const usernameKey = localStorage.getItem('username') || 'unknown';
-                          const now = new Date();
-                          const nowUtcMs = now.getTime() + (now.getTimezoneOffset() * 60000);
-                          const vnMs = nowUtcMs + (7 * 60 * 60 * 1000);
-                          const vn = new Date(vnMs);
-                          const dateKey = `${vn.getUTCFullYear()}-${String(vn.getUTCMonth() + 1).padStart(2, '0')}-${String(vn.getUTCDate()).padStart(2, '0')}`;
-                          const storeKey = `aiEvalCounters:${usernameKey}`;
-                          const counters = JSON.parse(localStorage.getItem(storeKey) || '{}');
-                          if (!counters[dateKey]) counters[dateKey] = { full: 0, forecast: 0, total: 0 };
-                          const isVipOrStudent = hasVipCredits || role === 'student';
-                          if (aiRemaining <= 0) {
-                            setAiResult({ error: 'You have reached the daily AI evaluation limit.' });
-                            setAiDialogOpen(true);
-                            return;
-                          }
-                          if (isVipOrStudent) {
-                            if (counters[dateKey].total >= 6) {
-                              setAiResult({ error: 'You have exceeded the daily AI evaluation limit (6).' });
-                              setAiDialogOpen(true);
-                              return;
-                            }
-                          } else {
-                            if (counters[dateKey].forecast >= 2) {
-                              setAiResult({ error: 'Regular accounts can only evaluate 2 practice exercises per day.' });
-                              setAiDialogOpen(true);
-                              return;
-                            }
-                          }
-                          setAiLoading(true);
-                          setAiDialogOpen(true);
-                          try {
-                            const token = secureStorage.getItem('token') || localStorage.getItem('token');
-                            let essayText = null;
-                            try {
-                              const taskResponse = await fetchWithTimeout(`${API_BASE}/student/writing/tasks/${it.task_id}`, { headers: { 'Authorization': `Bearer ${token}` } });
-                              if (taskResponse.ok) {
-                                const taskData = await taskResponse.json();
-                                essayText = taskData.previous_answer?.answer_text;
-                              }
-                            } catch (fetchErr) {
-                              // Network error fetching task - treat as no essay
-                            }
-                            if (!essayText) {
-                              setAiResult({ error: 'No essay content to evaluate. Please click "Take Practice" or "Edit" to write your essay first.' });
-                              return;
-                            }
-                            const response = await fetchWithTimeout(`${API_BASE}/ai/evaluate-and-save/${it.task_id}`, {
-                              method: 'POST',
-                              headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ essay_text: essayText, instructions: it.instructions })
-                            });
-                            const responseText = await response.text();
-                            let data;
-                            try { data = JSON.parse(responseText); } catch { throw new Error('Invalid AI response'); }
-                            if (!response.ok) throw new Error(data.detail || 'AI error');
-                            if (!data.evaluation_result) throw new Error('Missing evaluation result');
-                            setAiResult({
-                              task_id: data.task_id,
-                              evaluation_timestamp: data.evaluation_timestamp,
-                              band_score: data.evaluation_result.band_score,
-                              word_count: data.word_count,
-                              answer_text: essayText,
-                              evaluation_result: data.evaluation_result,
-                              part_number: it.part_number
-                            });
-                            setEvaluatedMap(prev => ({ ...prev, [it.task_id]: true }));
-                            counters[dateKey].total = (counters[dateKey].total || 0) + 1;
-                            counters[dateKey].forecast = (counters[dateKey].forecast || 0) + 1;
-                            localStorage.setItem(storeKey, JSON.stringify(counters));
-                          } catch (err) {
-                            setAiResult({ error: `Unable to process AI response: ${err.message}` });
-                          } finally {
-                            setAiLoading(false);
-                          }
-                        }}
-                        className={`mt-2 w-full bg-gradient-to-r from-green-400 to-blue-400 hover:from-green-500 hover:to-blue-500 text-white py-2 rounded flex items-center justify-center gap-2 ${aiRemaining <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        disabled={aiLoading || aiRemaining <= 0}
-                      >
-                        {evaluatedMap[it.task_id] ? <CheckCircle className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
-                        {aiLoading ? '...' : 'Evaluate with AI'}
-                      </button>
+                  {isLoggedIn && (
+                    <button
+                      onClick={() => navigate('/writing_review', { state: { testId: it.exam_id, isForecast: true, partNumber: it.part_number } })}
+                      className="mt-2 w-full bg-gradient-to-r from-green-400 to-blue-400 hover:from-green-500 hover:to-blue-500 text-white py-2 rounded flex items-center justify-center gap-2"
+                      title="Review, edit and evaluate your essay with AI"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      Review &amp; Evaluate with AI
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
@@ -461,20 +379,6 @@ const WritingForecast = () => {
             </div>
           </>
         )}
-        <EditEssayDialog
-          isOpen={editDialogOpen}
-          onClose={() => { setEditDialogOpen(false); setSelectedPart(null); }}
-          taskId={selectedPart}
-          partNumber={selectedPart?.part_number}
-        />
-        <AIFeedbackDialog
-          isOpen={aiDialogOpen}
-          onClose={() => setAiDialogOpen(false)}
-          result={aiResult}
-          loading={aiLoading}
-          setSelectedPart={setSelectedPart}
-          setEditDialogOpen={setEditDialogOpen}
-        />
       </div>
     </div>
   );
