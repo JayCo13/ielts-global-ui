@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, ChevronRight, Star, Trash2, BookOpen, Headphones, Filter, Languages, ChevronLeft, Play, RotateCcw, CheckCircle, XCircle, Clock, PenTool, Settings, Volume2 } from 'lucide-react';
+import { Home, ChevronRight, Star, Trash2, BookOpen, Headphones, Filter, Languages, ChevronLeft, Play, RotateCcw, CheckCircle, XCircle, Clock, PenTool, Mic, Settings, Volume2 } from 'lucide-react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import { toast, Toaster } from 'react-hot-toast';
@@ -8,6 +8,7 @@ import { TranslatorDialog } from '../translator';
 import ConfirmDialog from './ConfirmDialog';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
+import PronunciationCoach, { useSpeakingAllowed } from './PronunciationCoach';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -199,7 +200,29 @@ const NewWords = () => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const displayedVocabulary = filteredVocabulary.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
+    // Words saved from Speaking (SelectionMenu) and Writing get their own badge instead of
+    // falling through to "Reading" (ported from VN).
+    const EXTRA_SOURCE_BADGES = {
+        writing: { label: 'Writing', cls: 'bg-emerald-100 text-emerald-700', Icon: PenTool },
+        speaking: { label: 'Speaking', cls: 'bg-rose-100 text-rose-700', Icon: Mic },
+    };
+
+    // AI pronunciation practice per word (ported from VN) — only offered while the
+    // backend Speaking gate is open.
+    const speakingAllowed = useSpeakingAllowed();
+    const [coachWord, setCoachWord] = useState(null);
+
     const getSourceBadge = (sourceType) => {
+        const extra = EXTRA_SOURCE_BADGES[sourceType];
+        if (extra) {
+            const { label, cls, Icon } = extra;
+            return (
+                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${cls}`}>
+                    <Icon className="w-3 h-3" />
+                    {label}
+                </span>
+            );
+        }
         return sourceType === 'listening' ? (
             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
                 <Headphones className="w-3 h-3" />
@@ -823,8 +846,18 @@ const NewWords = () => {
                                                     {word.word}
                                                     <Languages className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-[#0096b1]" />
                                                 </button>
-                                                <div className="mt-1">
+                                                <div className="mt-1 flex items-center gap-2 flex-wrap">
                                                     {getSourceBadge(word.source_type)}
+                                                    {speakingAllowed && (
+                                                        <button
+                                                            onClick={() => setCoachWord(word)}
+                                                            className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs
+                                                                       font-semibold bg-[#eb7e37]/12 text-[#eb7e37] hover:bg-[#eb7e37]/20"
+                                                            title="AI pronunciation practice"
+                                                        >
+                                                            <Mic className="w-3 h-3" /> Practise pronunciation
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </div>
 
@@ -913,6 +946,11 @@ const NewWords = () => {
                         </div>
                     ))}
             </div>
+
+            {coachWord && (
+                <PronunciationCoach word={coachWord.word} example={coachWord.example}
+                                    onClose={() => setCoachWord(null)} />
+            )}
 
             <Footer />
         </div >

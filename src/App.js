@@ -23,6 +23,13 @@ import Profile from './components/Profile';
 import ResultReviewRd from './components/ResultReviewRd';
 import ResultReview from './components/ResultReview';
 import SpeakingLayout from './exam_elements/speaking/speaking_layout';
+import SpeakingSetup from './exam_elements/speaking/SpeakingSetup';
+import SpeakingRoom from './exam_elements/speaking/SpeakingRoom';
+import SpeakingResult from './exam_elements/speaking/SpeakingResult';
+import SpeakingForecast from './exam_elements/speaking/SpeakingForecast';
+import SpeakingAnalysis from './exam_elements/speaking/SpeakingAnalysis';
+import SpeakingQuestionDetail from './exam_elements/speaking/SpeakingQuestionDetail';
+import PronunciationLessons from './exam_elements/speaking/PronunciationLessons';
 import WritingLayout from './exam_elements/writing/writing_layout';
 import WritingForecastLayout from './exam_elements/writing/forecast_layout';
 import ExamHistory from './components/ExamHistory';
@@ -122,6 +129,15 @@ function App() {
             <Route path="/listening_test_room" element={<ListeningPageWrapper />} />
             <Route path="/reading_test_room" element={<ReadingPageWrapper />} />
             <Route path="/speaking_test_room" element={<SpeakingLayout />} />
+            {/* Speaking engine (ported from VN): AI examiner test, forecast practice,
+                analysis and pronunciation lessons. */}
+            <Route path="/speaking_test_setup" element={<SpeakingSetup />} />
+            <Route path="/speaking_test" element={<SpeakingRoom />} />
+            <Route path="/speaking_result" element={<SpeakingResult />} />
+            <Route path="/speaking_forecast" element={<SpeakingForecast />} />
+            <Route path="/speaking_analysis" element={<SpeakingAnalysis />} />
+            <Route path="/speaking_question" element={<SpeakingQuestionDetail />} />
+            <Route path="/speaking_lessons" element={<PronunciationLessons />} />
             <Route path="/writing_test_room" element={<WritingLayout />} />
             <Route path="/writing_forecast_view" element={<WritingForecastLayout />} />
             <Route path="/writing_review" element={<WritingReview />} />

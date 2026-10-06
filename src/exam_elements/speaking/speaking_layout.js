@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Wrench } from 'lucide-react';
 import API_BASE from '../../config/api';
 import fetchWithTimeout from '../../utils/fetchWithTimeout';
 
@@ -19,6 +19,22 @@ const SpeakingLayout = () => {
   const [pdfUrl, setPdfUrl] = useState(statePdfUrl ? toAbsoluteUrl(statePdfUrl) : '');
   const [partType, setPartType] = useState(statePart || null);
   const [loading, setLoading] = useState(!statePdfUrl);
+  const [locked, setLocked] = useState(false);
+
+  // Speaking gate (app/utils/speaking_gate.py — open to all accounts today). The room can be
+  // opened straight from a URL, so it checks on its own. Fails open on network errors.
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return undefined;
+    let alive = true;
+    fetchWithTimeout(`${API_BASE}/student/speaking/access`, { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => r.json().catch(() => ({})).then((d) => ({ status: r.status, ok: r.ok, d })))
+      .then(({ status, ok, d }) => {
+        if (alive && (status === 503 || (ok && d.allowed === false))) { setLocked(true); setLoading(false); }
+      })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
 
   useEffect(() => {
     if (statePdfUrl) return;
@@ -51,6 +67,29 @@ const SpeakingLayout = () => {
     };
     fetchMaterial();
   }, [location.search, statePdfUrl, stateId, navigate]);
+
+  if (locked) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 max-w-md w-full p-8 text-center">
+          <div className="w-16 h-16 rounded-full bg-[#eb7e37]/10 flex items-center justify-center mx-auto mb-5">
+            <Wrench className="text-[#eb7e37]" size={30} strokeWidth={2} />
+          </div>
+          <h2 className="text-2xl font-bold text-[#2b5356] mb-3">Feature update in progress</h2>
+          <p className="text-gray-600 leading-relaxed mb-6">
+            Speaking is being upgraded. We will reopen it as soon as it is ready;
+            Listening, Reading and Writing work as usual.
+          </p>
+          <button
+            onClick={() => navigate('/')}
+            className="px-6 py-2.5 rounded-lg bg-[#0096b1] text-white font-semibold hover:bg-[#007a90] transition-colors"
+          >
+            Back to home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
