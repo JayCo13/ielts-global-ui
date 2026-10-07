@@ -7,11 +7,11 @@ import { Helmet } from 'react-helmet-async';
 // through <HelmetProvider>). Keeps every public page's <head> consistent and
 // gives Google/AI answer-engines unique, crawlable signals per route.
 
-export const SITE_URL = 'https://ieltscomputertest.com';
-export const SITE_NAME = 'ieltscomputertest.com';
+export const SITE_URL = 'https://englishoncomputer.com';
+export const SITE_NAME = 'englishoncomputer.com';
 export const DEFAULT_IMAGE = `${SITE_URL}/img/logo-ielts.png`;
 export const DEFAULT_TITLE =
-  'IELTS Computer Test – Practice IELTS Online Free | ieltscomputertest.com';
+  'IELTS Computer Test – Practice IELTS Online Free | englishoncomputer.com';
 export const DEFAULT_DESCRIPTION =
   'Take the IELTS computer test online with a 100% real exam interface. Practice IELTS Listening, Reading, Writing and Speaking with up-to-date forecast tests. Improve your IELTS score effectively.';
 

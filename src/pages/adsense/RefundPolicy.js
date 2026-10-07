@@ -18,8 +18,8 @@ const RefundPolicy = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col w-full">
       <Seo
-        title="Refund Policy | ieltscomputertest.com"
-        description="Refund policy for ieltscomputertest.com VIP IELTS practice subscriptions."
+        title="Refund Policy | englishoncomputer.com"
+        description="Refund policy for englishoncomputer.com VIP IELTS practice subscriptions."
         path="/refund-policy"
       />
       <Navbar />
@@ -36,7 +36,7 @@ const RefundPolicy = () => {
             <div className="px-4 sm:px-6 pb-4">
               <h1 className="text-4xl sm:text-3xl text-center font-bold text-gray-900 mb-2">Refund Policy</h1>
               <p className="text-gray-500 text-sm">
-                Applicable to the e-commerce website: ieltscomputertest.com
+                Applicable to the e-commerce website: englishoncomputer.com
               </p>
               <p className="text-gray-500 text-sm">
                 Last updated: April 2, 2026

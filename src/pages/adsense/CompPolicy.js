@@ -18,8 +18,8 @@ const CompPolicy = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col w-full">
       <Seo
-        title="Terms and Conditions | ieltscomputertest.com"
-        description="The terms and conditions governing the use of ieltscomputertest.com IELTS practice services."
+        title="Terms and Conditions | englishoncomputer.com"
+        description="The terms and conditions governing the use of englishoncomputer.com IELTS practice services."
         path="/comp-policy"
       />
       <Navbar />
@@ -36,7 +36,7 @@ const CompPolicy = () => {
             <div className="px-4 sm:px-6 pb-4">
               <h1 className="text-4xl sm:text-3xl text-center font-bold text-gray-900 mb-2">Terms and Conditions</h1>
               <p className="text-gray-500 text-sm">
-                Applicable to the e-commerce website: ieltscomputertest.com
+                Applicable to the e-commerce website: englishoncomputer.com
               </p>
               <p className="text-gray-500 text-sm">
                 Last updated: April 2, 2026
@@ -46,7 +46,7 @@ const CompPolicy = () => {
             {/* Full width content */}
             <div className="w-full px-4 sm:px-6 pb-6">
               <p className="text-gray-700 mb-6">
-                These Terms and Conditions govern the purchase and use of products and services on <span className="font-bold">ieltscomputertest.com</span>.
+                These Terms and Conditions govern the purchase and use of products and services on <span className="font-bold">englishoncomputer.com</span>.
               </p>
 
               {/* Section 1: Scope of Service */}

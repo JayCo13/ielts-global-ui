@@ -166,7 +166,7 @@ const StudentGuard = () => {
         <div className="bg-white p-8 rounded-lg shadow-lg text-center max-w-md">
           <h2 className="text-xl font-bold mb-4 text-red-600">Account has been disabled</h2>
           <p className="mb-4">
-           Your account has been disabled by the moderation team for violating the rules of ieltscomputertest.com
+           Your account has been disabled by the moderation team for violating the rules of englishoncomputer.com
           </p>
           <div className="flex justify-center gap-4">
             <button

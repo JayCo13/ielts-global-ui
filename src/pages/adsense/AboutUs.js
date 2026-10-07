@@ -17,8 +17,8 @@ const AboutUs = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Seo
-        title="About Us | ieltscomputertest.com"
-        description="Learn about ieltscomputertest.com — helping students worldwide practice IELTS online with a 100% real computer-based exam interface for Listening, Reading, Writing and Speaking."
+        title="About Us | englishoncomputer.com"
+        description="Learn about englishoncomputer.com — helping students worldwide practice IELTS online with a 100% real computer-based exam interface for Listening, Reading, Writing and Speaking."
         path="/about"
       />
       <Navbar />
@@ -47,7 +47,7 @@ const AboutUs = () => {
             <div className="w-full md:w-3/4">
               <div className="space-y-8">
                 <p className="text-gray-700">
-                  <span className="font-bold text-[#e67e22]">ieltscomputertest.com</span> is designed to deliver a professional computer-based test preparation experience with high-quality materials and an intuitive interface. Our platform enables learners to practice efficiently, track their progress, and continuously improve their performance.
+                  <span className="font-bold text-[#e67e22]">englishoncomputer.com</span> is designed to deliver a professional computer-based test preparation experience with high-quality materials and an intuitive interface. Our platform enables learners to practice efficiently, track their progress, and continuously improve their performance.
                 </p>
 
                 <p className="text-gray-700">
@@ -77,7 +77,7 @@ const AboutUs = () => {
               <blockquote className="italic text-2xl md:text-3xl text-gray-700 mb-4">
                 "Master computer-based practice, where every session sharpens your skills and brings your goals within reach."
               </blockquote>
-              <p className="text-gray-500">- ieltscomputertest.com team</p>
+              <p className="text-gray-500">- englishoncomputer.com team</p>
             </div>
             <div className="w-full md:w-1/2 flex justify-center">
               <img
@@ -96,7 +96,7 @@ const AboutUs = () => {
           <div className="mb-24">
             <h2 className="text-2xl font-semibold text-gray-900 mb-6">Our Team</h2>
             <p className="text-gray-700 mb-6">
-              Ieltscomputertest.com brings together a team of experienced professionals in education and technology. We continuously research and improve our platform to deliver effective and up-to-date learning solutions for our users.
+              Englishoncomputer.com brings together a team of experienced professionals in education and technology. We continuously research and improve our platform to deliver effective and up-to-date learning solutions for our users.
             </p>
             <p className="text-gray-700 mb-4">Our team includes:</p>
 

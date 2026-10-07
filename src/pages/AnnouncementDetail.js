@@ -34,7 +34,7 @@ export default function AnnouncementDetail() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Seo
-        title={item?.title ? `${item.title} | ieltscomputertest.com` : undefined}
+        title={item?.title ? `${item.title} | englishoncomputer.com` : undefined}
         path={`/news/${id}`}
         type="article"
       />

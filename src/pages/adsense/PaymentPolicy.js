@@ -18,8 +18,8 @@ const PaymentPolicy = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col w-full">
       <Seo
-        title="Payment Policy | ieltscomputertest.com"
-        description="Payment terms for ieltscomputertest.com VIP plans and IELTS practice subscriptions."
+        title="Payment Policy | englishoncomputer.com"
+        description="Payment terms for englishoncomputer.com VIP plans and IELTS practice subscriptions."
         path="/payment-policy"
       />
       <Navbar />
@@ -36,7 +36,7 @@ const PaymentPolicy = () => {
             <div className="px-4 sm:px-6 pb-4">
               <h1 className="text-4xl sm:text-3xl text-center font-bold text-gray-900 mb-2">Payment Policy</h1>
               <p className="text-gray-500 text-sm">
-                Applicable to the e-commerce website: ieltscomputertest.com
+                Applicable to the e-commerce website: englishoncomputer.com
               </p>
               <p className="text-gray-500 text-sm">
                 Last updated: April 2, 2026
@@ -46,7 +46,7 @@ const PaymentPolicy = () => {
             {/* Full width content */}
             <div className="w-full px-4 sm:px-6 pb-6">
               <p className="text-gray-700 mb-6">
-                <span className="font-bold">ieltscomputertest.com</span> provides secure and convenient payment methods to ensure a smooth purchasing experience for our customers.
+                <span className="font-bold">englishoncomputer.com</span> provides secure and convenient payment methods to ensure a smooth purchasing experience for our customers.
               </p>
 
               <div className="mb-6">

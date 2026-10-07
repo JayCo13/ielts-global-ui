@@ -352,7 +352,7 @@ const LoginForm = () => {
           <div className="md:w-1/2 p-8">
             <div className="space-y-8">
               <div>
-                <h1 className="text-2xl font-bold text-lime-500 mb-8 text-center">Login Ieltscomputertest.com</h1>
+                <h1 className="text-2xl font-bold text-lime-500 mb-8 text-center">Login Englishoncomputer.com</h1>
 
                 <form className="space-y-6" onSubmit={handleSubmit}>
                   {infoMessage && (

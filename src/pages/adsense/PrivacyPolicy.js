@@ -19,8 +19,8 @@ const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col w-full">
       <Seo
-        title="Privacy Policy | ieltscomputertest.com"
-        description="How ieltscomputertest.com collects, uses and protects your personal data when you practice IELTS online."
+        title="Privacy Policy | englishoncomputer.com"
+        description="How englishoncomputer.com collects, uses and protects your personal data when you practice IELTS online."
         path="/privacy-policy"
       />
       <Navbar />
@@ -45,7 +45,7 @@ const PrivacyPolicy = () => {
               {/* Left content column */}
               <div className="w-full lg:w-7/12 px-4 sm:px-6 pb-6">
                 <p className="text-gray-700 mb-6">
-                  <span className="font-bold">ieltscomputertest.com</span> is committed to protecting the privacy and personal information of our users. This policy explains how we collect, use, and safeguard your information when you use our website and services.
+                  <span className="font-bold">englishoncomputer.com</span> is committed to protecting the privacy and personal information of our users. This policy explains how we collect, use, and safeguard your information when you use our website and services.
                 </p>
 
                 <div className="mb-6">
@@ -79,7 +79,7 @@ const PrivacyPolicy = () => {
                 <div className="mb-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-3">4. Entities That May Access the Information</h2>
                   <ul className="space-y-2 text-gray-700">
-                    <li>• Order management staff and customer service team of ieltscomputertest.com</li>
+                    <li>• Order management staff and customer service team of englishoncomputer.com</li>
                     <li>• Competent state authorities upon legal request</li>
                     <li>• Trusted third-party service providers (such as payment processors and analytics tools) who assist in operating our platform</li>
                     <li>• We do not sell, exchange, or share customer personal information with third parties beyond what is necessary for service delivery.</li>

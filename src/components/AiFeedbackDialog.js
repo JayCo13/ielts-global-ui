@@ -373,7 +373,7 @@ const AIFeedbackDialog = ({ isOpen, onClose, result, loading, setSelectedPart, s
                   bounce: 0.4 
                 }}
               >
-                Essay evaluation results from ieltscomputertest.com AI
+                Essay evaluation results from englishoncomputer.com AI
               </motion.h1>
               
                 <motion.button

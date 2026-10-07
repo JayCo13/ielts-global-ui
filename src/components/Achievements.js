@@ -11,7 +11,7 @@ const Achievements = () => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [selectedCertificate, setSelectedCertificate] = useState(null);
     const [images, setImages] = useState([]);
-    const [centerText, setCenterText] = useState('ieltscomputertest.com');
+    const [centerText, setCenterText] = useState('englishoncomputer.com');
     const [sloganText] = useState('Right trust – Breakthrough future');
     const [currentSlide, setCurrentSlide] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
@@ -132,8 +132,8 @@ const Achievements = () => {
     return (
         <div>
             <Seo
-                title="Student Achievements & IELTS Results | ieltscomputertest.com"
-                description="See real IELTS band scores and achievements from students who practiced online with ieltscomputertest.com."
+                title="Student Achievements & IELTS Results | englishoncomputer.com"
+                description="See real IELTS band scores and achievements from students who practiced online with englishoncomputer.com."
                 path="/achievements"
             />
             <Navbar />
@@ -296,7 +296,7 @@ const Achievements = () => {
                 </div>
                 <div class="inline-flex items-center justify-center w-full">
                     <hr class="w-[90%] h-1 my-8 bg-gray-200 border-0 dark:bg-gray-400 rounded-full" />
-                    <span class="absolute px-3 font-bold text-gray-900 -translate-x-1/2 bg-white left-1/2 dark:text-gray-400">ieltscomputertest.com</span>
+                    <span class="absolute px-3 font-bold text-gray-900 -translate-x-1/2 bg-white left-1/2 dark:text-gray-400">englishoncomputer.com</span>
                 </div>
                 {/* Certificate Gallery Section */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 overflow-hidden rounded-2xl">
@@ -453,7 +453,7 @@ const Achievements = () => {
                             <div className="relative">
                                 <div className="absolute inset-0 flex items-center justify-center opacity-25 z-10">
                                     <div className="bg-gray-200 text-gray-500 text-md md:text-2xl font-bold px-2 py-1 rounded-md">
-                                        ieltscomputertest.com
+                                        englishoncomputer.com
                                     </div>
                                 </div>
                                 <div className="max-h-[70vh] flex items-center justify-center p-4">

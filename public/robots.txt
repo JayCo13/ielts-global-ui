@@ -1,4 +1,4 @@
-# robots.txt for ieltscomputertest.com
+# robots.txt for englishoncomputer.com
 # Default: allow everything, then carve out private / thin / in-exam routes
 User-agent: *
 Allow: /
@@ -62,9 +62,9 @@ Allow: /
 User-agent: Google-Extended
 Allow: /
 
-Sitemap: https://ieltscomputertest.com/sitemap.xml
+Sitemap: https://englishoncomputer.com/sitemap.xml
 
 # Dynamic per-test sitemap — auto-includes every active exam/part, generated live
 # from the DB (new admin tests appear automatically). Served on the main domain
 # via the /public/* proxy in _redirects, so it stays on the brand domain.
-Sitemap: https://ieltscomputertest.com/public/sitemap-exams.xml
+Sitemap: https://englishoncomputer.com/public/sitemap-exams.xml

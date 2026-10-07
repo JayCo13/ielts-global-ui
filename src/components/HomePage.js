@@ -243,8 +243,8 @@ const HomePage = () => {
               'Practice IELTS online with a 100% real-exam interface. Full IELTS Listening, Reading, Writing and Speaking tests plus up-to-date forecast exams.',
             provider: {
               '@type': 'EducationalOrganization',
-              name: 'ieltscomputertest.com',
-              sameAs: 'https://ieltscomputertest.com',
+              name: 'englishoncomputer.com',
+              sameAs: 'https://englishoncomputer.com',
             },
           },
           {
@@ -257,7 +257,7 @@ const HomePage = () => {
                 acceptedAnswer: {
                   '@type': 'Answer',
                   text:
-                    'Yes. ieltscomputertest.com lets you practice IELTS Listening, Reading, Writing and Speaking online with a 100% real-exam computer-based interface.',
+                    'Yes. englishoncomputer.com lets you practice IELTS Listening, Reading, Writing and Speaking online with a 100% real-exam computer-based interface.',
                 },
               },
               {

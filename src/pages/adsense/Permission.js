@@ -17,8 +17,8 @@ const Permission = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Seo
-        title="Business Information | ieltscomputertest.com"
-        description="Business information and contact details for ieltscomputertest.com IELTS online practice."
+        title="Business Information | englishoncomputer.com"
+        description="Business information and contact details for englishoncomputer.com IELTS online practice."
         path="/permission"
       />
       <Navbar />
@@ -27,7 +27,7 @@ const Permission = () => {
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="text-center">
             <div className="mb-8">
-              <h3 className="text-2xl font-bold mb-4">© 2026 ieltscomputertest.com</h3>
+              <h3 className="text-2xl font-bold mb-4">© 2026 englishoncomputer.com</h3>
               <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto rounded-full"></div>
             </div>
 

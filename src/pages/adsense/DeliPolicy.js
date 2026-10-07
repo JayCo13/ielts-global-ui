@@ -18,8 +18,8 @@ const DeliPolicy = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col w-full">
       <Seo
-        title="Delivery Policy | ieltscomputertest.com"
-        description="Delivery policy for ieltscomputertest.com digital IELTS practice subscriptions and services."
+        title="Delivery Policy | englishoncomputer.com"
+        description="Delivery policy for englishoncomputer.com digital IELTS practice subscriptions and services."
         path="/deli-policy"
       />
       <Navbar />
@@ -36,7 +36,7 @@ const DeliPolicy = () => {
             <div className="px-4 sm:px-6 pb-4">
               <h1 className="text-4xl sm:text-3xl text-center font-bold text-gray-900 mb-2">Delivery Policy</h1>
               <p className="text-gray-500 text-sm">
-                Applicable to the e-commerce website: ieltscomputertest.com
+                Applicable to the e-commerce website: englishoncomputer.com
               </p>
               <p className="text-gray-500 text-sm">
                 Last updated: April 2, 2026
@@ -46,7 +46,7 @@ const DeliPolicy = () => {
             {/* Full width content */}
             <div className="w-full px-4 sm:px-6 pb-6">
               <p className="text-gray-700 mb-6">
-                This Shipping and Delivery Policy outlines how products and services are delivered on ieltscomputertest.com.
+                This Shipping and Delivery Policy outlines how products and services are delivered on englishoncomputer.com.
               </p>
 
               {/* Section 1: Delivery Method */}
