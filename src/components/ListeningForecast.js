@@ -203,13 +203,13 @@ const ListeningForecast = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Seo
-        title="IELTS Listening Forecast 2026 | Predicted IELTS Listening Tests"
-        description={`Practice IELTS Listening with the latest forecast exams${items.length ? ` like ${items.slice(0, 3).map(i => i.exam_title).join(', ')}` : ''}. A star marks Highly Forecast tests most likely to appear in the real exam.`}
+        title="English Listening Focus Tests | EnglishOnComputer"
+        description={`Practice English listening with our focus tests${items.length ? ` like ${items.slice(0, 3).map(i => i.exam_title).join(', ')}` : ''}. A star marks Very Important tests to prioritise.`}
         path="/listening_forecast"
         jsonLd={{
           '@context': 'https://schema.org',
           '@type': 'ItemList',
-          name: 'IELTS Listening Forecast Tests',
+          name: 'English Listening Focus Tests',
           itemListElement: items.slice(0, 20).map((i, idx) => ({
             '@type': 'ListItem',
             position: idx + 1,
@@ -230,7 +230,7 @@ const ListeningForecast = () => {
         </nav>
         <div className="inline-flex items-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg text-sm">
           <Star className="w-5 h-5 text-yellow-500" fill="currentColor" />
-          <span className="text-gray-700">= Highly Forecast</span>
+          <span className="text-gray-700">= Very Important</span>
         </div>
       </div>
 

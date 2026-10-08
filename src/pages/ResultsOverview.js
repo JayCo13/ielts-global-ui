@@ -110,7 +110,7 @@ export default function ResultsOverview() {
           <div className="text-center py-20 text-gray-500">Loading...</div>
         ) : active === 'speaking' ? (
           /* Speaking is measured in bands, not correct answers like the other skills,
-             so it has its own block: average, band per Part and the 4 IELTS criteria. */
+             so it has its own block: average, band per Part and the 4 scoring criteria. */
           !speaking || !speaking.attempts ? (
             <div className="bg-white rounded-2xl shadow-sm p-10 text-center text-gray-400">
               No graded Speaking tests yet. Take a test and grade it to see statistics.

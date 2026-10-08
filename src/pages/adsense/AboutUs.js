@@ -1,118 +1,56 @@
-import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
-import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
-import Seo from '../../components/Seo';
+import React from 'react';
+import PolicyLayout, { Section, Bullets } from '../../components/PolicyLayout';
 
-const AboutUs = () => {
-  const fadeIn = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  };
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <Seo
-        title="About Us | englishoncomputer.com"
-        description="Learn about englishoncomputer.com — helping students worldwide practice IELTS online with a 100% real computer-based exam interface for Listening, Reading, Writing and Speaking."
-        path="/about"
-      />
-      <Navbar />
-      <main className="flex-1 container mx-auto px-4 py-12 max-w-6xl">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={fadeIn}
-          transition={{ duration: 0.6 }}
-          className="mb-12"
-        >
-          {/* Header Section */}
-          <h1 className="text-5xl md:text-6xl font-bold text-center mb-16">About Us.</h1>
-
-          {/* About Section with Sidebar */}
-          <div className="flex flex-col md:flex-row gap-8 mb-24">
-            {/* Sidebar Navigation - Static now */}
-            <div className="w-full md:w-1/4">
-              <ul className="space-y-4 sticky top-24">
-                <li className="font-semibold text-black">Who We Are.</li>
-                <li className="text-gray-500">Our Team</li>
-              </ul>
-            </div>
-
-            {/* Main Content */}
-            <div className="w-full md:w-3/4">
-              <div className="space-y-8">
-                <p className="text-gray-700">
-                  <span className="font-bold text-[#e67e22]">englishoncomputer.com</span> is designed to deliver a professional computer-based test preparation experience with high-quality materials and an intuitive interface. Our platform enables learners to practice efficiently, track their progress, and continuously improve their performance.
-                </p>
-
-                <p className="text-gray-700">
-                  Powered by advanced learning tools, we provide smart insights and personalized support. Backed by a team of experienced educators, our system offers carefully designed materials and effective study methods to help learners prepare with confidence and achieve their goals.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Full Width Image Section */}
-          <div className="w-full mb-24">
-            <img
-              src="/img/ab-bg.png"
-              alt="Our team working together"
-              className="w-full h-auto object-cover"
-              style={{ maxHeight: '270px' }}
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = 'https://via.placeholder.com/1200x250?text=Team+Collaboration';
-              }}
-            />
-          </div>
-
-          {/* Quote Section */}
-          <div className="flex flex-col md:flex-row gap-8 mb-24 justify-center items-center mx-auto max-w-5xl">
-            <div className="w-full md:w-1/2 flex flex-col justify-center">
-              <blockquote className="italic text-2xl md:text-3xl text-gray-700 mb-4">
-                "Master computer-based practice, where every session sharpens your skills and brings your goals within reach."
-              </blockquote>
-              <p className="text-gray-500">- englishoncomputer.com team</p>
-            </div>
-            <div className="w-full md:w-1/2 flex justify-center">
-              <img
-                src="/img/hp1.webp"
-                alt="Creative work"
-                className="w-[450px] h-[300px] rounded-md shadow-md"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = 'https://via.placeholder.com/600x400?text=Creative+Work';
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Team Section */}
-          <div className="mb-24">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6">Our Team</h2>
-            <p className="text-gray-700 mb-6">
-              Englishoncomputer.com brings together a team of experienced professionals in education and technology. We continuously research and improve our platform to deliver effective and up-to-date learning solutions for our users.
-            </p>
-            <p className="text-gray-700 mb-4">Our team includes:</p>
-
-            <ul className="list-disc list-inside space-y-3 text-gray-700">
-              <li>Experienced instructors with years of teaching expertise </li>
-              <li>Experts in AI and educational technology</li>
-              <li>Dedicated content development specialists</li>
-              <li>24/7 technical support and customer service team </li>
-            </ul>
-          </div>
-
-        </motion.div>
-      </main>
-      <Footer />
+const AboutUs = () => (
+  <PolicyLayout
+    title="Introduction"
+    seoTitle="About Us | EnglishOnComputer"
+    seoDescription="EnglishOnComputer is an English learning website that uses AI-powered tools and technology to create useful, engaging, and personalized English lessons."
+    path="/about"
+  >
+    <div className="flex justify-center mb-8">
+      <img src="/img/logo-eoc.png" alt="EnglishOnComputer logo" className="h-40 w-auto" />
     </div>
-  );
-};
+
+    <Section title="Who We Are">
+      <p>
+        <strong>EnglishOnComputer</strong> is an English learning website that uses <strong>AI-powered tools and technology</strong> to
+        create useful, engaging, and personalized English lessons. Our goal is to provide learners with a modern alternative to
+        traditional teacher-based learning, allowing them to study English anytime and anywhere.
+      </p>
+      <p>
+        We develop a range of <strong>AI-supported learning tools</strong> designed to help students improve their English skills more
+        effectively. From practicing vocabulary and grammar to developing listening, speaking, reading, and writing skills, our
+        platform provides interactive learning experiences that adapt to learners' needs and support their continuous progress.
+      </p>
+      <p>
+        By combining <strong>artificial intelligence, educational content, and innovative learning methods</strong>, we aim to make
+        English learning more accessible, flexible, and effective. Our tools help students practice independently, identify areas
+        for improvement, and build their confidence step by step.
+      </p>
+      <blockquote className="border-l-4 border-[#0096b1] bg-[#0096b1]/5 rounded-r-lg px-5 py-4">
+        <p className="italic text-gray-800">"Learn smarter with AI, improve your English, and take your skills to the next level."</p>
+        <p className="mt-2 font-semibold text-[#2b5356]">— EnglishOnComputer Team</p>
+      </blockquote>
+    </Section>
+
+    <Section title="Our Team">
+      <p>
+        <strong>EnglishOnComputer</strong> brings together people who are passionate about <strong>English education, technology, and
+        artificial intelligence</strong>. We continuously develop and improve our learning tools to provide students with useful and
+        effective ways to improve their English.
+      </p>
+      <p>Our team includes:</p>
+      <Bullets
+        items={[
+          <><strong>English educators</strong> who understand students' learning needs</>,
+          <><strong>AI and technology specialists</strong> who develop smart learning tools</>,
+          <><strong>Content developers</strong> who create practical and engaging English lessons</>,
+          <><strong>Learning support specialists</strong> who help improve the overall learning experience</>,
+        ]}
+      />
+    </Section>
+  </PolicyLayout>
+);
 
 export default AboutUs;

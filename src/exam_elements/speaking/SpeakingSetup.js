@@ -312,7 +312,7 @@ const SpeakingSetup = () => {
                         />
                         <span className="min-w-0">
                             <span className="font-semibold text-[#2b5356] flex items-center gap-2">
-                                Practise with Forecast topics
+                                Practise with Focus topics
                                 {info.forecast_locked && (
                                     <span className="inline-flex items-center gap-1 text-xs font-bold text-[#eb7e37]">
                                         <Lock size={13} /> VIP
@@ -320,7 +320,7 @@ const SpeakingSetup = () => {
                                 )}
                             </span>
                             <span className="block text-sm text-gray-500 mt-0.5">
-                                Only use topics forecast for the month of your exam.
+                                Only use Focus topics for the month of your exam.
                             </span>
                         </span>
                     </label>
@@ -342,7 +342,7 @@ const SpeakingSetup = () => {
                                 </select>
                             ) : (
                                 <p className="text-sm text-[#eb7e37]">
-                                    There are no active Forecast topics at the moment.
+                                    There are no active Focus topics at the moment.
                                 </p>
                             )}
                         </div>

@@ -27,8 +27,8 @@ const Instruction = () => {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <Seo
-        title="How to Practice IELTS Online | Instructions | englishoncomputer.com"
-        description="Step-by-step instructions for practicing IELTS Listening, Reading, Writing and Speaking on englishoncomputer.com with a real computer-based exam interface."
+        title="How to Use EnglishOnComputer | Instructions"
+        description="Step-by-step instructions for practicing Listening, Reading, Writing and Speaking on EnglishOnComputer."
         path="/instruction"
       />
       <Navbar />

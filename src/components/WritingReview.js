@@ -1088,7 +1088,7 @@ export default function WritingReview() {
           {assistPanelTab === 'ask' && (
             <div className="flex-1 min-h-0 flex flex-col">
               <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-2">
-                {chat.length === 0 && <p className="text-sm text-gray-400">Ask the AI about the selected text or anything about IELTS Writing.{assistRemaining !== null && ` (${assistRemaining} questions left today)`}</p>}
+                {chat.length === 0 && <p className="text-sm text-gray-400">Ask the AI about the selected text or anything about your writing.{assistRemaining !== null && ` (${assistRemaining} questions left today)`}</p>}
                 {chat.map((m, i) => (
                   m.role === 'ai'
                     ? <div key={i} className="text-sm rounded-lg px-3 py-2 bg-gray-100 text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: formatAiAnswer(m.text) }} />

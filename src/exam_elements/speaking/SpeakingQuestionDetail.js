@@ -860,7 +860,7 @@ const SpeakingQuestionDetail = () => {
                                                     <p className="text-xs text-gray-500 mt-2 rounded-lg bg-gray-50 px-3 py-2">
                                                         Recording quality: {cur.audio_quality}
                                                         <span className="block text-gray-400 mt-0.5">
-                                                            Just to help you record better — it does not count towards the 4 IELTS criteria.
+                                                            Just to help you record better — it does not count towards the 4 scoring criteria.
                                                         </span>
                                                     </p>
                                                 )}

@@ -393,7 +393,7 @@ const ScoreBoard = ({ data }) => {
             )}
 
             <p className="px-5 py-3 border-t border-gray-100 text-[11px] text-gray-400 leading-relaxed">
-                AI-generated reference assessment, not an official IELTS score.
+                AI-generated reference assessment, not an official test score.
             </p>
         </div>
     );
@@ -552,7 +552,7 @@ const SpeakingResult = () => {
             });
         });
         h += `<p style="color:#666;font-size:12px">AI-generated reference assessment, `
-            + `not an official IELTS score.</p>`;
+            + `not an official test score.</p>`;
         return h;
     };
 
@@ -679,7 +679,7 @@ const SpeakingResult = () => {
                             className="px-3.5 sm:px-4 py-2 rounded-xl border-2 border-gray-200
                                        text-[#2b5356] font-bold text-sm hover:border-gray-300
                                        whitespace-nowrap">
-                            {fromForecast ? 'Back to Forecast' : 'Back to setup'}
+                            {fromForecast ? 'Back to Focus' : 'Back to setup'}
                         </button>
                     </div>
                 </div>

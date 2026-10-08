@@ -2,25 +2,25 @@ import React from 'react';
 import { Star, Target } from 'lucide-react';
 
 // forecast_level 1-4 → forecast likelihood stars (auto forecast by occurrence).
-const LABELS = { 4: 'Very likely', 3: 'High', 2: 'Medium', 1: 'Low' };
+const LABELS = { 4: 'Very Important', 3: 'Important', 2: 'Moderately Important', 1: 'Slightly Important' };
 
 // Hover legend shown on every star group (full test + parts, all 3 skills).
 export const FORECAST_LEGEND =
-  'Forecast likelihood:\n★★★★ Very likely\n★★★ High\n★★ Medium\n★ Low';
+  'Important Levels:\n★★★★ Very Important\n★★★ Important\n★★ Moderately Important\n★ Slightly Important';
 
 // Horizontal legend for the list headers (parts + full test). The Target icon
 // distinguishes the forecast stars from the difficulty badge.
 export function ForecastLegend({ className = '' }) {
   const rows = [
-    { stars: '★★★★', label: 'Very likely' },
-    { stars: '★★★', label: 'High' },
-    { stars: '★★', label: 'Medium' },
-    { stars: '★', label: 'Low' },
+    { stars: '★★★★', label: 'Very Important' },
+    { stars: '★★★', label: 'Important' },
+    { stars: '★★', label: 'Moderately Important' },
+    { stars: '★', label: 'Slightly Important' },
   ];
   return (
     <div className={`inline-flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg text-xs text-gray-700 ${className}`}>
       <span className="inline-flex items-center gap-1 font-semibold text-gray-600">
-        <Target size={14} className="text-[#eb7e37] shrink-0" /> Forecast likelihood:
+        <Target size={14} className="text-[#eb7e37] shrink-0" /> Important Levels:
       </span>
       {rows.map((r) => (
         <span key={r.stars} className="inline-flex items-center gap-1 whitespace-nowrap">

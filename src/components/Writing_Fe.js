@@ -310,7 +310,7 @@ const Writing_Fe = () => {
           </div>
 
           <div className="mt-4 text-sm text-gray-500 max-w-xs text-center">
-            Loading IELTS Writing tests. Please wait...
+            Loading Writing tests. Please wait...
           </div>
         </div>
       </div>
@@ -445,8 +445,8 @@ const Writing_Fe = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Seo
-        title="IELTS Writing Practice Tasks | Official & Practice"
-        description={`Practice your IELTS Writing skills. Includes tasks like ${tests.slice(0, 3).map(t => t.title).join(', ')}...`}
+        title="English Writing Practice Tasks | EnglishOnComputer"
+        description={`Practice your English writing skills. Includes tasks like ${tests.slice(0, 3).map(t => t.title).join(', ')}...`}
         path="/writing_list"
       />
       <Navbar />
@@ -499,7 +499,7 @@ const Writing_Fe = () => {
             <option value="alphabet">By Alphabet</option>
             {(isVIP || localStorage.getItem('role') === 'student') && (
               <>
-                <option value="forecast">By forecast (most likely first)</option>
+                <option value="forecast">Important Levels: Highest to Lowest</option>
                 <option value="difficulty">By difficulty (easiest first)</option>
                 <option value="latest">Newest</option>
                 <option value="oldest">Oldest</option>

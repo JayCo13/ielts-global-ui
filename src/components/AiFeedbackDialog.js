@@ -34,7 +34,7 @@ const AIFeedbackDialog = ({ isOpen, onClose, result, loading, setSelectedPart, s
             transition={{ delay: 0.3 }}
             className="flex flex-col"
           >
-            <span className="text-2xl font-semibold text-gray-700">Your IELTS Score</span>
+            <span className="text-2xl font-semibold text-gray-700">Your Score</span>
             <span className="text-gray-500 mt-1">Overall Band Score</span>
           </motion.div>
           <motion.div
@@ -122,7 +122,7 @@ const AIFeedbackDialog = ({ isOpen, onClose, result, loading, setSelectedPart, s
               className="rounded-2xl shadow-lg overflow-hidden"
             >
               <div className="bg-gradient-to-br from-[#0096b1] to-[#0078a3] p-6 text-white">
-                <h3 className="text-xl font-semibold mb-1">IELTS Band Score</h3>
+                <h3 className="text-xl font-semibold mb-1">Band Score</h3>
                 <p className="text-[#e6f7fb] text-sm">Overall Performance</p>
               </div>
               <div className="p-6 flex items-center justify-center bg-gradient-to-br from-white to-[#e6f7fb]">

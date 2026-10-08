@@ -132,8 +132,8 @@ const Achievements = () => {
     return (
         <div>
             <Seo
-                title="Student Achievements & IELTS Results | englishoncomputer.com"
-                description="See real IELTS band scores and achievements from students who practiced online with englishoncomputer.com."
+                title="Student Achievements | EnglishOnComputer"
+                description="See achievements from students who practiced online with EnglishOnComputer."
                 path="/achievements"
             />
             <Navbar />
@@ -356,7 +356,7 @@ const Achievements = () => {
                                         <img
                                             className="w-full h-full object-contain hover:scale-105 transition-transform duration-500"
                                             src={certificate.image}
-                                            alt="IELTS Certificate"
+                                            alt="Certificate"
                                             loading="lazy"
                                         />
                                     </div>
@@ -459,7 +459,7 @@ const Achievements = () => {
                                 <div className="max-h-[70vh] flex items-center justify-center p-4">
                                     <img
                                         src={selectedCertificate.image}
-                                        alt="IELTS Certificate"
+                                        alt="Certificate"
                                         className="max-w-full max-h-[70vh] h-auto w-auto rounded-md shadow-md object-contain"
                                     />
                                 </div>

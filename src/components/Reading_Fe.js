@@ -402,7 +402,7 @@ const Reading_Fe = () => {
           </div>
 
           <div className="mt-4 text-sm text-gray-500 max-w-xs text-center">
-            Loading IELTS Reading tests. Please wait...
+            Loading Reading tests. Please wait...
           </div>
         </div>
       </div>
@@ -411,8 +411,8 @@ const Reading_Fe = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Seo
-        title="IELTS Reading Practice Tests | Official Mockup Test"
-        description={`Practice your IELTS Reading skills. Includes tests like ${tests.slice(0, 3).map(t => t.title).join(', ')}...`}
+        title="English Reading Practice Tests | EnglishOnComputer"
+        description={`Practice your English reading skills. Includes tests like ${tests.slice(0, 3).map(t => t.title).join(', ')}...`}
         path="/reading_list"
       />
       <Navbar />
@@ -465,7 +465,7 @@ const Reading_Fe = () => {
             <option value="alphabet">By Alphabet</option>
             {(isVIP || userRole === 'student') && (
               <>
-                <option value="forecast">By forecast (most likely first)</option>
+                <option value="forecast">Important Levels: Highest to Lowest</option>
                 <option value="difficulty">By difficulty (easiest first)</option>
                 <option value="latest">Newest</option>
                 <option value="oldest">Oldest</option>

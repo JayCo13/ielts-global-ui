@@ -1,6 +1,6 @@
 {
-  "short_name": "IELTS Test",
-  "name": "englishoncomputer.com - Practice IELTS Online",
+  "short_name": "EnglishOnComputer",
+  "name": "EnglishOnComputer - Learn English Online",
   "icons": [
     {
       "src": "img/48.png",
@@ -22,5 +22,5 @@
   "display": "standalone",
   "theme_color": "#1e40af",
   "background_color": "#ffffff",
-  "description": "Improve your IELTS score with practice tests designed with a 100% real-exam interface"
+  "description": "An online English learning platform with practical lessons and AI-powered tools"
 }

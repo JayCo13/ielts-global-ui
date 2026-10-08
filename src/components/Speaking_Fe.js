@@ -15,8 +15,8 @@ const toAbsoluteUrl = (u) => (u && u.startsWith('/')) ? `${API_BASE}${u}` : u;
 const SECTIONS = [
     { key: 'mock', label: 'Mock Test', icon: Mic,
       blurb: 'Take a mock test with an AI examiner' },
-    { key: 'forecast', label: 'Forecast Topics', icon: Star,
-      blurb: 'Practise forecast topics' },
+    { key: 'forecast', label: 'Focus Topics', icon: Star,
+      blurb: 'Practise focus topics' },
     { key: 'lessons', label: 'Pronunciation Lessons', icon: Volume2,
       blurb: 'Learn pronunciation lesson by lesson' },
     { key: 'documents', label: 'Documents', icon: BookOpen,
@@ -263,12 +263,12 @@ const Speaking_Fe = () => {
             meta: ['3 parts', 'About 15 minutes', '1 free test per day'],
         },
         forecast: {
-            tag: 'FORECAST',
-            note: 'Forecast topics by exam month',
-            title: 'Practise forecast topics',
+            tag: 'FOCUS',
+            note: 'Focus topics by exam month',
+            title: 'Practise focus topics',
             desc: 'Pick exactly the topic you want to practise and answer every question in it.',
-            cta: 'View forecast topics', to: '/speaking_forecast',
-            caption: 'Forecast topics ready',
+            cta: 'View focus topics', to: '/speaking_forecast',
+            caption: 'Focus topics ready',
             meta: ['Practise each Part separately', 'No timer', 'Retry as often as you like'],
         },
         lessons: {
@@ -301,8 +301,8 @@ const Speaking_Fe = () => {
     return (
         <div className="min-h-screen bg-gray-50">
             <Seo
-                title="IELTS Speaking Materials | Practice"
-                description={`Practice your IELTS Speaking skills. Includes materials like ${materials.slice(0, 3).map(m => m.title).join(', ')}...`}
+                title="English Speaking Practice | EnglishOnComputer"
+                description={`Practice your English speaking skills. Includes materials like ${materials.slice(0, 3).map(m => m.title).join(', ')}...`}
                 path="/speaking_list"
             />
             <style>{PAGE_CSS}</style>
@@ -411,7 +411,7 @@ const Speaking_Fe = () => {
                             <div className="flex shrink-0 flex-col items-center gap-3 lg:pr-4">
                                 <div className="flex h-[132px] w-[132px] items-center justify-center
                                                 rounded-[24px] bg-white">
-                                    <img src="/img/logo-ielts.png" alt="AI examiner"
+                                    <img src="/img/logo-eoc-icon.png" alt="AI examiner"
                                          className="h-[112px] w-[112px] object-contain" />
                                 </div>
                                 <div className="flex h-7 items-center gap-[3px]">

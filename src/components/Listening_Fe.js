@@ -412,7 +412,7 @@ const Listening_Fe = () => {
           </div>
 
           <div className="mt-4 text-sm text-gray-500 max-w-xs text-center">
-            Loading IELTS Listening tests. Please wait...
+            Loading Listening tests. Please wait...
           </div>
         </div>
       </div>
@@ -421,8 +421,8 @@ const Listening_Fe = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Seo
-        title="IELTS Listening Practice Tests | Official & Practice"
-        description={`Practice your IELTS Listening skills. Includes tests like ${tests.slice(0, 3).map(t => t.title).join(', ')}... and many more parts!`}
+        title="English Listening Practice Tests | EnglishOnComputer"
+        description={`Practice your English listening skills. Includes tests like ${tests.slice(0, 3).map(t => t.title).join(', ')}... and many more parts!`}
         path="/listening_list"
       />
       <Navbar />
@@ -475,7 +475,7 @@ const Listening_Fe = () => {
             <option value="alphabet">By Alphabet</option>
             {(isVIP || userRole === 'student') && (
               <>
-                <option value="forecast">By forecast (most likely first)</option>
+                <option value="forecast">Important Levels: Highest to Lowest</option>
                 <option value="difficulty">By difficulty (easiest first)</option>
                 <option value="latest">Newest</option>
                 <option value="oldest">Oldest</option>

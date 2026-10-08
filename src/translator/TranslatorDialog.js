@@ -273,7 +273,7 @@ const TranslatorDialog = ({
 
                 {/* Footer */}
                 <div className="px-4 py-2 bg-gray-50 border-t border-gray-100 text-xs text-gray-400 text-center">
-                    IELTS Dictionary • {currentLang.flag} {currentLang.name}
+                    English Dictionary • {currentLang.flag} {currentLang.name}
                 </div>
             </div>
         </div>

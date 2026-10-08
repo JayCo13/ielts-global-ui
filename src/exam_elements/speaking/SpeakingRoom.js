@@ -101,7 +101,7 @@ const Mascot = ({ size = 72, ring = false, dim = false }) => (
         <div className="relative bg-white flex items-center justify-center overflow-hidden"
              style={{ width: size, height: size, borderRadius: size * 0.22,
                       opacity: dim ? 0.55 : 1 }}>
-            <img src="/img/logo-ielts.png" alt="Examiner"
+            <img src="/img/logo-eoc-icon.png" alt="Examiner"
                  style={{ width: size * 0.88, height: size * 0.88, objectFit: 'contain' }} />
         </div>
     </div>

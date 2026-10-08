@@ -24,12 +24,12 @@ const Footer = () => {
                     <div className="md:col-span-3 flex flex-col items-center">
                         <div className='flex items-center justify-center gap-6'>
                             <img
-                                src="/img/logo-ielts.png?v=2"
-                                alt="IELTS Prep Logo"
-                                className="h-28 w-28 mb-4"
+                                src="/img/logo-eoc.png"
+                                alt="EnglishOnComputer logo"
+                                className="h-28 w-auto mb-4"
                             />
                         </div>
-                        <p className="text-gray-600 mb-4 text-center">A professional platform for computer-based test preparation.</p>
+                        <p className="text-gray-600 mb-4 text-center">An online English learning platform with practical lessons and AI-powered tools.</p>
 
                         {/* Social Icons with hover effects */}
                     </div>
@@ -49,19 +49,19 @@ const Footer = () => {
                                     <span className="absolute -bottom-1 left-0 w-1/2 h-0.5 bg-gradient-to-r from-[#2b5356]/10 to-[#2b5356]"></span>
                                 </h3>
                                 <ul className="space-y-3">
-                                    <li><a href="listening_list" className="text-gray-600 hover:text-[#2b5356] transition-colors duration-300 flex items-center gap-1.5">
+                                    <li><a href="/listening_list" className="text-gray-600 hover:text-[#2b5356] transition-colors duration-300 flex items-center gap-1.5">
                                         <span className="w-1 h-1 rounded-full bg-gray-400 inline-block"></span>
                                         Listening
                                     </a></li>
-                                    <li><a href="#" className="text-gray-600 hover:text-[#2b5356] transition-colors duration-300 flex items-center gap-1.5">
+                                    <li><a href="/reading_list" className="text-gray-600 hover:text-[#2b5356] transition-colors duration-300 flex items-center gap-1.5">
                                         <span className="w-1 h-1 rounded-full bg-gray-400 inline-block"></span>
                                         Reading
                                     </a></li>
-                                    <li><a href="writing_list" className="text-gray-600 hover:text-[#2b5356] transition-colors duration-300 flex items-center gap-1.5">
+                                    <li><a href="/writing_list" className="text-gray-600 hover:text-[#2b5356] transition-colors duration-300 flex items-center gap-1.5">
                                         <span className="w-1 h-1 rounded-full bg-gray-400 inline-block"></span>
                                         Writing
                                     </a></li>
-                                    <li><a href="speaking_list" className="text-gray-600 hover:text-[#2b5356] transition-colors duration-300 flex items-center gap-1.5">
+                                    <li><a href="/speaking_list" className="text-gray-600 hover:text-[#2b5356] transition-colors duration-300 flex items-center gap-1.5">
                                         <span className="w-1 h-1 rounded-full bg-gray-400 inline-block"></span>
                                         Speaking
                                     </a></li>
@@ -173,14 +173,14 @@ const Footer = () => {
                                     <span className="absolute -bottom-1 left-0 w-1/2 h-0.5 bg-gradient-to-r from-blue-100 to-blue-500"></span>
                                 </h3>
                                 <ul className="space-y-3">
-                                    <li><a href="mailto:ieltscomputertestglobal@gmail.com" className="text-gray-600 hover:text-blue-500 transition-colors duration-300 flex items-center lg:items-start xl:items-center gap-2">
+                                    <li><a href="mailto:EnglishOnComputer.global@gmail.com" className="text-gray-600 hover:text-blue-500 transition-colors duration-300 flex items-center lg:items-start xl:items-center gap-2">
                                         <div className="rounded-full text-gray-500 hover:text-blue-500 transition-colors duration-300 flex-shrink-0">
                                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
                                                 <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
                                             </svg>
                                         </div>
-                                        <span className="text-sm 2xl:text-base">ieltscomputertestglobal<wbr />@gmail.com</span>
+                                        <span className="text-sm 2xl:text-base">EnglishOnComputer.global<wbr />@gmail.com</span>
                                     </a></li>
                                     <li className="flex items-center gap-3 mt-4">
                                         {/* Facebook */}
@@ -212,14 +212,14 @@ const Footer = () => {
                 {/* Bottom Copyright and legal links */}
                 <div className="justify-center items-center text-gray-500 text-md">
                     <div className="order-2 md:order-1 text-center mb-4 md:mb-0">
-                        <p>Copyright © 2025 englishoncomputer.com. All rights reserved</p>
+                        <p>© 2026 EnglishOnComputer. All rights reserved</p>
                     </div>
                 </div>
 
                 {/* Trademark Disclaimer */}
                 <div className="mt-4 pt-4 border-t border-gray-200">
                     <p className="text-center text-xs text-gray-400 leading-relaxed max-w-3xl mx-auto">
-                        <strong>Disclaimer:</strong> IELTS is a registered trademark jointly owned by the University of Cambridge ESOL Examinations (Cambridge Assessment English), the British Council, and IDP Education Australia. This website is independently operated and is <strong>not affiliated with, approved, or endorsed by</strong> any of these organizations. All test preparation materials on this platform are created independently for educational purposes only.
+                        <strong>Disclaimer:</strong> This website is independently developed and is <strong>not affiliated with, endorsed by, or officially connected to</strong> any educational organization.
                     </p>
                 </div>
             </div>

@@ -74,18 +74,18 @@ const WritingForecastLayout = () => {
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-4">
         <button onClick={() => navigate('/writing_forecast')} className="flex items-center text-gray-600 hover:text-[#0096b1]">
-          <ChevronLeft className="w-5 h-5 mr-1" /> Back to Forecasts
+          <ChevronLeft className="w-5 h-5 mr-1" /> Back to Focus
         </button>
       </div>
       <div className="max-w-7xl mx-auto px-4 pb-8">
         {loading ? (
           <div className="p-8 text-center text-gray-600">Loading...</div>
         ) : !item ? (
-          <div className="p-8 text-center text-gray-600">Forecast not available</div>
+          <div className="p-8 text-center text-gray-600">Focus not available</div>
         ) : (
           <div className="bg-white rounded-xl shadow p-6">
             <h2 className="text-2xl font-bold text-gray-800">
-              <span className="text-[#0096b1] italic mr-2">Writing Forecast:</span>
+              <span className="text-[#0096b1] italic mr-2">Writing Focus:</span>
               <span>{item.title || `Part ${item.part_number}`}</span>
             </h2>
             <div className="mt-1 text-sm text-gray-600">Exam: {item.exam_title}</div>

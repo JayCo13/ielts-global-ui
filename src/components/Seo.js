@@ -8,12 +8,12 @@ import { Helmet } from 'react-helmet-async';
 // gives Google/AI answer-engines unique, crawlable signals per route.
 
 export const SITE_URL = 'https://englishoncomputer.com';
-export const SITE_NAME = 'englishoncomputer.com';
-export const DEFAULT_IMAGE = `${SITE_URL}/img/logo-ielts.png`;
+export const SITE_NAME = 'EnglishOnComputer';
+export const DEFAULT_IMAGE = `${SITE_URL}/img/og-eoc.jpg`;
 export const DEFAULT_TITLE =
-  'IELTS Computer Test – Practice IELTS Online Free | englishoncomputer.com';
+  'EnglishOnComputer – Learn English Online with AI-Powered Tools';
 export const DEFAULT_DESCRIPTION =
-  'Take the IELTS computer test online with a 100% real exam interface. Practice IELTS Listening, Reading, Writing and Speaking with up-to-date forecast tests. Improve your IELTS score effectively.';
+  'An online English learning platform with practical lessons and AI-powered tools. Improve your listening, speaking, reading and writing skills anytime, anywhere, at a low and affordable cost.';
 
 /**
  * @param {string}  [title]        Page title (falls back to the site default).

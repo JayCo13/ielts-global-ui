@@ -409,7 +409,7 @@ const VIPPackages = () => {
                         variants={item}
                         className="text-xl text-gray-600 max-w-2xl mx-auto font-medium leading-relaxed"
                     >
-                        Choose the right premium package for your IELTS journey and reach your target band faster.
+                        Choose the right premium package for your English learning journey and reach your goals faster.
                     </motion.p>
                 </motion.div>
 

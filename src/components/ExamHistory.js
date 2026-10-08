@@ -451,7 +451,7 @@ const ExamHistory = () => {
                   No Exam History
                 </h2>
                 <p className="text-gray-600 leading-relaxed">
-                  You have not completed any exams yet. Start your IELTS journey today!
+                  You have not completed any exams yet. Start your English learning journey today!
                 </p>
               </div>
 
@@ -1179,7 +1179,7 @@ const ExamHistory = () => {
                             <div>
                               <div className="flex items-center gap-1.5 mb-1">
                                 {exam.is_custom && <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#eb7e37]/10 text-[#eb7e37]">Custom</span>}
-                                {exam.is_forecast && <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">Forecast</span>}
+                                {exam.is_forecast && <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">Focus</span>}
                               </div>
                               <h3 className="font-bold text-gray-800 leading-snug">{exam.title}</h3>
                             </div>

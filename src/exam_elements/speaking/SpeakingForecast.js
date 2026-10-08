@@ -26,19 +26,19 @@ const SECTIONS = [
 ];
 
 const SORTS = [
-    { value: 'forecast', label: 'Forecast likelihood', vipOnly: true },
+    { value: 'forecast', label: 'Important Levels', vipOnly: true },
     { value: 'newest', label: 'Newest', vipOnly: false },
     { value: 'title', label: 'Name A→Z', vipOnly: false },
 ];
 
 /** Bốn mức dự đoán, cùng thang với Reading/Listening/Writing. */
 /** Chú thích bốn mức dự đoán — cùng cách gọi với Listening / Reading / Writing. */
-const FORECAST_LEGEND = [[4, 'Very likely'], [3, 'High'], [2, 'Medium'], [1, 'Low']];
+const FORECAST_LEGEND = [[4, 'Very Important'], [3, 'Important'], [2, 'Moderately Important'], [1, 'Slightly Important']];
 
 const Legend = () => (
     <div className="flex items-center gap-3 flex-wrap rounded-xl bg-[#eb7e37]/8 border border-[#eb7e37]/25 px-4 py-2.5">
         <span className="inline-flex items-center gap-1.5 text-sm font-bold text-[#2b5356]">
-            <Target size={15} className="text-[#eb7e37]" /> Forecast likelihood:
+            <Target size={15} className="text-[#eb7e37]" /> Important Levels:
         </span>
         {FORECAST_LEGEND.map(([n, label]) => (
             <span key={n} className="inline-flex items-center gap-1 text-sm text-gray-700">
@@ -54,7 +54,7 @@ const Legend = () => (
 );
 
 const Stars = ({ level }) => (
-    <span className="inline-flex items-center gap-0.5" title={`Forecast ${level || 0}/4`}>
+    <span className="inline-flex items-center gap-0.5" title={`Important Level ${level || 0}/4`}>
         {[1, 2, 3, 4].map((n) => (
             <Star key={n} size={13}
                   className={n <= (level || 0) ? 'text-[#eb7e37] fill-[#eb7e37]' : 'text-gray-300'} />
@@ -373,7 +373,7 @@ const SpeakingForecast = () => {
                         <ChevronLeft size={22} />
                     </button>
                     <div>
-                        <h1 className="font-bold text-[#2b5356]">Speaking Forecast</h1>
+                        <h1 className="font-bold text-[#2b5356]">Speaking Focus</h1>
                         <p className="text-xs text-gray-500">
                             Pick a topic to practise — every question is asked; this does not count as a mock test
                         </p>
@@ -430,7 +430,7 @@ const SpeakingForecast = () => {
                             return (
                                 <button key={s.value} disabled={blocked}
                                         onClick={() => setSort(s.value)}
-                                        title={blocked ? 'Sorting by forecast is for VIP accounts' : undefined}
+                                        title={blocked ? 'Sorting by Important Levels is for VIP accounts' : undefined}
                                         className={`px-3 py-1.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1 ${
                                             sort === s.value ? 'bg-[#2b5356] text-white'
                                                              : 'bg-white text-gray-600 border border-gray-200'} ${
@@ -465,7 +465,7 @@ const SpeakingForecast = () => {
                 {!!months.length && (
                     <div className="mt-3 rounded-xl bg-white border-2 border-gray-100 px-4 py-3">
                         <p className="text-sm font-bold text-[#2b5356] mb-2 inline-flex items-center gap-1.5">
-                            <CalendarDays size={15} className="text-[#eb7e37]" /> Forecast by exam month
+                            <CalendarDays size={15} className="text-[#eb7e37]" /> Focus by exam month
                             {data?.month_locked && (
                                 <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#eb7e37]">
                                     <Crown size={12} /> VIP
@@ -495,7 +495,7 @@ const SpeakingForecast = () => {
                 {data?.sort_locked && (
                     <p className="mt-3 flex items-center gap-2 text-xs text-[#eb7e37] bg-[#eb7e37]/10 rounded-lg px-3 py-2">
                         <Crown size={14} className="shrink-0" />
-                        Sorting by forecast likelihood is for VIP accounts.
+                        Sorting by Important Levels is for VIP accounts.
                     </p>
                 )}
 
@@ -540,7 +540,7 @@ const SpeakingForecast = () => {
                             <p className="py-16 text-center text-sm text-gray-500">
                                 {query.trim() ? `No topics match “${query.trim()}”.`
                                     : hideDone ? 'You have practised every topic in this part.'
-                                               : 'No forecast topics for this part yet.'}
+                                               : 'No focus topics for this part yet.'}
                             </p>
                         )}
                     </div>

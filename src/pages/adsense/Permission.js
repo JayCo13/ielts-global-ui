@@ -1,92 +1,34 @@
-import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
-import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
-import Seo from '../../components/Seo';
+import React from 'react';
+import PolicyLayout, { EmailLink, WhatsAppLink } from '../../components/PolicyLayout';
 
-const Permission = () => {
-  const fadeIn = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  };
+const Row = ({ label, children }) => (
+  <div className="py-4 border-b border-gray-100 last:border-b-0 sm:grid sm:grid-cols-3 sm:gap-4">
+    <dt className="font-semibold text-gray-900">{label}</dt>
+    <dd className="mt-1 sm:mt-0 sm:col-span-2 text-gray-700">{children}</dd>
+  </div>
+);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <Seo
-        title="Business Information | englishoncomputer.com"
-        description="Business information and contact details for englishoncomputer.com IELTS online practice."
-        path="/permission"
-      />
-      <Navbar />
-      {/* Custom Footer with Business Information */}
-      <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-12">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <div className="text-center">
-            <div className="mb-8">
-              <h3 className="text-2xl font-bold mb-4">© 2026 englishoncomputer.com</h3>
-              <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto rounded-full"></div>
-            </div>
-
-            <div className="bg-gray-800/50 rounded-2xl p-8 backdrop-blur-sm border border-gray-700">
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 text-sm">
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-blue-400 mb-3">Business Information</h4>
-                  <p className="text-gray-300">
-                    <span className="font-medium">Owner:</span><br />
-                    Le Tiet An
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-green-400 mb-3">Tax ID</h4>
-                  <p className="text-gray-300">
-                    <span className="font-medium">Tax Identification Number:</span><br />
-                    072091002266
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-purple-400 mb-3">Contact</h4>
-                  <p className="text-gray-300">
-                    <span className="font-medium">Email:</span><br />
-                    <a href="mailto:ieltscomputertestglobal@gmail.com" className="text-blue-400 hover:text-blue-300 transition-colors">
-                      ieltscomputertestglobal@gmail.com
-                    </a>
-                  </p>
-                  <p className="text-gray-300 mt-1">
-                    <span className="font-medium">WhatsApp:</span><br />
-                    <a href="https://wa.me/84964996195" className="text-blue-400 hover:text-blue-300 transition-colors">
-                      +84 964 996 195
-                    </a>
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-orange-400 mb-3">Industry</h4>
-                  <p className="text-gray-300 text-xs leading-relaxed">
-                    Online English Learning Platform
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-8 pt-6 border-t border-gray-600">
-                <p className="text-xs text-gray-400 leading-relaxed max-w-4xl mx-auto">
-                  Not classified as a conditional business under the Investment Law.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
-
-      {/* Original Footer Component */}
-      <Footer />
-    </div>
-  );
-};
+const Permission = () => (
+  <PolicyLayout
+    title="Business Information"
+    seoTitle="Business Owner Details | EnglishOnComputer"
+    seoDescription="Business owner details and contact information for EnglishOnComputer, an AI-powered online learning platform."
+    path="/permission"
+  >
+    <dl>
+      <Row label="Owner">NGUYEN THI MAI ANH</Row>
+      <Row label="Tax ID">
+        <span className="block text-sm text-gray-500">Tax Identification Number:</span>
+        030195007851
+      </Row>
+      <Row label="Contact">
+        <p><span className="font-medium">Email:</span> <EmailLink /></p>
+        <p className="mt-1"><span className="font-medium">WhatsApp:</span> <WhatsAppLink /></p>
+      </Row>
+      <Row label="Industry">AI-powered online learning platform</Row>
+    </dl>
+    <p className="mt-8 text-center text-sm text-gray-500">© 2026 EnglishOnComputer</p>
+  </PolicyLayout>
+);
 
 export default Permission;
