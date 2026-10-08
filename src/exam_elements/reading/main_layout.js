@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { BookOpenText, Menu, Bell, Bot, Plus } from 'lucide-react';
+import { BookOpenText, Menu, Bell, Bot, Plus, MoreHorizontal, ChevronUp } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
 import DOMPurify from 'dompurify';
 import Split from 'react-split';
@@ -106,6 +106,8 @@ const MainLayout = () => {
   const [showClearDataDialog, setShowClearDataDialog] = useState(false);
   const [showErrorReport, setShowErrorReport] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showNewWordsDialog, setShowNewWordsDialog] = useState(false);
+  const [reviewMenuOpen, setReviewMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const [wifiStatus, setWifiStatus] = useState({
     isConnected: true,
@@ -1050,7 +1052,7 @@ const MainLayout = () => {
     }
   };
 
-  const clearExamData = () => {
+  const clearExamData = (destination) => {
     // Clear all stored data
     sessionStorage.removeItem(examStartKey);
     localStorage.removeItem('ielts-answers');
@@ -1142,7 +1144,8 @@ const MainLayout = () => {
     setStudentAnswers({});
     setCompletedQuestions({});
 
-    navigate(isForecastMode ? '/reading_forecast' : '/reading_list');
+    // `destination` is optional (e.g. '/new-vocabulary'); ignore click events passed by accident.
+    navigate((typeof destination === 'string' && destination) || (isForecastMode ? '/reading_forecast' : '/reading_list'));
   };
 
   const handleSubmitExam = async () => {
@@ -3278,8 +3281,8 @@ const MainLayout = () => {
 
         <footer className={`${colorTheme === 'black-on-white' ? 'bg-white' : 'bg-black'} border-t border-gray-200 p-2 md:p-4 w-full`}>
           <div className="max-w-7xl mx-auto px-2 md:px-4">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex-1 flex items-center justify-center gap-2 md:gap-6 overflow-x-auto md:overflow-visible">
+            <div className="flex flex-col xl:flex-row items-center justify-between gap-3">
+              <div className="w-full xl:flex-1 flex flex-wrap items-center justify-center gap-2 md:gap-4">
                 {partsToShow.map((part) => (
                   <div key={part} className="relative">
                     <button
@@ -3293,7 +3296,7 @@ const MainLayout = () => {
                         }`}
                     >
                       {currentPart === part ? (
-                        <div className="flex flex-nowrap md:flex-wrap justify-start md:justify-center gap-1 max-w-[55vw] md:max-w-none mx-auto overflow-x-auto md:overflow-visible">
+                        <div className="flex flex-nowrap md:flex-wrap justify-start md:justify-center gap-1 max-w-[88vw] md:max-w-none mx-auto overflow-x-auto md:overflow-visible">
                           {[...Array(part === 3 ? 14 : 13)].map((_, idx) => {
                             const questionNum = getQuestionRange(part).start + idx;
                             const isCompleted = isQuestionCompleted(questionNum);
@@ -3552,11 +3555,21 @@ const MainLayout = () => {
                   </div>
                 ))}
               </div>
-              <div className="ml-2 md:ml-6 flex space-x-2 md:space-x-4">
+              <div className="flex flex-wrap items-center justify-center gap-2 w-full xl:w-auto">
+                <button
+                  onClick={() => (navState.fromResultReview ? clearExamData() : setShowExitAlert(true))}
+                  title={navState.fromResultReview ? 'Leave the review' : 'Leave the test room without submitting'}
+                  className={`px-4 py-2.5 rounded-lg text-sm md:text-base font-semibold whitespace-nowrap transition-colors border
+                    ${colorTheme === 'white-on-black'
+                      ? 'border-gray-600 text-gray-200 hover:bg-gray-800'
+                      : 'border-gray-300 text-gray-700 hover:bg-gray-100'}`}
+                >
+                  Exit
+                </button>
                 {!navState.fromResultReview && !isRetakeIncorrectMode && (
                   <button
                     onClick={handleSubmitExam}
-                    className={`px-3 py-2 md:px-6 md:py-4 rounded-lg text-sm md:text-lg font-bold transition-colors whitespace-nowrap
+                    className={`px-5 py-2.5 rounded-lg text-sm md:text-base font-semibold whitespace-nowrap transition-colors
                       ${colorTheme === 'black-on-white'
                         ? 'bg-black text-white hover:bg-gray-600'
                         : colorTheme === 'white-on-black'
@@ -3570,86 +3583,84 @@ const MainLayout = () => {
                 {isRetakeIncorrectMode && (
                   <button
                     onClick={handleSubmitExam}
-                    className="px-6 py-4 rounded-lg text-lg font-bold bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 transition-colors shadow-lg"
+                    className="px-5 py-2.5 rounded-lg text-sm md:text-base font-semibold whitespace-nowrap bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 transition-colors shadow-lg"
                   >
                     Submit Retake
                   </button>
                 )}
                 {navState.fromResultReview && !isRetakeIncorrectMode && (
-                  <div className="flex flex-col space-y-2">
-                    <div className="flex space-x-4">
-                      <button
-                        onClick={() => {
-                          if (!answerData?.detailed_answers) return;
-
-                          // Determine offset for Forecast mode
-                          let offset = 0;
-                          if (isForecastMode && currentPart > 1) {
-                            const range = getQuestionRange(currentPart);
-                            // Check if backend answers use 1-based indexing for parts > 1
-                            const minQ = Math.min(...answerData.detailed_answers.map(a => a.question_number));
-                            if (minQ < range.start) {
-                              offset = range.start - 1;
-                            }
-                          }
-
-                          const incorrectQuestions = answerData.detailed_answers
-                            .filter(a => a.evaluation === 'wrong' || a.evaluation === 'blank')
-                            .map(a => a.question_number + offset);
-
-                          if (incorrectQuestions.length === 0) {
-                            alert('All questions are correct! No incorrect answers to retake.');
-                            return;
-                          }
-                          navigate('/reading_test_room', {
-                            state: {
-                              examId,
-                              retakeIncorrectMode: true,
-                              incorrectQuestions,
-                              answerData: {
-                                ...answerData,
-                                detailed_answers: answerData.detailed_answers.map(a => ({
-                                  ...a,
-                                  question_number: a.question_number + offset
-                                }))
-                              },
-                              forecastPart: isForecastMode ? currentPart : undefined,
-                              resultId: resultId
-                            }
-                          });
-                        }}
-                        className="px-6 py-4 rounded-lg text-lg font-bold transition-colors bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600"
-                      >
-                        Retake Incorrect
-                      </button>
-                      <button
-                        onClick={() => setShowErrorReport(true)}
-                        className="px-6 py-4 rounded-lg text-lg font-bold transition-colors border-2 border-[#0096b1] text-[#0096b1] bg-white hover:bg-[#0096b1] hover:text-white"
-                      >
-                        Report an Error
-                      </button>
-                      {!isForecastMode && (
+                  <div className="relative">
+                    {reviewMenuOpen && <div className="fixed inset-0 z-40" onClick={() => setReviewMenuOpen(false)} />}
+                    <button
+                      onClick={() => setReviewMenuOpen(o => !o)}
+                      className="px-4 py-2 rounded-lg text-sm md:text-base font-semibold whitespace-nowrap transition-colors border-2 border-[#eb7e37] text-[#eb7e37] hover:bg-[#eb7e37] hover:text-white inline-flex items-center gap-1.5"
+                    >
+                      <MoreHorizontal className="w-4 h-4" /> Options
+                      <ChevronUp className={`w-4 h-4 transition-transform ${reviewMenuOpen ? '' : 'rotate-180'}`} />
+                    </button>
+                    {reviewMenuOpen && (
+                      <div className="absolute right-0 bottom-full mb-2 w-52 bg-white rounded-xl shadow-2xl border border-gray-100 py-1.5 z-50">
+                        <button onClick={() => { setReviewMenuOpen(false); setShowErrorReport(true); }} className="w-full text-left px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">Report an Error</button>
+                        {!isForecastMode && (
+                          <button onClick={() => { setReviewMenuOpen(false); setShowLeaderboard(true); }} className="w-full text-left px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">Ranking</button>
+                        )}
                         <button
-                          onClick={() => setShowLeaderboard(true)}
-                          className="px-6 py-4 rounded-lg text-lg font-bold transition-colors border-2 border-[#eb7e37] text-[#eb7e37] bg-white hover:bg-[#eb7e37] hover:text-white"
+                          onClick={() => {
+                            setReviewMenuOpen(false);
+                            if (!answerData?.detailed_answers) return;
+
+                            // Determine offset for Focus (single-part) mode
+                            let offset = 0;
+                            if (isForecastMode && currentPart > 1) {
+                              const range = getQuestionRange(currentPart);
+                              // Check if backend answers use 1-based indexing for parts > 1
+                              const minQ = Math.min(...answerData.detailed_answers.map(a => a.question_number));
+                              if (minQ < range.start) {
+                                offset = range.start - 1;
+                              }
+                            }
+
+                            const incorrectQuestions = answerData.detailed_answers
+                              .filter(a => a.evaluation === 'wrong' || a.evaluation === 'blank')
+                              .map(a => a.question_number + offset);
+
+                            if (incorrectQuestions.length === 0) {
+                              alert('All questions are correct! No incorrect answers to retake.');
+                              return;
+                            }
+                            navigate('/reading_test_room', {
+                              state: {
+                                examId,
+                                retakeIncorrectMode: true,
+                                incorrectQuestions,
+                                answerData: {
+                                  ...answerData,
+                                  detailed_answers: answerData.detailed_answers.map(a => ({
+                                    ...a,
+                                    question_number: a.question_number + offset
+                                  }))
+                                },
+                                forecastPart: isForecastMode ? currentPart : undefined,
+                                resultId: resultId
+                              }
+                            });
+                          }}
+                          className="w-full text-left px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50"
                         >
-                          Ranking
+                          Retake Incorrect
                         </button>
-                      )}
-                      <button
-                        onClick={() => setShowClearDataDialog(true)}
-                        className={`px-6 py-4 rounded-lg text-lg font-bold transition-colors
-                          ${colorTheme === 'black-on-white'
-                            ? 'bg-red-600 text-white hover:bg-red-700'
-                            : colorTheme === 'white-on-black'
-                              ? 'bg-red-800 text-yellow-300 hover:bg-red-900'
-                              : 'bg-red-500 text-black hover:bg-red-600'
-                          }`}
-                      >
-                        Stop Review
-                      </button>
-                    </div>
+                        <button onClick={() => { setReviewMenuOpen(false); setShowNewWordsDialog(true); }} className="w-full text-left px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">New Words</button>
+                      </div>
+                    )}
                   </div>
+                )}
+                {navState.fromResultReview && !isRetakeIncorrectMode && (
+                  <button
+                    onClick={() => setShowClearDataDialog(true)}
+                    className="px-4 py-2 rounded-lg text-sm md:text-base font-semibold whitespace-nowrap transition-colors bg-red-600 text-white hover:bg-red-700"
+                  >
+                    Stop Review
+                  </button>
                 )}
               </div>
             </div>
@@ -3708,6 +3719,16 @@ const MainLayout = () => {
         }}
         title="Confirm stop review"
         message="Note: After stopping the review, the exam will be saved for later review in exam history."
+      />
+      <AlertForm
+        open={showNewWordsDialog}
+        onClose={() => setShowNewWordsDialog(false)}
+        onConfirm={() => {
+          setShowNewWordsDialog(false);
+          clearExamData('/new-vocabulary');
+        }}
+        title="Go to New Words"
+        message="After you open New Words you cannot come back to this Review page. Make sure you have finished reviewing before you continue."
       />
       <ConfirmDialog
         isOpen={showRetakeDialog}
