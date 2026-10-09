@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import usePersistedState from '../utils/useListPreferences';
+import { useLiveCounts } from '../utils/useLivePresence';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
-import { Search, Lock, ChevronLeft, ChevronRight, Sparkles, History } from 'lucide-react';
+import { Search, Lock, ChevronLeft, ChevronRight, Sparkles, History, Filter } from 'lucide-react';
 import secureStorage from '../utils/secureStorage';
 import API_BASE from '../config/api';
 import Seo from './Seo';
 import ForecastStars, { ForecastLegend } from './ForecastStars';
 import DifficultyBadge from './DifficultyBadge';
+import LiveTakers from './LiveTakers';
 
 const WritingForecast = () => {
   const navigate = useNavigate();
@@ -29,9 +32,21 @@ const WritingForecast = () => {
   const [aiQuota, setAiQuota] = useState(null);
   const [partSort, setPartSort] = useState(initial.part);
   const [typeFilter, setTypeFilter] = useState(initial.type);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [sortOrder, setSortOrder] = useState('default');
+  // Remembered so returning from a task lands back on the page it was on.
+  const [currentPage, setCurrentPage] = usePersistedState('listPage:writingForecast', 1);
+  const [hideDone, setHideDone] = usePersistedState('hideDone:writingForecast', false, 'local');
 
+  // partSort / typeFilter are already seeded from the URL, so the first run has
+  // nothing to change — resetting the page there would wipe the remembered page.
+  const appliedSearchRef = useRef(null);
   useEffect(() => {
+    if (appliedSearchRef.current === null) {
+      appliedSearchRef.current = location.search;
+      return;
+    }
+    if (appliedSearchRef.current === location.search) return;
+    appliedSearchRef.current = location.search;
     const next = parseSearch(location.search);
     setPartSort(next.part);
     setTypeFilter(next.type);
@@ -107,9 +122,12 @@ const WritingForecast = () => {
             task1_type: p.task1_type || exam.task1_type || null,
             task2_type: p.task2_type || exam.task2_type || null,
             difficulty_label: p.difficulty_label || null,
+            difficulty_score: p.difficulty_score ?? null,
             forecast_level: p.forecast_level || null,
             occurrence_count: p.occurrence_count || 0,
-            band: p.band ?? null   // this user's AI band (VN port)
+            band: p.band ?? null,   // this user's AI band (VN port)
+            // An essay exists for this task (graded or not) -> the card shows Retake + History.
+            done: p.band != null || !!p.has_answer
           }));
         });
         setItems(flat);
@@ -123,8 +141,10 @@ const WritingForecast = () => {
   }, [navigate]);
 
   const canSearch = !(userRole === 'customer' && !isVIP);
+  // Sort and "Hide completed" ride on the same VIP gate as search.
+  const canHideDone = isLoggedIn && canSearch;
   const base = canSearch
-    ? items.filter(it =>
+    ? items.filter(it => !(hideDone && canHideDone) || !it.done).filter(it =>
       (it.title + ' ' + it.exam_title).toLowerCase().includes(searchQuery.toLowerCase())
     )
     : items;
@@ -154,10 +174,31 @@ const WritingForecast = () => {
         ? it.task1_type === typeFilter
         : it.task2_type === typeFilter;
     })
-    .sort((a, b) => partSort === 'part1'
-      ? rank(TASK1_TYPE_ORDER, a.task1_type) - rank(TASK1_TYPE_ORDER, b.task1_type)
-      : rank(TASK2_TYPE_ORDER, a.task2_type) - rank(TASK2_TYPE_ORDER, b.task2_type)
-    );
+    .sort((a, b) => {
+      const effSort = canSearch ? sortOrder : 'default';
+      if (effSort === 'alphabet_asc' || effSort === 'alphabet_desc') {
+        const titleA = `${a.exam_title || ''} ${a.title || ''}`;
+        const titleB = `${b.exam_title || ''} ${b.title || ''}`;
+        const cmp = titleA.localeCompare(titleB, undefined, { numeric: true });
+        return effSort === 'alphabet_asc' ? cmp : -cmp;
+      }
+      if (effSort === 'difficulty') {
+        // Easiest first = higher average band; unclassified tasks go last.
+        const av = a.difficulty_score, bv = b.difficulty_score;
+        if (av == null && bv == null) return 0;
+        if (av == null) return 1;
+        if (bv == null) return -1;
+        return bv - av;
+      }
+      if (effSort === 'forecast') {
+        // Important Levels, highest first.
+        return (b.occurrence_count || 0) - (a.occurrence_count || 0);
+      }
+      // Default: grouped by question type (the order described above).
+      return partSort === 'part1'
+        ? rank(TASK1_TYPE_ORDER, a.task1_type) - rank(TASK1_TYPE_ORDER, b.task1_type)
+        : rank(TASK2_TYPE_ORDER, a.task2_type) - rank(TASK2_TYPE_ORDER, b.task2_type);
+    });
 
   // Pills shown above the grid — pre-built per-part so the Part 1 view
   // shows chart types and Part 2 shows essay flavours.
@@ -181,10 +222,25 @@ const WritingForecast = () => {
     { value: 'two_part_mixed', label: 'Two-part Mixed' }
   ];
   const currentPills = partSort === 'part1' ? PART1_PILLS : PART2_PILLS;
+  // Number of tasks behind each pill ("Pie (12)"), counted over the whole current part.
+  const partItems = items.filter(it => partSort === 'part1' ? it.part_number === 1 : it.part_number === 2);
+  const pillCount = (value) => (value
+    ? partItems.filter(it => (partSort === 'part1' ? it.task1_type : it.task2_type) === value).length
+    : partItems.length);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const paginated = sorted.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(sorted.length / itemsPerPage) || 1;
+
+  // A remembered page can point past the end after hiding finished items. Only clamp
+  // once the list has actually loaded — on the first render `items` is still empty and
+  // totalPages falls back to 1, which would throw away the remembered page.
+  useEffect(() => {
+    if (items.length > 0 && totalPages > 0 && currentPage > totalPages) setCurrentPage(totalPages);
+  }, [items.length, totalPages, currentPage, setCurrentPage]);
+
+  // Live "N people are taking this test" for the cards on this page (scope = "<exam>p<part>").
+  const liveCounts = useLiveCounts(paginated.map(it => `${it.exam_id}p${it.part_number}`));
 
   // Authoritative Writing-AI grade quota from the server (Gemini engine,
   // /ai/writing/quota). Replaces the old per-browser localStorage counters.
@@ -251,7 +307,7 @@ const WritingForecast = () => {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-4"><ForecastLegend /></div>
-        <div className="flex gap-4 mb-8">
+        <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
@@ -270,35 +326,65 @@ const WritingForecast = () => {
               <Lock className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             )}
           </div>
-          <div className="w-48">
-            <select
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500"
-              value={partSort}
-              onChange={(e) => updateUrl(e.target.value, '')}
-            >
-              <option value="part1">Part 1</option>
-              <option value="part2">Part 2</option>
-            </select>
-          </div>
+          <select
+            aria-label="Sort"
+            className={`px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500 font-medium ${!canSearch ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-white text-gray-700'}`}
+            value={sortOrder}
+            onChange={(e) => { if (canSearch) { setSortOrder(e.target.value); setCurrentPage(1); } }}
+            disabled={!canSearch}
+            title={!canSearch ? 'Sorting is VIP only' : undefined}
+          >
+            <option value="default">By question type</option>
+            <option value="forecast">Important Levels: Highest to Lowest</option>
+            <option value="difficulty">By difficulty (easiest first)</option>
+            <option value="alphabet_asc">By Alphabet (A-Z)</option>
+            <option value="alphabet_desc">By Alphabet (Z-A)</option>
+          </select>
+          <select
+            aria-label="Part"
+            className="md:w-32 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500 bg-white text-gray-700 font-medium"
+            value={partSort}
+            onChange={(e) => updateUrl(e.target.value, '')}
+          >
+            <option value="part1">Part 1</option>
+            <option value="part2">Part 2</option>
+          </select>
+          {canHideDone && (
+            <label className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg cursor-pointer select-none bg-white hover:bg-gray-50 whitespace-nowrap">
+              <input
+                type="checkbox"
+                className="w-4 h-4 accent-[#0096b1] cursor-pointer"
+                checked={!!hideDone}
+                onChange={(e) => { setHideDone(e.target.checked); setCurrentPage(1); }}
+              />
+              <span className="text-sm font-medium text-gray-700">Hide completed</span>
+            </label>
+          )}
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-6">
-          {currentPills.map(p => {
-            const active = (typeFilter || '') === p.value;
-            return (
-              <button
-                key={p.value || 'all'}
-                onClick={() => updateUrl(partSort, p.value)}
-                className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
-                  active
-                    ? 'bg-[#0096b1] text-white border-[#0096b1]'
-                    : 'bg-white text-gray-700 border-gray-200 hover:border-[#0096b1] hover:text-[#0096b1]'
-                }`}
-              >
-                {p.label}
-              </button>
-            );
-          })}
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-2">
+            <Filter className="w-4 h-4 text-gray-500" />
+            <span className="text-sm font-medium text-gray-600">Filter by question type:</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {currentPills.map(p => {
+              const active = (typeFilter || '') === p.value;
+              return (
+                <button
+                  key={p.value || 'all'}
+                  onClick={() => updateUrl(partSort, p.value)}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-full border transition-colors ${
+                    active
+                      ? 'bg-[#0096b1] text-white border-[#0096b1]'
+                      : 'bg-white text-gray-700 border-gray-200 hover:border-[#0096b1] hover:text-[#0096b1]'
+                  }`}
+                >
+                  {p.label}{!loading && ` (${pillCount(p.value)})`}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {loading ? (
@@ -315,9 +401,7 @@ const WritingForecast = () => {
                   <div className="h-3 w-5/6 bg-gray-100 rounded" />
                   <div className="h-3 w-4/6 bg-gray-100 rounded" />
                 </div>
-                <div className="h-9 w-full bg-gray-200 rounded mb-2" />
-                <div className="h-9 w-full bg-gray-100 rounded mb-2" />
-                <div className="h-9 w-full bg-gradient-to-r from-gray-200 to-gray-100 rounded" />
+                <div className="h-9 w-full bg-gray-200 rounded" />
               </div>
             ))}
           </div>
@@ -333,7 +417,7 @@ const WritingForecast = () => {
                     <span className="text-[#0096b1] italic mr-2">Writing:</span>
                     <span>{it.title}</span>
                   </h3>
-                  {isLoggedIn && it.band != null && (() => {
+                  {isLoggedIn && it.done && (() => {
                     const key = `${it.exam_id}-${it.part_number}`;
                     return (
                       <div className="relative shrink-0">
@@ -375,6 +459,7 @@ const WritingForecast = () => {
                   })()}
                   </div>
                   <div className="text-sm text-gray-600 mt-1">Exam: {it.exam_title}</div>
+                  <LiveTakers count={liveCounts[`${it.exam_id}p${it.part_number}`]} className="mt-2" />
                   {(it.difficulty_label || it.forecast_level) && (
                     <div className="mt-2 flex items-center gap-2">
                       <DifficultyBadge label={it.difficulty_label} />
@@ -413,20 +498,10 @@ const WritingForecast = () => {
                       }
                       navigate('/writing_test_room', { state: { taskId: it.task_id, testId: it.exam_id, isForecast: true, partNumber: it.part_number } });
                     }}
-                    className={`mt-4 w-full text-white py-2 rounded ${it.band != null ? 'bg-[#eb7e37] hover:bg-[#d66e2a]' : 'bg-[#0096b1]'}`}
+                    className={`mt-4 w-full py-2 rounded font-semibold text-white ${it.done ? 'bg-[#eb7e37] hover:bg-[#d66e2a]' : 'bg-[#0096b1] hover:bg-[#007a90]'}`}
                   >
-                    {it.band != null ? 'Retake' : 'Take Practice'}
+                    {it.done ? 'Retake' : 'Start'}
                   </button>
-                  {isLoggedIn && (
-                    <button
-                      onClick={() => navigate('/writing_review', { state: { testId: it.exam_id, isForecast: true, partNumber: it.part_number } })}
-                      className="mt-2 w-full bg-gradient-to-r from-green-400 to-blue-400 hover:from-green-500 hover:to-blue-500 text-white py-2 rounded flex items-center justify-center gap-2"
-                      title="Review, edit and evaluate your essay with AI"
-                    >
-                      <Sparkles className="w-4 h-4" />
-                      Review &amp; Evaluate with AI
-                    </button>
-                  )}
                 </div>
               ))}
             </div>
