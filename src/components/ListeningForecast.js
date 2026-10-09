@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
+import usePersistedState from '../utils/useListPreferences';
+import { useLiveCounts } from '../utils/useLivePresence';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
-import { Search, Lock, ChevronRight, ChevronLeft, Star, Tag, X } from 'lucide-react';
+import { Search, Lock, ChevronRight, ChevronLeft, Star, Filter, CheckCircle2 } from 'lucide-react';
 import secureStorage from '../utils/secureStorage';
 import ConfirmDialog from './ConfirmDialog';
 import API_BASE from '../config/api';
@@ -9,6 +11,7 @@ import fetchWithTimeout from '../utils/fetchWithTimeout';
 import Seo from './Seo';
 import ForecastStars, { ForecastLegend } from './ForecastStars';
 import DifficultyBadge from './DifficultyBadge';
+import LiveTakers from './LiveTakers';
 
 const ListeningForecast = () => {
   const navigate = useNavigate();
@@ -23,8 +26,12 @@ const ListeningForecast = () => {
   const examHistoryRefs = useRef({});
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [examToRetake, setExamToRetake] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [activeQuestionType, setActiveQuestionType] = useState(null);
+  const [sortOrder, setSortOrder] = useState('default');
+  // Remembered so returning from a part lands back on the page it was on.
+  const [currentPage, setCurrentPage] = usePersistedState('listPage:listeningForecast', 1);
+  const [hideDone, setHideDone] = usePersistedState('hideDone:listeningForecast', false, 'local');
+  const [selectedType, setSelectedType] = useState('all');
+  const [selectedPart, setSelectedPart] = useState('all');
   const itemsPerPage = 6;
 
   useEffect(() => {
@@ -110,10 +117,13 @@ const ListeningForecast = () => {
             forecast_title: p.forecast_title || '',
             completed: !!p.completed,
             attempts_count: p.attempts_count || 0,
+            latest_score: p.latest_score ?? null,
+            total_questions: p.total_questions ?? null,
             is_recommended: !!p.is_recommended,
             question_types: Array.isArray(p.question_types) ? p.question_types : [],
             forecast_level: p.forecast_level || null,
             difficulty_label: p.difficulty_label || null,
+            difficulty_score: p.difficulty_score ?? null,
             occurrence_count: p.occurrence_count || 0
           })) : []))
           : [];
@@ -179,7 +189,8 @@ const ListeningForecast = () => {
     });
   };
 
-  const allQuestionTypes = [...new Set(items.flatMap(it => it.question_types || []))];
+  const allQuestionTypes = [...new Set(items.flatMap(it => it.question_types || []))].filter(Boolean);
+  const allParts = [...new Set(items.map(it => it.part_number).filter(Boolean))].sort((a, b) => a - b);
 
   // A "limited" user sees gated/blurred content: non-VIP customers AND guests
   // (no token). Students/admins are never limited. Guests must be gated at least
@@ -187,18 +198,52 @@ const ListeningForecast = () => {
   // part names. '' (role not yet fetched) is treated as limited: safe default.
   const isLimitedUser = !isVIP && userRole !== 'student' && userRole !== 'admin';
 
+  const canSearch = !isLimitedUser;
+  // "Hide completed" rides on the same VIP gate as search / sort / filters: for a
+  // limited user the first 6 cards are the free ones, so the order must not change.
+  const canHideDone = !isLimitedUser;
+  const keepItem = (it) => !(hideDone && canHideDone) || !it.completed;
+
   const filtered = isLimitedUser
     ? items
-    : items.filter(it => {
+    : items.filter(keepItem).filter(it => {
       const matchesSearch = ((it.exam_title || '').toLowerCase().includes(searchQuery.toLowerCase())) ||
         ((it.forecast_title || '').toLowerCase().includes(searchQuery.toLowerCase()));
-      const matchesType = !activeQuestionType || (it.question_types || []).includes(activeQuestionType);
-      return matchesSearch && matchesType;
+      const matchesType = selectedType === 'all' || (it.question_types || []).includes(selectedType);
+      const matchesPart = selectedPart === 'all' || it.part_number === selectedPart;
+      return matchesSearch && matchesType && matchesPart;
+    }).sort((a, b) => {
+      if (sortOrder === 'alphabet_asc' || sortOrder === 'alphabet_desc') {
+        const titleA = a.forecast_title || a.exam_title || '';
+        const titleB = b.forecast_title || b.exam_title || '';
+        return sortOrder === 'alphabet_asc' ? titleA.localeCompare(titleB) : titleB.localeCompare(titleA);
+      } else if (sortOrder === 'difficulty') {
+        // Easiest first = higher average % correct; unclassified parts go last.
+        const av = a.difficulty_score, bv = b.difficulty_score;
+        if (av == null && bv == null) return 0;
+        if (av == null) return 1;
+        if (bv == null) return -1;
+        return bv - av;
+      } else if (sortOrder === 'forecast') {
+        // Important Levels, highest first.
+        return (b.occurrence_count || 0) - (a.occurrence_count || 0);
+      }
+      return 0; // default order
     });
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const paginated = filtered.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
+
+  // A remembered page can point past the end after hiding finished items. Only clamp
+  // once the list has actually loaded — on the first render `items` is still empty and
+  // totalPages falls back to 1, which would throw away the remembered page.
+  useEffect(() => {
+    if (items.length > 0 && totalPages > 0 && currentPage > totalPages) setCurrentPage(totalPages);
+  }, [items.length, totalPages, currentPage, setCurrentPage]);
+
+  // Live "N people are taking this test" for the cards on this page (scope = "<exam>p<part>").
+  const liveCounts = useLiveCounts(paginated.map(it => `${it.exam_id}p${it.part_number}`));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -232,18 +277,16 @@ const ListeningForecast = () => {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-4"><ForecastLegend /></div>
-        <div className="mb-8">
-          <div className="relative">
+        <div className="flex flex-col md:flex-row gap-4 mb-8">
+          <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder={isLimitedUser ? "Search is VIP only..." : "Search Practice..."}
+              placeholder={isLimitedUser ? "Search is VIP only..." : "Search focus tests..."}
               className={`w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500 ${isLimitedUser ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               value={searchQuery}
               onChange={(e) => {
-                if (!isLimitedUser) {
-                  setSearchQuery(e.target.value);
-                }
+                if (canSearch) { setSearchQuery(e.target.value); setCurrentPage(1); }
               }}
               disabled={isLimitedUser}
             />
@@ -251,39 +294,89 @@ const ListeningForecast = () => {
               <Lock className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             )}
           </div>
-          {allQuestionTypes.length > 0 && (
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              <Tag className="w-4 h-4 text-gray-400" />
-              {allQuestionTypes.map(qt => (
-                <button
-                  key={qt}
-                  onClick={() => {
-                    if (!isLimitedUser) {
-                      setActiveQuestionType(prev => prev === qt ? null : qt);
-                      setCurrentPage(1);
-                    }
-                  }}
-                  disabled={isLimitedUser}
-                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-                    activeQuestionType === qt
-                      ? 'bg-[#0096b1] border-[#0096b1] text-white'
-                      : 'bg-white border-gray-200 text-gray-600 hover:border-[#0096b1] hover:text-[#0096b1]'
-                  } ${isLimitedUser ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                >
-                  {qt}
-                </button>
-              ))}
-              {activeQuestionType && (
-                <button
-                  onClick={() => { setActiveQuestionType(null); setCurrentPage(1); }}
-                  className="px-2 py-1 rounded-full text-xs font-medium text-red-500 hover:bg-red-50 flex items-center gap-1"
-                >
-                  <X className="w-3 h-3" /> Clear
-                </button>
-              )}
-            </div>
+          <select
+            aria-label="Sort"
+            className={`px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0096b1] focus:border-[#0096b1] font-medium ${isLimitedUser ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-white text-gray-700'}`}
+            value={sortOrder}
+            onChange={(e) => { setSortOrder(e.target.value); setCurrentPage(1); }}
+            disabled={isLimitedUser}
+            title={isLimitedUser ? 'Sorting is VIP only' : undefined}
+          >
+            <option value="default">Newest</option>
+            <option value="forecast">Important Levels: Highest to Lowest</option>
+            <option value="difficulty">By difficulty (easiest first)</option>
+            <option value="alphabet_asc">By Alphabet (A-Z)</option>
+            <option value="alphabet_desc">By Alphabet (Z-A)</option>
+          </select>
+          <select
+            aria-label="Part"
+            className={`px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0096b1] focus:border-[#0096b1] font-medium ${isLimitedUser ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-white text-gray-700'}`}
+            value={selectedPart}
+            onChange={(e) => { setSelectedPart(e.target.value === 'all' ? 'all' : Number(e.target.value)); setCurrentPage(1); }}
+            disabled={isLimitedUser}
+            title={isLimitedUser ? 'Filtering is VIP only' : undefined}
+          >
+            <option value="all">All parts</option>
+            {allParts.map(pn => (
+              <option key={pn} value={pn}>Part {pn}</option>
+            ))}
+          </select>
+          {canHideDone && (
+            <label className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg cursor-pointer select-none bg-white hover:bg-gray-50 whitespace-nowrap">
+              <input
+                type="checkbox"
+                className="w-4 h-4 accent-[#0096b1] cursor-pointer"
+                checked={!!hideDone}
+                onChange={(e) => { setHideDone(e.target.checked); setCurrentPage(1); }}
+              />
+              <span className="text-sm font-medium text-gray-700">Hide completed</span>
+            </label>
           )}
         </div>
+
+        {/* Question type filter */}
+        {allQuestionTypes.length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              <Filter className="w-4 h-4 text-gray-500" />
+              <span className="text-sm font-medium text-gray-600">Filter by question type:</span>
+              {isLimitedUser && (
+                <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                  <Lock className="w-3 h-3" />
+                  VIP only
+                </span>
+              )}
+            </div>
+            <div className={`flex flex-wrap gap-2 ${isLimitedUser ? 'opacity-50 pointer-events-none select-none' : ''}`}>
+              <button
+                onClick={() => { setSelectedType('all'); setCurrentPage(1); }}
+                disabled={isLimitedUser}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all border ${selectedType === 'all'
+                  ? 'bg-[#0096b1] text-white border-[#0096b1]'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-[#0096b1] hover:text-[#0096b1]'
+                  }`}
+              >
+                All ({items.length})
+              </button>
+              {allQuestionTypes.map(type => {
+                const count = items.filter(it => (it.question_types || []).includes(type)).length;
+                return (
+                  <button
+                    key={type}
+                    onClick={() => { setSelectedType(type); setCurrentPage(1); }}
+                    disabled={isLimitedUser}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all border ${selectedType === type
+                      ? 'bg-[#0096b1] text-white border-[#0096b1]'
+                      : 'bg-white text-gray-600 border-gray-200 hover:border-[#0096b1] hover:text-[#0096b1]'
+                      }`}
+                  >
+                    {type} ({count})
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {loading ? (
           <div className="p-8 text-center text-gray-600">Loading...</div>
@@ -381,10 +474,16 @@ const ListeningForecast = () => {
                     <DifficultyBadge label={it.difficulty_label} className="ml-2 align-middle" />
                     <ForecastStars level={it.forecast_level} className="ml-2" />
                   </div>
+                  {it.latest_score != null && (
+                    <div className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-[#eb7e37]">
+                      <CheckCircle2 className="w-4 h-4" /> Correct {it.latest_score}/{it.total_questions}
+                    </div>
+                  )}
+                  <LiveTakers count={liveCounts[`${it.exam_id}p${it.part_number}`]} className="mt-2" />
                   {(it.question_types || []).length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-1">
+                    <div className="mt-2 flex flex-wrap gap-1.5">
                       {it.question_types.map(qt => (
-                        <span key={qt} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-teal-50 text-teal-700 border border-teal-200">
+                        <span key={qt} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#0096b1]/10 text-[#0096b1] border border-[#0096b1]/20">
                           {qt}
                         </span>
                       ))}
