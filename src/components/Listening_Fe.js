@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import usePersistedState from '../utils/useListPreferences';
+import { useLiveCounts } from '../utils/useLivePresence';
 import { useNavigate, Link } from 'react-router-dom';
 import { Play, Clock, BarChart, Search, Filter, ChevronLeft, ChevronRight, User, PhoneCall, AlertTriangle, Lock, ChevronDown, History, CheckCircle2 } from 'lucide-react';
 import Navbar from './Navbar';
@@ -11,6 +13,7 @@ import Seo from './Seo';
 import TestModeDialog from './TestModeDialog';
 import ForecastStars, { ForecastLegend } from './ForecastStars';
 import DifficultyBadge from './DifficultyBadge';
+import LiveTakers from './LiveTakers';
 
 const Listening_Fe = () => {
   // Helper to strip HTML tags from part titles (they may contain rich text HTML)
@@ -31,7 +34,10 @@ const Listening_Fe = () => {
   const [tests, setTests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
+  // Remembered (per tab session) so coming back from a test lands on the page it was on.
+  const [currentPage, setCurrentPage] = usePersistedState('listPage:listening', 1);
+  // Lasting preference: hide the tests already completed.
+  const [hideDone, setHideDone] = usePersistedState('hideDone:listening', false, 'local');
   const [difficulty, setDifficulty] = useState('all');
   const [isScrolled, setIsScrolled] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -348,7 +354,12 @@ const Listening_Fe = () => {
   // part titles. '' (role not yet fetched) is treated as limited: safe default.
   const isLimitedUser = !isVIP && userRole !== 'student' && userRole !== 'admin';
 
+  // "Hide completed" is a VIP filter, same as search and sort on this page: for a
+  // limited user the first 6 cards are the free ones, so the list must not shift.
+  const canHideDone = !isLimitedUser;
+
   const filteredTests = tests
+    .filter(test => !(hideDone && canHideDone) || !test.isCompleted)
     .filter(test => {
       const query = searchQuery.toLowerCase();
       if (!query) return true;
@@ -392,6 +403,16 @@ const Listening_Fe = () => {
   const indexOfFirstTest = indexOfLastTest - testsPerPage;
   const currentTests = filteredTests.slice(indexOfFirstTest, indexOfLastTest);
   const totalPages = Math.ceil(filteredTests.length / testsPerPage);
+
+  // The remembered page can point past the end once the list shrinks (search, or
+  // hiding completed tests) — fall back to the last page that still has results.
+  // Wait for the list to load first, or the remembered page would be thrown away.
+  useEffect(() => {
+    if (tests.length > 0 && totalPages > 0 && currentPage > totalPages) setCurrentPage(totalPages);
+  }, [tests.length, totalPages, currentPage, setCurrentPage]);
+
+  // Live "N people are taking this test" for the cards on this page (scope = exam id).
+  const liveCounts = useLiveCounts(currentTests.map(t => String(t.id)));
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center">
@@ -482,6 +503,17 @@ const Listening_Fe = () => {
               </>
             )}
           </select>
+          {canHideDone && (
+            <label className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg cursor-pointer select-none bg-white hover:bg-gray-50 whitespace-nowrap">
+              <input
+                type="checkbox"
+                className="w-4 h-4 accent-[#0096b1] cursor-pointer"
+                checked={!!hideDone}
+                onChange={(e) => { setHideDone(e.target.checked); setCurrentPage(1); }}
+              />
+              <span className="text-sm font-medium text-gray-700">Hide completed</span>
+            </label>
+          )}
         </div>
 
         <div className="mb-4"><ForecastLegend /></div>
@@ -566,6 +598,9 @@ const Listening_Fe = () => {
                     </div>
                   )}
                 </div>
+
+                {/* Live takers */}
+                <LiveTakers count={liveCounts[test.id]} className="mb-1" />
 
                 {/* Part Titles */}
                 <div className="flex flex-col gap-2 mb-2 mt-2">

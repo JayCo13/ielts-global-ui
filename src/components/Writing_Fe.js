@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import usePersistedState from '../utils/useListPreferences';
+import { useLiveCounts } from '../utils/useLivePresence';
 import { useNavigate, Link } from 'react-router-dom';
 import { Play, Search, ChevronLeft, ChevronRight, Sparkles, RotateCw, Bot, Lock, History } from 'lucide-react';
 import ConfirmDialog from './ConfirmDialog';
@@ -12,6 +14,7 @@ import fetchWithTimeout from '../utils/fetchWithTimeout';
 import Seo from './Seo';
 import ForecastStars, { ForecastLegend } from './ForecastStars';
 import DifficultyBadge from './DifficultyBadge';
+import LiveTakers from './LiveTakers';
 
 // Map a /student/writing/tasks row to the shape the list renders and sorts by.
 // Used for the initial load AND the refill after a retake, so both keep
@@ -35,7 +38,10 @@ const Writing_Fe = () => {
   const [tests, setTests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
+  // Remembered (per tab session) so coming back from a test lands on the page it was on.
+  const [currentPage, setCurrentPage] = usePersistedState('listPage:writing', 1);
+  // Lasting preference: hide the tests already completed.
+  const [hideDone, setHideDone] = usePersistedState('hideDone:writing', false, 'local');
   const [isScrolled, setIsScrolled] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [username, setUsername] = useState('');
@@ -250,7 +256,12 @@ const Writing_Fe = () => {
     return i === -1 ? TASK1_TYPE_ORDER.length : i;
   };
 
+  // "Hide completed" is a VIP filter, like the extra sort options (students always have it).
+  const canHideDone = !!(secureStorage.getItem('token') || localStorage.getItem('token'))
+    && (accountStatus?.is_subscribed || localStorage.getItem('role') !== 'customer');
+
   const filteredTests = tests
+    .filter(test => !(hideDone && canHideDone) || !test.is_completed)
     .filter(test => test.title.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => {
       const rankDiff = task1TypeRank(a.task1_type) - task1TypeRank(b.task1_type);
@@ -289,6 +300,16 @@ const Writing_Fe = () => {
   const indexOfFirstTest = indexOfLastTest - testsPerPage;
   const currentTests = filteredTests.slice(indexOfFirstTest, indexOfLastTest);
   const totalPages = Math.ceil(filteredTests.length / testsPerPage);
+
+  // The remembered page can point past the end once the list shrinks (search, or
+  // hiding completed tests) — fall back to the last page that still has results.
+  // Wait for the list to load first, or the remembered page would be thrown away.
+  useEffect(() => {
+    if (tests.length > 0 && totalPages > 0 && currentPage > totalPages) setCurrentPage(totalPages);
+  }, [tests.length, totalPages, currentPage, setCurrentPage]);
+
+  // Live "N people are taking this test" for the cards on this page (scope = test id).
+  const liveCounts = useLiveCounts(currentTests.map(t => String(t.test_id)));
 
   if (loading) {
     return (
@@ -380,6 +401,8 @@ const Writing_Fe = () => {
           )}
         </div>
 
+        <LiveTakers count={liveCounts[test.test_id]} className="mb-2" />
+
         {(test.task1_type || test.task2_type) && (
           <div className="mb-2 flex flex-wrap gap-1">
             {test.task1_type && (
@@ -429,7 +452,7 @@ const Writing_Fe = () => {
 
         <button
           onClick={() => handleStartTest(test)}
-          className={`w-full flex items-center justify-center gap-2 ${test.is_completed ? 'bg-red-500 hover:bg-red-600' : 'bg-[#0096b1] hover:bg-[#eb7e37]'} text-white px-4 py-2 rounded-md transition-colors font-medium text-sm`}
+          className={`w-full flex items-center justify-center gap-2 ${test.is_completed ? 'bg-[#eb7e37] hover:bg-[#d66e2a]' : 'bg-[#0096b1] hover:bg-[#007a90]'} text-white px-4 py-2 rounded-md transition-colors font-medium text-sm`}
         >
           {test.is_completed ? (
             <RotateCw className="w-4 h-4" />
@@ -506,6 +529,17 @@ const Writing_Fe = () => {
               </>
             )}
           </select>
+          {canHideDone && (
+            <label className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg cursor-pointer select-none bg-white hover:bg-gray-50 whitespace-nowrap">
+              <input
+                type="checkbox"
+                className="w-4 h-4 accent-[#0096b1] cursor-pointer"
+                checked={!!hideDone}
+                onChange={(e) => { setHideDone(e.target.checked); setCurrentPage(1); }}
+              />
+              <span className="text-sm font-medium text-gray-700">Hide completed</span>
+            </label>
+          )}
         </div>
 
         <div className="mb-4"><ForecastLegend /></div>
