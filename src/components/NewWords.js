@@ -469,7 +469,7 @@ const NewWords = () => {
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">New Words</h1>
-                    <p className="text-gray-600">Vocabulary you have saved from Listening and Reading exercises. Click on any word to see its definition. Use the Dictation Practice feature to review.</p>
+                    <p className="text-gray-600">Vocabulary you have saved from Listening, Reading, Writing and Speaking exercises. Click on any word to see its definition. Use the Dictation Practice feature to review.</p>
                 </div>
 
                 {mode === 'list' && (
@@ -486,7 +486,7 @@ const NewWords = () => {
                 )}
 
                 {/* Clickable Stats as Filters */}
-                <div className="grid grid-cols-3 gap-4 mb-8">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
 
                     <button
                         onClick={() => setFilter('listening')}
@@ -521,6 +521,38 @@ const NewWords = () => {
                     </button>
 
                     <button
+                        onClick={() => setFilter('writing')}
+                        className={`text-left rounded-2xl p-5 border shadow-sm hover:shadow-md transition-all cursor-pointer ${filter === 'writing'
+                            ? 'bg-emerald-600 border-emerald-600 ring-2 ring-emerald-600 ring-offset-2'
+                            : 'bg-gradient-to-br from-white to-emerald-50 border-emerald-100'
+                            }`}
+                    >
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className={`p-2 rounded-lg ${filter === 'writing' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-600'}`}>
+                                <PenTool className="w-5 h-5" />
+                            </div>
+                            <span className={`text-sm font-medium ${filter === 'writing' ? 'text-emerald-100' : 'text-emerald-600'}`}>Writing</span>
+                        </div>
+                        <div className={`text-3xl font-bold ml-1 ${filter === 'writing' ? 'text-white' : 'text-gray-900'}`}>{vocabulary.filter(v => v.source_type === 'writing').length}</div>
+                    </button>
+
+                    <button
+                        onClick={() => setFilter('speaking')}
+                        className={`text-left rounded-2xl p-5 border shadow-sm hover:shadow-md transition-all cursor-pointer ${filter === 'speaking'
+                            ? 'bg-rose-500 border-rose-500 ring-2 ring-rose-500 ring-offset-2'
+                            : 'bg-gradient-to-br from-white to-rose-50 border-rose-100'
+                            }`}
+                    >
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className={`p-2 rounded-lg ${filter === 'speaking' ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-600'}`}>
+                                <Mic className="w-5 h-5" />
+                            </div>
+                            <span className={`text-sm font-medium ${filter === 'speaking' ? 'text-rose-100' : 'text-rose-600'}`}>Speaking</span>
+                        </div>
+                        <div className={`text-3xl font-bold ml-1 ${filter === 'speaking' ? 'text-white' : 'text-gray-900'}`}>{vocabulary.filter(v => v.source_type === 'speaking').length}</div>
+                    </button>
+
+                    <button
                         onClick={() => setFilter('focus')}
                         className={`text-left rounded-2xl p-5 border shadow-sm hover:shadow-md transition-all cursor-pointer ${filter === 'important'
                             ? 'bg-amber-500 border-amber-500 ring-2 ring-amber-500 ring-offset-2'
@@ -542,10 +574,12 @@ const NewWords = () => {
                         {/* Sub-filter - pill style below */}
                         {filter === 'important' && (
                             <div className="mt-4" onClick={e => e.stopPropagation()}>
-                                <div className="flex bg-amber-600/50 rounded-full p-0.5">
+                                <div className="flex flex-wrap bg-amber-600/50 rounded-full p-0.5">
                                     {[
                                         { value: 'listening', label: 'Listening' },
-                                        { value: 'reading', label: 'Reading' }
+                                        { value: 'reading', label: 'Reading' },
+                                        { value: 'writing', label: 'Writing' },
+                                        { value: 'speaking', label: 'Speaking' }
                                     ].map(subTab => (
                                         <button
                                             key={subTab.value}
