@@ -15,7 +15,7 @@ const ITEMS_PER_PAGE = 5;
 const NewWords = () => {
     const [vocabulary, setVocabulary] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState('listening'); // 'listening', 'reading', 'important'
+    const [filter, setFilter] = useState('listening'); // 'listening', 'reading', 'writing', 'speaking', 'focus' (Practice tab)
     const [importantSubFilter, setImportantSubFilter] = useState('listening'); // 'listening', 'reading'
 
     // Pagination state
@@ -554,7 +554,7 @@ const NewWords = () => {
 
                     <button
                         onClick={() => setFilter('focus')}
-                        className={`text-left rounded-2xl p-5 border shadow-sm hover:shadow-md transition-all cursor-pointer ${filter === 'important'
+                        className={`text-left rounded-2xl p-5 border shadow-sm hover:shadow-md transition-all cursor-pointer ${filter === 'focus'
                             ? 'bg-amber-500 border-amber-500 ring-2 ring-amber-500 ring-offset-2'
                             : 'bg-gradient-to-br from-white to-amber-50 border-amber-100'
                             }`}
@@ -562,17 +562,17 @@ const NewWords = () => {
                         <div className="flex items-center justify-between">
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                    <Star className={`w-5 h-5 ${filter === 'important' ? 'text-white fill-white' : 'text-amber-500 fill-amber-500'}`} />
-                                    <span className={`text-sm font-medium ${filter === 'important' ? 'text-amber-100' : 'text-amber-600'}`}>Practice</span>
+                                    <Star className={`w-5 h-5 ${filter === 'focus' ? 'text-white fill-white' : 'text-amber-500 fill-amber-500'}`} />
+                                    <span className={`text-sm font-medium ${filter === 'focus' ? 'text-amber-100' : 'text-amber-600'}`}>Practice</span>
                                 </div>
-                                <div className={`text-3xl font-bold ${filter === 'important' ? 'text-white' : 'text-gray-900'}`}>
+                                <div className={`text-3xl font-bold ${filter === 'focus' ? 'text-white' : 'text-gray-900'}`}>
                                     {vocabulary.filter(v => v.is_important).length}
                                 </div>
                             </div>
                         </div>
 
                         {/* Sub-filter - pill style below */}
-                        {filter === 'important' && (
+                        {filter === 'focus' && (
                             <div className="mt-4" onClick={e => e.stopPropagation()}>
                                 <div className="flex flex-wrap bg-amber-600/50 rounded-full p-0.5">
                                     {[
@@ -857,7 +857,7 @@ const NewWords = () => {
                             <p className="text-gray-500">
                                 {filter === 'all'
                                     ? 'No words saved yet. Select text in your exam reviews to add them!'
-                                    : `No ${filter === 'important' ? 'important' : filter} words found.`
+                                    : `No ${filter === 'focus' ? 'practice' : filter} words found.`
                                 }
                             </p>
                         </div>
