@@ -431,13 +431,13 @@ const VIPPackages = () => {
                             <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform">
                                 <Star className="w-5 h-5 text-emerald-500" />
                             </div>
-                            <span className="text-gray-700 font-medium">Free <strong className="text-gray-900">Speaking</strong></span>
+                            <span className="text-gray-700 font-medium">Free <strong className="text-gray-900">Speaking</strong> <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full ml-1">1 AI/day</span></span>
                         </div>
                         <div className="flex items-center gap-3 px-5 py-4 bg-white rounded-2xl shadow-sm border border-emerald-50 hover:border-emerald-100 hover:shadow-md transition-all duration-300 group">
                             <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform">
                                 <Lightbulb className="w-5 h-5 text-emerald-500" />
                             </div>
-                            <span className="text-gray-700 font-medium">Free <strong className="text-gray-900">Writing</strong> <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full ml-1">1 AI/day</span></span>
+                            <span className="text-gray-700 font-medium">Free <strong className="text-gray-900">Writing</strong> <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full ml-1">2 AI/day</span></span>
                         </div>
                         <div className="flex items-center gap-3 px-5 py-4 bg-white rounded-2xl shadow-sm border border-amber-50 hover:border-amber-100 hover:shadow-md transition-all duration-300 group">
                             <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center group-hover:scale-110 transition-transform">

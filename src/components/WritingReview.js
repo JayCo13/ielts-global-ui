@@ -659,7 +659,7 @@ export default function WritingReview() {
         <div className="flex items-center gap-3 flex-wrap">
           {quota && (
             quota.is_vip
-              ? <span className="text-sm text-gray-600">AI evaluations this month: <span className="font-bold text-[#0096b1]">{quota.remaining}</span>/{quota.limit} <span className="text-gray-400">(VIP)</span></span>
+              ? <span className="text-sm text-gray-600">AI evaluations: <span className="font-bold text-[#0096b1]">Unlimited for normal use</span> <span className="text-gray-400">(VIP)</span></span>
               : <span className="text-sm text-gray-600 inline-flex items-center gap-2">AI evaluations left today: <span className="font-bold text-[#0096b1]">{quota.remaining}</span>/{quota.limit} <span className="text-gray-400">(free)</span>
                   <button onClick={() => navigate('/vip-packages')} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#eb7e37] text-white hover:bg-[#d66e2a]">Upgrade to VIP</button>
                 </span>

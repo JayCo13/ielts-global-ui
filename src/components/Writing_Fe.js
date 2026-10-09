@@ -463,8 +463,8 @@ const Writing_Fe = () => {
           {aiQuota && (aiQuota.is_vip ? (
             <div className="inline-flex items-center gap-2 rounded-full border border-[#0096b1]/25 bg-[#0096b1]/5 px-4 py-2 self-start sm:self-auto">
               <Sparkles className="w-4 h-4 text-[#0096b1] shrink-0" />
-              <span className="text-sm text-gray-600">AI evaluations this month</span>
-              <span className="text-sm font-bold text-[#0096b1] tabular-nums">{aiQuota.remaining}/{aiQuota.limit}</span>
+              <span className="text-sm text-gray-600">AI evaluations</span>
+              <span className="text-sm font-bold text-[#0096b1]">Unlimited for normal use</span>
             </div>
           ) : (
             <div className="inline-flex items-center gap-2 rounded-full border border-[#eb7e37]/30 bg-gradient-to-r from-[#0096b1]/5 to-[#eb7e37]/10 px-4 py-2 self-start sm:self-auto">

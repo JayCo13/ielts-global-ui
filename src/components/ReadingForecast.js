@@ -213,10 +213,6 @@ const ReadingForecast = () => {
             <li><span className="text-[#0096b1] font-medium">Reading Practice</span></li>
           </ol>
         </nav>
-        <div className="inline-flex items-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg text-sm">
-          <Star className="w-5 h-5 text-yellow-500" fill="currentColor" />
-          <span className="text-gray-700">= Very Important</span>
-        </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">

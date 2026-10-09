@@ -319,16 +319,13 @@ const SpeakingSetup = () => {
                                     </span>
                                 )}
                             </span>
-                            <span className="block text-sm text-gray-500 mt-0.5">
-                                Only use Focus topics for the month of your exam.
-                            </span>
                         </span>
                     </label>
 
                     {useForecast && !info.forecast_locked && (
                         <div className="mt-3">
                             <label className="block text-sm font-semibold text-[#2b5356] mb-1.5">
-                                Expected exam month
+                                Expected month
                             </label>
                             {info.forecast_months.length ? (
                                 <select
