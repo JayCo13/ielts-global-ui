@@ -9,6 +9,8 @@ import { toast, Toaster } from 'react-hot-toast';
 import { TranslatorDialog } from '../../translator';
 import API_BASE from '../../config/api';
 import fetchWithTimeout from '../../utils/fetchWithTimeout';
+import useLivePresence from '../../utils/useLivePresence';
+import LiveTakers from '../../components/LiveTakers';
 
 // VN port: count words in the rich-text answer (HTML string) for the live counter.
 const countWords = (html) => {
@@ -77,6 +79,12 @@ const WritingLayout = () => {
   // picked in TestModeDialog. Forecast keeps its timer. Entries without a mode keep
   // the previous global behaviour (timer on).
   const isPracticeMode = navState.mode === 'practice' && !isForecast;
+  // Live presence ("N people are taking this test"): Redis-only, no DB write.
+  // Scope = test id, or "<test>p<part>" for a single focus task.
+  const liveTakers = useLivePresence(
+    testId ? (isForecast && navState.partNumber ? `${testId}p${navState.partNumber}` : String(testId)) : null,
+    !!testId
+  );
   const [submitConfirmOpen, setSubmitConfirmOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const startTimeRef = useRef(Date.now());   // for "Time taken"
@@ -580,6 +588,7 @@ const WritingLayout = () => {
             <div>
               {isPracticeMode ? 'Practice · no time limit' : `${formatTime(timeLeft)} remaining`}
             </div>
+            <LiveTakers count={liveTakers} min={2} className="mt-0.5" />
           </div>
         </div>
 

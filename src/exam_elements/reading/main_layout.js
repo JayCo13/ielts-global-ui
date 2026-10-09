@@ -17,6 +17,8 @@ import Leaderboard from '../../components/Leaderboard';
 import fetchWithTimeout from '../../utils/fetchWithTimeout';
 import useExamHeartbeat from '../../utils/useExamHeartbeat';
 import useTabSwitchCount from '../../utils/useTabSwitchCount';
+import useLivePresence from '../../utils/useLivePresence';
+import LiveTakers from '../../components/LiveTakers';
 import { saveExamAnnotations } from '../../utils/annotations';
 
 const MainLayout = () => {
@@ -80,6 +82,12 @@ const MainLayout = () => {
     part: currentPart,
     tabSwitches,
   });
+  // Live presence ("N people are taking this test"): Redis-only, separate from the
+  // heartbeat above. Scope = exam id, or "<exam>p<part>" for a single focus part.
+  const liveTakers = useLivePresence(
+    examId ? (navState.forecastPart ? `${examId}p${navState.forecastPart}` : String(examId)) : null,
+    !!examId && !isReviewMode && !isRetakeIncorrectMode
+  );
 
   // Track elapsed time ("time taken"). The start stamp is persisted in
   // sessionStorage so a reload mid-test doesn't reset the clock.
@@ -2070,6 +2078,9 @@ const MainLayout = () => {
               <div className={`${colorTheme !== 'black-on-white' ? 'text-gray-300' : 'text-black-500'} ${textSizeClasses[textSize]}`}>
                 {isReviewMode ? 'Review Mode' : (isExamMode || isForecastMode) ? `${formatTime(timeLeft)} remaining` : 'Practice · no time limit'}
               </div>
+              {!isReviewMode && !isRetakeIncorrectMode && (
+                <LiveTakers count={liveTakers} min={2} className="mt-0.5" />
+              )}
             </div>
           </div>
 

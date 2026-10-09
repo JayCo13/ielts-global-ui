@@ -16,6 +16,8 @@ import API_BASE from '../../config/api';
 import fetchWithTimeout from '../../utils/fetchWithTimeout';
 import useExamHeartbeat from '../../utils/useExamHeartbeat';
 import useTabSwitchCount from '../../utils/useTabSwitchCount';
+import useLivePresence from '../../utils/useLivePresence';
+import LiveTakers from '../../components/LiveTakers';
 import { saveExamAnnotations } from '../../utils/annotations';
 
 // Audio Control Component
@@ -581,6 +583,12 @@ const MainLayout = () => {
     part: currentPart,
     tabSwitches,
   });
+  // Live presence ("N people are taking this test"): Redis-only, separate from the
+  // heartbeat above. Scope = exam id, or "<exam>p<part>" for a single focus part.
+  const liveTakers = useLivePresence(
+    examId ? (forecastPartFromNav ? `${examId}p${forecastPartFromNav}` : String(examId)) : null,
+    !!examId && !isReviewMode && !isRetakeIncorrectMode
+  );
   const {
     selectedText,
     selectionPosition,
@@ -2227,6 +2235,9 @@ const MainLayout = () => {
               <div className={`hidden md:block ${colorTheme !== 'black-on-white' ? 'text-gray-300' : 'text-black-500'} ${textSizeClasses[textSize]}`}>
                 1 year, 10 months, 1 week, 1 day, 21 hours, 11 minutes remaining
               </div>
+              {!isReviewMode && !isRetakeIncorrectMode && (
+                <LiveTakers count={liveTakers} min={2} className="mt-0.5" />
+              )}
             </div>
           </div>
 
