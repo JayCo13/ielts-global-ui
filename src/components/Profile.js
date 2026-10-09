@@ -2,8 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import EditProfile from './EditProfile';
 import ExamHistory from './ExamHistory';
+import AffiliatePanel from './AffiliatePanel';
+import PaymentPanel from './PaymentPanel';
 import Navbar from './Navbar';
-import { User, Edit, History, ChevronLeft, ChevronRight, BarChart, Headphones, PenTool, ArrowLeft, ArrowRight, Lock, Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
+import { User, Edit, History, ChevronLeft, ChevronRight, BarChart, Headphones, PenTool, ArrowLeft, ArrowRight, Lock, Eye, EyeOff, CheckCircle, AlertCircle, Gift, CreditCard } from 'lucide-react';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
 
@@ -309,7 +311,13 @@ const ProfilePage = () => {
   const [profileData, setProfileData] = useState(null);
   const [testStats, setTestStats] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeView, setActiveView] = useState('profile'); // 'profile', 'edit', 'history', 'password'
+  const [activeView, setActiveView] = useState('profile'); // 'profile', 'edit', 'history', 'password', 'affiliate', 'payment'
+
+  // Open a specific tab when arriving via ?tab= (e.g. the Affiliate link in the navbar/guide).
+  useEffect(() => {
+    const tab = new URLSearchParams(window.location.search).get('tab');
+    if (['edit', 'password', 'affiliate', 'payment'].includes(tab)) setActiveView(tab);
+  }, []);
   const [menuCollapsed, setMenuCollapsed] = useState(false);
   const [statsSection, setStatsSection] = useState(0); // 0 for overview, 1 for detailed stats
   const [imageTimestamp, setImageTimestamp] = useState(Date.now());
@@ -398,6 +406,10 @@ const ProfilePage = () => {
         return <ExamHistory />;
       case 'password':
         return <ChangePassword isGoogleAccount={profileData?.is_google_account} />;
+      case 'affiliate':
+        return <div className="flex-1 min-w-0"><AffiliatePanel onGoPayment={() => setActiveView('payment')} /></div>;
+      case 'payment':
+        return <div className="flex-1 min-w-0"><PaymentPanel /></div>;
       default:
         return (
           <div className="flex-1">
@@ -685,6 +697,29 @@ const ProfilePage = () => {
                   <Lock className="w-5 h-5 min-w-5" />
                   {!menuCollapsed && <span>Change Password</span>}
                 </div>
+                {/* Affiliate program: customer accounts only (admin-issued student accounts don't buy VIP). */}
+                {profileData?.role === 'customer' && (
+                  <>
+                    <div
+                      className={`flex items-center gap-3 p-2 cursor-pointer rounded-lg hover:bg-gray-50 ${activeView === 'affiliate' ? 'text-[#0096b1] bg-[#0096b1]-50' : 'text-gray-600'
+                        }`}
+                      onClick={() => setActiveView('affiliate')}
+                      title={menuCollapsed ? "Affiliate" : ""}
+                    >
+                      <Gift className="w-5 h-5 min-w-5" />
+                      {!menuCollapsed && <span>Affiliate</span>}
+                    </div>
+                    <div
+                      className={`flex items-center gap-3 p-2 cursor-pointer rounded-lg hover:bg-gray-50 ${activeView === 'payment' ? 'text-[#0096b1] bg-[#0096b1]-50' : 'text-gray-600'
+                        }`}
+                      onClick={() => setActiveView('payment')}
+                      title={menuCollapsed ? "Payout details" : ""}
+                    >
+                      <CreditCard className="w-5 h-5 min-w-5" />
+                      {!menuCollapsed && <span>Payout Details</span>}
+                    </div>
+                  </>
+                )}
               </nav>
             </div>
 

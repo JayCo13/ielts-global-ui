@@ -51,6 +51,8 @@ import CompPolicy from './pages/adsense/CompPolicy';
 import DeliPolicy from './pages/adsense/DeliPolicy';
 import RefundPolicy from './pages/adsense/RefundPolicy';
 import AnnouncementDetail from './pages/AnnouncementDetail';
+import AffiliateGuide from './pages/AffiliateGuide';
+import { captureReferral, claimReferral } from './utils/affiliateRef';
 import Permission from './pages/adsense/Permission';
 import Instruction from './pages/Instruction';
 import ResultsOverview from './pages/ResultsOverview';
@@ -74,10 +76,24 @@ function ReadingPageWrapper() {
   return <ReadingPage key={location.key} />;
 }
 
+// Affiliate: once a visitor who arrived through a ?ref= link is logged in, hand the
+// remembered code to the backend (it accepts it only for a just-created account).
+// Runs on every route change, so it fires right after login/registration navigates.
+function ReferralClaimer() {
+  const location = useLocation();
+  useEffect(() => {
+    claimReferral();
+  }, [location.pathname]);
+  return null;
+}
+
 function App() {
   useEffect(() => {
     // Initialize authentication and device tracking
     initializeAuth();
+
+    // Affiliate: remember a ?ref= code from any landing page until registration.
+    captureReferral();
 
     // Pre-warm backend immediately (wake Koyeb from cold start)
     const warmupBackend = () => {
@@ -94,6 +110,7 @@ function App() {
     <HelmetProvider>
       <Router>
         <NotificationProvider>
+          <ReferralClaimer />
           <Routes>
           {/* Public routes - accessible without authentication */}
           <Route path="/" element={<HomePage />} />
@@ -111,6 +128,7 @@ function App() {
           <Route path="/deli-policy" element={<DeliPolicy />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/news/:id" element={<AnnouncementDetail />} />
+          <Route path="/affiliate-guide" element={<AffiliateGuide />} />
           <Route path="/permission" element={<Permission />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-failure" element={<PaymentFailure />} />
