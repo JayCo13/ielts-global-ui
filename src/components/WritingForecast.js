@@ -141,6 +141,8 @@ const WritingForecast = () => {
   }, [navigate]);
 
   const canSearch = !(userRole === 'customer' && !isVIP);
+  // Not a Writing VIP (and not a center student / admin): free tier.
+  const isLimitedUser = !isVIP && userRole !== 'student' && userRole !== 'admin';
   // Sort and "Hide completed" ride on the same VIP gate as search.
   const canHideDone = isLoggedIn && canSearch;
   const base = canSearch
@@ -442,12 +444,16 @@ const WritingForecast = () => {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {paginated.map((it, index) => (
+              {paginated.map((it, index) => {
+                // Free tier (same rule as VN and as the Reading/Listening Focus lists):
+                // the first 6 items are usable, the rest are blurred with an upgrade prompt.
+                const locked = isLimitedUser && (index + indexOfFirstItem) >= 6;
+                return (
                 <div key={it.task_id} className="bg-white rounded-lg shadow border border-gray-100 p-4 relative">
                   <div className="flex items-start justify-between gap-2">
                   <h3 className="text-lg font-semibold text-gray-800 min-w-0">
                     <span className="text-[#0096b1] italic mr-2">Writing:</span>
-                    <span>{it.title}</span>
+                    <span className={locked ? 'blur-[5px] select-none' : ''}>{it.title}</span>
                   </h3>
                   {isLoggedIn && it.done && (() => {
                     const key = `${it.exam_id}-${it.part_number}`;
@@ -518,7 +524,7 @@ const WritingForecast = () => {
                   {it.instructions ? (
                     <div className="mt-3 text-gray-700 [&_img]:max-w-full [&_img]:h-auto" data-no-translate dangerouslySetInnerHTML={{ __html: it.instructions }} />
                   ) : thumbnails[String(it.task_id)] && (
-                    <div className="mt-3 rounded-md overflow-hidden border border-gray-200 bg-gray-50">
+                    <div className={`mt-3 rounded-md overflow-hidden border border-gray-200 bg-gray-50 ${locked ? 'blur-2xl select-none pointer-events-none' : ''}`}>
                       <img
                         src={(() => {
                           const url = thumbnails[String(it.task_id)];
@@ -537,6 +543,12 @@ const WritingForecast = () => {
                       <span className="text-lg font-extrabold text-[#0096b1]">{it.band}</span>
                     </div>
                   )}
+                  {locked ? (
+                    <div className="mt-4 flex items-center justify-between gap-2 bg-gray-50 border border-gray-100 rounded px-3 py-2">
+                      <span className="inline-flex items-center gap-1.5 text-gray-600 text-sm font-semibold"><Lock className="w-4 h-4 text-[#0096b1]" /> VIP upgrade required</span>
+                      <Link to="/vip-packages?type=writing" className="px-3 py-1.5 rounded text-xs font-bold text-[#0096b1] bg-white border border-[#0096b1] hover:bg-[#0096b1] hover:text-white transition-colors">View packages</Link>
+                    </div>
+                  ) : (
                   <button
                     onClick={() => {
                       if (!secureStorage.getItem('token') && !localStorage.getItem('token')) {
@@ -549,8 +561,10 @@ const WritingForecast = () => {
                   >
                     {it.done ? 'Retake' : 'Start'}
                   </button>
+                  )}
                 </div>
-              ))}
+                );
+              })}
             </div>
             <div className="flex justify-center items-center space-x-4 mt-8">
               <button
