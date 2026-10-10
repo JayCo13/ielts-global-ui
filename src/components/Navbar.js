@@ -166,7 +166,7 @@ const Navbar = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className={`flex justify-between items-center w-full mx-auto sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'py-0.5 bg-[#07223d]/80 backdrop-blur-md shadow-lg' : 'py-2 bg-[#07223d]'
+            className={`flex justify-between items-center w-full mx-auto sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'py-2 bg-[#07223d]/80 backdrop-blur-md shadow-lg' : 'py-4 bg-[#07223d]'
                 }`}
         >
             <div className="max-w-7xl w-full mx-auto px-4 flex justify-between items-center">
