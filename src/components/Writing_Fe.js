@@ -428,32 +428,40 @@ const Writing_Fe = () => {
 
         <div className="space-y-2 mb-4">
           {test.parts.map((task) => (
-            <div key={task.task_id} className="flex items-center justify-between text-sm text-gray-600 bg-gray-50 py-1.5 px-2 rounded">
-              <span className="flex items-center gap-2">
-                Part {task.part_number}
-                <DifficultyBadge label={task.difficulty_label} />
-                {/* Non-VIP (VN rule): a lock on EVERY task, so it does not reveal which
-                    ones are focus picks. VIP sees the real stars. */}
-                {test.vip_locked ? (
-                  <button onClick={() => navigate('/vip-packages?type=writing')} title="Upgrade to Writing VIP to see Important Levels"
-                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0096b1] hover:underline whitespace-nowrap">
-                    <Lock className="w-3 h-3" /> Upgrade to VIP to see Important Levels
-                  </button>
-                ) : <ForecastStars level={task.forecast_level} />}
-              </span>
-              <div className="flex items-center gap-2">
-                <span className="text-md">{task.word_limit} words</span>
-                {test.is_completed && (
-                  <button
-                    onClick={() => openReview(test, task.part_number)}
-                    className="px-2 py-0.5 text-md bg-gradient-to-r from-green-400 to-blue-400 hover:from-green-500 hover:to-blue-500 text-white rounded flex items-center gap-1"
-                    title="Review, edit and evaluate your essay with AI"
-                  >
-                    <Sparkles className="w-3 h-3" />
-                    Review &amp; AI
-                  </button>
-                )}
+            <div key={task.task_id} className="text-sm text-gray-600 bg-gray-50 py-2 px-2.5 rounded">
+              {/* Row 1: part, difficulty | word count, review. Row 2: Important Level
+                  (stars for VIP, a compact unlock link otherwise) on its own line so
+                  long labels / translations never squeeze the row above. */}
+              <div className="flex items-center justify-between gap-2">
+                <span className="flex items-center gap-2 min-w-0">
+                  <span className="font-medium text-gray-700 whitespace-nowrap">Part {task.part_number}</span>
+                  <DifficultyBadge label={task.difficulty_label} />
+                </span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="whitespace-nowrap">{task.word_limit} words</span>
+                  {test.is_completed && (
+                    <button
+                      onClick={() => openReview(test, task.part_number)}
+                      className="px-2 py-0.5 bg-gradient-to-r from-green-400 to-blue-400 hover:from-green-500 hover:to-blue-500 text-white rounded flex items-center gap-1 whitespace-nowrap"
+                      title="Review, edit and evaluate your essay with AI"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      Review &amp; AI
+                    </button>
+                  )}
+                </div>
               </div>
+              {/* Non-VIP (VN rule): a lock on EVERY task, so it does not reveal which
+                  ones are focus picks. VIP sees the real stars. */}
+              {test.vip_locked ? (
+                <button onClick={() => navigate('/vip-packages?type=writing')} title="Upgrade to Writing VIP to see Important Levels"
+                  className="mt-1.5 flex items-center gap-1 max-w-full text-xs font-semibold text-[#0096b1] hover:underline">
+                  <Lock className="w-3 h-3 shrink-0" />
+                  <span className="truncate">Unlock Important Levels with VIP</span>
+                </button>
+              ) : (task.forecast_level ? (
+                <div className="mt-1.5"><ForecastStars level={task.forecast_level} /></div>
+              ) : null)}
             </div>
           ))}
         </div>
