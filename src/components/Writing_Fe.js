@@ -29,6 +29,7 @@ const mapStudentWritingTest = (exam) => ({
   task1_type: exam.task1_type ?? null,
   task2_type: exam.task2_type ?? null,
   difficultyAvg: exam.difficulty_avg ?? null,
+  vip_locked: !!exam.vip_locked,
   occurrenceSum: exam.occurrence_sum || 0,
   overall_band: exam.overall_band ?? null
 });
@@ -431,7 +432,14 @@ const Writing_Fe = () => {
               <span className="flex items-center gap-2">
                 Part {task.part_number}
                 <DifficultyBadge label={task.difficulty_label} />
-                <ForecastStars level={task.forecast_level} />
+                {/* Non-VIP (VN rule): a lock on EVERY task, so it does not reveal which
+                    ones are focus picks. VIP sees the real stars. */}
+                {test.vip_locked ? (
+                  <button onClick={() => navigate('/vip-packages?type=writing')} title="Upgrade to Writing VIP to see Important Levels"
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0096b1] hover:underline whitespace-nowrap">
+                    <Lock className="w-3 h-3" /> Upgrade to VIP to see Important Levels
+                  </button>
+                ) : <ForecastStars level={task.forecast_level} />}
               </span>
               <div className="flex items-center gap-2">
                 <span className="text-md">{task.word_limit} words</span>
