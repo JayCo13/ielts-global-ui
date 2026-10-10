@@ -242,6 +242,38 @@ const WritingForecast = () => {
   // Live "N people are taking this test" for the cards on this page (scope = "<exam>p<part>").
   const liveCounts = useLiveCounts(paginated.map(it => `${it.exam_id}p${it.part_number}`));
 
+  // The list API no longer carries task instructions (they embed large base64
+  // images). The card preview image is fetched lazily for the visible page only.
+  const [thumbnails, setThumbnails] = useState({});
+  const thumbAttemptedRef = useRef(new Set());
+  const visibleThumbKey = paginated.map(it => it.task_id).join(',');
+  useEffect(() => {
+    if (!visibleThumbKey) return;
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    const needed = visibleThumbKey.split(',').map(Number).filter(id => !thumbAttemptedRef.current.has(id));
+    if (needed.length === 0) return;
+    needed.forEach(id => thumbAttemptedRef.current.add(id));
+    (async () => {
+      // The endpoint accepts at most 6 task ids per call.
+      for (let i = 0; i < needed.length; i += 6) {
+        try {
+          const res = await fetch(`${API_BASE}/student/writing/thumbnails`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ task_ids: needed.slice(i, i + 6) })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.thumbnails && Object.keys(data.thumbnails).length > 0) {
+              setThumbnails(prev => ({ ...prev, ...data.thumbnails }));
+            }
+          }
+        } catch (e) { /* preview image is optional */ }
+      }
+    })();
+  }, [visibleThumbKey]);
+
   // Authoritative Writing-AI grade quota from the server (Gemini engine,
   // /ai/writing/quota). Replaces the old per-browser localStorage counters.
   useEffect(() => {
@@ -483,7 +515,22 @@ const WritingForecast = () => {
                   {/* Show full preview (text + image). Previously line-clamp-3 was
                       used here, but its display:-webkit-box + overflow:hidden clipped
                       images entirely from view. Cards can grow taller now. */}
-                  <div className="mt-3 text-gray-700 [&_img]:max-w-full [&_img]:h-auto" data-no-translate dangerouslySetInnerHTML={{ __html: it.instructions }} />
+                  {it.instructions ? (
+                    <div className="mt-3 text-gray-700 [&_img]:max-w-full [&_img]:h-auto" data-no-translate dangerouslySetInnerHTML={{ __html: it.instructions }} />
+                  ) : thumbnails[String(it.task_id)] && (
+                    <div className="mt-3 rounded-md overflow-hidden border border-gray-200 bg-gray-50">
+                      <img
+                        src={(() => {
+                          const url = thumbnails[String(it.task_id)];
+                          return url.startsWith('/') ? `${API_BASE}${url}` : url;
+                        })()}
+                        alt={`${it.title} preview`}
+                        loading="lazy"
+                        className="w-full h-36 object-contain"
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                    </div>
+                  )}
                   {it.band != null && (
                     <div className="mt-3 flex items-center justify-center gap-2 rounded-lg bg-[#0096b1]/5 border border-[#0096b1]/20 py-1.5">
                       <span className="text-xs text-gray-500">Your band:</span>
