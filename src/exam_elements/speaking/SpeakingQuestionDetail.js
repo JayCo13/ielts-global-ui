@@ -883,7 +883,7 @@ const SpeakingQuestionDetail = () => {
                                                 <button type="button" onClick={() => play(recordingUrl(data.sample.answer_id))}
                                                         className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold
                                                                    text-[#eb7e37] border-2 border-[#eb7e37]/40 hover:bg-[#eb7e37]/8">
-                                                    <Play size={12} /> Nghe
+                                                    <Play size={12} /> Listen
                                                 </button>
                                             )}
                                         </div>

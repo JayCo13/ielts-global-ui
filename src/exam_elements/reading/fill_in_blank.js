@@ -3799,7 +3799,7 @@ const ReadingTest = ({
     }
   }, [examData?.exam_id, currentPart, mainText, colorTheme, restoreNonce]);
   return (
-    <div className={`${themeClass}`}>
+    <div data-no-translate className={`${themeClass}`}>
 
       <div
         ref={contentAreaRef}

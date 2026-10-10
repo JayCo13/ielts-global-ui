@@ -983,7 +983,7 @@ const ExamHistory = () => {
                             onClick={() => setCurrentReadingPage(currentReadingPage + 1)}
                             disabled={currentReadingPage === totalReadingPages}
                             className="p-2 rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-                            aria-label="Trang sau"
+                            aria-label="Next page"
                           >
                             <ChevronRight className="w-4 h-4" />
                           </button>
@@ -1139,7 +1139,7 @@ const ExamHistory = () => {
                             onClick={() => setCurrentListeningPage(currentListeningPage + 1)}
                             disabled={currentListeningPage === totalListeningPages}
                             className="p-2 rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-                            aria-label="Trang sau"
+                            aria-label="Next page"
                           >
                             <ChevronRight className="w-4 h-4" />
                           </button>

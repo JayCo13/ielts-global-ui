@@ -762,7 +762,7 @@ export default function WritingReview() {
               <section className="bg-white rounded-2xl shadow-sm border border-gray-200/70 p-4 flex flex-col min-h-0">
                 <h2 className="text-sm font-bold uppercase tracking-wide text-gray-400 mb-2 shrink-0">Task prompt — Task {part?.part_number}</h2>
                 <div className="max-w-none leading-relaxed text-base flex-1 min-h-0 overflow-y-auto [&_img]:max-w-full [&_img]:h-auto" onMouseUp={handleWordSelect}
-                  dangerouslySetInnerHTML={{ __html: processInstructions(part?.instructions) }} />
+                  data-no-translate dangerouslySetInnerHTML={{ __html: processInstructions(part?.instructions) }} />
               </section>
               <section className="bg-white rounded-2xl shadow-sm border border-gray-200/70 p-4 flex flex-col min-h-0">
                 <div className="flex items-center justify-between mb-2 shrink-0 gap-2 flex-wrap">
@@ -774,7 +774,7 @@ export default function WritingReview() {
                 </div>
                 <div className="flex-1 min-h-[140px] border border-gray-200 rounded-lg overflow-y-auto text-base" onMouseUp={onEditorMouseUp}>
                   {readOnly
-                    ? <div className="p-3 max-w-none whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: essay }} />
+                    ? <div className="p-3 max-w-none whitespace-pre-wrap" data-no-translate dangerouslySetInnerHTML={{ __html: essay }} />
                     : <CustomRichTextEditor value={essay} onChange={(v) => setEssays((s) => ({ ...s, [taskId]: v }))} textSize="regular" colorTheme="black-on-white" />}
                 </div>
                 {!readOnly && (
@@ -1091,7 +1091,7 @@ export default function WritingReview() {
                 {chat.length === 0 && <p className="text-sm text-gray-400">Ask the AI about the selected text or anything about your writing.{assistRemaining !== null && ` (${assistRemaining} questions left today)`}</p>}
                 {chat.map((m, i) => (
                   m.role === 'ai'
-                    ? <div key={i} className="text-sm rounded-lg px-3 py-2 bg-gray-100 text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: formatAiAnswer(m.text) }} />
+                    ? <div key={i} className="text-sm rounded-lg px-3 py-2 bg-gray-100 text-gray-700 leading-relaxed" data-no-translate dangerouslySetInnerHTML={{ __html: formatAiAnswer(m.text) }} />
                     : <div key={i} className="text-sm rounded-lg px-3 py-2 bg-[#0096b1]/10 text-gray-800 ml-8 whitespace-pre-wrap">{m.text}</div>
                 ))}
                 {chatLoading && <div className="text-sm text-gray-400">The AI is answering...</div>}

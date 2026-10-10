@@ -808,7 +808,7 @@ const StudentDictation = () => {
                                     <ChevronLeft className="w-4 h-4" />
                                 </button>
                                 <span className="text-sm text-gray-600">
-                                    Trang {resultsPage} / {totalResultPages}
+                                    Page {resultsPage} / {totalResultPages}
                                 </span>
                                 <button
                                     onClick={() => setResultsPage(p => Math.min(totalResultPages, p + 1))}

@@ -2315,14 +2315,14 @@ const MainLayout = () => {
             backgroundColor: colorTheme === 'black-on-white' ? '#e5e7eb' : '#374151'
           })}
         >
-          {/* Reading Passage */}
-          <div className={`${isMobile ? 'border-b' : 'border-r'} border-gray-300 p-4 overflow-y-auto`}>
+          {/* Reading Passage (test content: never translated by the UI language layer) */}
+          <div data-no-translate className={`${isMobile ? 'border-b' : 'border-r'} border-gray-300 p-4 overflow-y-auto`}>
             <h1 className="text-3xl font-bold mb-4 text-center">{getCurrentSection()?.passages[0]?.title}</h1>
             {getCurrentSection()?.passages[0]?.content && (
               <div
                 id="reading-passage-content"
                 className={textSizeClasses[textSize]}
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(getCurrentSection().passages[0].content) }}
+                data-no-translate dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(getCurrentSection().passages[0].content) }}
                 onMouseUp={(e) => {
                   // Get the current selection
                   const selection = window.getSelection();
@@ -3827,7 +3827,7 @@ const MainLayout = () => {
               </style>
               <div
                 className="explanation-content prose max-w-none"
-                dangerouslySetInnerHTML={{ __html: explanationDialog.explanation }}
+                data-no-translate dangerouslySetInnerHTML={{ __html: explanationDialog.explanation }}
               />
             </div>
 

@@ -53,6 +53,7 @@ import RefundPolicy from './pages/adsense/RefundPolicy';
 import AnnouncementDetail from './pages/AnnouncementDetail';
 import AffiliateGuide from './pages/AffiliateGuide';
 import { captureReferral, claimReferral } from './utils/affiliateRef';
+import { initI18n } from './i18n';
 import Permission from './pages/adsense/Permission';
 import Instruction from './pages/Instruction';
 import ResultsOverview from './pages/ResultsOverview';
@@ -91,6 +92,9 @@ function App() {
   useEffect(() => {
     // Initialize authentication and device tracking
     initializeAuth();
+
+    // Interface language: apply the visitor's saved choice (English needs no work).
+    initI18n();
 
     // Affiliate: remember a ?ref= code from any landing page until registration.
     captureReferral();

@@ -3015,13 +3015,13 @@ const MainLayout = () => {
                   <div className={`sticky top-0 z-10 p-4 border-b ${colorTheme === 'black-on-white' ? 'border-gray-200 bg-gray-50' : 'border-gray-700 bg-gray-800'}`}>
                     <AudioControl examId={examId} currentPart={currentPart} colorTheme={colorTheme} isReviewMode={isReviewMode} />
                   </div>
-                  <div className="p-4" id="transcript-panel">
+                  <div className="p-4" id="transcript-panel" data-no-translate>
                     <h2 className="text-2xl font-bold text-center text-blue-600 mb-4">Transcript Part {currentPart} - {testDescription?.title}</h2>
                     <div className="prose max-w-none">
                       {partDescriptions && currentPart && partDescriptions[`part${currentPart}_description`] && (
                         <div
                           className="text-gray-700"
-                          dangerouslySetInnerHTML={{ __html: partDescriptions[`part${currentPart}_description`] }}
+                          data-no-translate dangerouslySetInnerHTML={{ __html: partDescriptions[`part${currentPart}_description`] }}
                         />
                       )}
                     </div>
@@ -3516,7 +3516,7 @@ const MainLayout = () => {
               </style>
               <div
                 className="explanation-content prose max-w-none"
-                dangerouslySetInnerHTML={{ __html: currentExplanation }}
+                data-no-translate dangerouslySetInnerHTML={{ __html: currentExplanation }}
               />
             </div>
 

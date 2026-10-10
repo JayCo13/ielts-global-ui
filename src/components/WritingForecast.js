@@ -483,7 +483,7 @@ const WritingForecast = () => {
                   {/* Show full preview (text + image). Previously line-clamp-3 was
                       used here, but its display:-webkit-box + overflow:hidden clipped
                       images entirely from view. Cards can grow taller now. */}
-                  <div className="mt-3 text-gray-700 [&_img]:max-w-full [&_img]:h-auto" dangerouslySetInnerHTML={{ __html: it.instructions }} />
+                  <div className="mt-3 text-gray-700 [&_img]:max-w-full [&_img]:h-auto" data-no-translate dangerouslySetInnerHTML={{ __html: it.instructions }} />
                   {it.band != null && (
                     <div className="mt-3 flex items-center justify-center gap-2 rounded-lg bg-[#0096b1]/5 border border-[#0096b1]/20 py-1.5">
                       <span className="text-xs text-gray-500">Your band:</span>

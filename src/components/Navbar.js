@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
 import TopPerformerBadge from './TopPerformerBadge';
+import LanguageSwitcher from '../i18n/LanguageSwitcher';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -438,6 +439,10 @@ const Navbar = () => {
                 </div>
 
                 <div className="flex items-center space-x-4">
+                    {/* Interface language */}
+                    <div className="hidden md:block">
+                        <LanguageSwitcher />
+                    </div>
                     {/* User Role Badge */}
                     {username && (
                         <div className="hidden sm:flex items-center">
@@ -674,6 +679,7 @@ const Navbar = () => {
                         className="md:hidden bg-white w-full absolute top-full left-0 border-t border-gray-100 shadow-lg z-40 overflow-y-auto overscroll-contain"
                     >
                         <div className="max-w-7xl mx-auto px-4 py-2">
+                            <LanguageSwitcher variant="list" onPicked={() => setIsMobileMenuOpen(false)} />
                             <div className="flex flex-col space-y-1">
                                 {[
                                     { name: 'Home', path: '/' },

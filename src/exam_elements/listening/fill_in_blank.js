@@ -3323,7 +3323,7 @@ const ListeningTest = ({
   }, [retakeIncorrectMode, incorrectQuestionNumbers, mainText, currentPart]);
 
   return (
-    <div className={`${themeClass}`}>
+    <div data-no-translate className={`${themeClass}`}>
       <div className={`${colorTheme === 'black-on-white' ? 'bg-[#f3f3eb]' : 'bg-gray-800'} m-4 p-3 rounded-lg border ${colorTheme === 'black-on-white' ? 'border-gray-300' : 'border-gray-600'}`}>
         <h3 className="font-bold text-lg mb-2">Part {Math.floor(questionNumber / 10) + 1}</h3>
         <p className={colorTheme === 'black-on-white' ? 'text-black-600' : ''}>Listen and answer questions {questionNumber}-{questionNumber + 9}.</p>

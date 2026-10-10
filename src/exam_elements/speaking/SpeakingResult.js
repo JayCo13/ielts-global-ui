@@ -1036,7 +1036,7 @@ const SpeakingResult = () => {
                                                     className="inline-flex items-center gap-1 px-4 py-2 rounded-xl border-2
                                                                border-gray-200 text-[#2b5356] font-bold text-sm
                                                                hover:border-gray-300 disabled:opacity-40">
-                                                    Sau <ChevronRight size={16} />
+                                                    Next <ChevronRight size={16} />
                                                 </button>
                                             </nav>
                                         )}

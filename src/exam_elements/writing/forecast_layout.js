@@ -89,7 +89,7 @@ const WritingForecastLayout = () => {
               <span>{item.title || `Part ${item.part_number}`}</span>
             </h2>
             <div className="mt-1 text-sm text-gray-600">Exam: {item.exam_title}</div>
-            <div ref={contentRef} className="mt-6 prose max-w-none [&_img]:max-w-full [&_img]:h-auto" dangerouslySetInnerHTML={{ __html: item.instructions }} />
+            <div ref={contentRef} className="mt-6 prose max-w-none [&_img]:max-w-full [&_img]:h-auto" data-no-translate dangerouslySetInnerHTML={{ __html: item.instructions }} />
           </div>
         )}
       </div>

@@ -73,7 +73,7 @@ const ExplanationModal = ({ isOpen, onClose, title, description }) => {
           <div ref={contentRef} className="prose max-w-none mt-6 max-h-[70vh] overflow-y-auto">
             <p
               className="text-gray-600 whitespace-pre-wrap"
-              dangerouslySetInnerHTML={{ __html: highlightedText }}
+              data-no-translate dangerouslySetInnerHTML={{ __html: highlightedText }}
             />
           </div>
         </div>

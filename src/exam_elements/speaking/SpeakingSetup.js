@@ -219,7 +219,7 @@ const SpeakingSetup = () => {
                         className="p-2 -ml-2 rounded-lg hover:bg-gray-100 text-[#2b5356]">
                         <ChevronLeft size={22} />
                     </button>
-                    <h1 className="text-lg sm:text-xl font-bold text-[#2b5356]">Thi Speaking</h1>
+                    <h1 className="text-lg sm:text-xl font-bold text-[#2b5356]">Speaking Test</h1>
                     {/* Hai pill dùng chung với trang đề dự đoán và trang kết quả
                         (exam_elements/speaking/QuotaPills.js) — xem chú thích ở đó về lý do
                         phải hiện CẢ HAI túi lượt. */}

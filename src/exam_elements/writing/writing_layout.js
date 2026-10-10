@@ -746,6 +746,7 @@ const WritingLayout = () => {
         >
           <div className={`overflow-y-auto p-4 ${colorThemeClasses[colorTheme]} ${isMobile ? 'border-b border-gray-200' : ''}`} onMouseUp={handleWordSelect}>
             <div
+              data-no-translate
               className={`leading-relaxed ${textSizeClasses[textSize]} [&_img]:max-w-full [&_img]:h-auto`}
               dangerouslySetInnerHTML={{ __html: processInstructions(task.instructions) }}
             />
@@ -932,7 +933,7 @@ const WritingLayout = () => {
                 {askChat.length === 0 && <p className="text-sm text-gray-400">Ask the AI about the task, how to write it, vocabulary, structures...</p>}
                 {askChat.map((m, i) => (
                   m.role === 'ai'
-                    ? <div key={i} className="text-sm rounded-lg px-3 py-2 bg-gray-100 mr-6 leading-relaxed" dangerouslySetInnerHTML={{ __html: formatAiAnswer(m.text) }} />
+                    ? <div key={i} className="text-sm rounded-lg px-3 py-2 bg-gray-100 mr-6 leading-relaxed" data-no-translate dangerouslySetInnerHTML={{ __html: formatAiAnswer(m.text) }} />
                     : <div key={i} className="text-sm rounded-lg px-3 py-2 bg-[#0096b1]/10 ml-6 whitespace-pre-wrap">{m.text}</div>
                 ))}
                 {askLoading && <div className="text-sm text-gray-400">The AI is answering...</div>}

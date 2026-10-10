@@ -72,7 +72,7 @@ export default function AnnouncementDetail() {
             </header>
             <div
               className="announcement-content px-6 md:px-8 py-6 text-gray-700 leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.content || '<p>(No content yet)</p>') }}
+              data-no-translate dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.content || '<p>(No content yet)</p>') }}
             />
           </article>
         )}
