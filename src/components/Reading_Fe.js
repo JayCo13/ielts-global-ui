@@ -12,6 +12,7 @@ import Seo from './Seo';
 import TestModeDialog from './TestModeDialog';
 import ForecastStars, { ForecastLegend } from './ForecastStars';
 import DifficultyBadge from './DifficultyBadge';
+import { labelForType } from '../utils/questionTypeStats';
 import LiveTakers from './LiveTakers';
 
 const Reading_Fe = () => {
@@ -29,6 +30,7 @@ const Reading_Fe = () => {
   const [currentPage, setCurrentPage] = usePersistedState('listPage:reading', 1);
   // Lasting preference: hide the tests already completed.
   const [hideDone, setHideDone] = usePersistedState('hideDone:reading', false, 'local');
+  const [selectedType, setSelectedType] = useState('all');
   const [difficulty, setDifficulty] = useState('all');
   const [isScrolled, setIsScrolled] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -347,8 +349,16 @@ const Reading_Fe = () => {
   // limited user the first 6 cards are the free ones, so the list must not shift.
   const canHideDone = !isLimitedUser;
 
+  // Question types present across the tests, in a stable (label) order.
+  const allQuestionTypes = [...new Set(tests.flatMap(t => t.questionTypes || []))]
+    .filter(Boolean)
+    .sort((a, b) => labelForType(a).localeCompare(labelForType(b)));
+  // Limited users cannot filter; a stale selection also falls back to "all".
+  const activeType = (!isLimitedUser && allQuestionTypes.includes(selectedType)) ? selectedType : 'all';
+
   const filteredTests = tests
     .filter(test => !(hideDone && canHideDone) || !test.isCompleted)
+    .filter(test => activeType === 'all' || (test.questionTypes || []).includes(activeType))
     .filter(test => {
       const query = searchQuery.toLowerCase();
       if (!query) return true;
@@ -505,6 +515,50 @@ const Reading_Fe = () => {
             </label>
           )}
         </div>
+
+        {/* Question type filter (same control as the Focus lists; VIP filter like search/sort) */}
+        {allQuestionTypes.length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              <Filter className="w-4 h-4 text-gray-500" />
+              <span className="text-sm font-medium text-gray-600">Filter by question type:</span>
+              {isLimitedUser && (
+                <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                  <Lock className="w-3 h-3" />
+                  VIP only
+                </span>
+              )}
+            </div>
+            <div className={`flex flex-wrap gap-2 ${isLimitedUser ? 'opacity-50 pointer-events-none select-none' : ''}`}>
+              <button
+                onClick={() => { setSelectedType('all'); setCurrentPage(1); }}
+                disabled={isLimitedUser}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all border ${activeType === 'all'
+                  ? 'bg-[#0096b1] text-white border-[#0096b1]'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-[#0096b1] hover:text-[#0096b1]'
+                  }`}
+              >
+                All ({tests.length})
+              </button>
+              {allQuestionTypes.map(type => {
+                const count = tests.filter(t => (t.questionTypes || []).includes(type)).length;
+                return (
+                  <button
+                    key={type}
+                    onClick={() => { setSelectedType(type); setCurrentPage(1); }}
+                    disabled={isLimitedUser}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all border ${activeType === type
+                      ? 'bg-[#0096b1] text-white border-[#0096b1]'
+                      : 'bg-white text-gray-600 border-gray-200 hover:border-[#0096b1] hover:text-[#0096b1]'
+                      }`}
+                  >
+                    {labelForType(type)} ({count})
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div className="mb-4"><ForecastLegend /></div>
 

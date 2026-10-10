@@ -10,6 +10,7 @@ import fetchWithTimeout from '../utils/fetchWithTimeout';
 import Seo from './Seo';
 import ForecastStars, { ForecastLegend } from './ForecastStars';
 import DifficultyBadge from './DifficultyBadge';
+import { labelForType } from '../utils/questionTypeStats';
 import LiveTakers from './LiveTakers';
 
 const ReadingForecast = () => {
@@ -353,7 +354,7 @@ const ReadingForecast = () => {
                       : 'bg-white text-gray-600 border-gray-200 hover:border-[#0096b1] hover:text-[#0096b1]'
                       }`}
                   >
-                    {type} ({count})
+                    {labelForType(type)} ({count})
                   </button>
                 );
               })}
@@ -464,7 +465,7 @@ const ReadingForecast = () => {
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {it.question_types.map(qt => (
                         <span key={qt} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#0096b1]/10 text-[#0096b1] border border-[#0096b1]/20">
-                          {qt}
+                          {labelForType(qt)}
                         </span>
                       ))}
                     </div>
