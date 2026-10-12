@@ -4,6 +4,7 @@ import { ChevronRight, Home, Crown, Star, Sparkles, Zap, BookOpen, Mic, Lightbul
 import { motion } from 'framer-motion';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
+import { formatUsd, packageUsd } from '../utils/money';
 
 const VIPPackages = () => {
     const [packages, setPackages] = useState([]);
@@ -276,11 +277,7 @@ const VIPPackages = () => {
                     <div className={`mt-auto pt-6 border-t ${style.divider}`}>
                         <div className="flex items-baseline justify-center gap-1 mb-6">
                             <span className={`text-3xl font-extrabold ${style.priceColor}`}>
-                                {new Intl.NumberFormat('vi-VN', {
-                                    style: 'currency',
-                                    currency: 'VND',
-                                    minimumFractionDigits: 0
-                                }).format(pkg.price)}
+                                {formatUsd(packageUsd(pkg))}
                             </span>
                             <span className="text-sm text-gray-500 font-medium">/ package</span>
                         </div>

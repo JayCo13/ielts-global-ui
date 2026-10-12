@@ -10,8 +10,7 @@ import Footer from '../components/Footer';
 import Seo from '../components/Seo';
 
 // Public guide to the affiliate program (ported from the Vietnam tree). Amounts are
-// kept currency-neutral: the exact minimum withdrawal and wallet currency are shown
-// in Profile → Affiliate, which reads them from the server.
+// in US dollars; commission is withdrawn from $10 and paid out through PayPal.
 
 const fade = {
   hidden: { opacity: 0, y: 20 },
@@ -46,10 +45,10 @@ const STEPS = [
 ];
 
 const TIERS = [
-  ['20', '2'],
-  ['30', '3'],
-  ['50', '5'],
-  ['100', '10'],
+  ['$20', '$2'],
+  ['$30', '$3'],
+  ['$50', '$5'],
+  ['$100', '$10'],
 ];
 
 const FAQ = [
@@ -57,8 +56,8 @@ const FAQ = [
   ['How many people can I refer?', 'There is no limit.'],
   ['When do I receive my commission?', 'After the referred account\'s order is paid successfully. It can take a few minutes to appear in your wallet.'],
   ['Can I use my wallet balance to buy VIP?', 'No. The affiliate wallet is only for collecting and withdrawing commission.'],
-  ['When can I withdraw?', 'When your wallet balance reaches the minimum shown in Profile → Affiliate.'],
-  ['How will I be paid?', 'After you send a request and it is approved, we transfer the money to the payout details you provided (bank account, PayPal or QR code).'],
+  ['When can I withdraw?', 'When your wallet balance reaches $10.'],
+  ['How will I be paid?', 'Through PayPal. After you send a request and it is approved, we send the money to the PayPal account you provided.'],
   ['Where can I see my commission history?', 'In Profile → Affiliate → Wallet history.'],
 ];
 
@@ -94,7 +93,7 @@ export default function AffiliateGuide() {
             <p className="text-gray-600 leading-relaxed">It is our referral program. When you share your <b>affiliate link</b> and someone registers and then buys a VIP package through it, you earn <b>10% commission</b> on the amount they actually pay.</p>
             <div className="mt-4 rounded-2xl bg-[#0096b1]/5 border border-[#0096b1]/15 p-4 text-sm text-gray-700">
               <div className="font-semibold text-[#2b5356] mb-1">Example</div>
-              A friend registers through your link → buys a VIP package for <b>25</b> → you earn <b>2.5</b> in the same currency.
+              A friend registers through your link → buys a VIP package for <b>$25</b> → you earn <b>$2.50</b>.
             </div>
             <div className="mt-4 flex items-start gap-2.5 rounded-2xl bg-amber-50 border border-amber-100 p-4 text-sm text-gray-700">
               <Info className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
@@ -161,14 +160,14 @@ export default function AffiliateGuide() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-gray-400 mt-2">Amounts are in the currency the package is sold in. Every change to your wallet is recorded in Wallet history.</p>
+            <p className="text-xs text-gray-400 mt-2">Amounts are in US dollars (USD). Every change to your wallet is recorded in Wallet history.</p>
           </Section>
 
           <Section icon={Clock} title="Withdrawals and processing time">
             <ul className="space-y-2 text-sm text-gray-700">
-              <li className="flex items-start gap-2"><ArrowRight className="w-4 h-4 text-[#0096b1] shrink-0 mt-0.5" /> <span>Request a withdrawal once your balance reaches the <b>minimum shown in Profile → Affiliate</b>, after adding your payout details (QR code, bank account or PayPal).</span></li>
+              <li className="flex items-start gap-2"><ArrowRight className="w-4 h-4 text-[#0096b1] shrink-0 mt-0.5" /> <span>Request a withdrawal once your balance reaches $10, after adding your PayPal account in Profile.</span></li>
               <li className="flex items-start gap-2"><ArrowRight className="w-4 h-4 text-[#0096b1] shrink-0 mt-0.5" /> <span>When you send the request, the amount is deducted from your wallet and the request becomes <b>Pending</b>.</span></li>
-              <li className="flex items-start gap-2"><ArrowRight className="w-4 h-4 text-[#0096b1] shrink-0 mt-0.5" /> <span>We review it and transfer the money within <b>30 days</b>. The request then shows as Paid.</span></li>
+              <li className="flex items-start gap-2"><ArrowRight className="w-4 h-4 text-[#0096b1] shrink-0 mt-0.5" /> <span>We review it and send the money to your PayPal account within <b>30 days</b>. The request then shows as Paid.</span></li>
               <li className="flex items-start gap-2"><ArrowRight className="w-4 h-4 text-[#0096b1] shrink-0 mt-0.5" /> <span>If a request is rejected, the amount is returned to your wallet and the reason is shown.</span></li>
             </ul>
           </Section>

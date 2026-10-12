@@ -3,6 +3,7 @@ import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { ChevronRight, Home, Shield, Lock, AlertCircle, Crown, QrCode, Clock } from 'lucide-react';
 import { checkTokenExpiration, logout } from '../utils/authUtils';
 import API_BASE from '../config/api';
+import { formatUsd, packageUsd } from '../utils/money';
 
 /**
  * PAYOS PAYMENT FLOW
@@ -19,7 +20,6 @@ import API_BASE from '../config/api';
  * There is no automatic card renewal — the user buys again to extend.
  */
 
-const formatVnd = (value) => `${Number(value || 0).toLocaleString('vi-VN')}₫`;
 
 const Payment = () => {
     const [error, setError] = useState(null);
@@ -157,9 +157,9 @@ const Payment = () => {
                             </div>
                             <div className="text-right">
                                 <div className="text-2xl font-extrabold text-lime-600">
-                                    {formatVnd(selectedPackage.price)}
+                                    {formatUsd(packageUsd(selectedPackage))}
                                 </div>
-                                <p className="text-xs text-gray-400 mt-1">VND / {selectedPackage.duration_months} month{selectedPackage.duration_months > 1 ? 's' : ''}</p>
+                                <p className="text-xs text-gray-400 mt-1">USD / {selectedPackage.duration_months} month{selectedPackage.duration_months > 1 ? 's' : ''}</p>
                             </div>
                         </div>
 
@@ -211,13 +211,14 @@ const Payment = () => {
                             ) : (
                                 <>
                                     <QrCode className="w-5 h-5" />
-                                    Pay Now — {formatVnd(selectedPackage.price)}
+                                    Pay Now — {formatUsd(packageUsd(selectedPackage))}
                                 </>
                             )}
                         </button>
 
                         <p className="text-xs text-gray-400 text-center mt-4">
                             You will be redirected to scan a VietQR code or transfer via your bank
+                            <span className="block mt-1">The payment is taken in local currency at the equivalent amount.</span>
                         </p>
                     </div>
                 )}

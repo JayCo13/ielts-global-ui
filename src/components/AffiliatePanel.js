@@ -6,6 +6,7 @@ import API_BASE from '../config/api';
 // Affiliate tab of the Profile page (ported from the Vietnam tree).
 // Wallet amounts come from the API as integers in the currency's minor unit;
 // `unit_divisor` (1 for VND, 100 for USD) turns them into display amounts.
+// The wallet is in US dollars and is paid out through PayPal.
 
 const count = (n) => (n == null ? '0' : Number(n).toLocaleString('en-US'));
 const token = () => localStorage.getItem('token');
@@ -66,7 +67,7 @@ export default function AffiliatePanel({ onGoPayment }) {
     setMsg(null);
     // Warn + require payout details before withdrawing.
     if (payment && !payment.is_set) {
-      setMsg({ type: 'warn', text: 'You have not added your payout details yet. Please add a QR code or bank / PayPal account before withdrawing.', action: true });
+      setMsg({ type: 'warn', text: 'You have not added your PayPal account yet. Please add it before withdrawing.', action: true });
       return;
     }
     setSubmitting(true);
@@ -95,7 +96,7 @@ export default function AffiliatePanel({ onGoPayment }) {
     const s = v.toLocaleString('en-US', divisor === 1
       ? { maximumFractionDigits: 0 }
       : { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    return `${s} ${currency}`;
+    return currency === 'USD' ? `$${s}` : `${s} ${currency}`;
   };
   const ratePct = Math.round((info.commission_rate || 0.1) * 100);
 
@@ -154,7 +155,7 @@ export default function AffiliatePanel({ onGoPayment }) {
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="text-sm text-gray-500">
               Withdraw your full balance: <b className="text-gray-800">{money(info.balance)}</b>
-              {payment && payment.is_set && <span className="block text-xs text-gray-400 mt-0.5">Paid to: {payment.qr_url ? 'saved QR code' : ''}{payment.qr_url && payment.bank ? ' · ' : ''}{payment.bank ? `${payment.bank} ${payment.account_number || ''}` : ''}</span>}
+              {payment && payment.is_set && <span className="block text-xs text-gray-400 mt-0.5">Paid to: <span data-no-translate>PayPal · {payment.account_number || ''}</span></span>}
             </div>
             <button onClick={submitWithdraw} disabled={submitting} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#eb7e37] text-white text-sm font-semibold hover:bg-[#d96e28] disabled:opacity-50">
               <Send className="w-4 h-4" /> Request withdrawal
@@ -177,7 +178,7 @@ export default function AffiliatePanel({ onGoPayment }) {
             {withdrawals.map(w => (
               <div key={w.withdrawal_id} className="border-b border-gray-50 pb-2">
                 <div className="flex items-center justify-between text-sm gap-2">
-                  <span className="text-gray-600 min-w-0 break-words">{money(w.amount)} · {w.bank || 'QR'}{w.account_number ? ` · ${w.account_number}` : ''}</span>
+                  <span className="text-gray-600 min-w-0 break-words">{money(w.amount)} · {w.bank || 'PayPal'}{w.account_number ? ` · ${w.account_number}` : ''}</span>
                   <span className={`shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full ${w.status === 'paid' ? 'text-emerald-700 bg-emerald-50' : w.status === 'rejected' ? 'text-red-600 bg-red-50' : 'text-amber-700 bg-amber-50'}`}>
                     {w.status === 'paid' ? 'Paid' : w.status === 'rejected' ? 'Rejected' : 'Pending'}
                   </span>
