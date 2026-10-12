@@ -14,15 +14,36 @@
 // dictionary (test passages, questions, answers, AI feedback, user content) is left
 // alone, and anything inside `[data-no-translate]` is never looked at.
 
+// Same set, same order, as the dictionary's languages
+// (translator/translatorService.js SUPPORTED_LANGUAGES), with English first.
 export const LANGUAGES = [
   { code: 'en', label: 'English', short: 'EN' },
   { code: 'vi', label: 'Tiếng Việt', short: 'VI' },
+  { code: 'hi', label: 'हिन्दी', short: 'HI' },
   { code: 'zh', label: '中文', short: '中文' },
-  { code: 'hi', label: 'हिन्दी', short: 'हिं' },
+  { code: 'ko', label: '한국어', short: 'KO' },
+  { code: 'ja', label: '日本語', short: 'JA' },
+  { code: 'ms', label: 'Bahasa Melayu', short: 'MS' },
   { code: 'id', label: 'Bahasa Indonesia', short: 'ID' },
+  { code: 'th', label: 'ไทย', short: 'TH' },
+  { code: 'tl', label: 'Filipino', short: 'TL' },
+  { code: 'bn', label: 'বাংলা', short: 'BN' },
+  { code: 'ur', label: 'اردو', short: 'UR' },
+  { code: 'ar', label: 'العربية', short: 'AR' },
+  { code: 'ru', label: 'Русский', short: 'RU' },
   { code: 'es', label: 'Español', short: 'ES' },
-  { code: 'ar', label: 'العربية', short: 'ع' },
+  { code: 'pt', label: 'Português', short: 'PT' },
+  { code: 'fr', label: 'Français', short: 'FR' },
+  { code: 'de', label: 'Deutsch', short: 'DE' },
+  { code: 'tr', label: 'Türkçe', short: 'TR' },
+  { code: 'fa', label: 'فارسی', short: 'FA' },
+  { code: 'ne', label: 'नेपाली', short: 'NE' },
+  { code: 'si', label: 'සිංහල', short: 'SI' },
+  { code: 'my', label: 'မြန်မာ', short: 'MY' },
+  { code: 'km', label: 'ខ្មែរ', short: 'KM' },
 ];
+// Right-to-left scripts: the page layout stays as is, text direction follows each block.
+const RTL_LANGS = ['ar', 'ur', 'fa'];
 
 const STORAGE_KEY = 'ui_lang';
 const SKIP_SELECTOR = '[data-no-translate],.notranslate,script,style,noscript,textarea,code,pre,svg,[contenteditable="true"],[contenteditable=""]';
@@ -238,7 +259,7 @@ export async function setLanguage(lang) {
     document.documentElement.setAttribute('lang', target);
     // Layout stays left-to-right for every language; the marker class switches
     // on per-paragraph text direction for Arabic (see ensureBidiStyle).
-    document.documentElement.classList.toggle('ui-lang-ar', target === 'ar');
+    document.documentElement.classList.toggle('ui-lang-ar', RTL_LANGS.includes(target));
     ensureBidiStyle();
     walk(document.body);
     startObserver();

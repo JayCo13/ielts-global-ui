@@ -148,7 +148,7 @@ export default function AffiliateGuide() {
           </Section>
 
           <Section icon={Wallet} title="Commission and wallet">
-            <p className="text-gray-600 mb-3">Commission = <b>10%</b> of the amount the customer actually pays, added to your <b>affiliate wallet</b> (for collecting and withdrawing only — it <b>cannot</b> be used to buy VIP).</p>
+            <p className="text-gray-600 mb-3">Commission = <b>10%</b> of the amount the customer actually pays, added to your <b>affiliate wallet</b> (for collecting and withdrawing only — it cannot be used to buy VIP).</p>
             <div className="overflow-x-auto rounded-2xl border border-gray-100">
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
@@ -169,7 +169,7 @@ export default function AffiliateGuide() {
               <li className="flex items-start gap-2"><ArrowRight className="w-4 h-4 text-[#0096b1] shrink-0 mt-0.5" /> <span>Request a withdrawal once your balance reaches the <b>minimum shown in Profile → Affiliate</b>, after adding your payout details (QR code, bank account or PayPal).</span></li>
               <li className="flex items-start gap-2"><ArrowRight className="w-4 h-4 text-[#0096b1] shrink-0 mt-0.5" /> <span>When you send the request, the amount is deducted from your wallet and the request becomes <b>Pending</b>.</span></li>
               <li className="flex items-start gap-2"><ArrowRight className="w-4 h-4 text-[#0096b1] shrink-0 mt-0.5" /> <span>We review it and transfer the money within <b>30 days</b>. The request then shows as Paid.</span></li>
-              <li className="flex items-start gap-2"><ArrowRight className="w-4 h-4 text-[#0096b1] shrink-0 mt-0.5" /> <span>If a request is rejected, the amount is <b>returned</b> to your wallet and the reason is shown.</span></li>
+              <li className="flex items-start gap-2"><ArrowRight className="w-4 h-4 text-[#0096b1] shrink-0 mt-0.5" /> <span>If a request is rejected, the amount is returned to your wallet and the reason is shown.</span></li>
             </ul>
           </Section>
 

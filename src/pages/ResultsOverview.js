@@ -161,7 +161,7 @@ export default function ResultsOverview() {
           )
         ) : (skill.count || 0) === 0 ? (
           <div className="bg-white rounded-2xl shadow-sm p-10 text-center text-gray-400">
-            No {skillMeta?.label} data yet. Take a test to see statistics.
+            {`No ${skillMeta?.label} data yet. Take a test to see statistics.`}
           </div>
         ) : (
           <>

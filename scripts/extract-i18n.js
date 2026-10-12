@@ -234,9 +234,17 @@ for (const file of walk(SRC)) {
       // "{count} words", "{n} minutes": React renders the value and the word as two
       // text nodes, so the lone lowercase word next to an expression is UI text too.
       const word = norm(p.node.value);
-      if (!/^[a-z]{3,}[.,:!?]?$/.test(word)) return;
+      // "Tip:" / "Note:" lead-ins are single tokens the generic rule rejects.
+      if (/^[A-Z][a-z]+:$/.test(word)) { add(strings, word, rel); return; }
+      if (!/^[a-z]{2,}(\.{1,3}|[,:!?])?$/.test(word)) return;
       const sib = [p.getSibling(p.key - 1), p.getSibling(p.key + 1)];
-      if (sib.some((x) => x.node && x.isJSXExpressionContainer() && !x.get('expression').isJSXEmptyExpression())) add(strings, word, rel);
+      // next to a value ({n} seconds.) or an inline element (<b>real exam</b> timing.)
+      if (sib.some((x) => x.node && ((x.isJSXExpressionContainer() && !x.get('expression').isJSXEmptyExpression()) || x.isJSXElement()))) { add(strings, word, rel); return; }
+      // "the amount is <b>returned</b> to your wallet": an emphasised word in the
+      // middle of a sentence is its own text node.
+      const el = p.parentPath;
+      const tag = el.isJSXElement() && el.node.openingElement.name.name;
+      if (/^(b|strong|em|i|u|mark)$/.test(tag || '') && el.node.children.length === 1) add(strings, word, rel);
     },
     // 'A long sentence ' + 'split across lines' reaches the DOM joined.
     BinaryExpression(p) {
@@ -296,6 +304,10 @@ if (fs.existsSync(BACKEND)) {
     }
   }
 }
+
+// Text nodes the heuristics cannot recognise as copy (a lone lowercase word in a
+// styled <span>, a string starting with a number + %). Listed by hand.
+['anytime', '10% commission'].forEach((s) => add(strings, s, 'manual'));
 
 // Last-pass denylist for technical strings the heuristics above let through.
 const JUNK = /^\[|\[#|^&\w+=|\+=\{|#[0-9a-f]{6}\b|\.out\(|^text-\[/i;
