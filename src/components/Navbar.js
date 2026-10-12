@@ -233,7 +233,7 @@ const Navbar = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: 10 }}
                                     transition={{ duration: 0.15 }}
-                                    className="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-xl py-2 z-50 border border-gray-100"
+                                    className="absolute left-0 mt-2 min-w-[12rem] w-max max-w-[90vw] whitespace-nowrap bg-white rounded-xl shadow-xl py-2 z-50 border border-gray-100"
                                 >
                                     <Link
                                         to="/reading_list"
@@ -280,7 +280,7 @@ const Navbar = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: 10 }}
                                     transition={{ duration: 0.15 }}
-                                    className="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-xl py-2 z-50 border border-gray-100"
+                                    className="absolute left-0 mt-2 min-w-[12rem] w-max max-w-[90vw] whitespace-nowrap bg-white rounded-xl shadow-xl py-2 z-50 border border-gray-100"
                                 >
                                     <Link
                                         to="/listening_list"
@@ -327,7 +327,7 @@ const Navbar = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: 10 }}
                                     transition={{ duration: 0.15 }}
-                                    className="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-xl py-2 z-50 border border-gray-100"
+                                    className="absolute left-0 mt-2 min-w-[12rem] w-max max-w-[90vw] whitespace-nowrap bg-white rounded-xl shadow-xl py-2 z-50 border border-gray-100"
                                 >
                                     <Link
                                         to="/writing_list"
@@ -404,7 +404,7 @@ const Navbar = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: 10 }}
                                     transition={{ duration: 0.15 }}
-                                    className="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-xl py-2 z-50 border border-gray-100"
+                                    className="absolute left-0 mt-2 min-w-[12rem] w-max max-w-[90vw] whitespace-nowrap bg-white rounded-xl shadow-xl py-2 z-50 border border-gray-100"
                                 >
                                     <Link
                                         to="/new-vocabulary"
