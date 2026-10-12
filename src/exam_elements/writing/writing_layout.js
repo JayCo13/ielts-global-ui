@@ -23,6 +23,12 @@ const countWords = (html) => {
   return text.split(/\s+/).filter(Boolean).length;
 };
 
+// VN port: the sample answer is plain text where the admin marks bold as **…**.
+const renderSampleHtml = (s) => {
+  const esc = (s || 'No sample available').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return { __html: esc.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>') };
+};
+
 // VN port: render AI answers with light markdown: **bold**, "- " bullets, paragraphs.
 const formatAiAnswer = (t) => {
   const esc = (x) => (x || '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
@@ -873,9 +879,7 @@ const WritingLayout = () => {
               <h2 className="text-2xl font-bold">Sample Writing</h2>
               <button onClick={() => setSampleOpen(false)} className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300">Close</button>
             </div>
-            <div className="max-h-[80vh] overflow-y-auto whitespace-pre-wrap text-lg leading-relaxed" onMouseUp={handleWordSelect}>
-              {task?.sample_essay || 'No sample available'}
-            </div>
+            <div className="max-h-[80vh] overflow-y-auto whitespace-pre-wrap text-lg leading-relaxed" onMouseUp={handleWordSelect} data-no-translate dangerouslySetInnerHTML={renderSampleHtml(task?.sample_essay)} />
           </div>
         </div>
       )}
