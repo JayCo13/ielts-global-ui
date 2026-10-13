@@ -307,7 +307,7 @@ if (fs.existsSync(BACKEND)) {
 
 // Text nodes the heuristics cannot recognise as copy (a lone lowercase word in a
 // styled <span>, a string starting with a number + %). Listed by hand.
-['anytime', '10% commission'].forEach((s) => add(strings, s, 'manual'));
+['anytime', '20% commission'].forEach((s) => add(strings, s, 'manual'));
 
 // Last-pass denylist for technical strings the heuristics above let through.
 const JUNK = /^\[|\[#|^&\w+=|\+=\{|#[0-9a-f]{6}\b|\.out\(|^text-\[/i;

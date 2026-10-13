@@ -41,14 +41,14 @@ const STEPS = [
   { icon: Copy, t: 'Copy your affiliate link', d: 'Go to Profile → Affiliate and click Copy link.' },
   { icon: Share2, t: 'Share it', d: 'Send it to friends or students by social media, messaging apps, email, your website, blog or video channel.' },
   { icon: UserPlus, t: 'They open your link', d: 'They visit the website through your link and register a new account.' },
-  { icon: CreditCard, t: 'They buy VIP', d: 'When their VIP payment succeeds, 10% commission is added to your wallet automatically.' },
+  { icon: CreditCard, t: 'They buy VIP', d: 'When their VIP payment succeeds, 20% commission is added to your wallet automatically.' },
 ];
 
 const TIERS = [
-  ['$20', '$2'],
-  ['$30', '$3'],
-  ['$50', '$5'],
-  ['$100', '$10'],
+  ['$20', '$4'],
+  ['$30', '$6'],
+  ['$50', '$10'],
+  ['$100', '$20'],
 ];
 
 const FAQ = [
@@ -66,7 +66,7 @@ export default function AffiliateGuide() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Seo
         title="Affiliate Program Guide | EnglishOnComputer"
-        description="Share your EnglishOnComputer affiliate link and earn 10% commission on every VIP purchase made by the accounts you refer."
+        description="Share your EnglishOnComputer affiliate link and earn 20% commission on every VIP purchase made by the accounts you refer."
         path="/affiliate-guide"
       />
       <Navbar />
@@ -81,7 +81,7 @@ export default function AffiliateGuide() {
               <Gift className="w-8 h-8" />
             </motion.div>
             <h1 className="text-3xl md:text-4xl font-extrabold">Affiliate Program Guide</h1>
-            <p className="mt-3 text-white/85 max-w-2xl mx-auto">Share your link. When the people you refer buy VIP, you earn <b>10% commission</b> on what they pay.</p>
+            <p className="mt-3 text-white/85 max-w-2xl mx-auto">Share your link. When the people you refer buy VIP, you earn <b>20% commission</b> on what they pay.</p>
             <Link to="/profile?tab=affiliate" className="inline-flex items-center gap-2 mt-6 px-6 py-3 rounded-xl bg-white text-[#0096b1] font-semibold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5">
               Go to my Affiliate page <ArrowRight className="w-4 h-4" />
             </Link>
@@ -90,7 +90,7 @@ export default function AffiliateGuide() {
 
         <div className="max-w-4xl mx-auto px-4 py-10 space-y-6">
           <Section icon={Sparkles} title="What is the affiliate program?">
-            <p className="text-gray-600 leading-relaxed">It is our referral program. When you share your <b>affiliate link</b> and someone registers and then buys a VIP package through it, you earn <b>10% commission</b> on the amount they actually pay.</p>
+            <p className="text-gray-600 leading-relaxed">It is our referral program. When you share your <b>affiliate link</b> and someone registers and then buys a VIP package through it, you earn <b>20% commission</b> on the amount they actually pay.</p>
             <div className="mt-4 rounded-2xl bg-[#0096b1]/5 border border-[#0096b1]/15 p-4 text-sm text-gray-700">
               <div className="font-semibold text-[#2b5356] mb-1">Example</div>
               A friend registers through your link → buys a VIP package for <b>$25</b> → you earn <b>$2.50</b>.
@@ -147,7 +147,7 @@ export default function AffiliateGuide() {
           </Section>
 
           <Section icon={Wallet} title="Commission and wallet">
-            <p className="text-gray-600 mb-3">Commission = <b>10%</b> of the amount the customer actually pays, added to your <b>affiliate wallet</b> (for collecting and withdrawing only — it cannot be used to buy VIP).</p>
+            <p className="text-gray-600 mb-3">Commission = <b>20%</b> of the amount the customer actually pays, added to your <b>affiliate wallet</b> (for collecting and withdrawing only — it cannot be used to buy VIP).</p>
             <div className="overflow-x-auto rounded-2xl border border-gray-100">
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 text-gray-500 text-xs uppercase">

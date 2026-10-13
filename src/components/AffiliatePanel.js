@@ -98,7 +98,7 @@ export default function AffiliatePanel({ onGoPayment }) {
       : { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     return currency === 'USD' ? `$${s}` : `${s} ${currency}`;
   };
-  const ratePct = Math.round((info.commission_rate || 0.1) * 100);
+  const ratePct = Math.round((info.commission_rate || 0.2) * 100);
 
   const stat = [
     { icon: MousePointerClick, label: 'Link clicks', value: count(info.click_count), tone: 'text-sky-500' },
