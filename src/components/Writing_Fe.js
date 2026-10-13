@@ -132,11 +132,9 @@ const Writing_Fe = () => {
             setAccountStatus(subscriptionData);
 
             // Writing-specific VIP access logic
-            const hasWritingAccess = subscriptionData.is_subscribed && (
-              subscriptionData.package_type === 'all_skills' ||
-              (subscriptionData.package_type === 'single_skill' &&
-                subscriptionData.skill_type === 'writing')
-            );
+            // Only a Writing package grants it; the Listening + Reading bundle
+            // ("all_skills") does not.
+            const hasWritingAccess = !!subscriptionData.has_writing_access;
 
             setIsVIP(hasWritingAccess);
             setTests(testsData.map(mapStudentWritingTest));

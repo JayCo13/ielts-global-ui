@@ -102,10 +102,9 @@ const WritingForecast = () => {
           ]);
           forecastData = await forecastRes.json();
           const vipData = await vipRes.json();
-          const hasAccess = vipData.is_subscribed && (
-            vipData.package_type === 'all_skills' || (vipData.package_type === 'single_skill' && vipData.skill_type === 'writing')
-          );
-          setIsVIP(hasAccess);
+          // Writing VIP comes only from a Writing package; the Listening + Reading
+          // bundle ("all_skills") does not include it.
+          setIsVIP(!!vipData.has_writing_access);
         }
         const flat = [];
         forecastData.forEach(exam => {
