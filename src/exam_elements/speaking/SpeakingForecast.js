@@ -465,7 +465,7 @@ const SpeakingForecast = () => {
                 {!!months.length && (
                     <div className="mt-3 rounded-xl bg-white border-2 border-gray-100 px-4 py-3">
                         <p className="text-sm font-bold text-[#2b5356] mb-2 inline-flex items-center gap-1.5">
-                            <CalendarDays size={15} className="text-[#eb7e37]" /> Focus by exam month
+                            <CalendarDays size={15} className="text-[#eb7e37]" /> Focus Months
                             {data?.month_locked && (
                                 <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#eb7e37]">
                                     <Crown size={12} /> VIP

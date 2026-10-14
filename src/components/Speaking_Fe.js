@@ -256,7 +256,7 @@ const Speaking_Fe = () => {
             tag: 'MOCK TEST',
             note: 'Full Part 1–2–3 test',
             title: 'Take the Speaking test with an AI examiner',
-            desc: 'Answer by voice in the real Part 1 – 2 – 3 order, timed like the real exam, '
+            desc: 'Answer by voice in Part 1–2–3 order, following standard timing, '
                 + 'or practise at your own pace with hints and vocabulary for every question.',
             cta: 'Start a mock test', to: '/speaking_test_setup',
             caption: 'Examiner ready',
@@ -264,7 +264,6 @@ const Speaking_Fe = () => {
         },
         forecast: {
             tag: 'FOCUS',
-            note: 'Focus topics by exam month',
             title: 'Practise focus topics',
             desc: 'Pick exactly the topic you want to practise and answer every question in it.',
             cta: 'View focus topics', to: '/speaking_forecast',

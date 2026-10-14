@@ -21,7 +21,7 @@ const TEST_TYPES = [
 
 const MODES = [
     { value: 'practice', label: 'Practice', hint: 'No time limit, questions and hints visible' },
-    { value: 'mock', label: 'Mock test', hint: 'Timed like the real test, no hints' },
+    { value: 'mock', label: 'Mock test', hint: 'Standard timing, no hints' },
 ];
 
 const PRIORITIES = [

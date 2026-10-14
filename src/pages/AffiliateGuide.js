@@ -93,7 +93,7 @@ export default function AffiliateGuide() {
             <p className="text-gray-600 leading-relaxed">It is our referral program. When you share your <b>affiliate link</b> and someone registers and then buys a VIP package through it, you earn <b>20% commission</b> on the amount they actually pay.</p>
             <div className="mt-4 rounded-2xl bg-[#0096b1]/5 border border-[#0096b1]/15 p-4 text-sm text-gray-700">
               <div className="font-semibold text-[#2b5356] mb-1">Example</div>
-              A friend registers through your link → buys a VIP package for <b>$25</b> → you earn <b>$2.50</b>.
+              A friend registers through your link → buys a VIP package for <b>$25</b> → you earn <b>$5</b>.
             </div>
             <div className="mt-4 flex items-start gap-2.5 rounded-2xl bg-amber-50 border border-amber-100 p-4 text-sm text-gray-700">
               <Info className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />

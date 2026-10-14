@@ -495,7 +495,7 @@ const WritingForecast = () => {
                     );
                   })()}
                   </div>
-                  <div className="text-sm text-gray-600 mt-1">Exam: {it.exam_title}</div>
+                  <div className="text-sm text-gray-600 mt-1">Exam: <span className={locked ? 'blur-[5px] select-none' : ''}>{it.exam_title}</span></div>
                   <LiveTakers count={liveCounts[`${it.exam_id}p${it.part_number}`]} className="mt-2" />
                   {(it.difficulty_label || it.forecast_level) && (
                     <div className="mt-2 flex items-center gap-2">
