@@ -58,7 +58,7 @@ const PrivacyPolicy = () => (
     <Section title="5. Information Controller Details">
       <Bullets
         items={[
-          <><strong>Business owner:</strong> NGUYEN THI MAI ANH</>,
+          <><strong>Business owner:</strong> LE TIET AN</>,
           <><strong>Address:</strong> 105, Street 5B, Quarter 3, Hoa Phu Ward, Thu Dau Mot City, Binh Duong, Vietnam</>,
           <><strong>Email:</strong> <EmailLink /></>,
           <><strong>WhatsApp:</strong> <WhatsAppLink /></>,

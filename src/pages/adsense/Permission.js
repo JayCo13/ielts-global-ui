@@ -16,10 +16,10 @@ const Permission = () => (
     path="/permission"
   >
     <dl>
-      <Row label="Owner">NGUYEN THI MAI ANH</Row>
+      <Row label="Owner">LE TIET AN</Row>
       <Row label="Tax ID">
         <span className="block text-sm text-gray-500">Tax Identification Number:</span>
-        030195007851
+        072091003266
       </Row>
       <Row label="Contact">
         <p><span className="font-medium">Email:</span> <EmailLink /></p>
