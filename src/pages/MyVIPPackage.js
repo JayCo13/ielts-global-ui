@@ -462,7 +462,7 @@ const MyVIPPackage = () => {
                 </div>
 
                 {/* Legacy Lemon Squeezy subscription (bought before one-time packages) */}
-                {activeCount > 0 && hasLSSub && (
+                {activeCount > 0 && (hasLSSub || hasCancelledSub) && (
                     <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div>
@@ -473,14 +473,16 @@ const MyVIPPackage = () => {
                                 <p className="text-sm text-gray-500 mt-1">Receipts and payment details for your earlier subscription.</p>
                             </div>
                             <div className="flex flex-col sm:flex-row gap-3">
-                                <button
-                                    onClick={handleManageBilling}
-                                    disabled={managingBilling}
-                                    className="px-4 py-2.5 bg-indigo-50 text-indigo-700 rounded-xl font-medium hover:bg-indigo-100 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-                                >
-                                    <ExternalLink className="w-4 h-4" />
-                                    {managingBilling ? 'Opening...' : 'Manage Billing'}
-                                </button>
+                                {hasLSSub && (
+                                    <button
+                                        onClick={handleManageBilling}
+                                        disabled={managingBilling}
+                                        className="px-4 py-2.5 bg-indigo-50 text-indigo-700 rounded-xl font-medium hover:bg-indigo-100 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                                    >
+                                        <ExternalLink className="w-4 h-4" />
+                                        {managingBilling ? 'Opening...' : 'Manage Billing'}
+                                    </button>
+                                )}
                                 {!lsSelfServiceDisabled && hasAutoRenewSub && (
                                     <button
                                         onClick={handleCancelSubscription}
@@ -493,19 +495,21 @@ const MyVIPPackage = () => {
                                 )}
                             </div>
                         </div>
-                        {!lsSelfServiceDisabled && hasCancelledSub && (
+                        {hasCancelledSub && (
                             <div className="mt-3 bg-amber-50 rounded-lg px-4 py-3 border border-amber-100 flex flex-col sm:flex-row items-center justify-between gap-3">
                                 <p className="text-sm text-amber-700">
                                     ⚠️ Your subscription has been cancelled. VIP access remains active until the end of the billing period.
                                 </p>
-                                <button
-                                    onClick={handleResumeSubscription}
-                                    disabled={resuming}
-                                    className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 transition-colors flex items-center gap-2 disabled:opacity-50 whitespace-nowrap"
-                                >
-                                    <RefreshCw className={`w-4 h-4 ${resuming ? 'animate-spin' : ''}`} />
-                                    {resuming ? 'Resuming...' : 'Resume Subscription'}
-                                </button>
+                                {!lsSelfServiceDisabled && (
+                                    <button
+                                        onClick={handleResumeSubscription}
+                                        disabled={resuming}
+                                        className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 transition-colors flex items-center gap-2 disabled:opacity-50 whitespace-nowrap"
+                                    >
+                                        <RefreshCw className={`w-4 h-4 ${resuming ? 'animate-spin' : ''}`} />
+                                        {resuming ? 'Resuming...' : 'Resume Subscription'}
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>
