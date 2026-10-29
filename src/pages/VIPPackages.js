@@ -75,6 +75,9 @@ const VIPPackages = () => {
 
     const handleFilterChange = (filter) => {
         setActiveFilter(filter);
+        // Each tab has its own page count; staying on page 2+ of a longer tab
+        // would slice past the end of a shorter one and show nothing.
+        setCurrentPage(1);
         const newSearchParams = new URLSearchParams(location.search);
         if (filter === 'all') {
             newSearchParams.delete('type');
