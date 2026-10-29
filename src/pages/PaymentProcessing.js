@@ -89,7 +89,7 @@ const PaymentProcessing = () => {
                         )}
                         <div className="mt-6 flex items-center justify-center gap-2 text-xs text-gray-400">
                             <Lock className="w-3 h-3" />
-                            <span>Secured by PayOS • SSL Encrypted</span>
+                            <span>Secure payment • SSL Encrypted</span>
                         </div>
                     </div>
                 )}

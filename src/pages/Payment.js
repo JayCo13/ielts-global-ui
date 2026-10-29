@@ -1,11 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { ChevronRight, Home, Shield, Lock, AlertCircle, Crown, QrCode, Clock } from 'lucide-react';
+import { ChevronRight, Home, Shield, Lock, AlertCircle, Crown, QrCode, Clock, CreditCard } from 'lucide-react';
 import { checkTokenExpiration, logout } from '../utils/authUtils';
 import API_BASE from '../config/api';
 import { formatUsd, packageUsd } from '../utils/money';
 
 /**
+ * LEMON SQUEEZY PAYMENT FLOW (default — REACT_APP_PAYMENT_PROVIDER unset or "lemonsqueezy")
+ * ===========================
+ * 1. User clicks "Pay Now" → Frontend calls backend /packages/{id}/create-checkout
+ * 2. Backend creates a one-time LS checkout (USD) → returns { checkout_url }
+ * 3. Frontend opens the LS Checkout Overlay (lemon.js, loaded in public/index.html)
+ * 4. LS sends the order_created webhook → Backend activates VIP
+ * 5. On Checkout.Success the user goes to /payment-processing (polls for activation)
+ *
+ * Set REACT_APP_PAYMENT_PROVIDER=payos to switch back to the flow below.
+ *
  * PAYOS PAYMENT FLOW
  * ==================
  * 1. This page: User sees package info + "Pay Now" button
@@ -20,6 +30,9 @@ import { formatUsd, packageUsd } from '../utils/money';
  * There is no automatic card renewal — the user buys again to extend.
  */
 
+
+const PAYMENT_PROVIDER = (process.env.REACT_APP_PAYMENT_PROVIDER || 'lemonsqueezy').toLowerCase();
+const USE_LEMONSQUEEZY = PAYMENT_PROVIDER !== 'payos';
 
 const Payment = () => {
     const [error, setError] = useState(null);
@@ -57,6 +70,84 @@ const Payment = () => {
     useEffect(() => {
         validateTokenAndRedirect();
     }, []);
+
+    // Lemon Squeezy overlay: initialise lemon.js and watch for a completed checkout
+    useEffect(() => {
+        if (!USE_LEMONSQUEEZY) return;
+        if (window.createLemonSqueezy) {
+            window.createLemonSqueezy();
+        }
+        if (window.LemonSqueezy && window.LemonSqueezy.Setup) {
+            window.LemonSqueezy.Setup({
+                eventHandler: (event) => {
+                    if (event?.event === 'Checkout.Success') {
+                        if (window.LemonSqueezy.Url && window.LemonSqueezy.Url.Close) {
+                            window.LemonSqueezy.Url.Close();
+                        }
+                        navigate('/payment-processing', {
+                            state: { packageId, packageName: selectedPackage?.name }
+                        });
+                    }
+                },
+            });
+        }
+    }, [navigate, packageId, selectedPackage]);
+
+    // Create a one-time Lemon Squeezy checkout and open it as an overlay
+    const handleLemonSqueezyPay = async () => {
+        if (inProgressRef.current) return; // guard against double-clicks
+        if (!validateTokenAndRedirect()) return;
+        inProgressRef.current = true;
+        setError(null);
+        setLoading(true);
+
+        const token = localStorage.getItem('token');
+
+        try {
+            const res = await fetch(`${API_BASE}/customer/vip/packages/${packageId}/create-checkout`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (res.status === 401) {
+                navigate('/login', { state: { message: 'Session expired.' } });
+                return;
+            }
+
+            if (res.status === 429) {
+                throw new Error('Too many payment requests. Please try again in a few minutes.');
+            }
+
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data.detail || 'Failed to create checkout');
+            }
+
+            const data = await res.json();
+            const checkoutUrl = data.checkout_url;
+
+            if (!checkoutUrl) {
+                throw new Error('No checkout URL received');
+            }
+
+            if (window.LemonSqueezy && window.LemonSqueezy.Url) {
+                window.LemonSqueezy.Url.Open(checkoutUrl);
+                inProgressRef.current = false;
+                setLoading(false);
+            } else {
+                // lemon.js not loaded (blocked script etc.) — use the hosted checkout page
+                window.location.href = checkoutUrl;
+            }
+        } catch (err) {
+            console.error('Payment error:', err);
+            setError(err.message || 'Failed to start payment. Please try again.');
+            inProgressRef.current = false;
+            setLoading(false);
+        }
+    };
 
     // Create PayOS payment link and redirect to the hosted checkout
     const handlePay = async () => {
@@ -196,7 +287,7 @@ const Payment = () => {
                         </h3>
 
                         <button
-                            onClick={handlePay}
+                            onClick={USE_LEMONSQUEEZY ? handleLemonSqueezyPay : handlePay}
                             disabled={loading}
                             className="w-full py-4 bg-gradient-to-r from-lime-500 to-emerald-500 text-white font-bold text-lg rounded-xl hover:from-lime-600 hover:to-emerald-600 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
                         >
@@ -206,20 +297,27 @@ const Payment = () => {
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                                     </svg>
-                                    Redirecting to payment...
+                                    {USE_LEMONSQUEEZY ? 'Opening secure checkout...' : 'Redirecting to payment...'}
                                 </>
                             ) : (
                                 <>
-                                    <QrCode className="w-5 h-5" />
+                                    {USE_LEMONSQUEEZY ? <CreditCard className="w-5 h-5" /> : <QrCode className="w-5 h-5" />}
                                     Pay Now — {formatUsd(packageUsd(selectedPackage))}
                                 </>
                             )}
                         </button>
 
-                        <p className="text-xs text-gray-400 text-center mt-4">
-                            You will be redirected to scan a VietQR code or transfer via your bank
-                            <span className="block mt-1">The payment is taken in local currency at the equivalent amount.</span>
-                        </p>
+                        {USE_LEMONSQUEEZY ? (
+                            <p className="text-xs text-gray-400 text-center mt-4">
+                                Pay securely by card or PayPal in a Lemon Squeezy checkout window
+                                <span className="block mt-1">Applicable sales tax may be added at checkout based on your location.</span>
+                            </p>
+                        ) : (
+                            <p className="text-xs text-gray-400 text-center mt-4">
+                                You will be redirected to scan a VietQR code or transfer via your bank
+                                <span className="block mt-1">The payment is taken in local currency at the equivalent amount.</span>
+                            </p>
+                        )}
                     </div>
                 )}
 
@@ -227,7 +325,7 @@ const Payment = () => {
                 <div className="mt-6 flex justify-center">
                     <div className="flex items-center gap-2 text-xs text-gray-500">
                         <Lock className="w-4 h-4 text-lime-600" />
-                        <span>Secured by PayOS • SSL Encrypted • One-time payment</span>
+                        <span>Secured by {USE_LEMONSQUEEZY ? 'Lemon Squeezy' : 'PayOS'} • SSL Encrypted • One-time payment</span>
                     </div>
                 </div>
             </div>
