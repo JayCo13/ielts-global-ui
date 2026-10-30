@@ -26,6 +26,14 @@ import { formatUsd, packageUsd } from '../utils/money';
  * 6. PayOS sends a webhook → Backend activates VIP
  * 7. PayOS redirects the user back to /payment-processing (polls for activation)
  *
+ * 9PAY CARD FLOW (optional second button, alongside Lemon Squeezy — REACT_APP_NINEPAY_ENABLED=true)
+ * ===============
+ * 1. User clicks "Pay with 9Pay" → Frontend calls backend /packages/{id}/ninepay-checkout
+ * 2. Backend creates a signed 9Pay URL (charged in VND) → returns { checkoutUrl, invoice_no }
+ * 3. Frontend redirects (full navigation) to the 9Pay card form
+ * 4. 9Pay sends an IPN → Backend activates VIP
+ * 5. 9Pay redirects back to /payment-processing?provider=9pay&invoice=… (polls /ninepay/verify)
+ *
  * This is a one-time purchase: VIP time is added to the account.
  * There is no automatic card renewal — the user buys again to extend.
  */
@@ -33,10 +41,12 @@ import { formatUsd, packageUsd } from '../utils/money';
 
 const PAYMENT_PROVIDER = (process.env.REACT_APP_PAYMENT_PROVIDER || 'lemonsqueezy').toLowerCase();
 const USE_LEMONSQUEEZY = PAYMENT_PROVIDER !== 'payos';
+const NINEPAY_ENABLED = process.env.REACT_APP_NINEPAY_ENABLED === 'true';
 
 const Payment = () => {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [ninepayLoading, setNinepayLoading] = useState(false);
     const inProgressRef = useRef(false);
 
     const location = useLocation();
@@ -199,6 +209,58 @@ const Payment = () => {
         }
     };
 
+    // Create a 9Pay international-card payment URL and redirect to the 9Pay card form
+    const handleNinePayPay = async () => {
+        if (inProgressRef.current) return; // guard against double-clicks
+        if (!validateTokenAndRedirect()) return;
+        inProgressRef.current = true;
+        setError(null);
+        setNinepayLoading(true);
+
+        const token = localStorage.getItem('token');
+
+        try {
+            const res = await fetch(`${API_BASE}/customer/vip/packages/${packageId}/ninepay-checkout`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (res.status === 401) {
+                navigate('/login', { state: { message: 'Session expired.' } });
+                return;
+            }
+
+            if (res.status === 429) {
+                throw new Error('Too many payment requests. Please try again in a few minutes.');
+            }
+
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data.detail || 'Failed to create payment link');
+            }
+
+            const data = await res.json();
+            if (!data.checkoutUrl) {
+                throw new Error('No checkout URL received');
+            }
+
+            // Backup for /payment-processing in case 9Pay drops our return_url query
+            try {
+                sessionStorage.setItem('ninepay_invoice', data.invoice_no || '');
+            } catch (e) { /* storage unavailable */ }
+
+            window.location.href = data.checkoutUrl;
+        } catch (err) {
+            console.error('Payment error:', err);
+            setError(err.message || 'Failed to start payment. Please try again.');
+            inProgressRef.current = false;
+            setNinepayLoading(false);
+        }
+    };
+
     if (!selectedPackage) return null;
 
     return (
@@ -288,7 +350,7 @@ const Payment = () => {
 
                         <button
                             onClick={USE_LEMONSQUEEZY ? handleLemonSqueezyPay : handlePay}
-                            disabled={loading}
+                            disabled={loading || ninepayLoading}
                             className="w-full py-4 bg-gradient-to-r from-lime-500 to-emerald-500 text-white font-bold text-lg rounded-xl hover:from-lime-600 hover:to-emerald-600 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
                         >
                             {loading ? (
@@ -318,6 +380,41 @@ const Payment = () => {
                                 <span className="block mt-1">The payment is taken in local currency at the equivalent amount.</span>
                             </p>
                         )}
+
+                        {NINEPAY_ENABLED && (
+                            <>
+                                <div className="flex items-center gap-3 my-5">
+                                    <div className="flex-1 h-px bg-gray-200" />
+                                    <span className="text-xs font-medium text-gray-400 uppercase">or</span>
+                                    <div className="flex-1 h-px bg-gray-200" />
+                                </div>
+                                <button
+                                    onClick={handleNinePayPay}
+                                    disabled={loading || ninepayLoading}
+                                    className="w-full py-3.5 bg-white border-2 border-gray-200 text-gray-800 font-bold rounded-xl hover:border-lime-500 hover:text-lime-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                                >
+                                    {ninepayLoading ? (
+                                        <>
+                                            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                            </svg>
+                                            Redirecting to payment...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <CreditCard className="w-5 h-5" />
+                                            Pay by card with 9Pay
+                                        </>
+                                    )}
+                                </button>
+                                <p className="text-xs text-gray-400 text-center mt-3">
+                                    Visa, Mastercard or JCB. Your card is charged in Vietnamese dong:
+                                    <span className="font-semibold text-gray-500"> {Number(selectedPackage.price || 0).toLocaleString('en-US')} VND</span>
+                                    <span className="block mt-1">Your bank may apply its own currency conversion fee.</span>
+                                </p>
+                            </>
+                        )}
                     </div>
                 )}
 
@@ -325,7 +422,7 @@ const Payment = () => {
                 <div className="mt-6 flex justify-center">
                     <div className="flex items-center gap-2 text-xs text-gray-500">
                         <Lock className="w-4 h-4 text-lime-600" />
-                        <span>Secured by {USE_LEMONSQUEEZY ? 'Lemon Squeezy' : 'PayOS'} • SSL Encrypted • One-time payment</span>
+                        <span>Secured by {USE_LEMONSQUEEZY ? 'Lemon Squeezy' : 'PayOS'}{NINEPAY_ENABLED ? ' & 9Pay' : ''} • SSL Encrypted • One-time payment</span>
                     </div>
                 </div>
             </div>

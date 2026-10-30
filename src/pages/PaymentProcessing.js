@@ -7,6 +7,9 @@ import API_BASE from '../config/api';
  * PaymentProcessing — Polls for VIP activation after a PayOS payment.
  * This is the PayOS return_url target: the user lands here after paying and we
  * poll /subscription/status until the webhook has activated their VIP.
+ *
+ * 9Pay returns here with ?provider=9pay&invoice=…; that order is polled by its own
+ * status (/ninepay/verify), which also asks 9Pay directly in case the IPN is late.
  */
 const PaymentProcessing = () => {
     const [status, setStatus] = useState('processing');
@@ -32,7 +35,48 @@ const PaymentProcessing = () => {
 
         const maxAttempts = 20;
 
+        const params = new URLSearchParams(location.search);
+        let ninepayInvoice = params.get('provider') === '9pay' ? params.get('invoice') : null;
+        if (params.get('provider') === '9pay' && !ninepayInvoice) {
+            try { ninepayInvoice = sessionStorage.getItem('ninepay_invoice'); } catch (e) { /* storage unavailable */ }
+        }
+
         for (let i = 0; i < maxAttempts; i++) {
+            if (ninepayInvoice) {
+                try {
+                    const res = await fetch(`${API_BASE}/customer/vip/ninepay/verify/${encodeURIComponent(ninepayInvoice)}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        },
+                    });
+
+                    if (res.status === 401) {
+                        navigate('/login', { state: { message: 'Session expired.' } });
+                        return;
+                    }
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.status === 'completed') {
+                            try { sessionStorage.removeItem('ninepay_invoice'); } catch (e) { /* ignore */ }
+                            setStatus('success');
+                            setTimeout(() => navigate('/payment-success', { state: { fromPayment: true } }), 2000);
+                            return;
+                        }
+                        if (data.status === 'reject') {
+                            setErrorMsg('Your card payment was not completed, so no VIP time was added. You can go back and try again.');
+                            setStatus('error');
+                            return;
+                        }
+                    }
+                } catch (err) {
+                    console.warn(`[Payment] 9Pay check ${i + 1} failed:`, err.message);
+                }
+
+                await new Promise(r => setTimeout(r, 3000));
+                continue;
+            }
+
             try {
                 console.log(`[Payment] Polling attempt ${i + 1}/${maxAttempts}`);
 
