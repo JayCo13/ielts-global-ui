@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { ChevronRight, Home, Shield, Lock, AlertCircle, Crown, QrCode, Clock, CreditCard } from 'lucide-react';
+import { ChevronRight, Home, Shield, Lock, AlertCircle, Crown, QrCode, Clock } from 'lucide-react';
 import { checkTokenExpiration, logout } from '../utils/authUtils';
 import API_BASE from '../config/api';
 import { formatUsd, packageUsd } from '../utils/money';
@@ -42,6 +42,10 @@ import { formatUsd, packageUsd } from '../utils/money';
 const PAYMENT_PROVIDER = (process.env.REACT_APP_PAYMENT_PROVIDER || 'lemonsqueezy').toLowerCase();
 const USE_LEMONSQUEEZY = PAYMENT_PROVIDER !== 'payos';
 const NINEPAY_ENABLED = process.env.REACT_APP_NINEPAY_ENABLED === 'true';
+
+// Display helpers: drop spaced dash separators ("VIP Writing – 1 Month") and put each ⭐ benefit on its own line
+const stripDashes = (text) => (text || '').replace(/\s+[-–—]\s+/g, ' ');
+const benefitLines = (text) => stripDashes(text).split(/\n|(?=⭐)/).map(l => l.trim()).filter(Boolean);
 
 const Payment = () => {
     const [error, setError] = useState(null);
@@ -298,14 +302,18 @@ const Payment = () => {
                         </div>
                     </div>
                     <div className="p-6">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-start justify-between gap-4">
                             <div>
-                                <h3 className="text-lg font-bold text-gray-900">{selectedPackage.name}</h3>
+                                <h3 className="text-lg font-bold text-gray-900">{stripDashes(selectedPackage.name)}</h3>
                                 <p className="text-sm text-gray-500 mt-1">
                                     Duration: {selectedPackage.duration_months} month{selectedPackage.duration_months > 1 ? 's' : ''}
                                 </p>
                                 {selectedPackage.description && (
-                                    <p className="text-sm text-gray-600 mt-2">{selectedPackage.description}</p>
+                                    <ul className="text-sm text-gray-600 mt-2 space-y-1">
+                                        {benefitLines(selectedPackage.description).map((line, idx) => (
+                                            <li key={idx}>{line}</li>
+                                        ))}
+                                    </ul>
                                 )}
                             </div>
                             <div className="text-right">
@@ -321,7 +329,7 @@ const Payment = () => {
                             <div className="flex items-start gap-3">
                                 <Clock className="w-5 h-5 text-lime-600 mt-0.5 flex-shrink-0" />
                                 <div>
-                                    <p className="text-sm font-medium text-lime-800">One-time payment — {selectedPackage.duration_months} month{selectedPackage.duration_months > 1 ? 's' : ''} of VIP access</p>
+                                    <p className="text-sm font-medium text-lime-800">One-time payment: {selectedPackage.duration_months} month{selectedPackage.duration_months > 1 ? 's' : ''} of VIP access</p>
                                     <p className="text-xs text-lime-600 mt-1">
                                         This is a one-time purchase. Your VIP time is added to your account and there is no automatic renewal.
                                         When it runs out, simply purchase again to extend.
@@ -363,8 +371,12 @@ const Payment = () => {
                                 </>
                             ) : (
                                 <>
-                                    {USE_LEMONSQUEEZY ? <CreditCard className="w-5 h-5" /> : <QrCode className="w-5 h-5" />}
-                                    Pay Now — {formatUsd(packageUsd(selectedPackage))}
+                                    {USE_LEMONSQUEEZY ? (
+                                        <span className="bg-white rounded-lg p-1.5 flex items-center justify-center">
+                                            <img src="/img/lemonsqueezy-icon.svg" alt="Lemon Squeezy" className="h-5 w-auto" />
+                                        </span>
+                                    ) : <QrCode className="w-5 h-5" />}
+                                    Pay Now {formatUsd(packageUsd(selectedPackage))}
                                 </>
                             )}
                         </button>
@@ -403,8 +415,8 @@ const Payment = () => {
                                         </>
                                     ) : (
                                         <>
-                                            <CreditCard className="w-5 h-5" />
-                                            Pay by card with 9Pay
+                                            Pay by card
+                                            <img src="/img/9pay-logo.svg" alt="9Pay" className="h-7 w-auto" />
                                         </>
                                     )}
                                 </button>
