@@ -42,6 +42,18 @@ import { formatUsd, packageUsd } from '../utils/money';
 const PAYMENT_PROVIDER = (process.env.REACT_APP_PAYMENT_PROVIDER || 'lemonsqueezy').toLowerCase();
 const USE_LEMONSQUEEZY = PAYMENT_PROVIDER !== 'payos';
 const NINEPAY_ENABLED = process.env.REACT_APP_NINEPAY_ENABLED === 'true';
+// Wallets through the same 9Pay redirect (method=APPLE_PAY / GOOGLE_PAY); 9Pay must enable them on the merchant account
+const NINEPAY_APPLE_PAY = NINEPAY_ENABLED && process.env.REACT_APP_NINEPAY_APPLE_PAY === 'true';
+const NINEPAY_GOOGLE_PAY = NINEPAY_ENABLED && process.env.REACT_APP_NINEPAY_GOOGLE_PAY === 'true';
+
+// Apple Pay only works in Safari on Apple devices
+const canUseApplePay = () => {
+    try {
+        return !!(window.ApplePaySession && window.ApplePaySession.canMakePayments());
+    } catch (e) {
+        return false;
+    }
+};
 
 // Display helpers: drop spaced dash separators ("VIP Writing – 1 Month") and put each ⭐ benefit on its own line
 const stripDashes = (text) => (text || '').replace(/\s+[-–—]\s+/g, ' ');
@@ -50,7 +62,8 @@ const benefitLines = (text) => stripDashes(text).split(/\n|(?=⭐)/).map(l => l.
 const Payment = () => {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [ninepayLoading, setNinepayLoading] = useState(false);
+    const [ninepayLoading, setNinepayLoading] = useState(null); // 9Pay method being opened, or null
+    const [showApplePay] = useState(() => NINEPAY_APPLE_PAY && canUseApplePay());
     const inProgressRef = useRef(false);
 
     const location = useLocation();
@@ -213,18 +226,18 @@ const Payment = () => {
         }
     };
 
-    // Create a 9Pay international-card payment URL and redirect to the 9Pay card form
-    const handleNinePayPay = async () => {
+    // Create a 9Pay payment URL (card, Apple Pay or Google Pay) and redirect to the 9Pay page
+    const handleNinePayPay = async (method = 'CREDIT_CARD') => {
         if (inProgressRef.current) return; // guard against double-clicks
         if (!validateTokenAndRedirect()) return;
         inProgressRef.current = true;
         setError(null);
-        setNinepayLoading(true);
+        setNinepayLoading(method);
 
         const token = localStorage.getItem('token');
 
         try {
-            const res = await fetch(`${API_BASE}/customer/vip/packages/${packageId}/ninepay-checkout`, {
+            const res = await fetch(`${API_BASE}/customer/vip/packages/${packageId}/ninepay-checkout?method=${method}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -261,7 +274,7 @@ const Payment = () => {
             console.error('Payment error:', err);
             setError(err.message || 'Failed to start payment. Please try again.');
             inProgressRef.current = false;
-            setNinepayLoading(false);
+            setNinepayLoading(null);
         }
     };
 
@@ -401,11 +414,11 @@ const Payment = () => {
                                     <div className="flex-1 h-px bg-gray-200" />
                                 </div>
                                 <button
-                                    onClick={handleNinePayPay}
-                                    disabled={loading || ninepayLoading}
+                                    onClick={() => handleNinePayPay('CREDIT_CARD')}
+                                    disabled={loading || !!ninepayLoading}
                                     className="w-full py-3.5 bg-white border-2 border-gray-200 text-gray-800 font-bold rounded-xl hover:border-lime-500 hover:text-lime-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
                                 >
-                                    {ninepayLoading ? (
+                                    {ninepayLoading === 'CREDIT_CARD' ? (
                                         <>
                                             <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
                                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
@@ -420,8 +433,37 @@ const Payment = () => {
                                         </>
                                     )}
                                 </button>
+                                {(showApplePay || NINEPAY_GOOGLE_PAY) && (
+                                    <div className={`grid gap-3 mt-3 ${showApplePay && NINEPAY_GOOGLE_PAY ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                                        {showApplePay && (
+                                            <button
+                                                onClick={() => handleNinePayPay('APPLE_PAY')}
+                                                disabled={loading || !!ninepayLoading}
+                                                aria-label="Pay with Apple Pay"
+                                                className="py-3.5 bg-black text-white font-semibold text-lg rounded-xl hover:bg-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                                                style={{ fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}
+                                            >
+                                                {ninepayLoading === 'APPLE_PAY' ? 'Redirecting...' : '\uF8FF Pay'}
+                                            </button>
+                                        )}
+                                        {NINEPAY_GOOGLE_PAY && (
+                                            <button
+                                                onClick={() => handleNinePayPay('GOOGLE_PAY')}
+                                                disabled={loading || !!ninepayLoading}
+                                                aria-label="Pay with Google Pay"
+                                                className="py-3.5 bg-black text-white font-semibold rounded-xl hover:bg-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                                            >
+                                                {ninepayLoading === 'GOOGLE_PAY' ? 'Redirecting...' : (
+                                                    <img src="/img/google-pay-mark.svg" alt="Google Pay" className="h-6 w-auto" />
+                                                )}
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
                                 <p className="text-xs text-gray-400 text-center mt-3">
-                                    Visa, Mastercard or JCB. Your card is charged in Vietnamese dong:
+                                    {showApplePay || NINEPAY_GOOGLE_PAY
+                                        ? 'Visa, Mastercard, JCB or wallet. You are charged in Vietnamese dong:'
+                                        : 'Visa, Mastercard or JCB. Your card is charged in Vietnamese dong:'}
                                     <span className="font-semibold text-gray-500"> {Number(selectedPackage.price || 0).toLocaleString('en-US')} VND</span>
                                     <span className="block mt-1">Your bank may apply its own currency conversion fee.</span>
                                 </p>
