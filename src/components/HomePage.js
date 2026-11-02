@@ -17,6 +17,7 @@ import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
 import Seo from './Seo';
 import AnnouncementsSection from './AnnouncementsSection';
+import EmailVerifyBanner from './EmailVerifyBanner';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // EnglishOnComputer homepage (v2 layout).
@@ -340,6 +341,7 @@ const HomePage = () => {
       />
 
       <Navbar />
+      <EmailVerifyBanner />
       <main className="flex-1">
         {/* ── HERO: dark navy band, headline left, live practice-room preview right ── */}
         <section className="relative overflow-hidden text-white" style={{ background: `linear-gradient(135deg, #07223d 0%, ${NAVY} 45%, #123a73 100%)` }}>

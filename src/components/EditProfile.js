@@ -16,6 +16,42 @@ const EditProfile = ({ onProfileUpdate }) => {
   const [saveMessage, setSaveMessage] = useState({ type: '', text: '' });
   const fileInputRef = useRef(null);
 
+  // Email verification (6-digit code), ported from VN
+  const [verifyStep, setVerifyStep] = useState(0); // 0: idle | 1: entering code
+  const [code, setCode] = useState('');
+  const [verifyLoading, setVerifyLoading] = useState(false);
+  const [verifyMsg, setVerifyMsg] = useState('');
+
+  const postEmail = async (path, body) => {
+    const r = await fetch(`${API_BASE}${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+      body: JSON.stringify(body),
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.detail || 'Something went wrong. Please try again.');
+    return d;
+  };
+  const sendVerifyCode = async () => {
+    if (!formData.email?.trim()) { setVerifyMsg('Please enter your email first.'); return; }
+    setVerifyLoading(true); setVerifyMsg('');
+    try {
+      await postEmail('/student/email/send-code', { email: formData.email.trim() });
+      setVerifyStep(1);
+      setVerifyMsg('We sent a 6-digit code to your email. Check your spam folder if you cannot find it.');
+    } catch (e) { setVerifyMsg(e.message); } finally { setVerifyLoading(false); }
+  };
+  const confirmVerify = async () => {
+    if (code.trim().length < 6) { setVerifyMsg('Enter the 6-digit code from the email.'); return; }
+    setVerifyLoading(true); setVerifyMsg('');
+    try {
+      const d = await postEmail('/student/email/verify', { email: formData.email.trim(), code: code.trim() });
+      setProfileData((p) => ({ ...(p || {}), email_verified: true, email: d.email }));
+      setFormData((f) => ({ ...f, email: d.email }));
+      setVerifyStep(0); setCode(''); setVerifyMsg('');
+    } catch (e) { setVerifyMsg(e.message); } finally { setVerifyLoading(false); }
+  };
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -106,7 +142,7 @@ const EditProfile = ({ onProfileUpdate }) => {
         }
 
         // Update the profile data with the modified image URL
-        setProfileData(updatedData);
+        setProfileData((p) => ({ ...(p || {}), ...updatedData }));
 
         // Reset file input
         if (fileInputRef.current) {
@@ -207,6 +243,39 @@ const EditProfile = ({ onProfileUpdate }) => {
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500"
               disabled={isSaving}
             />
+
+            {/* Email verification */}
+            {profileData?.email_verified && formData.email?.trim().toLowerCase() === (profileData.email || '').toLowerCase() ? (
+              <div className="inline-flex items-center gap-1.5 text-sm font-medium text-green-600">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                Email verified
+              </div>
+            ) : profileData && !profileData.is_google_account ? (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
+                <p className="text-sm text-gray-700">
+                  <b className="text-amber-700">Email not verified.</b> Verify it to keep your account secure and to be able to reset your password if you forget it.
+                </p>
+                {verifyStep === 0 ? (
+                  <button type="button" onClick={sendVerifyCode} disabled={verifyLoading}
+                    className="mt-2 px-4 py-2 rounded-lg text-sm font-bold text-white bg-[#0096b1] hover:bg-[#007d93] disabled:opacity-60">
+                    {verifyLoading ? 'Sending...' : 'Send verification code'}
+                  </button>
+                ) : (
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <input value={code} inputMode="numeric" autoComplete="one-time-code" placeholder="6-digit code"
+                      onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      className="px-3 py-2 border border-gray-300 rounded-lg text-sm tracking-[0.2em] font-semibold w-36 focus:ring-2 focus:ring-[#0096b1] outline-none" />
+                    <button type="button" onClick={confirmVerify} disabled={verifyLoading}
+                      className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-[#0096b1] hover:bg-[#007d93] disabled:opacity-60">
+                      {verifyLoading ? '...' : 'Verify'}
+                    </button>
+                    <button type="button" onClick={sendVerifyCode} disabled={verifyLoading}
+                      className="text-xs font-medium text-[#0096b1] hover:underline">Resend code</button>
+                  </div>
+                )}
+                {verifyMsg && <p className="text-xs text-gray-500 mt-1.5">{verifyMsg}</p>}
+              </div>
+            ) : null}
           </div>
 
           <button
