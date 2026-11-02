@@ -757,7 +757,7 @@ const Navbar = () => {
                                         </Link>
 
                                         <Link
-                                            to="/vip-package"
+                                            to="/my-vip-package"
                                             className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-[#07223d]/10 rounded-lg transition-colors"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
