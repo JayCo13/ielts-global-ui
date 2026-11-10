@@ -174,7 +174,7 @@ const Navbar = () => {
                     }`}>
                     <Link to="/" className="flex items-center gap-2.5" aria-label="EnglishOnComputer home">
                         <img src="/img/logo-eoc-icon.png" alt="EnglishOnComputer logo" className="h-12 w-12 object-contain bg-white rounded-xl p-1 shrink-0" />
-                        <span className="leading-none">
+                        <span className="leading-none" data-no-translate>
                             <span className="block text-white font-extrabold tracking-wide text-lg">ENGLISH</span>
                             <span className="block text-[#aea091] font-semibold tracking-wider text-[10px] mt-0.5">ONCOMPUTER.COM</span>
                         </span>
@@ -602,13 +602,13 @@ const Navbar = () => {
                                                 )}
                                                 {localStorage.getItem('role') === 'customer' && (
                                                     <Link
-                                                        to="/profile?tab=affiliate"
+                                                        to="/profile?tab=creator-hub"
                                                         className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-[#07223d]/10 rounded-lg transition-colors"
                                                     >
                                                         <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path>
                                                         </svg>
-                                                        <span>Affiliate</span>
+                                                        <span>Creator Hub</span>
                                                     </Link>
                                                 )}
                                             </div>
@@ -769,14 +769,14 @@ const Navbar = () => {
 
                                         {localStorage.getItem('role') === 'customer' && (
                                             <Link
-                                                to="/profile?tab=affiliate"
+                                                to="/profile?tab=creator-hub"
                                                 className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-[#07223d]/10 rounded-lg transition-colors"
                                                 onClick={() => setIsMobileMenuOpen(false)}
                                             >
                                                 <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path>
                                                 </svg>
-                                                <span>Affiliate</span>
+                                                <span>Creator Hub</span>
                                             </Link>
                                         )}
 

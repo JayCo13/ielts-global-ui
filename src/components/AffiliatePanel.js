@@ -27,12 +27,17 @@ function TxType({ t }) {
     commission: { label: 'Commission', cls: 'text-emerald-600' },
     withdraw: { label: 'Withdrawal', cls: 'text-red-500' },
     withdraw_refund: { label: 'Refund', cls: 'text-amber-600' },
+    creator_reward: { label: 'Creator reward', cls: 'text-violet-600' },
   };
   const m = map[t] || { label: t, cls: 'text-gray-500' };
   return <span className={`text-xs font-medium ${m.cls}`}>{m.label}</span>;
 }
 
-export default function AffiliatePanel({ onGoPayment }) {
+// part: 'all' (default, original layout) | 'affiliate' (link + stats) | 'wallet' (shared
+// Creator + Affiliate wallet: balance, withdraw, requests, history) — used by CreatorHub.
+export default function AffiliatePanel({ onGoPayment, part = 'all' }) {
+  const showAffiliate = part !== 'wallet';
+  const showWallet = part !== 'affiliate';
   const [info, setInfo] = useState(null);
   const [history, setHistory] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
@@ -98,7 +103,9 @@ export default function AffiliatePanel({ onGoPayment }) {
       : { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     return currency === 'USD' ? `$${s}` : `${s} ${currency}`;
   };
-  const ratePct = Math.round((info.commission_rate || 0.2) * 100);
+  const ratePct = info.rate_pct != null
+    ? Number(info.rate_pct).toLocaleString('en-US', { maximumFractionDigits: 1 })
+    : Math.round((info.commission_rate || 0.05) * 100);
 
   const stat = [
     { icon: MousePointerClick, label: 'Link clicks', value: count(info.click_count), tone: 'text-sky-500' },
@@ -106,12 +113,13 @@ export default function AffiliatePanel({ onGoPayment }) {
     { icon: Crown, label: 'Referrals who bought VIP', value: count(info.vip_signup_count), tone: 'text-amber-500' },
     { icon: Gift, label: 'Total commission', value: money(info.total_commission), tone: 'text-emerald-600' },
     { icon: Coins, label: 'Wallet balance', value: money(info.balance), tone: 'text-[#eb7e37]' },
-  ];
+  ].filter((s) => part === 'all' || s.icon !== Coins);
 
   return (
     <div className="space-y-6">
+      {showAffiliate && (<>
       <div>
-        <h2 className="text-xl font-bold text-[#2b5356] flex items-center gap-2"><Gift className="w-6 h-6 text-[#0096b1]" /> Affiliate — refer friends, earn commission</h2>
+        <h2 className="text-xl font-bold text-[#2b5356] flex items-center gap-2"><Gift className="w-6 h-6 text-[#0096b1]" /> {part === 'affiliate' ? 'Affiliate Program' : 'Affiliate'} — refer friends, earn commission</h2>
         <p className="text-sm text-gray-500 mt-1">Share your affiliate link. When someone registers a new account through your link and buys a VIP package, you earn <b>{ratePct}% commission</b> on the amount they actually pay.</p>
         <Link to="/affiliate-guide" className="inline-flex items-center gap-1.5 mt-2 text-sm font-medium text-[#0096b1] hover:underline">
           <BookOpen className="w-4 h-4" /> Read the full guide
@@ -134,7 +142,7 @@ export default function AffiliatePanel({ onGoPayment }) {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className={`grid grid-cols-2 sm:grid-cols-3 ${part === 'all' ? 'lg:grid-cols-5' : 'lg:grid-cols-4'} gap-3`}>
         {stat.map((s, i) => (
           <div key={i} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-3">
             <s.icon className={`w-8 h-8 shrink-0 ${s.tone}`} />
@@ -145,10 +153,22 @@ export default function AffiliatePanel({ onGoPayment }) {
           </div>
         ))}
       </div>
+      </>)}
+
+      {showWallet && (<>
+      {part === 'wallet' && (
+        <div className="bg-gradient-to-r from-[#eb7e37]/10 to-[#0096b1]/5 rounded-xl p-5 border border-[#eb7e37]/20 flex items-center gap-4">
+          <Coins className="w-10 h-10 text-[#eb7e37] shrink-0" />
+          <div>
+            <div className="text-2xl font-bold text-gray-800">{money(info.balance)}</div>
+            <div className="text-xs text-gray-500">Wallet balance · Creator rewards + affiliate commission</div>
+          </div>
+        </div>
+      )}
 
       {/* Withdraw */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-        <div className="flex items-center gap-2 mb-3"><Wallet className="w-5 h-5 text-[#0096b1]" /><h3 className="font-bold text-gray-800">Withdraw commission</h3></div>
+        <div className="flex items-center gap-2 mb-3"><Wallet className="w-5 h-5 text-[#0096b1]" /><h3 className="font-bold text-gray-800">{part === 'wallet' ? 'Withdraw' : 'Withdraw commission'}</h3></div>
         {!info.can_withdraw ? (
           <p className="text-sm text-gray-500">You need at least <b>{money(info.withdraw_min)}</b> to withdraw. Current balance: <b>{money(info.balance)}</b>.</p>
         ) : (
@@ -219,6 +239,7 @@ export default function AffiliatePanel({ onGoPayment }) {
           </div>
         )}
       </div>
+      </>)}
     </div>
   );
 }

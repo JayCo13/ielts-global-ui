@@ -2,10 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import EditProfile from './EditProfile';
 import ExamHistory from './ExamHistory';
-import AffiliatePanel from './AffiliatePanel';
+import CreatorHub from './CreatorHub';
 import PaymentPanel from './PaymentPanel';
 import Navbar from './Navbar';
-import { User, Edit, History, ChevronLeft, ChevronRight, BarChart, Headphones, PenTool, ArrowLeft, ArrowRight, Lock, Eye, EyeOff, CheckCircle, AlertCircle, Gift, CreditCard } from 'lucide-react';
+import { Edit, History, ChevronLeft, ChevronRight, BarChart, Headphones, PenTool, ArrowLeft, ArrowRight, Lock, Eye, EyeOff, CheckCircle, AlertCircle, Gift, CreditCard } from 'lucide-react';
 import API_BASE from '../config/api';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
 
@@ -311,13 +311,23 @@ const ProfilePage = () => {
   const [profileData, setProfileData] = useState(null);
   const [testStats, setTestStats] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeView, setActiveView] = useState('profile'); // 'profile', 'edit', 'history', 'password', 'affiliate', 'payment'
+  // 2026-11: the Overview tab is hidden from the menu (brief), so the page opens on Edit Profile.
+  const [activeView, setActiveView] = useState('edit'); // 'profile', 'edit', 'history', 'password', 'affiliate' (= Creator Hub), 'payment'
+  const [hubAccess, setHubAccess] = useState(false);   // Creator Hub enabled → Payout Details visible
+  const onHubStatus = useCallback((s) => setHubAccess(!!(s && s.hub_access)), []);
 
-  // Open a specific tab when arriving via ?tab= (e.g. the Affiliate link in the navbar/guide).
+  // Open a specific tab when arriving via ?tab= (e.g. the Creator Hub link in the navbar/guide).
   useEffect(() => {
     const tab = new URLSearchParams(window.location.search).get('tab');
-    if (['edit', 'password', 'affiliate', 'payment'].includes(tab)) setActiveView(tab);
+    if (tab === 'creator-hub') setActiveView('affiliate');
+    else if (['edit', 'password', 'affiliate', 'payment'].includes(tab)) setActiveView(tab);
   }, []);
+
+  useEffect(() => {
+    if (localStorage.getItem('role') !== 'customer') return;
+    fetch(`${API_BASE}/creator-hub/status`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
+      .then((r) => (r.ok ? r.json() : null)).then(onHubStatus).catch(() => {});
+  }, [onHubStatus]);
   const [menuCollapsed, setMenuCollapsed] = useState(false);
   const [statsSection, setStatsSection] = useState(0); // 0 for overview, 1 for detailed stats
   const [imageTimestamp, setImageTimestamp] = useState(Date.now());
@@ -406,8 +416,8 @@ const ProfilePage = () => {
         return <ExamHistory />;
       case 'password':
         return <ChangePassword isGoogleAccount={profileData?.is_google_account} />;
-      case 'affiliate':
-        return <div className="flex-1 min-w-0"><AffiliatePanel onGoPayment={() => setActiveView('payment')} /></div>;
+      case 'affiliate':   // Creator Hub (Creator Program + Affiliate Program + shared wallet)
+        return <div className="flex-1 min-w-0"><CreatorHub onGoPayment={() => setActiveView('payment')} onStatus={onHubStatus} /></div>;
       case 'payment':
         return <div className="flex-1 min-w-0"><PaymentPanel /></div>;
       default:
@@ -671,15 +681,6 @@ const ProfilePage = () => {
               <hr />
               <nav className="space-y-4 mt-3">
                 <div
-                  className={`flex items-center gap-3 p-2 cursor-pointer rounded-lg hover:bg-gray-50 ${activeView === 'profile' ? 'text-[#0096b1] bg-[#0096b1]-50' : 'text-gray-600'
-                    }`}
-                  onClick={() => setActiveView('profile')}
-                  title={menuCollapsed ? "Profile Overview" : ""}
-                >
-                  <User className="w-5 h-5 min-w-5" />
-                  {!menuCollapsed && <span>Overview</span>}
-                </div>
-                <div
                   className={`flex items-center gap-3 p-2 cursor-pointer rounded-lg hover:bg-gray-50 ${activeView === 'edit' ? 'text-[#0096b1] bg-[#0096b1]-50' : 'text-gray-600'
                     }`}
                   onClick={() => setActiveView('edit')}
@@ -704,12 +705,12 @@ const ProfilePage = () => {
                       className={`flex items-center gap-3 p-2 cursor-pointer rounded-lg hover:bg-gray-50 ${activeView === 'affiliate' ? 'text-[#0096b1] bg-[#0096b1]-50' : 'text-gray-600'
                         }`}
                       onClick={() => setActiveView('affiliate')}
-                      title={menuCollapsed ? "Affiliate" : ""}
+                      title={menuCollapsed ? "Creator Hub" : ""}
                     >
                       <Gift className="w-5 h-5 min-w-5" />
-                      {!menuCollapsed && <span>Affiliate</span>}
+                      {!menuCollapsed && <span>Creator Hub</span>}
                     </div>
-                    <div
+                    {hubAccess && <div
                       className={`flex items-center gap-3 p-2 cursor-pointer rounded-lg hover:bg-gray-50 ${activeView === 'payment' ? 'text-[#0096b1] bg-[#0096b1]-50' : 'text-gray-600'
                         }`}
                       onClick={() => setActiveView('payment')}
@@ -717,7 +718,7 @@ const ProfilePage = () => {
                     >
                       <CreditCard className="w-5 h-5 min-w-5" />
                       {!menuCollapsed && <span>Payout Details</span>}
-                    </div>
+                    </div>}
                   </>
                 )}
               </nav>

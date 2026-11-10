@@ -235,6 +235,69 @@ function PracticeRoomPreview() {
   );
 }
 
+// ── Hero photo slideshow (brief 2026-11: four photos replace the mock window) ──
+// The previous PracticeRoomPreview is kept above, unused, in case the owner
+// wants it back.
+const HERO_PHOTOS = [
+  { src: '/img/hero/hero-1.webp', alt: 'A learner wearing headphones gives a thumbs-up next to a computer' },
+  { src: '/img/hero/hero-2.webp', alt: 'Learners practising English on computers' },
+  { src: '/img/hero/hero-3.webp', alt: 'Two learners working on English exercises at their computers' },
+  { src: '/img/hero/hero-4.webp', alt: 'A learner practising English online' },
+];
+
+function HeroPhotoCarousel() {
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    // Warm the cache so each crossfade starts with a decoded image.
+    HERO_PHOTOS.slice(1).forEach(({ src }) => { const im = new Image(); im.src = src; });
+  }, []);
+
+  useEffect(() => {
+    if (paused) return undefined;
+    const t = setInterval(() => setActive((a) => (a + 1) % HERO_PHOTOS.length), 3000);
+    return () => clearInterval(t);
+  }, [paused]);
+
+  return (
+    <div
+      className="relative rounded-[28px] p-[1px] bg-gradient-to-br from-white/30 via-white/10 to-transparent shadow-[0_40px_80px_-30px_rgba(0,0,0,0.6)]"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      <div className="relative overflow-hidden rounded-[27px] bg-[#0e2d59] aspect-[4/3]">
+        <AnimatePresence initial={false}>
+          <motion.img
+            key={HERO_PHOTOS[active].src}
+            src={HERO_PHOTOS[active].src}
+            alt={HERO_PHOTOS[active].alt}
+            className="absolute inset-0 w-full h-full object-cover"
+            initial={{ opacity: 0, scale: 1.06 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ opacity: { duration: 0.7 }, scale: { duration: 3.5, ease: 'linear' } }}
+            loading={active === 0 ? 'eager' : 'lazy'}
+            draggable={false}
+          />
+        </AnimatePresence>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/45 to-transparent" />
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+          {HERO_PHOTOS.map((p, i) => (
+            <button
+              key={p.src}
+              type="button"
+              aria-label={`Show photo ${i + 1}`}
+              onClick={() => setActive(i)}
+              className={`h-2 rounded-full transition-all ${i === active ? 'w-7 bg-white' : 'w-2 bg-white/50 hover:bg-white/80'}`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Scroll-to-top button (kept from the previous homepage).
 const ScrollToTopButton = () => {
   const [showScrollTop, setShowScrollTop] = React.useState(false);
@@ -416,7 +479,7 @@ const HomePage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
             >
-              <PracticeRoomPreview />
+              <HeroPhotoCarousel />
             </motion.div>
           </div>
 

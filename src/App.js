@@ -52,6 +52,9 @@ import DeliPolicy from './pages/adsense/DeliPolicy';
 import RefundPolicy from './pages/adsense/RefundPolicy';
 import AnnouncementDetail from './pages/AnnouncementDetail';
 import AffiliateGuide from './pages/AffiliateGuide';
+import WorkWithUs from './pages/WorkWithUs';
+import WorkWithUsFab from './components/WorkWithUsFab';
+import ScrollToTop from './components/ScrollToTop';
 import { captureReferral, claimReferral } from './utils/affiliateRef';
 import { initI18n } from './i18n';
 import Permission from './pages/adsense/Permission';
@@ -114,7 +117,9 @@ function App() {
     <HelmetProvider>
       <Router>
         <NotificationProvider>
+          <ScrollToTop />
           <ReferralClaimer />
+          <WorkWithUsFab />
           <Routes>
           {/* Public routes - accessible without authentication */}
           <Route path="/" element={<HomePage />} />
@@ -133,6 +138,7 @@ function App() {
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/news/:id" element={<AnnouncementDetail />} />
           <Route path="/affiliate-guide" element={<AffiliateGuide />} />
+          <Route path="/work-with-us" element={<WorkWithUs />} />
           <Route path="/permission" element={<Permission />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-failure" element={<PaymentFailure />} />
