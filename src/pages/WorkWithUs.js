@@ -112,18 +112,23 @@ function VideoCard({ v, ...rest }) {
   );
 }
 
+// Creator profile card: the photo fills the whole card (feedback 2026-11-10), text sits on a
+// dark gradient at the bottom so it stays readable on any photo.
 function CreatorCard({ c, ...rest }) {
   const Wrap = c.profile_url ? 'a' : 'div';
   const linkProps = c.profile_url ? { href: c.profile_url, target: '_blank', rel: 'noopener noreferrer' } : {};
   return (
-    <Wrap {...rest} {...linkProps} className="shrink-0 w-[220px] rounded-2xl bg-white border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+    <Wrap {...rest} {...linkProps} className="group/card relative shrink-0 w-[250px] sm:w-[280px] aspect-[4/5] rounded-3xl overflow-hidden shadow-lg ring-1 ring-black/5 hover:-translate-y-1 hover:shadow-xl transition-all" style={{ background: `linear-gradient(160deg, ${BLUE}, ${NAVY})` }}>
       {c.avatar_url
-        ? <img src={c.avatar_url} alt={c.name} loading="lazy" className="w-14 h-14 rounded-full object-cover" />
-        : <div className="w-14 h-14 rounded-full grid place-items-center text-white text-xl font-bold" style={{ background: BLUE }}>{(c.name || '?')[0]}</div>}
-      {c.earned && <div className="mt-3 text-2xl font-extrabold" style={{ color: BLUE }}>{c.earned}</div>}
-      <div className="font-semibold text-gray-900">{c.name}</div>
-      {c.subtitle && <div className="text-xs text-gray-500 mt-0.5">{c.subtitle}</div>}
-      {c.note && <div className="text-xs text-gray-400 italic mt-2">{c.note}</div>}
+        ? <img src={c.avatar_url} alt={c.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105" />
+        : <div className="absolute inset-0 grid place-items-center text-white/90 text-7xl font-extrabold">{(c.name || '?')[0]}</div>}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+        {c.earned && <div className="text-3xl font-extrabold leading-none drop-shadow" style={{ color: '#7cc4ff' }}>{c.earned}</div>}
+        <div className="mt-2 text-lg font-bold leading-tight" data-no-translate>{c.name}</div>
+        {c.subtitle && <div className="text-sm text-white/80 mt-0.5">{c.subtitle}</div>}
+        {c.note && <div className="text-sm text-white/70 italic mt-2 line-clamp-2">{c.note}</div>}
+      </div>
     </Wrap>
   );
 }
@@ -561,7 +566,7 @@ export default function WorkWithUs() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Seo
-        title="Work With Us – Become a UGC Creator | EnglishOnComputer"
+        title="Work With Us – Become a Creator | EnglishOnComputer"
         description="Create short videos for EnglishOnComputer and earn from views plus a commission on every purchase through your link. No experience needed, no upfront costs."
         path="/work-with-us"
       />
@@ -573,7 +578,7 @@ export default function WorkWithUs() {
           <div className="pointer-events-none absolute -bottom-40 right-0 w-[26rem] h-[26rem] rounded-full blur-3xl opacity-20" style={{ background: ORANGE }} />
           <div className="relative max-w-5xl mx-auto px-5 sm:px-8 pt-14 pb-12 lg:pt-20 text-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1 text-sm font-medium text-white/85">Work With Us</span>
-            <h1 className="mt-5 text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight">Become a <span style={{ color: ORANGE }}>UGC Creator</span></h1>
+            <h1 className="mt-5 text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1]">Become a <span style={{ color: ORANGE }}>Creator</span> for a Global Online Education Platform</h1>
             <p className="mt-4 text-lg sm:text-xl text-white/80">Create content. Earn money. Work anywhere.</p>
             <ul className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-white/85">
               {['No experience needed.', 'No upfront costs.'].map((t) => (
@@ -674,6 +679,25 @@ export default function WorkWithUs() {
             ))}
           </div>
           <div className="mt-8 text-center"><Cta>Try for Free</Cta></div>
+        </section>
+
+        {/* CLOSING CTA (feedback 2026-11-10) */}
+        <section className="relative overflow-hidden text-white" style={{ background: '#050b18' }}>
+          <div className="pointer-events-none absolute left-1/2 top-full -translate-x-1/2 -translate-y-1/2 w-[46rem] h-[22rem] rounded-full blur-3xl opacity-25" style={{ background: BLUE }} />
+          <div className="relative max-w-4xl mx-auto px-5 sm:px-8 py-20 text-center">
+            <div className="text-6xl sm:text-7xl" aria-hidden="true">⏰</div>
+            <h2 className="mt-6 text-3xl sm:text-5xl font-extrabold tracking-tight">While you hesitate, others are earning</h2>
+            <p className="mt-4 text-lg text-white/60">Just a phone and ambition.</p>
+            <p className="mt-7 inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-2.5 text-sm sm:text-base">
+              <span aria-hidden="true">🎁</span> Premium content guide for signup
+            </p>
+            <div className="mt-8">
+              <button type="button" onClick={() => setOpen(true)}
+                className="inline-flex items-center gap-2 rounded-2xl px-8 sm:px-12 py-4 text-base sm:text-lg font-semibold text-white bg-gradient-to-b from-[#5b9dff] to-[#2563eb] shadow-[0_0_40px_rgba(59,130,246,0.45)] transition-transform hover:-translate-y-0.5">
+                Sign up and claim your guide <ArrowRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
         </section>
       </main>
       <Footer />

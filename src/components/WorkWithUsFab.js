@@ -20,9 +20,9 @@ export default function WorkWithUsFab() {
       className="fixed right-0 top-1/2 -translate-y-1/2 z-[997] group"
     >
       <span className="absolute inset-0 rounded-l-2xl bg-[#f28c28] animate-ping opacity-30" />
-      <span className="relative flex flex-col items-center gap-1.5 rounded-l-2xl bg-gradient-to-b from-[#f7a14a] to-[#f28c28] px-2 py-3 text-white shadow-lg transition-all group-hover:pr-3.5">
-        <Sparkles className="w-4 h-4 animate-pulse" />
-        <span className="text-xs font-bold tracking-wide [writing-mode:vertical-rl] rotate-180">Work With Us</span>
+      <span className="relative flex flex-col items-center gap-2 rounded-l-2xl bg-gradient-to-b from-[#f7a14a] to-[#f28c28] px-2.5 py-4 text-white shadow-lg transition-all group-hover:pr-4">
+        <Sparkles className="w-5 h-5 animate-pulse" />
+        <span className="text-sm sm:text-base font-extrabold tracking-wide [writing-mode:vertical-rl] rotate-180">Work With Us</span>
       </span>
     </Link>
   );

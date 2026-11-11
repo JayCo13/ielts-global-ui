@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Coins, Gift, Copy, Check, Wallet, Send, Clock, BookOpen, MousePointerClick, UserPlus, Crown } from 'lucide-react';
+import { Coins, Gift, Copy, Check, Wallet, Send, Clock, BookOpen, MousePointerClick, UserPlus, Crown, HandCoins as BanknoteArrowUp } from 'lucide-react';
 import API_BASE from '../config/api';
 
 // Affiliate tab of the Profile page (ported from the Vietnam tree).
@@ -103,6 +103,8 @@ export default function AffiliatePanel({ onGoPayment, part = 'all' }) {
       : { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     return currency === 'USD' ? `$${s}` : `${s} ${currency}`;
   };
+  const totalWithdrawn = withdrawals.filter((w) => w.status === 'paid').reduce((s, w) => s + Number(w.amount || 0), 0);
+  const pendingWithdraw = withdrawals.filter((w) => w.status === 'pending').reduce((s, w) => s + Number(w.amount || 0), 0);
   const ratePct = info.rate_pct != null
     ? Number(info.rate_pct).toLocaleString('en-US', { maximumFractionDigits: 1 })
     : Math.round((info.commission_rate || 0.05) * 100);
@@ -119,8 +121,9 @@ export default function AffiliatePanel({ onGoPayment, part = 'all' }) {
     <div className="space-y-6">
       {showAffiliate && (<>
       <div>
-        <h2 className="text-xl font-bold text-[#2b5356] flex items-center gap-2"><Gift className="w-6 h-6 text-[#0096b1]" /> {part === 'affiliate' ? 'Affiliate Program' : 'Affiliate'} — refer friends, earn commission</h2>
-        <p className="text-sm text-gray-500 mt-1">Share your affiliate link. When someone registers a new account through your link and buys a VIP package, you earn <b>{ratePct}% commission</b> on the amount they actually pay.</p>
+        {/* In Creator Hub the section header already names the program. */}
+        {part !== 'affiliate' && <h2 className="text-xl font-bold text-[#2b5356] flex items-center gap-2 mb-1"><Gift className="w-6 h-6 text-[#0096b1]" /> Affiliate — refer friends, earn commission</h2>}
+        <p className="text-sm text-gray-500">Share your affiliate link. When someone registers a new account through your link and buys a VIP package, you earn <b>{ratePct}% commission</b> on the amount they actually pay.</p>
         <Link to="/affiliate-guide" className="inline-flex items-center gap-1.5 mt-2 text-sm font-medium text-[#0096b1] hover:underline">
           <BookOpen className="w-4 h-4" /> Read the full guide
         </Link>
@@ -157,11 +160,21 @@ export default function AffiliatePanel({ onGoPayment, part = 'all' }) {
 
       {showWallet && (<>
       {part === 'wallet' && (
-        <div className="bg-gradient-to-r from-[#eb7e37]/10 to-[#0096b1]/5 rounded-xl p-5 border border-[#eb7e37]/20 flex items-center gap-4">
-          <Coins className="w-10 h-10 text-[#eb7e37] shrink-0" />
-          <div>
-            <div className="text-2xl font-bold text-gray-800">{money(info.balance)}</div>
-            <div className="text-xs text-gray-500">Wallet balance · Creator rewards + affiliate commission</div>
+        <div className="bg-gradient-to-r from-[#eb7e37]/10 to-[#0096b1]/5 rounded-xl p-5 border border-[#eb7e37]/20 flex flex-wrap items-center gap-x-8 gap-y-4">
+          <div className="flex items-center gap-4">
+            <Coins className="w-10 h-10 text-[#eb7e37] shrink-0" />
+            <div>
+              <div className="text-2xl font-bold text-gray-800">{money(info.balance)}</div>
+              <div className="text-xs text-gray-500">Wallet balance · Creator rewards + affiliate commission</div>
+            </div>
+          </div>
+          {/* Total withdrawn = paid withdrawal requests (feedback 2026-11-10) */}
+          <div className="flex items-center gap-4 sm:pl-8 sm:border-l sm:border-gray-200">
+            <BanknoteArrowUp className="w-10 h-10 text-emerald-600 shrink-0" />
+            <div>
+              <div className="text-2xl font-bold text-gray-800">{money(totalWithdrawn)}</div>
+              <div className="text-xs text-gray-500">Total withdrawn{pendingWithdraw > 0 && <> · {money(pendingWithdraw)} pending</>}</div>
+            </div>
           </div>
         </div>
       )}
