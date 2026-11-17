@@ -597,7 +597,17 @@ const SpeakingRoom = () => {
             setLive(null);
             return !stale();
         }
-        const text = res.feedback;
+        // NFC + chỉ cắt ở ranh giới TỪ: cắt giữa một chữ tiếng Việt (nhất là dấu tổ hợp)
+        // làm chữ vỡ dấu / dính vào nhau (feedback 2026-11-17).
+        const text = String(res.feedback).normalize('NFC');
+        const cuts = [0];
+        text.replace(/\S+/g, (w, i) => { cuts.push(i + w.length); return w; });
+        const upTo = (p) => {
+            const want = text.length * p;
+            let best = 0;
+            for (const c of cuts) { if (c <= want + 0.5) best = c; else break; }
+            return p >= 1 ? text.length : best;
+        };
         setLive({ status: 'speaking', text, mood: res.mood, shown: 0 });
         await new Promise((resolve) => {
             let settled = false;
@@ -623,7 +633,7 @@ const SpeakingRoom = () => {
                 tick = setInterval(() => {
                     if (stale()) { done(); return; }
                     const p = Math.min(1, (Date.now() - t0) / total);
-                    setLive((l) => (l ? { ...l, shown: Math.round(text.length * p) } : l));
+                    setLive((l) => (l ? { ...l, shown: upTo(p) } : l));
                     if (p >= 1) done();
                 }, 120);
             };
@@ -636,7 +646,7 @@ const SpeakingRoom = () => {
                 if (stale()) { done(); return; }
                 if (Number.isFinite(el.duration) && el.duration > 0) {
                     const p = Math.min(1, el.currentTime / el.duration);
-                    setLive((l) => (l ? { ...l, shown: Math.round(text.length * p) } : l));
+                    setLive((l) => (l ? { ...l, shown: upTo(p) } : l));
                 }
             }, 120);
             const started = el.play();
