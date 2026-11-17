@@ -213,3 +213,29 @@ export const scoreLessonItem = async (itemId, blob, ext) => {
     if (!res.ok) throw await asError(res);
     return res.json();
 };
+
+// ── Live Action with an Examiner (2026-11-14) ─────────────────────────────────────────
+// Gửi SONG SONG với submitAnswer, cùng bản ghi âm: giám khảo nhận xét ngay mà không phải
+// chờ lưu R2 + Whisper. Không lưu gì, không ảnh hưởng chấm điểm khi Submit.
+export const liveFeedback = async (attemptId, { orderIndex, lang, text, blob, ext, signal }) => {
+    const form = new FormData();
+    form.append('order_index', String(orderIndex));
+    form.append('lang', lang || 'en');
+    if (text) form.append('text', text);
+    if (blob && blob.size) form.append('audio', blob, `answer.${ext || 'webm'}`);
+    const res = await fetch(`${API_BASE}/student/speaking/live/attempts/${attemptId}/feedback`, {
+        method: 'POST', headers: authHeaders(), body: form, signal,
+    });
+    if (!res.ok) throw await asError(res);
+    return res.json();
+};
+
+// Chế độ Live + ngôn ngữ feedback đi theo bài thi. Lưu sessionStorage để F5 giữa bài
+// vẫn giữ đúng chế độ (máy chủ không lưu gì về Live Action).
+const LIVE_KEY = (attemptId) => `speaking_live_${attemptId}`;
+export const rememberLive = (attemptId, lang) => {
+    try { sessionStorage.setItem(LIVE_KEY(attemptId), lang || 'en'); } catch (e) { /* private mode */ }
+};
+export const recallLive = (attemptId) => {
+    try { return sessionStorage.getItem(LIVE_KEY(attemptId)); } catch (e) { return null; }
+};

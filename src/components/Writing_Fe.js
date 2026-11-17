@@ -431,9 +431,15 @@ const Writing_Fe = () => {
                   (stars for VIP, a compact unlock link otherwise) on its own line so
                   long labels / translations never squeeze the row above. */}
               <div className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-2 min-w-0">
+                <span className="flex items-center gap-2 min-w-0 flex-1">
                   <span className="font-medium text-gray-700 whitespace-nowrap">Part {task.part_number}</span>
-                  <DifficultyBadge label={task.difficulty_label} />
+                  {/* Title auto-taken from the prompt, like Listening / Reading cards (feedback 2026-11-14). */}
+                  {task.display_title && (
+                    <span className="min-w-0 flex-1 truncate text-gray-700" title={task.display_title} data-no-translate>
+                      {task.display_title}
+                    </span>
+                  )}
+                  <DifficultyBadge label={task.difficulty_label} className="shrink-0" />
                 </span>
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="whitespace-nowrap">{task.word_limit} words</span>

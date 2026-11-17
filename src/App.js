@@ -53,7 +53,6 @@ import RefundPolicy from './pages/adsense/RefundPolicy';
 import AnnouncementDetail from './pages/AnnouncementDetail';
 import AffiliateGuide from './pages/AffiliateGuide';
 import WorkWithUs from './pages/WorkWithUs';
-import WorkWithUsFab from './components/WorkWithUsFab';
 import ScrollToTop from './components/ScrollToTop';
 import { captureReferral, claimReferral } from './utils/affiliateRef';
 import { initI18n } from './i18n';
@@ -119,7 +118,6 @@ function App() {
         <NotificationProvider>
           <ScrollToTop />
           <ReferralClaimer />
-          <WorkWithUsFab />
           <Routes>
           {/* Public routes - accessible without authentication */}
           <Route path="/" element={<HomePage />} />

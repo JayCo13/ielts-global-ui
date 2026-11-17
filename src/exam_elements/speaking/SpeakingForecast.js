@@ -13,11 +13,13 @@ import {
     ChevronLeft, Star, Loader2, Lock, Crown, AlertCircle, Play, X, Check, Wrench,
     Search, Target, Volume2, FileSearch, CalendarDays, Sparkles, PenLine,
 } from 'lucide-react';
-import { fetchForecast, fetchForecastTopic, startForecast, fetchSetup, examinerAudioUrl } from './speakingApi';
+import { fetchForecast, fetchForecastTopic, startForecast, fetchSetup, examinerAudioUrl, rememberLive } from './speakingApi';
+import { ModeChooser } from './LiveMode';
 import ComposeSample from './ComposeSample';
 import QuotaPills from './QuotaPills';
 import AttemptHistory, { History } from './AttemptHistory';
 import DifficultyBadge from '../../components/DifficultyBadge';
+import { ExaminerFace } from './ExaminerAvatar';
 
 const SECTIONS = [
     { key: 'part1', label: 'Part 1', hint: 'Topics about yourself' },
@@ -280,6 +282,8 @@ const SpeakingForecast = () => {
     const [composeQ, setComposeQ] = useState(null);
     const [starting, setStarting] = useState(false);
     const [query, setQuery] = useState('');           // tìm theo tên chủ đề
+    // Jump straight to one topic group (Places, People…) instead of scrolling (feedback 2026-11-14).
+    const [group, setGroup] = useState('');
     const [voices, setVoices] = useState([]);         // chọn giọng ngay ở đây, không phải
     const [voice, setVoice] = useState('');           // quay về màn thi thử mới đổi được
     const [months, setMonths] = useState([]);         // tháng thi có đề Forecast
@@ -318,18 +322,26 @@ const SpeakingForecast = () => {
         el.play().catch(() => { /* chưa có clip cho giọng này thì thôi */ });
     };
 
-    const start = async (topicId, section, questionId) => {
+    // Live Action (2026-11-14): bấm luyện một câu / cả chủ đề thì hỏi chế độ trước —
+    // Serious Practice (như cũ) hay Live Action with an Examiner.
+    const [pendingStart, setPendingStart] = useState(null);
+    const start = (topicId, section, questionId) => setPendingStart({ topicId, section, questionId });
+
+    const reallyStart = async ({ live, lang }) => {
+        const { topicId, section, questionId } = pendingStart || {};
         setStarting(true);
         try {
             const res = await startForecast({
                 topic_id: topicId, section, question_id: questionId, voice: voice || undefined,
             });
+            if (live) rememberLive(res.attempt_id, lang);
             navigate('/speaking_test', {
-                state: { attemptId: res.attempt_id, plan: res.plan },
+                state: { attemptId: res.attempt_id, plan: res.plan, live: live ? lang : null },
             });
         } catch (e) {
             setError(e.message);
             setOpen(null);
+            setPendingStart(null);
         } finally {
             setStarting(false);
         }
@@ -359,9 +371,11 @@ const SpeakingForecast = () => {
     const match = (t) => !query.trim()
         || (t.title || '').toLowerCase().includes(query.trim().toLowerCase());
     const raw = data?.sections?.[tab];
+    const allGroups = raw?.groups || [];
     const section = raw && (raw.topics
         ? { ...raw, topics: raw.topics.filter(match) }
-        : { ...raw, groups: (raw.groups || []).map((g) => ({ ...g, topics: g.topics.filter(match) }))
+        : { ...raw, groups: allGroups.filter((g) => !group || g.key === group)
+            .map((g) => ({ ...g, topics: g.topics.filter(match) }))
             .filter((g) => g.topics.length) });
 
     return (
@@ -387,7 +401,7 @@ const SpeakingForecast = () => {
             <div className="max-w-5xl mx-auto px-4 pt-4">
                 <div className="flex gap-2">
                     {SECTIONS.map((s) => (
-                        <button key={s.key} onClick={() => setTab(s.key)}
+                        <button key={s.key} onClick={() => { setTab(s.key); setGroup(''); }}
                                 className={`px-5 py-2.5 rounded-xl text-base font-bold transition ${
                                     tab === s.key ? 'bg-[#0096b1] text-white'
                                                   : 'bg-white text-gray-600 border border-gray-200 hover:border-[#0096b1]/40'}`}>
@@ -410,12 +424,12 @@ const SpeakingForecast = () => {
                             {voices.map((v) => (
                                 <button key={v.name} type="button" onClick={() => pickVoice(v.name)}
                                         title={`Preview ${v.label || v.name}`}
-                                        className={`px-3 py-1.5 rounded-lg text-sm font-semibold border-2 ${
+                                        className={`inline-flex items-center pl-1.5 pr-3 py-1 rounded-lg text-sm font-semibold border-2 ${
                                             voice === v.name
                                                 ? 'border-[#0096b1] bg-[#0096b1]/8 text-[#0096b1]'
                                                 : 'border-gray-200 text-gray-600 hover:border-[#0096b1]/50'}`}>
-                                    <Volume2 size={12} className="inline mr-1 -mt-0.5 opacity-70" />
-                                    {v.label || v.name}
+                                    <ExaminerFace voice={v.name} size={20} />
+                                    <span className="ml-1.5">{v.label || v.name}</span>
                                     <span className="ml-1 text-xs opacity-60">{v.accent_label}</span>
                                 </button>
                             ))}
@@ -447,6 +461,21 @@ const SpeakingForecast = () => {
                         Hide topics already done
                     </label>
                 </div>
+
+                {!!allGroups.length && (
+                    <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                        <span className="text-xs font-semibold text-gray-500 mr-1">Topic:</span>
+                        {[{ key: '', label: 'All topics' }, ...allGroups].map((g) => (
+                            <button key={g.key || 'all'} type="button" onClick={() => setGroup(g.key)}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${
+                                        group === g.key ? 'bg-[#0096b1] text-white border-[#0096b1]'
+                                                        : 'bg-white text-gray-600 border-gray-200 hover:border-[#0096b1]/50'}`}>
+                                {g.label}
+                                {g.key && <span className="ml-1 opacity-70">{g.topics.length}</span>}
+                            </button>
+                        ))}
+                    </div>
+                )}
 
                 <div className="mt-4"><Legend /></div>
 
@@ -555,6 +584,10 @@ const SpeakingForecast = () => {
                 <AttemptHistory kind="forecast" />
             </div>
 
+            {pendingStart && (
+                <ModeChooser starting={starting} onClose={() => setPendingStart(null)}
+                             onPick={reallyStart} />
+            )}
             {open != null && (
                 <TopicDetail topicId={open} section={tab} starting={starting}
                              onClose={() => setOpen(null)} onStart={start}

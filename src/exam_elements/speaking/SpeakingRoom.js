@@ -16,20 +16,24 @@ import useExamHeartbeat from '../../utils/useExamHeartbeat';
 import useTabSwitchCount from '../../utils/useTabSwitchCount';
 import {
     AlertCircle, CheckCircle2, ChevronDown, Eye, Lightbulb, Loader2, LogOut, MicOff,
-    Pause, Play, Send, Star, Volume2,
+    Pause, Play, Send, Star, Volume2, SkipForward,
 } from 'lucide-react';
 import {
     beaconFinish, examinerAudioUrl, fetchAttempt, fetchHelp, finishTest,
-    requestAiFollowup, submitAnswer,
+    requestAiFollowup, submitAnswer, liveFeedback, recallLive,
 } from './speakingApi';
 import { createRecorder } from './recorder';
 import Outline from './Outline';
+import ExaminerAvatar from './ExaminerAvatar';
 import { useExamGuard } from '../../utils/examGuard';
 
 const ANSWER_KINDS = ['question', 'cue_card', 'ai_followup'];
 // §4.4 — rời màn hình quá ngưỡng này thì bài bị dừng.
 const AWAY_LIMIT_MS = 30000;
 const SILENT_STREAK_LIMIT = 3;
+// Live Action: chờ AI tối đa chừng này rồi bỏ qua nhận xét, đi tiếp câu sau — không để
+// việc phân tích làm đứng buổi luyện (brief §3, "rất quan trọng").
+const LIVE_WAIT_MS = 20000;
 
 const PART_LABEL = {
     part1: 'Part 1', part2: 'Part 2', part2_followup: 'Part 2', part3: 'Part 3',
@@ -91,21 +95,15 @@ const ROOM_CSS = `
  * nhìn vào đâu ngay khi màn đổi. `ring` chỉ bật lúc đang đọc đề: vòng lan nghĩa là đang
  * phát ra tiếng, bật ở trạng thái khác là nói dối người dùng.
  */
-const Mascot = ({ size = 72, ring = false, dim = false }) => (
-    <div className="relative flex items-center justify-center shrink-0">
-        {ring && (
-            <span aria-hidden="true" className="ttm-ring absolute"
-                  style={{ width: size, height: size, borderRadius: size * 0.26,
-                           border: '2px solid #7dd3fc' }} />
-        )}
-        <div className="relative bg-white flex items-center justify-center overflow-hidden"
-             style={{ width: size, height: size, borderRadius: size * 0.22,
-                      opacity: dim ? 0.55 : 1 }}>
-            <img src="/img/logo-eoc-icon.png" alt="Examiner"
-                 style={{ width: size * 0.88, height: size * 0.88, objectFit: 'contain' }} />
-        </div>
-    </div>
-);
+// Voice of this attempt → which examiner appears (feedback 2026-11-14: each examiner is a
+// person on a video call instead of the logo).
+const ExaminerVoice = React.createContext(null);
+const Mascot = ({ size = 72, ring = false, dim = false }) => {
+    const voice = React.useContext(ExaminerVoice);
+    // Small slots (next to a heading) stay compact; the main slots get a real video tile.
+    const h = size < 60 ? size : Math.round(size * 1.3);
+    return <ExaminerAvatar voice={voice} size={h} speaking={ring} dim={dim} />;
+};
 
 /**
  * Cột sóng âm. `level` là âm lượng micro thật (0–1): có nó thì cột nhảy theo tiếng nói,
@@ -282,6 +280,17 @@ const SpeakingRoom = () => {
     const [replaying, setReplaying] = useState(false);
     const [countdown, setCountdown] = useState(null);
 
+    // ── Live Action with an Examiner (2026-11-14) ──
+    // Ngôn ngữ feedback, hoặc null = luyện tập bình thường. Đến từ router state; F5 giữa
+    // bài thì lấy lại từ sessionStorage (máy chủ không lưu gì về Live Action).
+    const liveLang = useMemo(() => location.state?.live || (attemptId ? recallLive(attemptId) : null),
+        [location.state, attemptId]);
+    const isLive = !!liveLang;
+    const [live, setLive] = useState(null);           // {status: thinking|speaking|error, text, mood, shown}
+    const liveRef = useRef(null);                     // Promise nhận xét của câu vừa nộp
+    const liveAudioRef = useRef(null);
+    const liveSkipRef = useRef(null);
+
     // Cờ điều khiển máy trạng thái — để trong ref vì các callback đo âm thanh và đồng hồ
     // chạy ngoài chu kỳ render, đọc state ở đó sẽ lấy phải giá trị cũ.
     // Mỗi lần bắt đầu / tạm dừng / tiếp tục một bước sẽ tăng số này lên. Mọi việc chạy
@@ -385,6 +394,7 @@ const SpeakingRoom = () => {
         busyRef.current = true;
         try { if (recorderRef.current) await recorderRef.current.stop(); } catch (e) { /* mic đã tắt */ }
         if (audioRef.current) { audioRef.current.pause(); }
+        if (liveAudioRef.current) { liveAudioRef.current.pause(); }
         setPhase('ended');
         setEnded({ status, reason, submitted: status === 'completed' });
         try {
@@ -431,6 +441,8 @@ const SpeakingRoom = () => {
         pausedRef.current = true;
         runIdRef.current += 1;          // huỷ mọi việc đang chạy dở của bước hiện tại
         if (audioRef.current) audioRef.current.pause();
+        if (liveAudioRef.current) liveAudioRef.current.pause();
+        if (liveSkipRef.current) liveSkipRef.current();
         // Dừng hẳn micro: tạm dừng mà vẫn ghi thì thí sinh nói gì lúc nghỉ cũng bị tính.
         if (recorderRef.current) recorderRef.current.stop().catch(() => {});
         answeringRef.current = null;
@@ -532,6 +544,18 @@ const SpeakingRoom = () => {
         }
         const text = subtitle ? typed.trim() : '';
         const finalStatus = status || ((spoke || text) ? 'answered' : 'no_answer');
+        // Live Action: gửi cùng bản ghi sang giám khảo NGAY, song song với việc lưu câu trả lời.
+        liveRef.current = null;
+        if (liveLang && (spoke || text) && (text || (blob && blob.size))) {
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), LIVE_WAIT_MS);
+            liveRef.current = liveFeedback(attemptId, {
+                orderIndex: current.order_index, lang: liveLang, text, blob,
+                ext: recorderRef.current ? recorderRef.current.extension() : 'webm',
+                signal: ctrl.signal,
+            }).then((r) => r, (e) => ({ error: e.name === 'AbortError' ? 'timeout' : (e.message || 'error') }))
+              .finally(() => clearTimeout(timer));
+        }
         try {
             const res = await submitAnswer(attemptId, {
                 orderIndex: current.order_index,
@@ -549,7 +573,83 @@ const SpeakingRoom = () => {
             setBanner('This answer could not be sent. The test will continue.');
             return null;
         }
-    }, [attemptId, subtitle, typed]);
+    }, [attemptId, subtitle, typed, liveLang]);
+
+    // ── Live Action: giám khảo nhận xét bằng giọng nói, chữ chạy theo giọng ──
+    // Luôn resolve. Bị tạm dừng / thoát giữa chừng thì tắt tiếng và trả về false.
+    const playLive = useCallback(async () => {
+        const pending = liveRef.current;
+        liveRef.current = null;
+        if (!pending) return true;
+        const runId = runIdRef.current;
+        const stale = () => runId !== runIdRef.current || endedRef.current;
+        setPhase('feedback');
+        setLive({ status: 'thinking', text: '', shown: 0 });
+        const res = await Promise.race([
+            pending,
+            new Promise((r) => { liveSkipRef.current = () => r({ skipped: true }); }),
+        ]);
+        if (stale()) { setLive(null); return false; }
+        if (!res || res.error || res.skipped || !res.feedback) {
+            setLive(res && res.error && !res.skipped
+                ? { status: 'error', text: res.error === 'timeout' ? '' : res.error, shown: 0 } : null);
+            if (res && res.error && !res.skipped) await new Promise((r) => setTimeout(r, 1800));
+            setLive(null);
+            return !stale();
+        }
+        const text = res.feedback;
+        setLive({ status: 'speaking', text, mood: res.mood, shown: 0 });
+        await new Promise((resolve) => {
+            let settled = false;
+            let tick = null;
+            let guard = null;
+            const el = liveAudioRef.current;
+            const done = () => {
+                if (settled) return;
+                settled = true;
+                clearInterval(tick); clearTimeout(guard);
+                if (el) { el.pause(); el.onended = null; el.onerror = null; }
+                liveSkipRef.current = null;
+                setLive((l) => (l ? { ...l, shown: text.length } : l));
+                resolve();
+            };
+            liveSkipRef.current = done;
+            // Không có tiếng (TTS chưa cấu hình / lỗi) hoặc trình duyệt chặn phát: cho chữ
+            // chạy theo tốc độ đọc rồi đi tiếp.
+            const readOnly = () => {
+                const total = readingMs(text) + 1500;
+                const t0 = Date.now();
+                clearInterval(tick);
+                tick = setInterval(() => {
+                    if (stale()) { done(); return; }
+                    const p = Math.min(1, (Date.now() - t0) / total);
+                    setLive((l) => (l ? { ...l, shown: Math.round(text.length * p) } : l));
+                    if (p >= 1) done();
+                }, 120);
+            };
+            if (!el || !res.audio) { readOnly(); return; }
+            el.src = `data:${res.audio_mime || 'audio/mpeg'};base64,${res.audio}`;
+            el.onended = done;
+            el.onerror = () => readOnly();
+            guard = setTimeout(done, 75000);
+            tick = setInterval(() => {
+                if (stale()) { done(); return; }
+                if (Number.isFinite(el.duration) && el.duration > 0) {
+                    const p = Math.min(1, el.currentTime / el.duration);
+                    setLive((l) => (l ? { ...l, shown: Math.round(text.length * p) } : l));
+                }
+            }, 120);
+            const started = el.play();
+            if (started && started.catch) started.catch(() => readOnly());
+        });
+        if (stale()) { setLive(null); return false; }
+        // Để học viên kịp đọc nốt câu cuối trước khi sang câu mới.
+        await new Promise((r) => setTimeout(r, 900));
+        setLive(null);
+        return !stale();
+    }, []);
+
+    const skipLive = () => { if (liveSkipRef.current) liveSkipRef.current(); };
 
     // ── Chạy một bước của đề ──
     const advance = useCallback(() => {
@@ -576,7 +676,7 @@ const SpeakingRoom = () => {
             return;
         }
         // Câu quá ngắn: Luyện tập được mời trả lời lại, Thi thử thì hệ thống không can thiệp.
-        if (!isMock && res && res.suggest_retry && !(opts && opts.isRetry)) {
+        if (!isMock && !isLive && res && res.suggest_retry && !(opts && opts.isRetry)) {
             setPhase('answer');
             setRetryOffer(true);
             return;
@@ -585,8 +685,15 @@ const SpeakingRoom = () => {
         if (current.kind === 'cue_card' && current.stop_key) {
             await speak(current.stop_key, 'Thank you.', runIdRef.current);
         }
+        // Live Action: giám khảo nhận xét xong mới sang câu tiếp theo. Bị tạm dừng giữa
+        // lúc nhận xét thì vẫn chuyển chỉ số câu (runStep tự đứng yên vì đang pause), để
+        // lúc tiếp tục không bị hỏi lại câu đã trả lời.
+        if (isLive) {
+            await playLive();
+            if (endedRef.current) return;
+        }
         advance();
-    }, [sendAnswer, isMock, endAttempt, advance, speak]);
+    }, [sendAnswer, isMock, isLive, playLive, endAttempt, advance, speak]);
 
     const finishRef = useRef(finishAnswer);
     useEffect(() => { finishRef.current = finishAnswer; }, [finishAnswer]);
@@ -846,9 +953,11 @@ const SpeakingRoom = () => {
     );
 
     return (
+        <ExaminerVoice.Provider value={plan?.voice || null}>
         <div className="min-h-screen flex flex-col" style={{ background: '#eef1f1' }}>
             <style>{ROOM_CSS}</style>
             <audio ref={audioRef} className="hidden" />
+            <audio ref={liveAudioRef} className="hidden" />
 
             {/* ── Thanh đầu: đang ở Part nào, câu thứ mấy, còn bao lâu ── */}
             <header className="bg-white border-b border-gray-200 sticky top-0 z-20">
@@ -859,7 +968,7 @@ const SpeakingRoom = () => {
                             {partLabel || 'Speaking'}
                         </span>
                         <span className="text-sm font-extrabold uppercase tracking-[0.06em] text-gray-400">
-                            {isMock ? 'Mock test' : 'Practice'}
+                            {isMock ? 'Mock test' : isLive ? 'Live Action' : 'Practice'}
                         </span>
                     </div>
 
@@ -968,6 +1077,39 @@ const SpeakingRoom = () => {
                                             Listen to the whole question, then answer. The microphone turns on when the examiner finishes.
                                         </p>
                                     )}
+                                </div>
+                            )}
+
+                            {phase === 'feedback' && live && (
+                                <div className="flex flex-col items-center gap-5 text-center">
+                                    {eyebrow(live.status === 'thinking' ? 'THE EXAMINER IS THINKING…'
+                                        : live.status === 'error' ? 'NO FEEDBACK THIS TIME' : 'LIVE FEEDBACK', '#ffd0ae')}
+                                    <Mascot size={live.status === 'speaking' ? 108 : 84} ring={live.status === 'speaking'} />
+                                    {live.status === 'thinking' && (
+                                        <p className="m-0 text-[15px] text-[#dff0f1] max-w-[460px] inline-flex items-center gap-2">
+                                            <Loader2 size={16} className="animate-spin" />
+                                            Listening back to your answer…
+                                        </p>
+                                    )}
+                                    {live.status === 'error' && (
+                                        <p className="m-0 text-[15px] text-[#dff0f1] max-w-[460px]">
+                                            The examiner could not react this time. Moving on to the next question.
+                                        </p>
+                                    )}
+                                    {live.status === 'speaking' && (
+                                        /* Chữ chạy đồng bộ theo giọng: phần đã nói sáng, phần chưa nói mờ. */
+                                        <p data-no-translate
+                                           className="m-0 text-[19px] sm:text-[22px] font-semibold leading-[1.5] max-w-[620px] text-left whitespace-pre-line">
+                                            <span>{live.text.slice(0, live.shown)}</span>
+                                            <span className="opacity-35">{live.text.slice(live.shown)}</span>
+                                        </p>
+                                    )}
+                                    <button type="button" onClick={skipLive}
+                                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold
+                                                       bg-white/10 hover:bg-white/20 border border-white/25">
+                                        <SkipForward size={16} />
+                                        {live.status === 'thinking' ? 'Skip feedback' : 'Next question'}
+                                    </button>
                                 </div>
                             )}
 
@@ -1251,6 +1393,7 @@ const SpeakingRoom = () => {
                 </div>
             )}
         </div>
+        </ExaminerVoice.Provider>
     );
 };
 

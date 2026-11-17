@@ -8,9 +8,11 @@ import { useNavigate } from 'react-router-dom';
 import {
     ChevronLeft, Mic, MicOff, Loader2, Lock, Crown, AlertCircle, Volume2, Wrench, Sparkles,
 } from 'lucide-react';
-import { fetchSetup, startTest, examinerAudioUrl } from './speakingApi';
+import { fetchSetup, startTest, examinerAudioUrl, rememberLive } from './speakingApi';
+import { FeedbackLanguageSelect, defaultFeedbackLang } from './LiveMode';
 import QuotaPills from './QuotaPills';
 import AttemptHistory from './AttemptHistory';
+import { ExaminerFace } from './ExaminerAvatar';
 
 const TEST_TYPES = [
     { value: 'full', label: 'Full Test', hint: 'Part 1 + 2 + 3, just like the real test' },
@@ -22,6 +24,8 @@ const TEST_TYPES = [
 const MODES = [
     { value: 'practice', label: 'Practice', hint: 'No time limit, questions and hints visible' },
     { value: 'mock', label: 'Mock test', hint: 'Standard timing, no hints' },
+    // Live Action (2026-11-14): chạy như Practice, cộng thêm giám khảo nhận xét sau mỗi câu.
+    { value: 'live', label: 'Live Action with an Examiner', hint: 'The examiner reacts out loud after every answer' },
 ];
 
 const PRIORITIES = [
@@ -90,6 +94,7 @@ const SpeakingSetup = () => {
     const [forecastMonth, setForecastMonth] = useState('');
     const [priority, setPriority] = useState('default');
     const [voice, setVoice] = useState('');
+    const [liveLang, setLiveLang] = useState(defaultFeedbackLang);
 
     // 'checking' | 'granted' | 'denied' — denied nghĩa là Subtitle Mode, không phải lỗi.
     const [mic, setMic] = useState('checking');
@@ -164,7 +169,7 @@ const SpeakingSetup = () => {
         try {
             const data = await startTest({
                 test_type: testType,
-                mode,
+                mode: mode === 'live' ? 'practice' : mode,
                 input_method: mic === 'granted' ? 'micro' : 'subtitle',
                 occupation,
                 voice,
@@ -172,7 +177,9 @@ const SpeakingSetup = () => {
                 forecast_month: useForecast ? forecastMonth : null,
                 priority,
             });
-            navigate('/speaking_test', { state: { attemptId: data.attempt_id, plan: data.plan } });
+            const live = mode === 'live' ? liveLang : null;
+            if (live) rememberLive(data.attempt_id, live);
+            navigate('/speaking_test', { state: { attemptId: data.attempt_id, plan: data.plan, live } });
         } catch (e) {
             setError(e.message);
             setStarting(false);
@@ -279,12 +286,17 @@ const SpeakingSetup = () => {
                 </Card>
 
                 <Card title="Mode">
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         {MODES.map((m) => (
                             <Choice key={m.value} active={mode === m.value} label={m.label}
                                 hint={m.hint} onClick={() => setMode(m.value)} />
                         ))}
                     </div>
+                    {mode === 'live' && (
+                        <div className="mt-4">
+                            <FeedbackLanguageSelect value={liveLang} onChange={setLiveLang} />
+                        </div>
+                    )}
                 </Card>
 
                 {(testType === 'full' || testType === 'part1') && (
@@ -373,7 +385,7 @@ const SpeakingSetup = () => {
                                         // TÊN giám khảo, không phải "Nữ/Nam" trống trơn — thí sinh
                                         // nhớ được "Alice" chứ không nhớ "giọng Anh nữ thứ nhất".
                                         // Mã kỹ thuật en-GB-Neural2-C thì tuyệt đối không hiện.
-                                        label={v.display || v.label || v.name}
+                                        label={<span className="inline-flex items-center gap-2"><ExaminerFace voice={v.name} size={26} />{v.display || v.label || v.name}</span>}
                                         hint={v.gender_label || undefined}
                                         badge={<Volume2 size={16} className="text-gray-400" />}
                                         onClick={() => playVoiceSample(v.name)} />
