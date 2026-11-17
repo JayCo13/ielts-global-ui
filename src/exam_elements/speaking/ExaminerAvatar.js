@@ -50,8 +50,27 @@ const shade = (hex, f) => {
     return `#${[(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => c(v).toString(16).padStart(2, '0')).join('')}`;
 };
 
+// Live Action (brief 5 §9, 2026-11-17): "khen thì cười, chê thì mặt cáu gắt, miệng nhép theo
+// lời nói". Brows + resting mouth per mood; while `talking`, an open mouth whose height
+// follows the CSS variable --mouth (0–1) that the room sets from the voice's loudness.
+const BROWS = {
+    furious:   ['M71 48.5 L77 51.5', 'M83 51.5 L89 48.5'],
+    sarcastic: ['M71 50.5 Q74 49.5 77 50.5', 'M83 48 Q86 45.5 89 47.5'],
+    shocked:   ['M71 47 Q74 44.5 77 47', 'M83 47 Q86 44.5 89 47'],
+    helpless:  ['M71 50.5 L77 48', 'M83 48 L89 50.5'],
+    amused:    ['M71 49 Q74 47 77 49', 'M83 49 Q86 47 89 49'],
+    impressed: ['M71 48 Q74 45.5 77 48', 'M83 48 Q86 45.5 89 48'],
+};
+const MOUTHS = {
+    furious:   'M75 68 Q80 64.5 85 68',
+    sarcastic: 'M75 67 Q80 68 86 64.5',
+    helpless:  'M75 67 Q77.5 65.8 80 67 Q82.5 68.2 85 67',
+    amused:    'M74 65 Q80 71 86 65',
+    impressed: 'M73.5 64.5 Q80 72 86.5 64.5',
+};
+
 // The scene: examiner sitting at a desk in a small office, framed like a webcam shot.
-function Scene({ e, uid }) {
+function Scene({ e, uid, mood = null, talking = false }) {
     const hairDark = shade(e.hair, 0.8);
     return (
         <svg viewBox="0 0 160 120" preserveAspectRatio="xMidYMid slice" className="block w-full h-full" aria-hidden="true">
@@ -109,15 +128,25 @@ function Scene({ e, uid }) {
             )}
 
             {/* face */}
-            <path d="M71 50 Q74 48.5 77 50" stroke={hairDark} strokeWidth="1.2" fill="none" strokeLinecap="round" />
-            <path d="M83 50 Q86 48.5 89 50" stroke={hairDark} strokeWidth="1.2" fill="none" strokeLinecap="round" />
-            <circle cx="74" cy="55" r="1.7" fill="#1f2937" />
-            <circle cx="86" cy="55" r="1.7" fill="#1f2937" />
+            <path d={(BROWS[mood] || [])[0] || 'M71 50 Q74 48.5 77 50'} stroke={hairDark} strokeWidth={mood ? 1.5 : 1.2} fill="none" strokeLinecap="round" />
+            <path d={(BROWS[mood] || [])[1] || 'M83 50 Q86 48.5 89 50'} stroke={hairDark} strokeWidth={mood ? 1.5 : 1.2} fill="none" strokeLinecap="round" />
+            <circle cx="74" cy="55" r={mood === 'shocked' ? 2.3 : 1.7} fill="#1f2937" />
+            <circle cx="86" cy="55" r={mood === 'shocked' ? 2.3 : 1.7} fill="#1f2937" />
             <path d="M80 57 Q79 61 81 62" stroke={shade(e.skin, 0.78)} strokeWidth="1" fill="none" strokeLinecap="round" />
             {e.beard
                 ? <path d="M66 60 Q68 75 80 76 Q92 75 94 60 Q90 69 80 69 Q70 69 66 60Z" fill={e.hair} opacity="0.9" />
                 : null}
-            <path d="M75 66 Q80 69.5 85 66" stroke="#9a3b3b" strokeWidth="1.4" fill="none" strokeLinecap="round" />
+            {talking ? (
+                <ellipse cx="80" cy="66.5" rx={mood === 'amused' || mood === 'impressed' ? 5 : 4.2} ry="3.4"
+                         fill="#5b1f1f" stroke="#9a3b3b" strokeWidth="0.8"
+                         style={{ transformBox: 'fill-box', transformOrigin: 'center',
+                                  transform: 'scaleY(calc(0.12 + var(--mouth, 0.5) * 0.95))',
+                                  transition: 'transform 60ms linear' }} />
+            ) : mood === 'shocked' ? (
+                <ellipse cx="80" cy="66.5" rx="3" ry="3.6" fill="#5b1f1f" />
+            ) : (
+                <path d={MOUTHS[mood] || 'M75 66 Q80 69.5 85 66'} stroke="#9a3b3b" strokeWidth="1.4" fill="none" strokeLinecap="round" />
+            )}
             {e.glasses && (
                 <g stroke="#1f2937" strokeWidth="1.1" fill="rgba(255,255,255,0.18)">
                     <rect x="68.5" y="51" width="11" height="8" rx="3" />
@@ -145,7 +174,8 @@ let seq = 0;
  * Examiner as a video-call tile. `speaking` adds the glowing "talking" ring,
  * `dim` greys it out (paused). Width/height follow `size` (height) at 4:3.
  */
-export default function ExaminerAvatar({ voice, size = 96, speaking = false, dim = false, showName = true }) {
+export default function ExaminerAvatar({ voice, size = 96, speaking = false, dim = false, showName = true,
+                                         mood = null, talking = false }) {
     const uidRef = React.useRef(null);
     if (uidRef.current == null) { seq += 1; uidRef.current = seq; }
     const name = examinerName(voice);
@@ -163,7 +193,7 @@ export default function ExaminerAvatar({ voice, size = 96, speaking = false, dim
                           boxShadow: speaking ? '0 0 0 2px #7dd3fc, 0 8px 24px rgba(0,0,0,0.25)' : '0 6px 18px rgba(0,0,0,0.22)' }}>
                 {e.photo
                     ? <img src={`/img/examiners/${name.toLowerCase()}.webp`} alt="" className="w-full h-full object-cover" />
-                    : <Scene e={e} uid={uidRef.current} />}
+                    : <Scene e={e} uid={uidRef.current} mood={mood} talking={talking} />}
                 {!small && (
                     <span className="absolute top-1.5 left-1.5 inline-flex items-center gap-1 rounded-md bg-black/45 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-white">
                         <span className="block w-1.5 h-1.5 rounded-full bg-emerald-400" /> LIVE

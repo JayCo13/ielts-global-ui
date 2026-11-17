@@ -56,7 +56,7 @@ const Option = ({ active, icon, title, hint, onClick }) => (
 );
 
 export const SERIOUS_HINT = 'Practise as usual and get your full score after you submit.';
-export const LIVE_HINT = 'The AI examiner reacts out loud after every answer: your 1–2 biggest mistakes, roasted with humour, and how to fix them.';
+export const LIVE_HINT = 'The examiner roasts your 1–2 biggest mistakes out loud after every answer, then shows you the fix.';
 
 /** onPick({ live: bool, lang }) */
 export const ModeChooser = ({ onClose, onPick, starting }) => {

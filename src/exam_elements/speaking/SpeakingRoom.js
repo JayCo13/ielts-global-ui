@@ -98,11 +98,11 @@ const ROOM_CSS = `
 // Voice of this attempt → which examiner appears (feedback 2026-11-14: each examiner is a
 // person on a video call instead of the logo).
 const ExaminerVoice = React.createContext(null);
-const Mascot = ({ size = 72, ring = false, dim = false }) => {
+const Mascot = ({ size = 72, ring = false, dim = false, mood = null, talking = false }) => {
     const voice = React.useContext(ExaminerVoice);
     // Small slots (next to a heading) stay compact; the main slots get a real video tile.
     const h = size < 60 ? size : Math.round(size * 1.3);
-    return <ExaminerAvatar voice={voice} size={h} speaking={ring} dim={dim} />;
+    return <ExaminerAvatar voice={voice} size={h} speaking={ring} dim={dim} mood={mood} talking={talking} />;
 };
 
 /**
@@ -290,6 +290,8 @@ const SpeakingRoom = () => {
     const liveRef = useRef(null);                     // Promise nhận xét của câu vừa nộp
     const liveAudioRef = useRef(null);
     const liveSkipRef = useRef(null);
+    const liveFaceRef = useRef(null);                 // khung giám khảo: nhận biến CSS --mouth
+    const lipRef = useRef(null);                      // {ctx, analyser, buf} — nối 1 lần với liveAudioRef
 
     // Cờ điều khiển máy trạng thái — để trong ref vì các callback đo âm thanh và đồng hồ
     // chạy ngoài chu kỳ render, đọc state ở đó sẽ lấy phải giá trị cũ.
@@ -575,6 +577,64 @@ const SpeakingRoom = () => {
         }
     }, [attemptId, subtitle, typed, liveLang]);
 
+    // Miệng giám khảo nhép theo độ lớn của giọng (brief 5 §9). Dùng WebAudio analyser trên
+    // chính thẻ <audio>; chỉ nối khi AudioContext đang chạy (nếu không, tiếng sẽ bị câm) —
+    // không được thì miệng đóng mở theo nhịp giả. Trả về hàm dừng.
+    const startLips = useCallback(async (el) => {
+        const face = () => liveFaceRef.current;
+        let lip = lipRef.current;
+        if (!lip) {
+            try {
+                const Ctx = window.AudioContext || window.webkitAudioContext;
+                const ctx = new Ctx();
+                if (ctx.state !== 'running') {
+                    await Promise.race([ctx.resume(), new Promise((r) => setTimeout(r, 300))]);
+                }
+                if (ctx.state === 'running') {
+                    const src = ctx.createMediaElementSource(el);
+                    const analyser = ctx.createAnalyser();
+                    analyser.fftSize = 512;
+                    src.connect(analyser);
+                    analyser.connect(ctx.destination);
+                    lip = { ctx, analyser, buf: new Uint8Array(analyser.fftSize) };
+                } else {
+                    ctx.close().catch(() => {});
+                    lip = { fake: true };
+                }
+            } catch (e) {
+                lip = { fake: true };
+            }
+            lipRef.current = lip;
+        } else if (lip.ctx && lip.ctx.state !== 'running') {
+            await Promise.race([lip.ctx.resume().catch(() => {}), new Promise((r) => setTimeout(r, 300))]);
+        }
+        let raf = 0;
+        let smooth = 0;
+        const t0 = performance.now();
+        const loop = () => {
+            let v;
+            if (lip.analyser) {
+                lip.analyser.getByteTimeDomainData(lip.buf);
+                let sum = 0;
+                for (let i = 0; i < lip.buf.length; i += 1) { const d = (lip.buf[i] - 128) / 128; sum += d * d; }
+                v = Math.min(1, Math.sqrt(sum / lip.buf.length) * 5);
+            } else {
+                const t = (performance.now() - t0) / 1000;
+                v = el.paused ? 0 : Math.max(0, 0.55 + 0.45 * Math.sin(t * 17) * Math.sin(t * 5.3));
+            }
+            smooth = smooth * 0.45 + v * 0.55;
+            const f = face();
+            if (f) f.style.setProperty('--mouth', smooth.toFixed(3));
+            raf = requestAnimationFrame(loop);
+        };
+        raf = requestAnimationFrame(loop);
+        return () => {
+            cancelAnimationFrame(raf);
+            const f = face();
+            if (f) f.style.setProperty('--mouth', '0');
+        };
+    }, []);
+
     // ── Live Action: giám khảo nhận xét bằng giọng nói, chữ chạy theo giọng ──
     // Luôn resolve. Bị tạm dừng / thoát giữa chừng thì tắt tiếng và trả về false.
     const playLive = useCallback(async () => {
@@ -608,16 +668,18 @@ const SpeakingRoom = () => {
             for (const c of cuts) { if (c <= want + 0.5) best = c; else break; }
             return p >= 1 ? text.length : best;
         };
-        setLive({ status: 'speaking', text, mood: res.mood, shown: 0 });
+        setLive({ status: 'speaking', text, mood: res.mood, shown: 0, voiced: !!res.audio });
         await new Promise((resolve) => {
             let settled = false;
             let tick = null;
             let guard = null;
+            let stopLips = null;
             const el = liveAudioRef.current;
             const done = () => {
                 if (settled) return;
                 settled = true;
                 clearInterval(tick); clearTimeout(guard);
+                if (stopLips) stopLips();
                 if (el) { el.pause(); el.onended = null; el.onerror = null; }
                 liveSkipRef.current = null;
                 setLive((l) => (l ? { ...l, shown: text.length } : l));
@@ -640,7 +702,7 @@ const SpeakingRoom = () => {
             if (!el || !res.audio) { readOnly(); return; }
             el.src = `data:${res.audio_mime || 'audio/mpeg'};base64,${res.audio}`;
             el.onended = done;
-            el.onerror = () => readOnly();
+            el.onerror = () => { setLive((l) => (l ? { ...l, voiced: false } : l)); readOnly(); };
             guard = setTimeout(done, 75000);
             tick = setInterval(() => {
                 if (stale()) { done(); return; }
@@ -649,17 +711,21 @@ const SpeakingRoom = () => {
                     setLive((l) => (l ? { ...l, shown: upTo(p) } : l));
                 }
             }, 120);
-            const started = el.play();
-            if (started && started.catch) started.catch(() => readOnly());
+            startLips(el).then((stop) => {
+                if (settled) stop(); else stopLips = stop;
+                const started = el.play();
+                if (started && started.catch) started.catch(() => { setLive((l) => (l ? { ...l, voiced: false } : l)); readOnly(); });
+            });
         });
         if (stale()) { setLive(null); return false; }
         // Để học viên kịp đọc nốt câu cuối trước khi sang câu mới.
         await new Promise((r) => setTimeout(r, 900));
         setLive(null);
         return !stale();
-    }, []);
+    }, [startLips]);
 
     const skipLive = () => { if (liveSkipRef.current) liveSkipRef.current(); };
+
 
     // ── Chạy một bước của đề ──
     const advance = useCallback(() => {
@@ -1094,7 +1160,11 @@ const SpeakingRoom = () => {
                                 <div className="flex flex-col items-center gap-5 text-center">
                                     {eyebrow(live.status === 'thinking' ? 'THE EXAMINER IS THINKING…'
                                         : live.status === 'error' ? 'NO FEEDBACK THIS TIME' : 'LIVE FEEDBACK', '#ffd0ae')}
-                                    <Mascot size={live.status === 'speaking' ? 108 : 84} ring={live.status === 'speaking'} />
+                                    <div ref={liveFaceRef}>
+                                        <Mascot size={live.status === 'speaking' ? 108 : 84} ring={live.status === 'speaking'}
+                                                mood={live.status === 'speaking' ? live.mood : null}
+                                                talking={live.status === 'speaking' && live.voiced && live.shown < live.text.length} />
+                                    </div>
                                     {live.status === 'thinking' && (
                                         <p className="m-0 text-[15px] text-[#dff0f1] max-w-[460px] inline-flex items-center gap-2">
                                             <Loader2 size={16} className="animate-spin" />

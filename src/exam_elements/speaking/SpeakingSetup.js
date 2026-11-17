@@ -24,8 +24,13 @@ const TEST_TYPES = [
 const MODES = [
     { value: 'practice', label: 'Practice', hint: 'No time limit, questions and hints visible' },
     { value: 'mock', label: 'Mock test', hint: 'Standard timing, no hints' },
-    // Live Action (2026-11-14): chạy như Practice, cộng thêm giám khảo nhận xét sau mỗi câu.
-    { value: 'live', label: 'Live Action with an Examiner', hint: 'The examiner reacts out loud after every answer' },
+];
+
+// Live Action (brief 5 §1.2, 2026-11-17): một lựa chọn BÊN TRONG Practice — chạy như
+// Practice, cộng thêm giám khảo nhận xét bằng giọng nói sau mỗi câu. Mock test giữ nguyên.
+const PRACTICE_STYLES = [
+    { value: false, label: 'Standard practice', hint: 'Answer every question, get your full score after you submit' },
+    { value: true, label: 'Live Action with an Examiner', hint: 'The examiner roasts your 1–2 biggest mistakes out loud after every answer, then shows you the fix.' },
 ];
 
 const PRIORITIES = [
@@ -89,6 +94,7 @@ const SpeakingSetup = () => {
 
     const [testType, setTestType] = useState('full');   // đổi sang part1 nếu bị khoá VIP
     const [mode, setMode] = useState('practice');
+    const [liveOn, setLiveOn] = useState(false);
     const [occupation, setOccupation] = useState('student');
     const [useForecast, setUseForecast] = useState(false);
     const [forecastMonth, setForecastMonth] = useState('');
@@ -169,7 +175,7 @@ const SpeakingSetup = () => {
         try {
             const data = await startTest({
                 test_type: testType,
-                mode: mode === 'live' ? 'practice' : mode,
+                mode,
                 input_method: mic === 'granted' ? 'micro' : 'subtitle',
                 occupation,
                 voice,
@@ -177,7 +183,7 @@ const SpeakingSetup = () => {
                 forecast_month: useForecast ? forecastMonth : null,
                 priority,
             });
-            const live = mode === 'live' ? liveLang : null;
+            const live = mode === 'practice' && liveOn ? liveLang : null;
             if (live) rememberLive(data.attempt_id, live);
             navigate('/speaking_test', { state: { attemptId: data.attempt_id, plan: data.plan, live } });
         } catch (e) {
@@ -286,15 +292,25 @@ const SpeakingSetup = () => {
                 </Card>
 
                 <Card title="Mode">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {MODES.map((m) => (
                             <Choice key={m.value} active={mode === m.value} label={m.label}
                                 hint={m.hint} onClick={() => setMode(m.value)} />
                         ))}
                     </div>
-                    {mode === 'live' && (
-                        <div className="mt-4">
-                            <FeedbackLanguageSelect value={liveLang} onChange={setLiveLang} />
+                    {mode === 'practice' && (
+                        <div className="mt-4 pt-4 border-t border-gray-100">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {PRACTICE_STYLES.map((p) => (
+                                    <Choice key={String(p.value)} active={liveOn === p.value} label={p.label}
+                                        hint={p.hint} onClick={() => setLiveOn(p.value)} />
+                                ))}
+                            </div>
+                            {liveOn && (
+                                <div className="mt-4">
+                                    <FeedbackLanguageSelect value={liveLang} onChange={setLiveLang} />
+                                </div>
+                            )}
                         </div>
                     )}
                 </Card>
