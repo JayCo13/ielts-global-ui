@@ -1196,10 +1196,9 @@ const SpeakingRoom = () => {
                                     {eyebrow(live.status === 'thinking' ? 'THE EXAMINER IS THINKING…'
                                         : live.status === 'error' ? 'NO FEEDBACK THIS TIME' : 'LIVE FEEDBACK', '#ffd0ae')}
                                     <div ref={liveFaceRef}>
-                                        {/* Live Action luôn dùng MỘT giọng cố định (máy chủ: SPEAKING_LIVE_VOICE) nên
-                                            hình cũng cố định theo giới tính giọng đó: Tony / Alice. */}
+                                        {/* Giọng nhận xét cố định theo giới tính examiner đã chọn (nữ → Kore, nam →
+                                            Fenrir, xem máy chủ), nên giữ luôn khuôn mặt examiner đó. */}
                                         <Mascot size={live.status === 'speaking' ? 108 : 84} ring={live.status === 'speaking'}
-                                                voiceOverride={live.gender === 'female' ? 'en-GB-Neural2-C' : 'en-GB-Neural2-B'}
                                                 mood={live.status === 'speaking' ? live.mood : null}
                                                 talking={live.status === 'speaking' && live.voiced && live.shown < live.text.length} />
                                     </div>
