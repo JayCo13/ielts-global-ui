@@ -319,6 +319,7 @@ const SpeakingRoom = () => {
     const isLive = !!liveLang;
     const [live, setLive] = useState(null);           // {status: thinking|speaking|error, text, mood, shown}
     const liveRef = useRef(null);                     // Promise nhận xét của câu vừa nộp
+    const liveSaidRef = useRef([]);                   // câu giám khảo đã nói (gửi kèm để không lặp lại)
     const liveAudioRef = useRef(null);
     const liveSkipRef = useRef(null);
     const liveFaceRef = useRef(null);                 // khung giám khảo: nhận biến CSS --mouth
@@ -585,7 +586,7 @@ const SpeakingRoom = () => {
             liveRef.current = liveFeedback(attemptId, {
                 orderIndex: current.order_index, lang: liveLang, text, blob,
                 ext: recorderRef.current ? recorderRef.current.extension() : 'webm',
-                signal: ctrl.signal,
+                signal: ctrl.signal, recent: liveSaidRef.current,
             }).then((r) => r, (e) => ({ error: e.name === 'AbortError' ? 'timeout' : (e.message || 'error') }))
               .finally(() => clearTimeout(timer));
         }
@@ -691,6 +692,7 @@ const SpeakingRoom = () => {
         // NFC + chỉ cắt ở ranh giới TỪ: cắt giữa một chữ tiếng Việt (nhất là dấu tổ hợp)
         // làm chữ vỡ dấu / dính vào nhau (feedback 2026-11-17).
         const text = String(res.feedback).normalize('NFC');
+        liveSaidRef.current = [...liveSaidRef.current, text].slice(-4);
         const cuts = [0];
         text.replace(/\S+/g, (w, i) => { cuts.push(i + w.length); return w; });
         const upTo = (p) => {

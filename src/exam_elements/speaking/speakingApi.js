@@ -217,11 +217,13 @@ export const scoreLessonItem = async (itemId, blob, ext) => {
 // ── Live Action with an Examiner (2026-11-14) ─────────────────────────────────────────
 // Gửi SONG SONG với submitAnswer, cùng bản ghi âm: giám khảo nhận xét ngay mà không phải
 // chờ lưu R2 + Whisper. Không lưu gì, không ảnh hưởng chấm điểm khi Submit.
-export const liveFeedback = async (attemptId, { orderIndex, lang, text, blob, ext, signal }) => {
+export const liveFeedback = async (attemptId, { orderIndex, lang, text, blob, ext, signal, recent }) => {
     const form = new FormData();
     form.append('order_index', String(orderIndex));
     form.append('lang', lang || 'en');
     if (text) form.append('text', text);
+    // Những câu giám khảo đã nói trong bài này, để không lặp lại cùng một kiểu đùa.
+    if (recent && recent.length) form.append('recent', JSON.stringify(recent.slice(-4)));
     if (blob && blob.size) form.append('audio', blob, `answer.${ext || 'webm'}`);
     const res = await fetch(`${API_BASE}/student/speaking/live/attempts/${attemptId}/feedback`, {
         method: 'POST', headers: authHeaders(), body: form, signal,
