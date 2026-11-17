@@ -33,7 +33,7 @@ const AWAY_LIMIT_MS = 30000;
 const SILENT_STREAK_LIMIT = 3;
 // Live Action: chờ AI tối đa chừng này rồi bỏ qua nhận xét, đi tiếp câu sau — không để
 // việc phân tích làm đứng buổi luyện (brief §3, "rất quan trọng").
-const LIVE_WAIT_MS = 20000;
+const LIVE_WAIT_MS = 30000;
 
 const PART_LABEL = {
     part1: 'Part 1', part2: 'Part 2', part2_followup: 'Part 2', part3: 'Part 3',
@@ -653,7 +653,7 @@ const SpeakingRoom = () => {
         if (!res || res.error || res.skipped || !res.feedback) {
             setLive(res && res.error && !res.skipped
                 ? { status: 'error', text: res.error === 'timeout' ? '' : res.error, shown: 0 } : null);
-            if (res && res.error && !res.skipped) await new Promise((r) => setTimeout(r, 1800));
+            if (res && res.error && !res.skipped) await new Promise((r) => setTimeout(r, 3000));
             setLive(null);
             return !stale();
         }
@@ -1174,6 +1174,11 @@ const SpeakingRoom = () => {
                                     {live.status === 'error' && (
                                         <p className="m-0 text-[15px] text-[#dff0f1] max-w-[460px]">
                                             The examiner could not react this time. Moving on to the next question.
+                                        </p>
+                                    )}
+                                    {live.status === 'error' && (
+                                        <p className="m-0 -mt-3 text-xs text-[#dff0f1]/60 max-w-[460px]" data-no-translate>
+                                            {live.text || 'Timed out'}
                                         </p>
                                     )}
                                     {live.status === 'speaking' && (
