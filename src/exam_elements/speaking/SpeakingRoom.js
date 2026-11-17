@@ -731,9 +731,10 @@ const SpeakingRoom = () => {
             };
             if (!el || !res.audio) { readOnly(); return; }
             el.src = `data:${res.audio_mime || 'audio/mpeg'};base64,${res.audio}`;
-            // Đọc nhanh hơn cho "catchy" (feedback 2026-11-17). Chirp đã được đặt tốc độ
-            // 1.15 ở máy chủ; giọng Gemini (ogg) thì tăng ở đây, giữ nguyên cao độ.
-            el.playbackRate = (res.audio_mime || '').includes('ogg') ? 1.12 : 1;
+            // Phát đúng tốc độ gốc: tua nhanh trên trình duyệt làm giọng Gemini méo (2026-11-17).
+            el.playbackRate = 1;
+            // Để kiểm tra đang dùng giọng nào (gemini = giọng hay, google-chirp = dự phòng).
+            if (res.engine) console.info('[live] voice engine:', res.engine);
             el.onended = done;
             el.onerror = () => { setLive((l) => (l ? { ...l, voiced: false } : l)); readOnly(); };
             guard = setTimeout(done, 75000);
