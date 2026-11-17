@@ -78,6 +78,18 @@ const Payment = () => {
         }
     }, [packageId, selectedPackage, navigate]);
 
+    // Note that checkout was opened: if no payment follows, the backend sends ONE reminder
+    // email later (app/utils/email_automation.py). Fire-and-forget, never blocks paying.
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!packageId || !token) return;
+        fetch(`${API_BASE}/customer/checkout-intent`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ package_id: packageId }),
+        }).catch(() => {});
+    }, [packageId]);
+
     // Token validation
     const validateTokenAndRedirect = () => {
         const tokenCheck = checkTokenExpiration();
