@@ -106,6 +106,36 @@ const Mascot = ({ size = 72, ring = false, dim = false, mood = null, talking = f
 };
 
 /**
+ * Giám khảo nhép miệng khi đang đọc câu hỏi (feedback 2026-11-17). Clip câu hỏi đến từ
+ * máy chủ khác nên KHÔNG nối WebAudio (thiếu CORS là câm luôn câu hỏi) — miệng đóng mở
+ * theo nhịp nói giả lập, chỉ khi thẻ <audio> đang thật sự phát.
+ */
+const TalkingMascot = ({ audioRef, size }) => {
+    const boxRef = useRef(null);
+    useEffect(() => {
+        let raf = 0;
+        let smooth = 0;
+        const t0 = performance.now();
+        const loop = () => {
+            const el = audioRef.current;
+            const playing = el && !el.paused && !el.ended && el.currentTime > 0;
+            const t = (performance.now() - t0) / 1000;
+            const v = playing ? Math.max(0, 0.5 + 0.5 * Math.sin(t * 16) * Math.sin(t * 4.7 + 1)) : 0;
+            smooth = smooth * 0.5 + v * 0.5;
+            if (boxRef.current) boxRef.current.style.setProperty('--mouth', smooth.toFixed(3));
+            raf = requestAnimationFrame(loop);
+        };
+        raf = requestAnimationFrame(loop);
+        return () => cancelAnimationFrame(raf);
+    }, [audioRef]);
+    return (
+        <div ref={boxRef} style={{ '--mouth': 0 }}>
+            <Mascot size={size} ring talking />
+        </div>
+    );
+};
+
+/**
  * Cột sóng âm. `level` là âm lượng micro thật (0–1): có nó thì cột nhảy theo tiếng nói,
  * không có thì chạy nhịp đều — dùng cho lúc giám khảo đang đọc đề.
  */
@@ -701,6 +731,9 @@ const SpeakingRoom = () => {
             };
             if (!el || !res.audio) { readOnly(); return; }
             el.src = `data:${res.audio_mime || 'audio/mpeg'};base64,${res.audio}`;
+            // Đọc nhanh hơn cho "catchy" (feedback 2026-11-17). Chirp đã được đặt tốc độ
+            // 1.15 ở máy chủ; giọng Gemini (ogg) thì tăng ở đây, giữ nguyên cao độ.
+            el.playbackRate = (res.audio_mime || '').includes('ogg') ? 1.12 : 1;
             el.onended = done;
             el.onerror = () => { setLive((l) => (l ? { ...l, voiced: false } : l)); readOnly(); };
             guard = setTimeout(done, 75000);
@@ -1141,7 +1174,7 @@ const SpeakingRoom = () => {
                             {phase === 'examiner' && (
                                 <div className="flex flex-col items-center gap-5 text-center">
                                     {eyebrow('THE EXAMINER IS ASKING')}
-                                    <Mascot size={108} ring />
+                                    <TalkingMascot audioRef={audioRef} size={108} />
                                     <Bars color="#7dd3fc" count={23} height={40} />
                                     {/* Thi thử không được xem chữ (§4.2); Luyện tập thì phải tự bấm con mắt. */}
                                     {!isMock && showQuestion && step?.text ? (
