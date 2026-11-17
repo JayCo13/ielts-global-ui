@@ -98,8 +98,9 @@ const ROOM_CSS = `
 // Voice of this attempt → which examiner appears (feedback 2026-11-14: each examiner is a
 // person on a video call instead of the logo).
 const ExaminerVoice = React.createContext(null);
-const Mascot = ({ size = 72, ring = false, dim = false, mood = null, talking = false }) => {
-    const voice = React.useContext(ExaminerVoice);
+const Mascot = ({ size = 72, ring = false, dim = false, mood = null, talking = false, voiceOverride = null }) => {
+    const ctxVoice = React.useContext(ExaminerVoice);
+    const voice = voiceOverride || ctxVoice;
     // Small slots (next to a heading) stay compact; the main slots get a real video tile.
     const h = size < 60 ? size : Math.round(size * 1.3);
     return <ExaminerAvatar voice={voice} size={h} speaking={ring} dim={dim} mood={mood} talking={talking} />;
@@ -698,7 +699,7 @@ const SpeakingRoom = () => {
             for (const c of cuts) { if (c <= want + 0.5) best = c; else break; }
             return p >= 1 ? text.length : best;
         };
-        setLive({ status: 'speaking', text, mood: res.mood, shown: 0, voiced: !!res.audio });
+        setLive({ status: 'speaking', text, mood: res.mood, shown: 0, voiced: !!res.audio, gender: res.voice_gender });
         await new Promise((resolve) => {
             let settled = false;
             let tick = null;
@@ -1195,7 +1196,10 @@ const SpeakingRoom = () => {
                                     {eyebrow(live.status === 'thinking' ? 'THE EXAMINER IS THINKING…'
                                         : live.status === 'error' ? 'NO FEEDBACK THIS TIME' : 'LIVE FEEDBACK', '#ffd0ae')}
                                     <div ref={liveFaceRef}>
+                                        {/* Live Action luôn dùng MỘT giọng cố định (máy chủ: SPEAKING_LIVE_VOICE) nên
+                                            hình cũng cố định theo giới tính giọng đó: Tony / Alice. */}
                                         <Mascot size={live.status === 'speaking' ? 108 : 84} ring={live.status === 'speaking'}
+                                                voiceOverride={live.gender === 'female' ? 'en-GB-Neural2-C' : 'en-GB-Neural2-B'}
                                                 mood={live.status === 'speaking' ? live.mood : null}
                                                 talking={live.status === 'speaking' && live.voiced && live.shown < live.text.length} />
                                     </div>
