@@ -755,6 +755,8 @@ const SpeakingRoom = () => {
             for (const c of cuts) { if (c <= want + 0.5) best = c; else break; }
             return p >= 1 ? text.length : best;
         };
+        // Xem giọng/engine đang dùng: mở Console của trình duyệt (F12).
+        console.info('[live] examiner voice:', res.voice || '(server default)', '|', res.engine || (res.realtime ? 'gemini-live' : 'analyse + TTS'));
         setLive({ status: 'speaking', text, mood: res.mood, shown: 0, voiced: !!(res.audio || res.stream), gender: res.voice_gender });
         await new Promise((resolve) => {
             let settled = false;

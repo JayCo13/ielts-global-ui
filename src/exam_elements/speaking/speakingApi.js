@@ -306,7 +306,7 @@ export const liveFeedbackStream = async (attemptId, opts) => {
     if (!head) throw new Error('The examiner could not give feedback this time.');
     return {
         feedback: head.feedback || '', mood: head.mood, voice_gender: head.voice_gender, stream,
-        realtime: head.type === 'start',
+        realtime: head.type === 'start', voice: head.voice, engine: head.engine,
     };
 };
 
