@@ -261,7 +261,7 @@ export const liveFeedbackStream = async (attemptId, opts) => {
     if (!res.body || !res.body.getReader) return liveFeedback(attemptId, opts);
 
     const stream = {
-        chunks: [], full: null, done: false, engine: null, listeners: new Set(),
+        chunks: [], says: [], feedback: '', full: null, done: false, engine: null, listeners: new Set(),
         abort: () => inner.abort(),
         notify() { this.listeners.forEach((fn) => { try { fn(); } catch (e) { /* bỏ qua */ } }); },
     };
@@ -273,10 +273,12 @@ export const liveFeedbackStream = async (attemptId, opts) => {
         if (!line.trim()) return;
         let msg;
         try { msg = JSON.parse(line); } catch (e) { return; }
-        if (msg.type === 'text') head = msg;
+        if (msg.type === 'text' || msg.type === 'start') head = msg;
         else if (msg.type === 'pcm') stream.chunks.push({ data: msg.data, rate: msg.rate || 24000 });
+        // Realtime (Gemini Live): từng mẩu lời đang được nói, xếp xen với các mảnh âm thanh.
+        else if (msg.type === 'say') stream.says.push({ text: msg.text, at: stream.chunks.length });
         else if (msg.type === 'full') stream.full = { audio: msg.audio, mime: msg.audio_mime };
-        else if (msg.type === 'done') { stream.engine = msg.engine; stream.done = true; }
+        else if (msg.type === 'done') { stream.engine = msg.engine; if (msg.feedback) stream.feedback = msg.feedback; stream.done = true; }
         stream.notify();
     };
     const pump = async () => {
@@ -302,7 +304,10 @@ export const liveFeedbackStream = async (attemptId, opts) => {
     };
     await new Promise((resolve) => { stream.resolveHead = resolve; pump(); });
     if (!head) throw new Error('The examiner could not give feedback this time.');
-    return { feedback: head.feedback, mood: head.mood, voice_gender: head.voice_gender, stream };
+    return {
+        feedback: head.feedback || '', mood: head.mood, voice_gender: head.voice_gender, stream,
+        realtime: head.type === 'start',
+    };
 };
 
 // Chế độ Live + ngôn ngữ feedback đi theo bài thi. Lưu sessionStorage để F5 giữa bài

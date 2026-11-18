@@ -727,7 +727,7 @@ const SpeakingRoom = () => {
             new Promise((r) => { liveSkipRef.current = () => r({ skipped: true }); }),
         ]);
         if (stale()) { setLive(null); return false; }
-        if (!res || res.error || res.skipped || !res.feedback) {
+        if (!res || res.error || res.skipped || (!res.feedback && !res.realtime)) {
             setLive(res && res.error && !res.skipped
                 ? { status: 'error', text: res.error === 'timeout' ? '' : res.error, shown: 0 } : null);
             if (res && res.error && !res.skipped) await new Promise((r) => setTimeout(r, 3000));
@@ -736,17 +736,26 @@ const SpeakingRoom = () => {
         }
         // NFC + chỉ cắt ở ranh giới TỪ: cắt giữa một chữ tiếng Việt (nhất là dấu tổ hợp)
         // làm chữ vỡ dấu / dính vào nhau (feedback 2026-11-17).
-        const text = String(res.feedback).normalize('NFC');
-        liveSaidRef.current = [...liveSaidRef.current, text].slice(-4);
-        const cuts = [0];
-        text.replace(/\S+/g, (w, i) => { cuts.push(i + w.length); return w; });
+        // Realtime (Gemini Live): chưa có chữ lúc bắt đầu — chữ đến dần cùng giọng nói.
+        let text = '';
+        let cuts = [0];
+        const setText = (t) => {
+            text = String(t || '').normalize('NFC');
+            cuts = [0];
+            text.replace(/\S+/g, (w, i) => { cuts.push(i + w.length); return w; });
+        };
+        const finalText = () => (res.realtime && res.stream
+            ? (res.stream.feedback || res.stream.says.map((x) => x.text).join('')).normalize('NFC').trim()
+            : text);
+        setText(res.feedback);
+        if (text) liveSaidRef.current = [...liveSaidRef.current, text].slice(-4);
         const upTo = (p) => {
             const want = text.length * p;
             let best = 0;
             for (const c of cuts) { if (c <= want + 0.5) best = c; else break; }
             return p >= 1 ? text.length : best;
         };
-        setLive({ status: 'speaking', text, mood: res.mood, shown: 0, voiced: !!res.audio, gender: res.voice_gender });
+        setLive({ status: 'speaking', text, mood: res.mood, shown: 0, voiced: !!(res.audio || res.stream), gender: res.voice_gender });
         await new Promise((resolve) => {
             let settled = false;
             let tick = null;
@@ -762,7 +771,9 @@ const SpeakingRoom = () => {
                 if (stopLips) stopLips();
                 if (el) { el.pause(); el.onended = null; el.onerror = null; }
                 liveSkipRef.current = null;
-                setLive((l) => (l ? { ...l, shown: text.length } : l));
+                const full = finalText();
+                if (res.realtime && full) liveSaidRef.current = [...liveSaidRef.current, full].slice(-4);
+                setLive((l) => (l ? { ...l, text: full || l.text, shown: (full || l.text).length, finished: true } : l));
                 resolve();
             };
             liveSkipRef.current = done;
@@ -823,6 +834,7 @@ const SpeakingRoom = () => {
                         feed = () => {
                             if (settled || !st.done) return;
                             st.listeners.delete(feed);
+                            if (res.realtime) { setText(finalText()); setLive((l) => (l ? { ...l, text, shown: 0 } : l)); }
                             if (st.full) playEl(`data:${st.full.mime || 'audio/mpeg'};base64,${st.full.audio}`, st.engine);
                             else playEl(st.chunks.length ? pcmToWavUrl(st.chunks) : null, st.engine);
                         };
@@ -837,12 +849,24 @@ const SpeakingRoom = () => {
                     let t0 = 0;
                     let next = 0;
                     let carry = null;
+                    const starts = [];                                // giờ bắt đầu phát của từng mảnh
+                    // Realtime: chữ hiện đúng lúc phần tiếng tương ứng được phát.
+                    const spoken = () => {
+                        const now = ctx.currentTime;
+                        let out = '';
+                        for (const sy of st.says) {
+                            const at = sy.at > 0 ? starts[sy.at - 1] : t0;
+                            if (at === undefined || at > now) break;
+                            out += sy.text;
+                        }
+                        return out.normalize('NFC');
+                    };
                     const schedule = (c) => {
                         let bytes = b64ToBytes(c.data);
                         if (carry) { const m = new Uint8Array(carry.length + bytes.length); m.set(carry); m.set(bytes, carry.length); bytes = m; carry = null; }
                         if (bytes.length % 2) { carry = bytes.slice(-1); bytes = bytes.slice(0, -1); }
                         const n = bytes.length / 2;
-                        if (!n) return;
+                        if (!n) { starts.push(next); return; }
                         const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.length);
                         const ab = ctx.createBuffer(1, n, c.rate);
                         const ch = ab.getChannelData(0);
@@ -860,15 +884,21 @@ const SpeakingRoom = () => {
                             });
                             tick = setInterval(() => {
                                 if (stale()) { done(); return; }
-                                const sched = next - t0;
-                                const total = st.done ? sched : Math.max(sched, estimate);
-                                const p = total > 0 ? Math.min(1, (ctx.currentTime - t0) / total) : 0;
-                                setLive((l) => (l ? { ...l, shown: upTo(p) } : l));
+                                if (res.realtime) {
+                                    const said = spoken();
+                                    setLive((l) => (l && l.text !== said ? { ...l, text: said, shown: said.length } : l));
+                                } else {
+                                    const sched = next - t0;
+                                    const total = st.done ? sched : Math.max(sched, estimate);
+                                    const p = total > 0 ? Math.min(1, (ctx.currentTime - t0) / total) : 0;
+                                    setLive((l) => (l ? { ...l, shown: upTo(p) } : l));
+                                }
                                 if (st.done && ctx.currentTime >= next) done();
                             }, 120);
                         }
                         if (next < now + 0.02) next = now + 0.02;     // mạng chậm: nối tiếp từ bây giờ
                         node.start(next);
+                        starts.push(next);
                         next += ab.duration;
                         srcs.push(node);
                     };
@@ -1341,7 +1371,7 @@ const SpeakingRoom = () => {
                                             Fenrir, xem máy chủ), nên giữ luôn khuôn mặt examiner đó. */}
                                         <Mascot size={live.status === 'speaking' ? 108 : 84} ring={live.status === 'speaking'}
                                                 mood={live.status === 'speaking' ? live.mood : null}
-                                                talking={live.status === 'speaking' && live.voiced && live.shown < live.text.length} />
+                                                talking={live.status === 'speaking' && live.voiced && !live.finished} />
                                     </div>
                                     {live.status === 'thinking' && (
                                         <p className="m-0 text-[15px] text-[#dff0f1] max-w-[460px] inline-flex items-center gap-2">
@@ -1364,7 +1394,7 @@ const SpeakingRoom = () => {
                                         <p data-no-translate
                                            className="m-0 text-[19px] sm:text-[22px] font-semibold leading-[1.5] max-w-[620px] text-left whitespace-pre-line">
                                             <span>{live.text.slice(0, live.shown)}</span>
-                                            <span className="opacity-35">{live.text.slice(live.shown)}</span>
+                                            {/* Không hiện trước phần chưa nói: chữ chạy đúng theo giọng (2026-11-18). */}
                                         </p>
                                     )}
                                     <button type="button" onClick={skipLive}
