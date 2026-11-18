@@ -232,6 +232,79 @@ export const liveFeedback = async (attemptId, { orderIndex, lang, text, blob, ex
     return res.json();
 };
 
+// Bản STREAM (2026-11-18, "feedback nhanh hơn"): máy chủ trả từng dòng JSON — dòng đầu
+// là chữ nhận xét, sau đó là từng mảnh âm thanh PCM để phát NGAY khi tới, không chờ cả
+// đoạn. Promise trả về khi có dòng chữ, kèm `stream` tiếp tục nhận âm thanh ở nền.
+// Máy chủ chưa có endpoint này (404/405) thì tự quay về liveFeedback cũ.
+export const canStreamLive = () => typeof window !== 'undefined'
+    && !!(window.AudioContext || window.webkitAudioContext)
+    && typeof ReadableStream !== 'undefined' && typeof TextDecoder !== 'undefined';
+
+export const liveFeedbackStream = async (attemptId, opts) => {
+    const { orderIndex, lang, text, blob, ext, signal, recent } = opts;
+    const inner = new AbortController();
+    if (signal) {
+        if (signal.aborted) inner.abort();
+        else signal.addEventListener('abort', () => inner.abort());
+    }
+    const form = new FormData();
+    form.append('order_index', String(orderIndex));
+    form.append('lang', lang || 'en');
+    if (text) form.append('text', text);
+    if (recent && recent.length) form.append('recent', JSON.stringify(recent.slice(-4)));
+    if (blob && blob.size) form.append('audio', blob, `answer.${ext || 'webm'}`);
+    const res = await fetch(`${API_BASE}/student/speaking/live/attempts/${attemptId}/feedback/stream`, {
+        method: 'POST', headers: authHeaders(), body: form, signal: inner.signal,
+    });
+    if (res.status === 404 || res.status === 405) return liveFeedback(attemptId, opts);
+    if (!res.ok) throw await asError(res);
+    if (!res.body || !res.body.getReader) return liveFeedback(attemptId, opts);
+
+    const stream = {
+        chunks: [], full: null, done: false, engine: null, listeners: new Set(),
+        abort: () => inner.abort(),
+        notify() { this.listeners.forEach((fn) => { try { fn(); } catch (e) { /* bỏ qua */ } }); },
+    };
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+    let head = null;
+    const handle = (line) => {
+        if (!line.trim()) return;
+        let msg;
+        try { msg = JSON.parse(line); } catch (e) { return; }
+        if (msg.type === 'text') head = msg;
+        else if (msg.type === 'pcm') stream.chunks.push({ data: msg.data, rate: msg.rate || 24000 });
+        else if (msg.type === 'full') stream.full = { audio: msg.audio, mime: msg.audio_mime };
+        else if (msg.type === 'done') { stream.engine = msg.engine; stream.done = true; }
+        stream.notify();
+    };
+    const pump = async () => {
+        try {
+            for (;;) {
+                // eslint-disable-next-line no-await-in-loop
+                const { value, done } = await reader.read();
+                if (done) break;
+                buf += decoder.decode(value, { stream: true });
+                let i = buf.indexOf('\n');
+                while (i >= 0) {
+                    handle(buf.slice(0, i));
+                    buf = buf.slice(i + 1);
+                    if (head && !stream.started) { stream.started = true; stream.resolveHead(); }
+                    i = buf.indexOf('\n');
+                }
+            }
+            handle(buf);
+        } catch (e) { /* bị huỷ hoặc mất mạng giữa chừng: phát nốt phần đã có */ }
+        stream.done = true;
+        if (!stream.started) { stream.started = true; stream.resolveHead(); }
+        stream.notify();
+    };
+    await new Promise((resolve) => { stream.resolveHead = resolve; pump(); });
+    if (!head) throw new Error('The examiner could not give feedback this time.');
+    return { feedback: head.feedback, mood: head.mood, voice_gender: head.voice_gender, stream };
+};
+
 // Chế độ Live + ngôn ngữ feedback đi theo bài thi. Lưu sessionStorage để F5 giữa bài
 // vẫn giữ đúng chế độ (máy chủ không lưu gì về Live Action).
 const LIVE_KEY = (attemptId) => `speaking_live_${attemptId}`;

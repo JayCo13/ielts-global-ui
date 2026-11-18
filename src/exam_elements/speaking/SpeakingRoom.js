@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import {
     beaconFinish, examinerAudioUrl, fetchAttempt, fetchHelp, finishTest,
-    requestAiFollowup, submitAnswer, liveFeedback, recallLive,
+    requestAiFollowup, submitAnswer, liveFeedback, liveFeedbackStream, canStreamLive, recallLive,
 } from './speakingApi';
 import { createRecorder } from './recorder';
 import Outline from './Outline';
@@ -34,6 +34,27 @@ const SILENT_STREAK_LIMIT = 3;
 // Live Action: chờ AI tối đa chừng này rồi bỏ qua nhận xét, đi tiếp câu sau — không để
 // việc phân tích làm đứng buổi luyện (brief §3, "rất quan trọng").
 const LIVE_WAIT_MS = 30000;
+
+// base64 → bytes, và PCM s16le → URL WAV (dự phòng khi không phát được bằng WebAudio).
+const b64ToBytes = (b64) => {
+    const bin = atob(b64);
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i += 1) out[i] = bin.charCodeAt(i);
+    return out;
+};
+const pcmToWavUrl = (chunks) => {
+    const parts = chunks.map((c) => b64ToBytes(c.data));
+    const rate = (chunks[0] && chunks[0].rate) || 24000;
+    let len = parts.reduce((a, b) => a + b.length, 0);
+    len -= len % 2;
+    const head = new DataView(new ArrayBuffer(44));
+    const str = (o, t) => { for (let i = 0; i < t.length; i += 1) head.setUint8(o + i, t.charCodeAt(i)); };
+    str(0, 'RIFF'); head.setUint32(4, 36 + len, true); str(8, 'WAVE'); str(12, 'fmt ');
+    head.setUint32(16, 16, true); head.setUint16(20, 1, true); head.setUint16(22, 1, true);
+    head.setUint32(24, rate, true); head.setUint32(28, rate * 2, true);
+    head.setUint16(32, 2, true); head.setUint16(34, 16, true); str(36, 'data'); head.setUint32(40, len, true);
+    return URL.createObjectURL(new Blob([head.buffer, ...parts], { type: 'audio/wav' }));
+};
 
 const PART_LABEL = {
     part1: 'Part 1', part2: 'Part 2', part2_followup: 'Part 2', part3: 'Part 3',
@@ -583,7 +604,8 @@ const SpeakingRoom = () => {
         if (liveLang && (spoke || text) && (text || (blob && blob.size))) {
             const ctrl = new AbortController();
             const timer = setTimeout(() => ctrl.abort(), LIVE_WAIT_MS);
-            liveRef.current = liveFeedback(attemptId, {
+            const ask = canStreamLive() ? liveFeedbackStream : liveFeedback;
+            liveRef.current = ask(attemptId, {
                 orderIndex: current.order_index, lang: liveLang, text, blob,
                 ext: recorderRef.current ? recorderRef.current.extension() : 'webm',
                 signal: ctrl.signal, recent: liveSaidRef.current,
@@ -612,10 +634,11 @@ const SpeakingRoom = () => {
     // Miệng giám khảo nhép theo độ lớn của giọng (brief 5 §9). Dùng WebAudio analyser trên
     // chính thẻ <audio>; chỉ nối khi AudioContext đang chạy (nếu không, tiếng sẽ bị câm) —
     // không được thì miệng đóng mở theo nhịp giả. Trả về hàm dừng.
-    const startLips = useCallback(async (el) => {
-        const face = () => liveFaceRef.current;
+    // Một AudioContext dùng chung: analyser → loa. Thẻ <audio> (bản cũ) và các mảnh PCM
+    // stream (bản mới) đều đi qua analyser này để miệng nhép theo.
+    const getLipCtx = useCallback(async () => {
         let lip = lipRef.current;
-        if (!lip) {
+        if (!lip || lip.fake) {          // lần trước bị chặn tự phát thì thử lại
             try {
                 const Ctx = window.AudioContext || window.webkitAudioContext;
                 const ctx = new Ctx();
@@ -623,10 +646,8 @@ const SpeakingRoom = () => {
                     await Promise.race([ctx.resume(), new Promise((r) => setTimeout(r, 300))]);
                 }
                 if (ctx.state === 'running') {
-                    const src = ctx.createMediaElementSource(el);
                     const analyser = ctx.createAnalyser();
                     analyser.fftSize = 512;
-                    src.connect(analyser);
                     analyser.connect(ctx.destination);
                     lip = { ctx, analyser, buf: new Uint8Array(analyser.fftSize) };
                 } else {
@@ -640,6 +661,30 @@ const SpeakingRoom = () => {
         } else if (lip.ctx && lip.ctx.state !== 'running') {
             await Promise.race([lip.ctx.resume().catch(() => {}), new Promise((r) => setTimeout(r, 300))]);
         }
+        return lip;
+    }, []);
+
+    // Safari chỉ cho AudioContext chạy nếu được tạo/resume trong một cú bấm của người dùng:
+    // mở khoá ngay lần bấm đầu tiên trong phòng (chỉ khi có Live Action).
+    useEffect(() => {
+        if (!liveLang) return undefined;
+        const unlock = () => { getLipCtx(); };
+        document.addEventListener('pointerdown', unlock, { once: true, capture: true });
+        return () => document.removeEventListener('pointerdown', unlock, { capture: true });
+    }, [liveLang, getLipCtx]);
+
+    // el: thẻ <audio> đang phát (hoặc null khi phát stream); playing(): đang có tiếng không
+    // (chỉ dùng cho nhịp giả khi không có analyser).
+    const startLips = useCallback(async (el, playing) => {
+        const face = () => liveFaceRef.current;
+        const lip = await getLipCtx();
+        if (el && lip.analyser && !lip.elSrc) {
+            try {
+                lip.elSrc = lip.ctx.createMediaElementSource(el);
+                lip.elSrc.connect(lip.analyser);
+            } catch (e) { /* đã nối từ trước */ }
+        }
+        const isPlaying = playing || (() => !!el && !el.paused);
         let raf = 0;
         let smooth = 0;
         const t0 = performance.now();
@@ -652,7 +697,7 @@ const SpeakingRoom = () => {
                 v = Math.min(1, Math.sqrt(sum / lip.buf.length) * 5);
             } else {
                 const t = (performance.now() - t0) / 1000;
-                v = el.paused ? 0 : Math.max(0, 0.55 + 0.45 * Math.sin(t * 17) * Math.sin(t * 5.3));
+                v = !isPlaying() ? 0 : Math.max(0, 0.55 + 0.45 * Math.sin(t * 17) * Math.sin(t * 5.3));
             }
             smooth = smooth * 0.45 + v * 0.55;
             const f = face();
@@ -665,7 +710,7 @@ const SpeakingRoom = () => {
             const f = face();
             if (f) f.style.setProperty('--mouth', '0');
         };
-    }, []);
+    }, [getLipCtx]);
 
     // ── Live Action: giám khảo nhận xét bằng giọng nói, chữ chạy theo giọng ──
     // Luôn resolve. Bị tạm dừng / thoát giữa chừng thì tắt tiếng và trả về false.
@@ -707,11 +752,13 @@ const SpeakingRoom = () => {
             let tick = null;
             let guard = null;
             let stopLips = null;
+            let stopStream = null;
             const el = liveAudioRef.current;
             const done = () => {
                 if (settled) return;
                 settled = true;
                 clearInterval(tick); clearTimeout(guard);
+                if (stopStream) stopStream();
                 if (stopLips) stopLips();
                 if (el) { el.pause(); el.onended = null; el.onerror = null; }
                 liveSkipRef.current = null;
@@ -732,34 +779,126 @@ const SpeakingRoom = () => {
                     if (p >= 1) done();
                 }, 120);
             };
+            const playEl = (src, engine) => {
+                if (!el || !src) { setLive((l) => (l ? { ...l, voiced: false } : l)); readOnly(); return; }
+                el.src = src;
+                // Phát đúng tốc độ gốc: tua nhanh trên trình duyệt làm giọng Gemini méo (2026-11-17).
+                el.playbackRate = 1;
+                // Để kiểm tra đang dùng giọng nào (gemini = giọng hay, google-chirp = dự phòng).
+                if (engine) console.info('[live] voice engine:', engine);
+                el.onended = done;
+                el.onerror = () => { setLive((l) => (l ? { ...l, voiced: false } : l)); readOnly(); };
+                guard = setTimeout(done, 75000);
+                tick = setInterval(() => {
+                    if (stale()) { done(); return; }
+                    if (Number.isFinite(el.duration) && el.duration > 0) {
+                        const p = Math.min(1, el.currentTime / el.duration);
+                        setLive((l) => (l ? { ...l, shown: upTo(p) } : l));
+                    }
+                }, 120);
+                startLips(el).then((stop) => {
+                    if (settled) stop(); else stopLips = stop;
+                    const started = el.play();
+                    if (started && started.catch) started.catch(() => { setLive((l) => (l ? { ...l, voiced: false } : l)); readOnly(); });
+                });
+            };
+            if (res.stream) { playStream(res.stream); return; }
             if (!el || !res.audio) { readOnly(); return; }
-            el.src = `data:${res.audio_mime || 'audio/mpeg'};base64,${res.audio}`;
-            // Phát đúng tốc độ gốc: tua nhanh trên trình duyệt làm giọng Gemini méo (2026-11-17).
-            el.playbackRate = 1;
-            // Để kiểm tra đang dùng giọng nào (gemini = giọng hay, google-chirp = dự phòng).
-            if (res.engine) console.info('[live] voice engine:', res.engine);
-            el.onended = done;
-            el.onerror = () => { setLive((l) => (l ? { ...l, voiced: false } : l)); readOnly(); };
-            guard = setTimeout(done, 75000);
-            tick = setInterval(() => {
-                if (stale()) { done(); return; }
-                if (Number.isFinite(el.duration) && el.duration > 0) {
-                    const p = Math.min(1, el.currentTime / el.duration);
-                    setLive((l) => (l ? { ...l, shown: upTo(p) } : l));
-                }
-            }, 120);
-            startLips(el).then((stop) => {
-                if (settled) stop(); else stopLips = stop;
-                const started = el.play();
-                if (started && started.catch) started.catch(() => { setLive((l) => (l ? { ...l, voiced: false } : l)); readOnly(); });
-            });
+            playEl(`data:${res.audio_mime || 'audio/mpeg'};base64,${res.audio}`, res.engine);
+
+            // ── Bản stream: phát từng mảnh PCM ngay khi tới (2026-11-18) ──
+            function playStream(st) {
+                const srcs = [];
+                let feed = null;
+                stopStream = () => {
+                    if (feed) st.listeners.delete(feed);
+                    st.abort();
+                    srcs.forEach((x) => { try { x.stop(); } catch (e) { /* đã dừng */ } });
+                };
+                getLipCtx().then((lip) => {
+                    if (settled) return;
+                    // Không chạy được WebAudio (trình duyệt chặn tự phát): chờ đủ rồi phát
+                    // bằng thẻ <audio> như cũ.
+                    if (!lip.ctx || lip.ctx.state !== 'running') {
+                        feed = () => {
+                            if (settled || !st.done) return;
+                            st.listeners.delete(feed);
+                            if (st.full) playEl(`data:${st.full.mime || 'audio/mpeg'};base64,${st.full.audio}`, st.engine);
+                            else playEl(st.chunks.length ? pcmToWavUrl(st.chunks) : null, st.engine);
+                        };
+                        st.listeners.add(feed);
+                        feed();
+                        return;
+                    }
+                    const ctx = lip.ctx;
+                    const words = text.split(/\s+/).filter(Boolean).length;
+                    const estimate = Math.max(2, words * 0.36);       // giây, trước khi biết độ dài thật
+                    let fed = 0;
+                    let t0 = 0;
+                    let next = 0;
+                    let carry = null;
+                    const schedule = (c) => {
+                        let bytes = b64ToBytes(c.data);
+                        if (carry) { const m = new Uint8Array(carry.length + bytes.length); m.set(carry); m.set(bytes, carry.length); bytes = m; carry = null; }
+                        if (bytes.length % 2) { carry = bytes.slice(-1); bytes = bytes.slice(0, -1); }
+                        const n = bytes.length / 2;
+                        if (!n) return;
+                        const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.length);
+                        const ab = ctx.createBuffer(1, n, c.rate);
+                        const ch = ab.getChannelData(0);
+                        for (let i = 0; i < n; i += 1) ch[i] = dv.getInt16(i * 2, true) / 32768;
+                        const node = ctx.createBufferSource();
+                        node.buffer = ab;
+                        node.connect(lip.analyser);
+                        const now = ctx.currentTime;
+                        if (!t0) {
+                            t0 = now + 0.06;
+                            next = t0;
+                            console.info('[live] voice engine: gemini-stream');
+                            startLips(null, () => !!t0 && ctx.currentTime < next).then((stop) => {
+                                if (settled) stop(); else stopLips = stop;
+                            });
+                            tick = setInterval(() => {
+                                if (stale()) { done(); return; }
+                                const sched = next - t0;
+                                const total = st.done ? sched : Math.max(sched, estimate);
+                                const p = total > 0 ? Math.min(1, (ctx.currentTime - t0) / total) : 0;
+                                setLive((l) => (l ? { ...l, shown: upTo(p) } : l));
+                                if (st.done && ctx.currentTime >= next) done();
+                            }, 120);
+                        }
+                        if (next < now + 0.02) next = now + 0.02;     // mạng chậm: nối tiếp từ bây giờ
+                        node.start(next);
+                        next += ab.duration;
+                        srcs.push(node);
+                    };
+                    feed = () => {
+                        if (settled) return;
+                        if (st.full && !fed) {                        // máy chủ dùng giọng dự phòng (cả đoạn)
+                            st.listeners.delete(feed);
+                            playEl(`data:${st.full.mime || 'audio/mpeg'};base64,${st.full.audio}`, st.engine);
+                            return;
+                        }
+                        while (fed < st.chunks.length) { schedule(st.chunks[fed]); fed += 1; }
+                        if (st.done && !t0) {                         // không có tiếng nào
+                            st.listeners.delete(feed);
+                            if (st.engine) console.info('[live] voice engine:', st.engine);
+                            setLive((l) => (l ? { ...l, voiced: false } : l));
+                            readOnly();
+                        }
+                    };
+                    st.listeners.add(feed);
+                    guard = setTimeout(done, 75000);
+                    feed();
+                });
+            }
         });
         if (stale()) { setLive(null); return false; }
         // Để học viên kịp đọc nốt câu cuối trước khi sang câu mới.
         await new Promise((r) => setTimeout(r, 900));
         setLive(null);
         return !stale();
-    }, [startLips]);
+    }, [startLips, getLipCtx]);
 
     const skipLive = () => { if (liveSkipRef.current) liveSkipRef.current(); };
 
