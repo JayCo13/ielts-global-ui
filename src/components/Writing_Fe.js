@@ -109,34 +109,30 @@ const Writing_Fe = () => {
             setTests(mapped);
           }
         } else {
-          const [testsResponse, subscriptionResponse] = await Promise.all([
-            fetch(`${API_BASE}/student/writing/tasks`, {
-              headers: { 'Authorization': `Bearer ${token}` }
-            }),
-            fetch(`${API_BASE}/customer/vip/subscription/status`, {
-              headers: { 'Authorization': `Bearer ${token}` }
+          // The list shows as soon as the tests arrive; the VIP status fills in on its
+          // own and no longer holds the loading screen (2026-11-19).
+          const auth = { headers: { 'Authorization': `Bearer ${token}` } };
+          fetch(`${API_BASE}/customer/vip/subscription/status`, auth)
+            .then(r => (r.ok ? r.json() : null))
+            .then(subscriptionData => {
+              if (!subscriptionData) return;
+              setAccountStatus(subscriptionData);
+              // Writing-specific VIP access logic
+              // Only a Writing package grants it; the Listening + Reading bundle
+              // ("all_skills") does not.
+              setIsVIP(!!subscriptionData.has_writing_access);
             })
-          ]);
+            .catch(() => {});
 
-          if (testsResponse.status === 401 || subscriptionResponse.status === 401) {
+          const testsResponse = await fetch(`${API_BASE}/student/writing/tasks`, auth);
+
+          if (testsResponse.status === 401) {
             navigate('/login');
             return;
           }
 
-          if (testsResponse.ok && subscriptionResponse.ok) {
-            const [testsData, subscriptionData] = await Promise.all([
-              testsResponse.json(),
-              subscriptionResponse.json()
-            ]);
-
-            setAccountStatus(subscriptionData);
-
-            // Writing-specific VIP access logic
-            // Only a Writing package grants it; the Listening + Reading bundle
-            // ("all_skills") does not.
-            const hasWritingAccess = !!subscriptionData.has_writing_access;
-
-            setIsVIP(hasWritingAccess);
+          if (testsResponse.ok) {
+            const testsData = await testsResponse.json();
             setTests(testsData.map(mapStudentWritingTest));
           }
         }
