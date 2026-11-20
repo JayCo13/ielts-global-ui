@@ -43,6 +43,7 @@ export default function AffiliatePanel({ onGoPayment, part = 'all' }) {
   const [withdrawals, setWithdrawals] = useState([]);
   const [payment, setPayment] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [codeCopied, setCodeCopied] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [msg, setMsg] = useState(null);
   const [loadError, setLoadError] = useState(false);
@@ -65,6 +66,13 @@ export default function AffiliatePanel({ onGoPayment, part = 'all' }) {
     if (!info) return;
     navigator.clipboard.writeText(info.referral_link).then(() => {
       setCopied(true); setTimeout(() => setCopied(false), 1500);
+    }).catch(() => {});
+  };
+
+  const copyCode = () => {
+    if (!info?.discount_code) return;
+    navigator.clipboard.writeText(info.discount_code).then(() => {
+      setCodeCopied(true); setTimeout(() => setCodeCopied(false), 1500);
     }).catch(() => {});
   };
 
@@ -109,6 +117,8 @@ export default function AffiliatePanel({ onGoPayment, part = 'all' }) {
     ? Number(info.rate_pct).toLocaleString('en-US', { maximumFractionDigits: 1 })
     : Math.round((info.commission_rate || 0.05) * 100);
 
+  const discountPct = Number(info.discount_pct || 5).toLocaleString('en-US', { maximumFractionDigits: 1 });
+
   const stat = [
     { icon: MousePointerClick, label: 'Link clicks', value: count(info.click_count), tone: 'text-sky-500' },
     { icon: UserPlus, label: 'Accounts registered via your link', value: count(info.signup_count), tone: 'text-[#0096b1]' },
@@ -123,13 +133,17 @@ export default function AffiliatePanel({ onGoPayment, part = 'all' }) {
       <div>
         {/* In Creator Hub the section header already names the program. */}
         {part !== 'affiliate' && <h2 className="text-xl font-bold text-[#2b5356] flex items-center gap-2 mb-1"><Gift className="w-6 h-6 text-[#0096b1]" /> Affiliate — refer friends, earn commission</h2>}
-        <p className="text-sm text-gray-500">Share your affiliate link. When someone registers a new account through your link and buys a VIP package, you earn <b>{ratePct}% commission</b> on the amount they actually pay.</p>
+        {info.discount_enabled ? (
+          <p className="text-sm text-gray-500">Share your affiliate link or discount code. When someone registers through your link or enters your code when making their first VIP purchase, they receive <b>{discountPct}% off their first VIP order</b>, and you earn <b>{ratePct}% commission</b> on the amount they actually pay.</p>
+        ) : (
+          <p className="text-sm text-gray-500">Share your affiliate link or discount code. When someone registers through your link or enters your code when making their first VIP purchase, you earn <b>{ratePct}% commission</b> on the amount they actually pay.</p>
+        )}
         <Link to="/affiliate-guide" className="inline-flex items-center gap-1.5 mt-2 text-sm font-medium text-[#0096b1] hover:underline">
           <BookOpen className="w-4 h-4" /> Read the full guide
         </Link>
         <div className="mt-3 flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-100 p-3 text-sm text-gray-700">
           <span className="shrink-0">💡</span>
-          <p><b className="text-amber-700">Note:</b> once an account has registered through your link, you earn commission on <b>every successful VIP purchase or renewal</b> that account makes, including future ones. Commission can take a few minutes to appear after a purchase.</p>
+          <p><b className="text-amber-700">Note:</b> once an account is linked to you through your affiliate link or discount code, you earn commission on <b>every successful VIP purchase or renewal</b> that account makes, including future purchases. Commission can take a few minutes to appear after a purchase.</p>
         </div>
       </div>
 
@@ -142,6 +156,18 @@ export default function AffiliatePanel({ onGoPayment, part = 'all' }) {
             {copied ? <><Check className="w-4 h-4" /> Copied</> : <><Copy className="w-4 h-4" /> Copy link</>}
           </button>
         </div>
+        {info.discount_code && (<>
+          <div className="text-sm font-semibold text-[#2b5356] mt-4 mb-2">Your discount code</div>
+          <div className="flex gap-2">
+            <input readOnly value={info.discount_code} data-no-translate className="flex-1 min-w-0 px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm font-semibold tracking-wider text-gray-700" />
+            <button onClick={copyCode} className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#0096b1] text-white text-sm font-medium hover:bg-[#007d93]">
+              {codeCopied ? <><Check className="w-4 h-4" /> Copied</> : <><Copy className="w-4 h-4" /> Copy code</>}
+            </button>
+          </div>
+          <p className="text-xs text-gray-500 mt-1.5">{info.discount_enabled
+            ? `Buyers enter this code at checkout to get ${discountPct}% off their first VIP order.`
+            : 'Buyers can enter this code at checkout to link their account to you.'}</p>
+        </>)}
       </div>
 
       {/* Stats */}

@@ -94,7 +94,7 @@ function ApplyView({ status, onDone }) {
       <div>
         <h2 className="text-xl font-bold text-[#2b5356] flex items-center gap-2"><Sparkles className="w-6 h-6 text-[#eb7e37]" /> Creator Hub</h2>
         <p className="text-sm text-gray-500 mt-1">
-          Creator Hub brings together the <b>Creator Program</b> (get paid for views) and the <b>Affiliate Program</b> (earn commission on purchases through your link).
+          Creator Hub brings together the <b>Creator Program</b> (get paid for views) and the <b>Affiliate Program</b> (earn commission on purchases through your link or discount code).
           It opens once your creator application is approved.
         </p>
         <Link to="/work-with-us" className="inline-flex items-center gap-1 mt-2 text-sm font-medium text-[#0096b1] hover:underline">
@@ -314,12 +314,56 @@ function PrimaryWarning({ info, onSwitch, onSubmitAnyway, onCancel }) {
   );
 }
 
-function SubmitViews({ channels, rates, openRecon, nextSubmitAt, minDays, onDone }) {
+// Individual Video Bonus (policy 2026-11-19): links of videos that reached the minimum views
+// this month. A link can only ever be submitted once; amounts are not shown to creators.
+const VIDEO_DUP = 'This video has already been submitted.';
+function VideoBonus({ links, onChange, minViews, dups, onCheck }) {
+  const count = links.length;
+  const setCount = (raw) => {
+    const n = Math.max(0, Math.min(200, Math.floor(Number(String(raw).replace(/[^\d]/g, '')) || 0)));
+    onChange(n >= count ? [...links, ...Array(n - count).fill('')] : links.slice(0, n));
+  };
+  return (
+    <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-4">
+      <h5 className="font-semibold text-gray-800">Individual Video Bonus</h5>
+      <label className="mt-2 block text-sm text-gray-500">Number of videos reaching {num(minViews)} views this month:</label>
+      <div className="mt-1 flex items-center gap-2">
+        <input inputMode="numeric" aria-label="Number of videos" className={`${input} w-20 text-center text-lg font-semibold tabular-nums`}
+          value={count} onChange={(e) => setCount(e.target.value)} />
+        <span className="text-lg font-semibold text-gray-700">{count === 1 ? 'video' : 'videos'}</span>
+      </div>
+      <h6 className="mt-4 mb-2 font-semibold text-gray-700">Add Video Links</h6>
+      <div className="space-y-2">
+        {links.map((u, i) => {
+          const dup = u.trim() && dups.includes(u);
+          return (
+            <div key={i}>
+              <div className="flex items-center gap-2">
+                <input className={`${input} rounded-full px-4 ${dup ? 'border-red-300 focus:ring-red-200' : ''}`} placeholder="Paste video URL here"
+                  value={u} onChange={(e) => onChange(links.map((x, j) => (j === i ? e.target.value : x)))} onBlur={onCheck} />
+                <button type="button" onClick={() => onChange(links.filter((_, j) => j !== i))} aria-label="Remove video" className="p-1.5 text-red-500 hover:text-red-600"><Trash2 className="w-4 h-4" /></button>
+              </div>
+              {dup && <p className="mt-1 ml-4 text-xs text-red-500">{VIDEO_DUP}</p>}
+            </div>
+          );
+        })}
+        <button type="button" onClick={() => onChange([...links, ''])}
+          className="w-full rounded-full border border-gray-200 bg-white py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 inline-flex items-center justify-center gap-1.5">
+          <Plus className="w-4 h-4" /> Add Video
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function SubmitViews({ channels, rates, openRecon, nextSubmitAt, minDays, videoMinViews, onDone }) {
   const approved = channels.filter((c) => c.status === 'approved');
   const [primary, setPrimary] = useState(() => (approved.find((c) => c.is_primary) || approved[0] || {}).id);
   const [vals, setVals] = useState({});
   const [dates, setDates] = useState({});
   const [proofs, setProofs] = useState({});
+  const [videos, setVideos] = useState([]);
+  const [dups, setDups] = useState([]);
   const [warn, setWarn] = useState(null);
   const [locked, setLocked] = useState(false);
   const [err, setErr] = useState('');
@@ -357,18 +401,30 @@ function SubmitViews({ channels, rates, openRecon, nextSubmitAt, minDays, onDone
         body: JSON.stringify({
           primary_channel_id: approved.length > 1 ? pid : undefined,
           items: filled.map((l) => ({ channel_id: l.c.id, total_views: l.total, views_date: dates[l.c.id] || today(), proof_urls: proofs[l.c.id] || [] })),
+          videos: videoLinks,
         }),
       });
-      setVals({}); setDates({}); setProofs({}); onDone();
-    } catch (e) { setErr(e.message); } finally { setBusy(false); }
+      setVals({}); setDates({}); setProofs({}); setVideos([]); setDups([]); onDone();
+    } catch (e) { setErr(e.message); if (e.message === VIDEO_DUP) checkVideos(); } finally { setBusy(false); }
+  };
+
+  const videoLinks = videos.map((u) => u.trim()).filter(Boolean);
+  const checkVideos = async () => {
+    const urls = videos.filter((u) => u.trim());
+    if (!urls.length) { setDups([]); return; }
+    try {
+      const r = await api('/creator-hub/videos/check', { method: 'POST', body: JSON.stringify({ urls }) });
+      setDups(r.duplicates || []);
+    } catch (e) { /* checked again on submit */ }
   };
 
   const submit = () => {
     setErr('');
     if (nextSubmitAt) { setLocked(true); return; }
-    if (!filled.length) { setErr('Enter the current total views of at least one channel.'); return; }
+    if (!filled.length && !videoLinks.length) { setErr('Enter the current total views of at least one channel.'); return; }
+    if (videos.some((u) => u.trim() && dups.includes(u))) { setErr(VIDEO_DUP); return; }
     if (bad) { setErr(`Total views for “${bad.c.channel_name}” can't be lower than the last approved total (${num(bad.c.approved_total_views)}).`); return; }
-    if (approved.length > 1) {
+    if (approved.length > 1 && filled.length) {
       const best = filled.filter((l) => l.period > 0).sort((a, b) => b.period - a.period)[0];
       const currentTotal = totalWith(primary);
       if (best && best.c.id !== primary) {
@@ -437,6 +493,7 @@ function SubmitViews({ channels, rates, openRecon, nextSubmitAt, minDays, onDone
           </tbody>
         </table>
       </div>
+      <VideoBonus links={videos} onChange={(v) => setVideos(v)} minViews={videoMinViews || 1000} dups={dups} onCheck={checkVideos} />
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="text-sm text-gray-600">Estimated reward: <b className="text-emerald-600">{usd(totalReward)}</b> <span className="text-xs text-gray-400">· added to your wallet after review</span></div>
         <button onClick={submit} disabled={busy} className={`${btn} bg-[#eb7e37] text-white hover:bg-[#d96e28]`}><Send className="w-4 h-4" /> {busy ? 'Sending…' : 'Submit views for review'}</button>
@@ -462,6 +519,12 @@ function SubmitViews({ channels, rates, openRecon, nextSubmitAt, minDays, onDone
   );
 }
 
+const VID_STATUS = {
+  pending: { label: 'Pending', cls: 'bg-sky-50 text-sky-600' },
+  approved: { label: 'Approved', cls: 'bg-emerald-50 text-emerald-600' },
+  rejected: { label: 'Not approved', cls: 'bg-red-50 text-red-500' },
+  returned: { label: 'Returned', cls: 'bg-gray-100 text-gray-500' },
+};
 const PREVIEW = 3;
 const ShowMore = ({ total, open, onToggle }) => (total > PREVIEW ? (
   <button type="button" onClick={onToggle} className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-[#0096b1] hover:underline">
@@ -503,6 +566,17 @@ function History({ items }) {
                   ))}
                 </tbody>
               </table>
+              {(r.videos || []).length > 0 && (
+                <div className="mt-2 text-xs text-gray-600">
+                  <div className="font-semibold text-gray-500 mb-1">Videos ({r.videos.length})</div>
+                  {r.videos.map((v) => (
+                    <div key={v.url} className="flex items-center gap-2 py-0.5">
+                      <a href={v.url} target="_blank" rel="noopener noreferrer" className="truncate text-[#0096b1] hover:underline" data-no-translate>{v.url}</a>
+                      <span className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold ${VID_STATUS[v.status]?.cls || 'bg-gray-100 text-gray-500'}`}>{VID_STATUS[v.status]?.label || v.status}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -621,7 +695,7 @@ function CreatorProgram() {
   if (err && !data) return <Card><p className="text-sm text-gray-500">Could not load the Creator Program. <button onClick={load} className="text-[#0096b1] font-semibold hover:underline">Try again</button></p></Card>;
   if (!data) return <Card><p className="text-sm text-gray-400">Loading…</p></Card>;
 
-  const { channels, rates, platforms, open_reconciliation: openRecon, next_submit_at: nextSubmitAt, min_days_between: minDays = 20 } = data;
+  const { channels, rates, platforms, open_reconciliation: openRecon, next_submit_at: nextSubmitAt, min_days_between: minDays = 20, video_min_views: videoMinViews } = data;
   const stats = [
     { icon: DollarSign, label: 'Approved creator rewards', value: money(earn?.approved_rewards), tone: 'text-emerald-600' },
     { icon: Clock, label: 'Pending rewards (estimated)', value: usd(earn?.pending_rewards_usd), tone: 'text-amber-500' },
@@ -657,7 +731,7 @@ function CreatorProgram() {
 
       <Card>
         <h4 className="font-bold text-gray-800 mb-3">Submit views</h4>
-        <SubmitViews channels={channels} rates={rates} openRecon={openRecon} nextSubmitAt={nextSubmitAt} minDays={minDays} onDone={load} />
+        <SubmitViews channels={channels} rates={rates} openRecon={openRecon} nextSubmitAt={nextSubmitAt} minDays={minDays} videoMinViews={videoMinViews} onDone={load} />
       </Card>
 
       <Card>
@@ -886,7 +960,7 @@ export default function CreatorHub({ onGoPayment, onStatus }) {
         <CreatorProgram />
       </HubSection>
 
-      <HubSection n={2} icon={Gift} title="Affiliate Program" subtitle="Earn commission on purchases through your link." tone="bg-[#0096b1]/10 text-[#00687b]">
+      <HubSection n={2} icon={Gift} title="Affiliate Program" subtitle="Earn commission when people purchase through your affiliate link or discount code." tone="bg-[#0096b1]/10 text-[#00687b]">
         <AffiliatePanel part="affiliate" onGoPayment={onGoPayment} />
       </HubSection>
 
