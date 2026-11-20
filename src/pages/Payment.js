@@ -46,8 +46,9 @@ const NINEPAY_ENABLED = process.env.REACT_APP_NINEPAY_ENABLED === 'true';
 const NINEPAY_APPLE_PAY = NINEPAY_ENABLED && process.env.REACT_APP_NINEPAY_APPLE_PAY === 'true';
 const NINEPAY_GOOGLE_PAY = NINEPAY_ENABLED && process.env.REACT_APP_NINEPAY_GOOGLE_PAY === 'true';
 // Vietnamese buyers: bank transfer (method=COLLECTION) and VietQR / VietQR Global (method=QR_PAY) through 9Pay
-const NINEPAY_BANK_TRANSFER = NINEPAY_ENABLED && process.env.REACT_APP_NINEPAY_BANK_TRANSFER === 'true';
-const NINEPAY_VIETQR = NINEPAY_ENABLED && process.env.REACT_APP_NINEPAY_VIETQR === 'true';
+// On by default (9Pay enabled both on the merchant account); set the env var to "false" to hide one.
+const NINEPAY_BANK_TRANSFER = NINEPAY_ENABLED && process.env.REACT_APP_NINEPAY_BANK_TRANSFER !== 'false';
+const NINEPAY_VIETQR = NINEPAY_ENABLED && process.env.REACT_APP_NINEPAY_VIETQR !== 'false';
 // Lemon Squeezy is retired from the pay page while 9Pay is on (set REACT_APP_LEMONSQUEEZY_BUTTON=true to show it again).
 // The LS checkout code and webhook stay in place for existing orders.
 const SHOW_PRIMARY_PAY = !NINEPAY_ENABLED || process.env.REACT_APP_LEMONSQUEEZY_BUTTON === 'true';
