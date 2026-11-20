@@ -1,6 +1,6 @@
 {
   "short_name": "EnglishOnComputer",
-  "name": "EnglishOnComputer - Learn English Online",
+  "name": "EnglishOnComputer - Learn IELTS Online",
   "icons": [
     {
       "src": "img/48.png",
@@ -22,5 +22,5 @@
   "display": "standalone",
   "theme_color": "#1e40af",
   "background_color": "#ffffff",
-  "description": "An online English learning platform with practical lessons and AI-powered tools"
+  "description": "An online IELTS learning platform with practical lessons and AI-powered tools"
 }

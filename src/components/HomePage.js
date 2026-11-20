@@ -38,25 +38,25 @@ const SKILLS = [
 
 const OFFERS = [
   {
-    title: 'Learn English Anywhere',
-    text: (<>We make English learning available to people around the world at a <strong>low and affordable cost</strong>. Learners can study anytime and anywhere.</>),
+    title: 'Learn IELTS Anywhere',
+    text: (<>We make IELTS learning available to people around the world at a <strong>low and affordable cost</strong>. Learners can study anytime and anywhere.</>),
   },
   {
     title: 'AI-Powered Learning Tools',
     text: (<>Our AI tools help learners <strong>practice, get feedback, and learn at their own pace</strong>.</>),
   },
   {
-    title: 'Improve All Four English Skills',
+    title: 'Improve All Four IELTS Skills',
     text: (<>Our platform helps learners improve their <strong>listening, speaking, reading, and writing skills</strong> through practical lessons and AI-powered exercises.</>),
   },
 ];
 
 const AUDIENCES = [
-  { icon: GraduationCap, title: 'Students of All Levels', text: (<>Suitable for learners at <strong>all English levels</strong>, from beginners to advanced students.</>) },
-  { icon: Presentation, title: 'English Teachers', text: (<>Provides useful tools and resources for <strong>teachers who teach English online</strong>.</>) },
-  { icon: PiggyBank, title: 'Affordable English Learning', text: (<>A good option for people who want to <strong>learn English at a low cost</strong>.</>) },
-  { icon: DoorOpen, title: 'Learners Without Access to Traditional Classes', text: (<>Helps people who <strong>cannot afford or do not have access to conventional English classes</strong>.</>) },
-  { icon: Clock, title: 'Busy Learners', text: (<>Designed for people with busy schedules who want to <strong>learn English anytime and anywhere</strong>.</>) },
+  { icon: GraduationCap, title: 'Students of All Levels', text: (<>Suitable for learners at <strong>all IELTS levels</strong>, from beginners to advanced students.</>) },
+  { icon: Presentation, title: 'IELTS Teachers', text: (<>Provides useful tools and resources for <strong>teachers who teach IELTS online</strong>.</>) },
+  { icon: PiggyBank, title: 'Affordable IELTS Learning', text: (<>A good option for people who want to <strong>learn IELTS at a low cost</strong>.</>) },
+  { icon: DoorOpen, title: 'Learners Without Access to Traditional Classes', text: (<>Helps people who <strong>cannot afford or do not have access to conventional IELTS classes</strong>.</>) },
+  { icon: Clock, title: 'Busy Learners', text: (<>Designed for people with busy schedules who want to <strong>learn IELTS anytime and anywhere</strong>.</>) },
 ];
 
 // ── Hero "practice room" preview: a small, purely decorative mock of each skill ──
@@ -240,9 +240,9 @@ function PracticeRoomPreview() {
 // wants it back.
 const HERO_PHOTOS = [
   { src: '/img/hero/hero-1.webp', alt: 'A learner wearing headphones gives a thumbs-up next to a computer' },
-  { src: '/img/hero/hero-2.webp', alt: 'Learners practising English on computers' },
-  { src: '/img/hero/hero-3.webp', alt: 'Two learners working on English exercises at their computers' },
-  { src: '/img/hero/hero-4.webp', alt: 'A learner practising English online' },
+  { src: '/img/hero/hero-2.webp', alt: 'Learners practising IELTS on computers' },
+  { src: '/img/hero/hero-3.webp', alt: 'Two learners working on IELTS exercises at their computers' },
+  { src: '/img/hero/hero-4.webp', alt: 'A learner practising IELTS online' },
 ];
 
 function HeroPhotoCarousel() {
@@ -360,7 +360,7 @@ const HomePage = () => {
             '@type': 'Course',
             name: 'EnglishOnComputer – Online English Learning',
             description:
-              'An online English learning platform with practical lessons and AI-powered tools to improve listening, speaking, reading and writing skills.',
+              'An online IELTS learning platform with practical lessons and AI-powered tools to improve listening, speaking, reading and writing skills.',
             provider: {
               '@type': 'EducationalOrganization',
               name: 'EnglishOnComputer',
@@ -377,7 +377,7 @@ const HomePage = () => {
                 acceptedAnswer: {
                   '@type': 'Answer',
                   text:
-                    'We provide an online English learning platform with practical lessons and AI-powered tools to help learners improve their English without relying on traditional teacher-led learning.',
+                    'We provide an online IELTS learning platform with practical lessons and AI-powered tools to help learners improve their IELTS skills without relying on traditional teacher-led learning.',
                 },
               },
               {
@@ -386,12 +386,12 @@ const HomePage = () => {
                 acceptedAnswer: {
                   '@type': 'Answer',
                   text:
-                    'Our platform is designed for anyone who wants to learn or teach English online: students of all levels, English teachers, learners looking for an affordable option, people without access to traditional classes, and busy learners.',
+                    'Our platform is designed for anyone who wants to learn or teach IELTS online: students of all levels, IELTS teachers, learners looking for an affordable option, people without access to traditional classes, and busy learners.',
                 },
               },
               {
                 '@type': 'Question',
-                name: 'Which English skills can I practice?',
+                name: 'Which IELTS skills can I practice?',
                 acceptedAnswer: {
                   '@type': 'Answer',
                   text:
@@ -427,23 +427,21 @@ const HomePage = () => {
                 <span className="grid place-items-center w-5 h-5 rounded-full" style={{ background: ORANGE }}>
                   <Sparkles className="w-3 h-3 text-white" />
                 </span>
-                AI-powered online English learning
+                AI-Powered Online IELTS Learning
               </span>
 
               <h1 className="mt-6 font-extrabold tracking-tight leading-[1.05] text-4xl sm:text-5xl xl:text-6xl">
-                Learn English
-                <span className="block">
-                  <span className="relative inline-block">
-                    <span className="relative z-10" style={{ color: ORANGE }}>anytime</span>
-                    <span className="absolute left-0 right-0 bottom-1 h-3 rounded-full opacity-25" style={{ background: ORANGE }} />
-                  </span>{' '}
-                  and anywhere.
+                Learn{' '}
+                <span className="relative inline-block">
+                  <span className="relative z-10" style={{ color: ORANGE }}>IELTS</span>
+                  <span className="absolute left-0 right-0 bottom-1 h-3 rounded-full opacity-25" style={{ background: ORANGE }} />
                 </span>
+                <span className="block">Anytime, Anywhere.</span>
               </h1>
 
               <p className="mt-6 text-base sm:text-lg text-white/75 max-w-xl leading-relaxed">
-                We provide an <strong className="text-white">online English learning platform</strong> with practical lessons and{' '}
-                <strong className="text-white">AI-powered tools</strong> to help learners improve their English without relying on
+                We provide an <strong className="text-white">online IELTS learning platform</strong> with practical lessons and{' '}
+                <strong className="text-white">AI-powered tools</strong> to help learners improve their IELTS skills without relying on
                 traditional teacher-led learning.
               </p>
 
@@ -456,16 +454,10 @@ const HomePage = () => {
                   Start practicing
                   <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                 </Link>
-                <Link
-                  to="/about"
-                  className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-base font-semibold text-white border border-white/25 hover:bg-white/10 transition-colors"
-                >
-                  Who we are
-                </Link>
               </div>
 
-              <ul className="mt-9 flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/70">
-                {['Listening', 'Speaking', 'Reading', 'Writing'].map((s) => (
+              <ul className="mt-9 flex flex-col gap-2 text-sm sm:text-base font-semibold text-white/85">
+                {['Realistic Test Interface', 'Authentic Test Materials', 'Accurate Predictions'].map((s) => (
                   <li key={s} className="inline-flex items-center gap-1.5">
                     <Check className="w-4 h-4" style={{ color: ORANGE }} /> {s}
                   </li>
@@ -551,8 +543,8 @@ const HomePage = () => {
                 Practical lessons, powered by AI
               </h2>
               <p className="mt-4 text-[#0b2447]/70 leading-relaxed">
-                We provide an <strong>online English learning platform</strong> with practical lessons and{' '}
-                <strong>AI-powered tools</strong> to help learners improve their English without relying on traditional
+                We provide an <strong>online IELTS learning platform</strong> with practical lessons and{' '}
+                <strong>AI-powered tools</strong> to help learners improve their IELTS skills without relying on traditional
                 teacher-led learning.
               </p>
             </motion.div>
@@ -590,13 +582,13 @@ const HomePage = () => {
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }} variants={reveal} className="lg:sticky lg:top-28">
               <p className="text-sm font-bold uppercase tracking-[0.18em]" style={{ color: BLUE }}>Who Is It For?</p>
               <h2 className="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight" style={{ color: NAVY }}>
-                For anyone who wants to learn or teach English online
+                For anyone who wants to learn or teach IELTS online
               </h2>
               <p className="mt-4 text-[#0b2447]/70 leading-relaxed">
-                Our platform is designed for anyone who wants to learn or teach English online.
+                Our platform is designed for anyone who wants to learn or teach IELTS online.
               </p>
               <div className="mt-8 hidden lg:block rounded-[26px] border border-[#e3ecf7] bg-white p-7 shadow-[0_24px_60px_-30px_rgba(11,36,71,0.35)]">
-                <img src="/img/logo-eoc.png" alt="EnglishOnComputer.com" className="w-56 h-auto mx-auto" />
+                <img src="/img/logo-kangaroo.webp" alt="IELTS EnglishOnComputer.com" className="w-56 h-auto mx-auto" />
               </div>
             </motion.div>
           </div>
@@ -709,7 +701,7 @@ const HomePage = () => {
             <div className="relative grid md:grid-cols-[1fr,auto] items-center gap-8">
               <div>
                 <p className="text-2xl sm:text-3xl font-extrabold leading-snug max-w-2xl">
-                  “Learn smarter with AI, improve your English, and take your skills to the next level.”
+                  “Learn smarter with AI, improve your IELTS, and take your skills to the next level.”
                 </p>
                 <p className="mt-3 text-white/70 font-medium">— EnglishOnComputer Team</p>
               </div>

@@ -15,7 +15,7 @@ const CompPolicy = () => (
 
     <Section title="1. Scope of Service">
       <p>
-        We provide English test preparation materials designed for use on our website, including mock tests and practice
+        We provide IELTS test preparation materials designed for use on our website, including mock tests and practice
         exercises with audio components.
       </p>
       <p>

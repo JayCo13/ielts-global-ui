@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { ChevronRight, Home, Shield, Lock, AlertCircle, Crown, QrCode, Clock } from 'lucide-react';
+import { ChevronRight, Home, Shield, Lock, AlertCircle, Crown, QrCode, Building2, Clock, Tag, Check } from 'lucide-react';
 import { checkTokenExpiration, logout } from '../utils/authUtils';
 import API_BASE from '../config/api';
 import { formatUsd, packageUsd } from '../utils/money';
@@ -45,6 +45,12 @@ const NINEPAY_ENABLED = process.env.REACT_APP_NINEPAY_ENABLED === 'true';
 // Wallets through the same 9Pay redirect (method=APPLE_PAY / GOOGLE_PAY); 9Pay must enable them on the merchant account
 const NINEPAY_APPLE_PAY = NINEPAY_ENABLED && process.env.REACT_APP_NINEPAY_APPLE_PAY === 'true';
 const NINEPAY_GOOGLE_PAY = NINEPAY_ENABLED && process.env.REACT_APP_NINEPAY_GOOGLE_PAY === 'true';
+// Vietnamese buyers: bank transfer (method=COLLECTION) and VietQR / VietQR Global (method=QR_PAY) through 9Pay
+const NINEPAY_BANK_TRANSFER = NINEPAY_ENABLED && process.env.REACT_APP_NINEPAY_BANK_TRANSFER === 'true';
+const NINEPAY_VIETQR = NINEPAY_ENABLED && process.env.REACT_APP_NINEPAY_VIETQR === 'true';
+// Lemon Squeezy is retired from the pay page while 9Pay is on (set REACT_APP_LEMONSQUEEZY_BUTTON=true to show it again).
+// The LS checkout code and webhook stay in place for existing orders.
+const SHOW_PRIMARY_PAY = !NINEPAY_ENABLED || process.env.REACT_APP_LEMONSQUEEZY_BUTTON === 'true';
 
 // Apple Pay only works in Safari on Apple devices
 const canUseApplePay = () => {
@@ -59,12 +65,24 @@ const canUseApplePay = () => {
 const stripDashes = (text) => (text || '').replace(/\s+[-–—]\s+/g, ' ');
 const benefitLines = (text) => stripDashes(text).split(/\n|(?=⭐)/).map(l => l.trim()).filter(Boolean);
 
+// Affiliate discount (first VIP order only). Same rounding as the backend
+// (vip_packages.py): USD to the cent, VND to the dong.
+const discountUsd = (usd, pct) => (pct ? Math.round(Number(usd) * 100 * (100 - pct) / 100) / 100 : Number(usd));
+const discountVnd = (vnd, pct) => (pct ? Math.round(Number(vnd) * (100 - pct) / 100) : Number(vnd));
+
 const Payment = () => {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const [ninepayLoading, setNinepayLoading] = useState(null); // 9Pay method being opened, or null
     const [showApplePay] = useState(() => NINEPAY_APPLE_PAY && canUseApplePay());
     const inProgressRef = useRef(false);
+
+    // Affiliate discount: earned through the referral link, or a code typed here
+    const [offer, setOffer] = useState(null);          // GET /customer/affiliate/checkout-offer
+    const [codeInput, setCodeInput] = useState('');
+    const [appliedCode, setAppliedCode] = useState(null); // { code, discount_pct }
+    const [codeMsg, setCodeMsg] = useState(null);       // { type: 'ok' | 'err', text }
+    const [codeChecking, setCodeChecking] = useState(false);
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -89,6 +107,62 @@ const Payment = () => {
             body: JSON.stringify({ package_id: packageId }),
         }).catch(() => {});
     }, [packageId]);
+
+    // Affiliate discount offer. A visitor who came through a ?ref= link but whose
+    // account was not linked at signup gets that code pre-filled in the code box.
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!packageId || !token) return;
+        fetch(`${API_BASE}/customer/affiliate/checkout-offer`, {
+            headers: { Authorization: `Bearer ${token}` },
+        })
+            .then((res) => (res.ok ? res.json() : null))
+            .then((data) => {
+                if (!data) return;
+                setOffer(data);
+                if (data.show_code_box) {
+                    let saved = '';
+                    try { saved = localStorage.getItem('ref_code') || ''; } catch (e) { /* storage unavailable */ }
+                    if (saved) applyCode(saved, true);
+                }
+            })
+            .catch(() => {});
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [packageId]);
+
+    const applyCode = async (raw, silent = false) => {
+        const code = (raw ?? codeInput).trim();
+        if (!code) return;
+        setCodeInput(code);
+        setCodeChecking(true);
+        setCodeMsg(null);
+        try {
+            const res = await fetch(`${API_BASE}/customer/affiliate/validate-code`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` },
+                body: JSON.stringify({ code }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.detail || 'This discount code is not valid.');
+            setAppliedCode({ code: data.code, discount_pct: Number(data.discount_pct || 0) });
+            setCodeMsg(data.discount_pct
+                ? { type: 'ok', text: `Code applied: ${data.discount_pct}% off this order.` }
+                : { type: 'ok', text: 'Code accepted. This code does not include a discount.' });
+        } catch (err) {
+            setAppliedCode(null);
+            // A remembered ?ref= code that doesn't work is dropped quietly
+            if (silent) setCodeInput('');
+            else setCodeMsg({ type: 'err', text: err.message });
+        } finally {
+            setCodeChecking(false);
+        }
+    };
+
+    const removeCode = () => { setAppliedCode(null); setCodeMsg(null); setCodeInput(''); };
+
+    const discountPct = Number(offer?.discount_pct || 0) || Number(appliedCode?.discount_pct || 0);
+    // Sent with the checkout so the backend links the account and applies the discount
+    const codeQuery = offer?.show_code_box && appliedCode ? `code=${encodeURIComponent(appliedCode.code)}` : '';
 
     // Token validation
     const validateTokenAndRedirect = () => {
@@ -143,7 +217,7 @@ const Payment = () => {
         const token = localStorage.getItem('token');
 
         try {
-            const res = await fetch(`${API_BASE}/customer/vip/packages/${packageId}/create-checkout`, {
+            const res = await fetch(`${API_BASE}/customer/vip/packages/${packageId}/create-checkout${codeQuery ? `?${codeQuery}` : ''}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -199,7 +273,7 @@ const Payment = () => {
         const token = localStorage.getItem('token');
 
         try {
-            const res = await fetch(`${API_BASE}/customer/vip/packages/${packageId}/purchase`, {
+            const res = await fetch(`${API_BASE}/customer/vip/packages/${packageId}/purchase${codeQuery ? `?${codeQuery}` : ''}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -249,7 +323,7 @@ const Payment = () => {
         const token = localStorage.getItem('token');
 
         try {
-            const res = await fetch(`${API_BASE}/customer/vip/packages/${packageId}/ninepay-checkout?method=${method}`, {
+            const res = await fetch(`${API_BASE}/customer/vip/packages/${packageId}/ninepay-checkout?method=${method}${codeQuery ? `&${codeQuery}` : ''}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -342,8 +416,11 @@ const Payment = () => {
                                 )}
                             </div>
                             <div className="text-right">
+                                {discountPct > 0 && (
+                                    <div className="text-sm text-gray-400 line-through">{formatUsd(packageUsd(selectedPackage))}</div>
+                                )}
                                 <div className="text-2xl font-extrabold text-lime-600">
-                                    {formatUsd(packageUsd(selectedPackage))}
+                                    {formatUsd(discountUsd(packageUsd(selectedPackage), discountPct))}
                                 </div>
                                 <p className="text-xs text-gray-400 mt-1">USD / {selectedPackage.duration_months} month{selectedPackage.duration_months > 1 ? 's' : ''}</p>
                             </div>
@@ -362,6 +439,54 @@ const Payment = () => {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Affiliate discount: earned through the referral link */}
+                        {offer?.source === 'link' && discountPct > 0 && (
+                            <div className="mt-4 flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-100 p-3 text-sm text-emerald-800">
+                                <Tag className="w-4 h-4 flex-shrink-0" />
+                                <span>Referral discount: <b>{discountPct}% off</b> your first VIP order has been applied.</span>
+                            </div>
+                        )}
+
+                        {/* Affiliate discount code: first VIP order only, accounts not linked to an affiliate yet */}
+                        {offer?.show_code_box && (
+                            <div className="mt-4">
+                                <label htmlFor="discount-code" className="block text-sm font-medium text-gray-700 mb-1.5">Discount code</label>
+                                {appliedCode ? (
+                                    <div className="flex items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5">
+                                        <span className="flex items-center gap-2 text-sm text-emerald-800">
+                                            <Check className="w-4 h-4" />
+                                            <b data-no-translate>{appliedCode.code}</b>
+                                        </span>
+                                        <button type="button" onClick={removeCode} className="text-xs font-medium text-gray-500 hover:text-red-500">Remove</button>
+                                    </div>
+                                ) : (
+                                    <div className="flex gap-2">
+                                        <input
+                                            id="discount-code"
+                                            value={codeInput}
+                                            onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
+                                            onKeyDown={(e) => { if (e.key === 'Enter') applyCode(); }}
+                                            maxLength={32}
+                                            placeholder="Enter a discount code"
+                                            className="flex-1 min-w-0 px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-lime-400"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => applyCode()}
+                                            disabled={codeChecking || !codeInput.trim()}
+                                            className="shrink-0 px-4 py-2.5 rounded-xl bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 disabled:opacity-50"
+                                        >
+                                            {codeChecking ? 'Checking…' : 'Apply'}
+                                        </button>
+                                    </div>
+                                )}
+                                {codeMsg && (
+                                    <p className={`text-xs mt-1.5 ${codeMsg.type === 'err' ? 'text-red-600' : 'text-emerald-700'}`}>{codeMsg.text}</p>
+                                )}
+                                <p className="text-xs text-gray-400 mt-1.5">Only for your first VIP order. The code links your account to the creator who shared it.</p>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -381,6 +506,7 @@ const Payment = () => {
                             Secure Payment
                         </h3>
 
+                        {SHOW_PRIMARY_PAY && (<>
                         <button
                             onClick={USE_LEMONSQUEEZY ? handleLemonSqueezyPay : handlePay}
                             disabled={loading || ninepayLoading}
@@ -401,7 +527,7 @@ const Payment = () => {
                                             <img src="/img/lemonsqueezy-icon.svg" alt="Lemon Squeezy" className="h-5 w-auto" />
                                         </span>
                                     ) : <QrCode className="w-5 h-5" />}
-                                    Pay Now {formatUsd(packageUsd(selectedPackage))}
+                                    Pay Now {formatUsd(discountUsd(packageUsd(selectedPackage), discountPct))}
                                 </>
                             )}
                         </button>
@@ -417,14 +543,17 @@ const Payment = () => {
                                 <span className="block mt-1">The payment is taken in local currency at the equivalent amount.</span>
                             </p>
                         )}
+                        </>)}
 
                         {NINEPAY_ENABLED && (
                             <>
+                                {SHOW_PRIMARY_PAY && (
                                 <div className="flex items-center gap-3 my-5">
                                     <div className="flex-1 h-px bg-gray-200" />
                                     <span className="text-xs font-medium text-gray-400 uppercase">or</span>
                                     <div className="flex-1 h-px bg-gray-200" />
                                 </div>
+                                )}
                                 <button
                                     onClick={() => handleNinePayPay('CREDIT_CARD')}
                                     disabled={loading || !!ninepayLoading}
@@ -476,9 +605,45 @@ const Payment = () => {
                                     {showApplePay || NINEPAY_GOOGLE_PAY
                                         ? 'Visa, Mastercard, JCB or wallet. You are charged in Vietnamese dong:'
                                         : 'Visa, Mastercard or JCB. Your card is charged in Vietnamese dong:'}
-                                    <span className="font-semibold text-gray-500"> {Number(selectedPackage.price || 0).toLocaleString('en-US')} VND</span>
+                                    <span className="font-semibold text-gray-500"> {discountVnd(selectedPackage.price || 0, discountPct).toLocaleString('en-US')} VND</span>
                                     <span className="block mt-1">Your bank may apply its own currency conversion fee.</span>
                                 </p>
+                                {(NINEPAY_BANK_TRANSFER || NINEPAY_VIETQR) && (
+                                    <>
+                                        <div className="flex items-center gap-3 my-5">
+                                            <div className="flex-1 h-px bg-gray-200" />
+                                            <span className="text-xs font-medium text-gray-400">Paying from Vietnam</span>
+                                            <div className="flex-1 h-px bg-gray-200" />
+                                        </div>
+                                        <div className={`grid gap-3 ${NINEPAY_BANK_TRANSFER && NINEPAY_VIETQR ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
+                                            {NINEPAY_BANK_TRANSFER && (
+                                                <button
+                                                    onClick={() => handleNinePayPay('COLLECTION')}
+                                                    disabled={loading || !!ninepayLoading}
+                                                    className="py-3.5 bg-white border-2 border-gray-200 text-gray-800 font-bold rounded-xl hover:border-lime-500 hover:text-lime-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                                >
+                                                    {ninepayLoading === 'COLLECTION' ? 'Redirecting...' : (
+                                                        <><Building2 className="w-5 h-5" /> Bank transfer</>
+                                                    )}
+                                                </button>
+                                            )}
+                                            {NINEPAY_VIETQR && (
+                                                <button
+                                                    onClick={() => handleNinePayPay('QR_PAY')}
+                                                    disabled={loading || !!ninepayLoading}
+                                                    className="py-3.5 bg-white border-2 border-gray-200 text-gray-800 font-bold rounded-xl hover:border-lime-500 hover:text-lime-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                                >
+                                                    {ninepayLoading === 'QR_PAY' ? 'Redirecting...' : (
+                                                        <><QrCode className="w-5 h-5" /> VietQR</>
+                                                    )}
+                                                </button>
+                                            )}
+                                        </div>
+                                        <p className="text-xs text-gray-400 text-center mt-3">
+                                            Transfer or scan a VietQR code from any Vietnamese banking app through 9Pay.
+                                        </p>
+                                    </>
+                                )}
                             </>
                         )}
                     </div>
@@ -488,7 +653,7 @@ const Payment = () => {
                 <div className="mt-6 flex justify-center">
                     <div className="flex items-center gap-2 text-xs text-gray-500">
                         <Lock className="w-4 h-4 text-lime-600" />
-                        <span>Secured by {USE_LEMONSQUEEZY ? 'Lemon Squeezy' : 'PayOS'}{NINEPAY_ENABLED ? ' & 9Pay' : ''} • SSL Encrypted • One-time payment</span>
+                        <span>Secured by {SHOW_PRIMARY_PAY ? `${USE_LEMONSQUEEZY ? 'Lemon Squeezy' : 'PayOS'}${NINEPAY_ENABLED ? ' & 9Pay' : ''}` : '9Pay'} • SSL Encrypted • One-time payment</span>
                     </div>
                 </div>
             </div>

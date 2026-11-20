@@ -679,7 +679,7 @@ const SpeakingResult = () => {
                             className="px-3.5 sm:px-4 py-2 rounded-xl border-2 border-gray-200
                                        text-[#2b5356] font-bold text-sm hover:border-gray-300
                                        whitespace-nowrap">
-                            {fromForecast ? 'Back to Focus' : 'Back to setup'}
+                            {fromForecast ? 'Back to Forecast' : 'Back to setup'}
                         </button>
                     </div>
                 </div>

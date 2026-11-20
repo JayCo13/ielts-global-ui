@@ -173,10 +173,10 @@ const Navbar = () => {
                 <div className={`w-48 flex items-center transition-all duration-300 ${isScrolled ? 'scale-80' : 'scale-100'
                     }`}>
                     <Link to="/" className="flex items-center gap-2.5" aria-label="EnglishOnComputer home">
-                        <img src="/img/logo-eoc-icon.png" alt="EnglishOnComputer logo" className="h-12 w-12 object-contain bg-white rounded-xl p-1 shrink-0" />
+                        <img src="/img/logo-kangaroo.webp" alt="IELTS EnglishOnComputer logo" className="h-12 w-12 object-contain shrink-0" />
                         <span className="leading-none" data-no-translate>
-                            <span className="block text-white font-extrabold tracking-wide text-lg">ENGLISH</span>
-                            <span className="block text-[#aea091] font-semibold tracking-wider text-[10px] mt-0.5">ONCOMPUTER.COM</span>
+                            <span className="block text-[#e11d2a] font-extrabold tracking-wide text-xl">IELTS</span>
+                            <span className="block text-white font-semibold tracking-wide text-[11px] mt-0.5">Englishoncomputer.com</span>
                         </span>
                     </Link>
                 </div>
@@ -247,7 +247,7 @@ const Navbar = () => {
                                         className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsReadingOpen(false)}
                                     >
-                                        Focus
+                                        Forecast
                                     </Link>
                                 </motion.div>
                             )}
@@ -294,7 +294,7 @@ const Navbar = () => {
                                         className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsListeningOpen(false)}
                                     >
-                                        Focus
+                                        Forecast
                                     </Link>
                                 </motion.div>
                             )}
@@ -341,14 +341,14 @@ const Navbar = () => {
                                         className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsWritingOpen(false)}
                                     >
-                                        Writing Focus Task 1
+                                        Writing Forecast Task 1
                                     </Link>
                                     <Link
                                         to="/writing_forecast?part=2"
                                         className="flex items-center px-4 py-3 text-md font-bold text-gray-700 rounded-lg hover:bg-[#07223d]/10 hover:text-[#07223d] transition-all duration-200"
                                         onClick={() => setIsWritingOpen(false)}
                                     >
-                                        Writing Focus Task 2
+                                        Writing Forecast Task 2
                                     </Link>
                                     <Link
                                         to="/writing_custom"
@@ -684,12 +684,12 @@ const Navbar = () => {
                                 {[
                                     { name: 'Home', path: '/' },
                                     { name: 'Listening – Full Test', path: '/listening_list' },
-                                    { name: 'Listening – Focus', path: '/listening_forecast' },
+                                    { name: 'Listening – Forecast', path: '/listening_forecast' },
                                     { name: 'Reading – Full Test', path: '/reading_list' },
-                                    { name: 'Reading – Focus', path: '/reading_forecast' },
+                                    { name: 'Reading – Forecast', path: '/reading_forecast' },
                                     { name: 'Writing Full Test', path: '/writing_list' },
-                                    { name: 'Writing Focus Task 1', path: '/writing_forecast?part=1' },
-                                    { name: 'Writing Focus Task 2', path: '/writing_forecast?part=2' },
+                                    { name: 'Writing Forecast Task 1', path: '/writing_forecast?part=1' },
+                                    { name: 'Writing Forecast Task 2', path: '/writing_forecast?part=2' },
                                     { name: 'Writing Custom Tasks', path: '/writing_custom' },
                                     { name: 'Speaking', path: '/speaking_list?part=part1' },
                                     ...(canDictation ? [{ name: 'Dictation', path: '/dictation' }] : []),

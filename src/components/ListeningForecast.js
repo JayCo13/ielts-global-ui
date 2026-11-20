@@ -249,13 +249,13 @@ const ListeningForecast = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Seo
-        title="English Listening Focus Tests | EnglishOnComputer"
-        description={`Practice English listening with our focus tests${items.length ? ` like ${items.slice(0, 3).map(i => i.exam_title).join(', ')}` : ''}. A star marks Very Important tests to prioritise.`}
+        title="IELTS Listening Forecast Tests | EnglishOnComputer"
+        description={`Practice IELTS listening with our forecast tests${items.length ? ` like ${items.slice(0, 3).map(i => i.exam_title).join(', ')}` : ''}. A star marks Very Important tests to prioritise.`}
         path="/listening_forecast"
         jsonLd={{
           '@context': 'https://schema.org',
           '@type': 'ItemList',
-          name: 'English Listening Focus Tests',
+          name: 'IELTS Listening Forecast Tests',
           itemListElement: items.slice(0, 20).map((i, idx) => ({
             '@type': 'ListItem',
             position: idx + 1,
@@ -283,7 +283,7 @@ const ListeningForecast = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder={isLimitedUser ? "Search is VIP only..." : "Search focus tests..."}
+              placeholder={isLimitedUser ? "Search is VIP only..." : "Search forecast tests..."}
               className={`w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-lime-500 ${isLimitedUser ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               value={searchQuery}
               onChange={(e) => {

@@ -453,7 +453,7 @@ const Listening_Fe = () => {
     <div className="min-h-screen bg-gray-50">
       <Seo
         title="English Listening Practice Tests | EnglishOnComputer"
-        description={`Practice your English listening skills. Includes tests like ${tests.slice(0, 3).map(t => t.title).join(', ')}... and many more parts!`}
+        description={`Practice your IELTS listening skills. Includes tests like ${tests.slice(0, 3).map(t => t.title).join(', ')}... and many more parts!`}
         path="/listening_list"
       />
       <Navbar />

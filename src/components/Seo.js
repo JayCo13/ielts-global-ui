@@ -9,11 +9,11 @@ import { Helmet } from 'react-helmet-async';
 
 export const SITE_URL = 'https://englishoncomputer.com';
 export const SITE_NAME = 'EnglishOnComputer';
-export const DEFAULT_IMAGE = `${SITE_URL}/img/og-eoc.jpg`;
+export const DEFAULT_IMAGE = `${SITE_URL}/img/logo-ielts.png`;
 export const DEFAULT_TITLE =
-  'EnglishOnComputer – Learn English Online with AI-Powered Tools';
+  'EnglishOnComputer – Learn IELTS Online with AI-Powered Tools';
 export const DEFAULT_DESCRIPTION =
-  'An online English learning platform with practical lessons and AI-powered tools. Improve your listening, speaking, reading and writing skills anytime, anywhere, at a low and affordable cost.';
+  'An online IELTS learning platform with practical lessons and AI-powered tools. Improve your listening, speaking, reading and writing skills anytime, anywhere, at a low and affordable cost.';
 
 /**
  * @param {string}  [title]        Page title (falls back to the site default).

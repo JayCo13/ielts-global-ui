@@ -443,7 +443,7 @@ const Reading_Fe = () => {
     <div className="min-h-screen bg-gray-50">
       <Seo
         title="English Reading Practice Tests | EnglishOnComputer"
-        description={`Practice your English reading skills. Includes tests like ${tests.slice(0, 3).map(t => t.title).join(', ')}...`}
+        description={`Practice your IELTS reading skills. Includes tests like ${tests.slice(0, 3).map(t => t.title).join(', ')}...`}
         path="/reading_list"
       />
       <Navbar />

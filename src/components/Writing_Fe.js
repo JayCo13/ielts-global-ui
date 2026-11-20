@@ -485,7 +485,7 @@ const Writing_Fe = () => {
     <div className="min-h-screen bg-gray-50">
       <Seo
         title="English Writing Practice Tasks | EnglishOnComputer"
-        description={`Practice your English writing skills. Includes tasks like ${tests.slice(0, 3).map(t => t.title).join(', ')}...`}
+        description={`Practice your IELTS writing skills. Includes tasks like ${tests.slice(0, 3).map(t => t.title).join(', ')}...`}
         path="/writing_list"
       />
       <Navbar />

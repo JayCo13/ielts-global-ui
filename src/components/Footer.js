@@ -24,12 +24,12 @@ const Footer = () => {
                     <div className="md:col-span-3 flex flex-col items-center">
                         <div className='flex items-center justify-center gap-6'>
                             <img
-                                src="/img/logo-eoc.png"
-                                alt="EnglishOnComputer logo"
+                                src="/img/logo-kangaroo.webp"
+                                alt="IELTS EnglishOnComputer logo"
                                 className="h-28 w-auto mb-4"
                             />
                         </div>
-                        <p className="text-gray-600 mb-4 text-center">An online English learning platform with practical lessons and AI-powered tools.</p>
+                        <p className="text-gray-600 mb-4 text-center">An online IELTS learning platform with practical lessons and AI-powered tools.</p>
 
                         {/* Social Icons with hover effects */}
                     </div>
