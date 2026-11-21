@@ -94,7 +94,7 @@ function ApplyView({ status, onDone }) {
       <div>
         <h2 className="text-xl font-bold text-[#2b5356] flex items-center gap-2"><Sparkles className="w-6 h-6 text-[#eb7e37]" /> Creator Hub</h2>
         <p className="text-sm text-gray-500 mt-1">
-          Creator Hub brings together the <b>Creator Program</b> (get paid for views) and the <b>Affiliate Program</b> (earn commission on purchases through your link or discount code).
+          Creator Hub brings together the <b>Creator Program</b> (get paid for views) and the <b>Affiliate Program</b> (earn commission on purchases through your affiliate link).
           It opens once your creator application is approved.
         </p>
         <Link to="/work-with-us" className="inline-flex items-center gap-1 mt-2 text-sm font-medium text-[#0096b1] hover:underline">
@@ -317,15 +317,16 @@ function PrimaryWarning({ info, onSwitch, onSubmitAnyway, onCancel }) {
 // Individual Video Bonus (policy 2026-11-19): links of videos that reached the minimum views
 // this month. A link can only ever be submitted once; amounts are not shown to creators.
 const VIDEO_DUP = 'This video has already been submitted.';
-function VideoBonus({ links, onChange, minViews, dups, onCheck }) {
+function VideoBonus({ links, onChange, minViews, dups, onCheck, max = 30, left = 30 }) {
   const count = links.length;
   const setCount = (raw) => {
-    const n = Math.max(0, Math.min(200, Math.floor(Number(String(raw).replace(/[^\d]/g, '')) || 0)));
+    const n = Math.max(0, Math.min(left, Math.floor(Number(String(raw).replace(/[^\d]/g, '')) || 0)));
     onChange(n >= count ? [...links, ...Array(n - count).fill('')] : links.slice(0, n));
   };
   return (
     <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-4">
-      <h5 className="font-semibold text-gray-800">Individual Video Bonus</h5>
+      <h5 className="font-semibold text-gray-800">Individual Video Bonus <span className="font-normal text-gray-500">{`(Maximum ${max} videos)`}</span></h5>
+      {left < max && <p className="mt-1 text-xs text-gray-500">{left === 1 ? 'You can add 1 more video this month.' : `You can add ${left} more videos this month.`}</p>}
       <label className="mt-2 block text-sm text-gray-500">Number of videos reaching {num(minViews)} views this month:</label>
       <div className="mt-1 flex items-center gap-2">
         <input inputMode="numeric" aria-label="Number of videos" className={`${input} w-20 text-center text-lg font-semibold tabular-nums`}
@@ -347,16 +348,72 @@ function VideoBonus({ links, onChange, minViews, dups, onCheck }) {
             </div>
           );
         })}
-        <button type="button" onClick={() => onChange([...links, ''])}
+        {count < left && <button type="button" onClick={() => onChange([...links, ''])}
           className="w-full rounded-full border border-gray-200 bg-white py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 inline-flex items-center justify-center gap-1.5">
           <Plus className="w-4 h-4" /> Add Video
-        </button>
+        </button>}
       </div>
     </div>
   );
 }
 
-function SubmitViews({ channels, rates, openRecon, nextSubmitAt, minDays, videoMinViews, onDone }) {
+// Live estimate under the form (adjustment 2026-11-21): appears once anything is entered.
+// Numbers come from POST /creator-hub/reconciliations/preview (same pricing as the submission).
+const rateLabel = (r) => `$${Number(r).toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
+function BreakdownTable({ title, head, rows, total }) {
+  return (
+    <div>
+      <h6 className="mb-1.5 text-sm font-semibold text-gray-800">{title}</h6>
+      <table className="w-full text-sm">
+        <thead className="text-xs text-gray-400"><tr>{head.map((h, i) => <th key={h} className={`py-1 font-medium ${i === 0 ? 'text-left' : 'text-right'}`}>{h}</th>)}</tr></thead>
+        <tbody className="divide-y divide-gray-100">
+          {rows.map((r) => (
+            <tr key={r.key} className="text-gray-700">{r.cells.map((c, i) => <td key={i} className={`py-1.5 ${i === 0 ? 'text-left' : 'text-right tabular-nums'}`}>{c}</td>)}</tr>
+          ))}
+          {total && <tr className="font-semibold text-gray-900">{total.map((c, i) => <td key={i} className={`py-1.5 ${i === 0 ? 'text-left' : 'text-right tabular-nums'}`}>{c}</td>)}</tr>}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function RewardBreakdown({ p }) {
+  const v = p.views;
+  const typeLabel = (t) => (t === 'primary' ? 'Primary' : 'Secondary');
+  return (
+    <div className="rounded-xl border border-emerald-100 bg-emerald-50/40 p-4 space-y-5">
+      <div>
+        <BreakdownTable title="1. Total Views Bonus" head={['Channel', 'Views', 'Bonus']}
+          rows={[
+            { key: 'p', cells: [`Primary × ${rateLabel(p.rates.primary_per_k)}`, num(v.primary.views), usd(v.primary.usd)] },
+            { key: 's', cells: [`Secondary × ${rateLabel(p.rates.secondary_per_k)}`, num(v.secondary.views), usd(v.secondary.usd)] },
+          ]}
+          total={[`Total (Max. ${usd(v.cap_usd).replace('.00', '')})`, num(v.total_views), usd(v.usd)]} />
+        <p className="mt-1 text-xs italic text-gray-500">If the calculated bonus exceeds the maximum reward, the maximum reward will apply.</p>
+      </div>
+      {p.channels.length > 0 && (
+        <BreakdownTable title="2. Monthly Total Views Bonus per Channel" head={['Channel', 'Milestone', 'Bonus']}
+          rows={p.channels.map((c) => ({ key: c.channel_id, cells: [
+            <span>{typeLabel(c.type)} <span className="text-xs text-gray-400" data-no-translate>· {c.channel_name}</span></span>,
+            c.milestone ? num(c.milestone) : '—', usd(c.bonus)] }))}
+          total={['Total', '', usd(p.tier_usd)]} />
+      )}
+      <BreakdownTable title={`3. Individual Video Bonus (Maximum ${p.videos.max} videos)`} head={[`Eligible Videos (>${num(p.videos.min_views)} views)`, 'Quantity', 'Bonus']}
+        rows={[{ key: 'v', cells: ['Videos', num(p.videos.counted), usd(p.videos.usd)] }]} />
+      <div className="border-t border-emerald-100 pt-4">
+        <BreakdownTable title="Estimated Reward" head={['Bonus Category', 'Amount']}
+          rows={[
+            { key: 'a', cells: ['Total Views Bonus', usd(v.usd)] },
+            { key: 'b', cells: ['Monthly Total Views Bonus', usd(p.tier_usd)] },
+            { key: 'c', cells: ['Individual Video Bonus', usd(p.videos.usd)] },
+          ]}
+          total={['Estimated Total Reward', <span className="text-emerald-600">{usd(p.total_usd)}</span>]} />
+      </div>
+    </div>
+  );
+}
+
+function SubmitViews({ channels, rates, openRecon, nextSubmitAt, minDays, videoMinViews, videoMax = 30, videosLeft = 30, prefill, onDone }) {
   const approved = channels.filter((c) => c.status === 'approved');
   const [primary, setPrimary] = useState(() => (approved.find((c) => c.is_primary) || approved[0] || {}).id);
   const [vals, setVals] = useState({});
@@ -368,6 +425,26 @@ function SubmitViews({ channels, rates, openRecon, nextSubmitAt, minDays, videoM
   const [locked, setLocked] = useState(false);
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
+  const [preview, setPreview] = useState(null);
+
+  // "Resubmit" on a rejected submission: fill the form with what was sent.
+  useEffect(() => {
+    if (!prefill) return;
+    const r = prefill.rec;
+    const ok = (id) => approved.some((c) => c.id === id);
+    const v = {}; const d = {}; const pr = {};
+    (r.items || []).filter((it) => ok(it.channel_id)).forEach((it) => {
+      v[it.channel_id] = String(it.submitted_total);
+      if (it.views_date) d[it.channel_id] = String(it.views_date).slice(0, 10);
+      if ((it.proof_urls || []).length) pr[it.channel_id] = it.proof_urls;
+    });
+    setVals(v); setDates(d); setProofs(pr);
+    const prim = (r.items || []).find((it) => it.channel_type === 'primary' && ok(it.channel_id));
+    if (prim) setPrimary(prim.channel_id);
+    setVideos((r.videos || []).filter((x) => x.status === 'returned').map((x) => x.url).slice(0, videosLeft));
+    setDups([]); setErr('');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefill]);
 
   useEffect(() => {
     if (!approved.some((c) => c.id === primary)) setPrimary((approved.find((c) => c.is_primary) || approved[0] || {}).id);
@@ -393,6 +470,23 @@ function SubmitViews({ channels, rates, openRecon, nextSubmitAt, minDays, videoM
     return s + (l.period * rate) / 1000;
   }, 0);
 
+  const videoKey = videos.map((u) => u.trim()).filter(Boolean).join('\n');
+  const valsKey = JSON.stringify(vals);
+  useEffect(() => {
+    const items = filled.filter((l) => l.total != null).map((l) => ({ channel_id: l.c.id, total_views: l.total }));
+    const vids = videoKey ? videoKey.split('\n') : [];
+    if (!items.length && !vids.length) { setPreview(null); return undefined; }
+    let live = true;
+    const t = setTimeout(() => {
+      api('/creator-hub/reconciliations/preview', {
+        method: 'POST',
+        body: JSON.stringify({ primary_channel_id: approved.length > 1 ? primary : undefined, items, videos: vids }),
+      }).then((p) => { if (live) setPreview(p); }).catch(() => { /* the estimate is optional */ });
+    }, 350);
+    return () => { live = false; clearTimeout(t); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [valsKey, videoKey, primary]);
+
   const send = async (pid) => {
     setWarn(null); setBusy(true);
     try {
@@ -404,7 +498,7 @@ function SubmitViews({ channels, rates, openRecon, nextSubmitAt, minDays, videoM
           videos: videoLinks,
         }),
       });
-      setVals({}); setDates({}); setProofs({}); setVideos([]); setDups([]); onDone();
+      setVals({}); setDates({}); setProofs({}); setVideos([]); setDups([]); setPreview(null); onDone();
     } catch (e) { setErr(e.message); if (e.message === VIDEO_DUP) checkVideos(); } finally { setBusy(false); }
   };
 
@@ -452,7 +546,7 @@ function SubmitViews({ channels, rates, openRecon, nextSubmitAt, minDays, videoM
   return (
     <div className="space-y-3">
       <div className="overflow-x-auto">
-        <table className="w-full text-sm min-w-[640px]">
+        <table className="w-full text-sm min-w-[520px]">
           <thead className="text-xs text-gray-400 border-b border-gray-100">
             <tr>
               {approved.length > 1 && <th className="text-left py-2 pr-2">Primary</th>}
@@ -460,8 +554,6 @@ function SubmitViews({ channels, rates, openRecon, nextSubmitAt, minDays, videoM
               <th className="text-right">Last approved total</th>
               <th className="text-right">Current total views</th>
               <th className="text-left pl-3">As of</th>
-              <th className="text-right">This period</th>
-              <th className="text-right">Est. reward</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
@@ -486,16 +578,15 @@ function SubmitViews({ channels, rates, openRecon, nextSubmitAt, minDays, videoM
                   <div className="mt-1 flex justify-end"><ProofPicker urls={proofs[l.c.id] || []} onChange={(u) => setProofs({ ...proofs, [l.c.id]: u })} /></div>
                 </td>
                 <td className="pl-3 py-1.5 align-top"><input type="date" max={today()} className={`${input} w-36`} value={dates[l.c.id] || today()} onChange={(e) => setDates({ ...dates, [l.c.id]: e.target.value })} /></td>
-                <td className={`text-right tabular-nums align-top pt-4 ${l.period < 0 ? 'text-red-500' : 'text-gray-700'}`}>{l.period == null ? '—' : num(l.period)}</td>
-                <td className="text-right tabular-nums font-medium text-emerald-600 align-top pt-4">{l.period > 0 ? usd(l.reward) : '—'}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <VideoBonus links={videos} onChange={(v) => setVideos(v)} minViews={videoMinViews || 1000} dups={dups} onCheck={checkVideos} />
+      <VideoBonus links={videos} onChange={(v) => setVideos(v)} minViews={videoMinViews || 1000} dups={dups} onCheck={checkVideos} max={videoMax} left={videosLeft} />
+      {preview && (filled.length > 0 || videoKey) && <RewardBreakdown p={preview} />}
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="text-sm text-gray-600">Estimated reward: <b className="text-emerald-600">{usd(totalReward)}</b> <span className="text-xs text-gray-400">· added to your wallet after review</span></div>
+        <div className="text-sm text-gray-600">Estimated reward: <b className="text-emerald-600">{usd(preview && (filled.length > 0 || videoKey) ? preview.total_usd : totalReward)}</b> <span className="text-xs text-gray-400">· added to your wallet after review</span></div>
         <button onClick={submit} disabled={busy} className={`${btn} bg-[#eb7e37] text-white hover:bg-[#d96e28]`}><Send className="w-4 h-4" /> {busy ? 'Sending…' : 'Submit views for review'}</button>
       </div>
       {err && <p className="text-sm text-red-500">⚠️ {err}</p>}
@@ -532,9 +623,15 @@ const ShowMore = ({ total, open, onToggle }) => (total > PREVIEW ? (
   </button>
 ) : null);
 
-function History({ items }) {
+function History({ items, canResubmit, onResubmit, onChanged }) {
   const [openId, setOpenId] = useState(null);
   const [all, setAll] = useState(false);
+  const [confirmDel, setConfirmDel] = useState(null);
+  const [delErr, setDelErr] = useState('');
+  const remove = async (id) => {
+    setDelErr('');
+    try { await api(`/creator-hub/reconciliations/${id}`, { method: 'DELETE' }); setConfirmDel(null); onChanged(); } catch (e) { setDelErr(e.message); }
+  };
   if (!items.length) return <p className="text-sm text-gray-400">No submissions yet.</p>;
   return (
     <div>
@@ -546,6 +643,27 @@ function History({ items }) {
             <span className="flex items-center gap-2"><Badge map={REC_STATUS} value={r.status} />{openId === r.id ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}</span>
           </button>
           {r.status === 'rejected' && r.reject_reason && <p className="mt-1 text-xs text-red-500">⚠️ Reason: <span data-no-translate>{r.reject_reason}</span> — please correct and submit again.</p>}
+          {r.status === 'rejected' && (
+            <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs">
+              {canResubmit && (
+                <button type="button" onClick={() => onResubmit(r)} className="inline-flex items-center gap-1 rounded-lg border border-[#0096b1]/30 px-2.5 py-1 font-semibold text-[#0096b1] hover:bg-[#0096b1]/5">
+                  <RotateCcw className="w-3.5 h-3.5" /> Resubmit
+                </button>
+              )}
+              {confirmDel === r.id ? (
+                <>
+                  <span className="text-gray-500">Delete this submission?</span>
+                  <button type="button" onClick={() => remove(r.id)} className="rounded-lg bg-red-500 px-2.5 py-1 font-semibold text-white hover:bg-red-600">Delete</button>
+                  <button type="button" onClick={() => setConfirmDel(null)} className="rounded-lg border border-gray-200 px-2.5 py-1 font-semibold text-gray-500 hover:bg-gray-50">Cancel</button>
+                </>
+              ) : (
+                <button type="button" onClick={() => { setDelErr(''); setConfirmDel(r.id); }} className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-2.5 py-1 font-semibold text-red-500 hover:bg-red-50">
+                  <Trash2 className="w-3.5 h-3.5" /> Delete
+                </button>
+              )}
+            </div>
+          )}
+          {confirmDel === r.id && delErr && <p className="mt-1 text-xs text-red-500">⚠️ {delErr}</p>}
           {openId === r.id && (
             <div className="mt-2 overflow-x-auto">
               <table className="w-full text-xs min-w-[520px]">
@@ -676,6 +794,8 @@ function CreatorProgram() {
   const [recs, setRecs] = useState([]);
   const [earn, setEarn] = useState(null);
   const [err, setErr] = useState(false);
+  const [prefill, setPrefill] = useState(null);
+  const submitRef = React.useRef(null);
 
   const load = useCallback(async () => {
     try {
@@ -695,7 +815,12 @@ function CreatorProgram() {
   if (err && !data) return <Card><p className="text-sm text-gray-500">Could not load the Creator Program. <button onClick={load} className="text-[#0096b1] font-semibold hover:underline">Try again</button></p></Card>;
   if (!data) return <Card><p className="text-sm text-gray-400">Loading…</p></Card>;
 
-  const { channels, rates, platforms, open_reconciliation: openRecon, next_submit_at: nextSubmitAt, min_days_between: minDays = 20, video_min_views: videoMinViews } = data;
+  const { channels, rates, platforms, open_reconciliation: openRecon, next_submit_at: nextSubmitAt, min_days_between: minDays = 20, video_min_views: videoMinViews,
+    video_max_per_month: videoMax = 30, videos_left_this_month: videosLeft = 30 } = data;
+  const resubmit = (rec) => {
+    setPrefill({ rec, at: Date.now() });
+    if (submitRef.current) submitRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   const stats = [
     { icon: DollarSign, label: 'Approved creator rewards', value: money(earn?.approved_rewards), tone: 'text-emerald-600' },
     { icon: Clock, label: 'Pending rewards (estimated)', value: usd(earn?.pending_rewards_usd), tone: 'text-amber-500' },
@@ -729,14 +854,17 @@ function CreatorProgram() {
         <RegisterChannel platforms={platforms} onDone={load} />
       </Card>
 
+      <div ref={submitRef} className="scroll-mt-24">
       <Card>
         <h4 className="font-bold text-gray-800 mb-3">Submit views</h4>
-        <SubmitViews channels={channels} rates={rates} openRecon={openRecon} nextSubmitAt={nextSubmitAt} minDays={minDays} videoMinViews={videoMinViews} onDone={load} />
+        <SubmitViews channels={channels} rates={rates} openRecon={openRecon} nextSubmitAt={nextSubmitAt} minDays={minDays} videoMinViews={videoMinViews}
+          videoMax={videoMax} videosLeft={videosLeft} prefill={prefill} onDone={load} />
       </Card>
+      </div>
 
       <Card>
         <h4 className="font-bold text-gray-800 mb-2">Views submissions</h4>
-        <History items={recs} />
+        <History items={recs} canResubmit={!openRecon && channels.some((c) => c.status === 'approved')} onResubmit={resubmit} onChanged={load} />
       </Card>
     </div>
   );
@@ -960,7 +1088,7 @@ export default function CreatorHub({ onGoPayment, onStatus }) {
         <CreatorProgram />
       </HubSection>
 
-      <HubSection n={2} icon={Gift} title="Affiliate Program" subtitle="Earn commission when people purchase through your affiliate link or discount code." tone="bg-[#0096b1]/10 text-[#00687b]">
+      <HubSection n={2} icon={Gift} title="Affiliate Program" subtitle="Earn commission when people purchase through your affiliate link." tone="bg-[#0096b1]/10 text-[#00687b]">
         <AffiliatePanel part="affiliate" onGoPayment={onGoPayment} />
       </HubSection>
 

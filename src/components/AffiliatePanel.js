@@ -3,6 +3,10 @@ import { Link } from 'react-router-dom';
 import { Coins, Gift, Copy, Check, Wallet, Send, Clock, BookOpen, MousePointerClick, UserPlus, Crown, HandCoins as BanknoteArrowUp } from 'lucide-react';
 import API_BASE from '../config/api';
 
+// Discount codes are not used on the international site (adjustment 2026-11-21); the
+// affiliate link still links buyers. REACT_APP_AFFILIATE_CODES=true shows the code again.
+const AFFILIATE_CODES = process.env.REACT_APP_AFFILIATE_CODES === 'true';
+
 // Affiliate tab of the Profile page (ported from the Vietnam tree).
 // Wallet amounts come from the API as integers in the currency's minor unit;
 // `unit_divisor` (1 for VND, 100 for USD) turns them into display amounts.
@@ -134,16 +138,16 @@ export default function AffiliatePanel({ onGoPayment, part = 'all' }) {
         {/* In Creator Hub the section header already names the program. */}
         {part !== 'affiliate' && <h2 className="text-xl font-bold text-[#2b5356] flex items-center gap-2 mb-1"><Gift className="w-6 h-6 text-[#0096b1]" /> Affiliate — refer friends, earn commission</h2>}
         {info.discount_enabled ? (
-          <p className="text-sm text-gray-500">Share your affiliate link or discount code. When someone registers through your link or enters your code when making their first VIP purchase, they receive <b>{discountPct}% off their first VIP order</b>, and you earn <b>{ratePct}% commission</b> on the amount they actually pay.</p>
+          <p className="text-sm text-gray-500">Share your affiliate link. When someone registers through your link, they receive <b>{discountPct}% off their first VIP order</b>, and you earn <b>{ratePct}% commission</b> on the amount they actually pay.</p>
         ) : (
-          <p className="text-sm text-gray-500">Share your affiliate link or discount code. When someone registers through your link or enters your code when making their first VIP purchase, you earn <b>{ratePct}% commission</b> on the amount they actually pay.</p>
+          <p className="text-sm text-gray-500">Share your affiliate link. When someone registers through your link, you earn <b>{ratePct}% commission</b> on the amount they actually pay.</p>
         )}
         <Link to="/affiliate-guide" className="inline-flex items-center gap-1.5 mt-2 text-sm font-medium text-[#0096b1] hover:underline">
           <BookOpen className="w-4 h-4" /> Read the full guide
         </Link>
         <div className="mt-3 flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-100 p-3 text-sm text-gray-700">
           <span className="shrink-0">💡</span>
-          <p><b className="text-amber-700">Note:</b> once an account is linked to you through your affiliate link or discount code, you earn commission on <b>every successful VIP purchase or renewal</b> that account makes, including future purchases. Commission can take a few minutes to appear after a purchase.</p>
+          <p><b className="text-amber-700">Note:</b> once an account is linked to you through your affiliate link, you earn commission on <b>every successful VIP purchase or renewal</b> that account makes, including future purchases. Commission can take a few minutes to appear after a purchase.</p>
         </div>
       </div>
 
@@ -156,7 +160,7 @@ export default function AffiliatePanel({ onGoPayment, part = 'all' }) {
             {copied ? <><Check className="w-4 h-4" /> Copied</> : <><Copy className="w-4 h-4" /> Copy link</>}
           </button>
         </div>
-        {info.discount_code && (<>
+        {AFFILIATE_CODES && info.discount_code && (<>
           <div className="text-sm font-semibold text-[#2b5356] mt-4 mb-2">Your discount code</div>
           <div className="flex gap-2">
             <input readOnly value={info.discount_code} data-no-translate className="flex-1 min-w-0 px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm font-semibold tracking-wider text-gray-700" />

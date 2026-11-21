@@ -51,6 +51,9 @@ const NINEPAY_BANK_TRANSFER = NINEPAY_ENABLED && process.env.REACT_APP_NINEPAY_B
 const NINEPAY_VIETQR = NINEPAY_ENABLED && process.env.REACT_APP_NINEPAY_VIETQR !== 'false';
 // Lemon Squeezy is retired from the pay page while 9Pay is on (set REACT_APP_LEMONSQUEEZY_BUTTON=true to show it again).
 // The LS checkout code and webhook stay in place for existing orders.
+// Discount codes are not used on the international site (adjustment 2026-11-21). A visitor who
+// came through a ?ref= link is still linked (the remembered link code is applied silently).
+const AFFILIATE_CODES = process.env.REACT_APP_AFFILIATE_CODES === 'true';
 const SHOW_PRIMARY_PAY = !NINEPAY_ENABLED || process.env.REACT_APP_LEMONSQUEEZY_BUTTON === 'true';
 
 // Apple Pay only works in Safari on Apple devices
@@ -449,8 +452,16 @@ const Payment = () => {
                             </div>
                         )}
 
+                        {/* Referral link remembered from ?ref= and applied without the code box */}
+                        {!AFFILIATE_CODES && offer?.show_code_box && appliedCode && discountPct > 0 && (
+                            <div className="mt-4 flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-100 p-3 text-sm text-emerald-800">
+                                <Tag className="w-4 h-4 flex-shrink-0" />
+                                <span>Referral discount: <b>{discountPct}% off</b> your first VIP order has been applied.</span>
+                            </div>
+                        )}
+
                         {/* Affiliate discount code: first VIP order only, accounts not linked to an affiliate yet */}
-                        {offer?.show_code_box && (
+                        {AFFILIATE_CODES && offer?.show_code_box && (
                             <div className="mt-4">
                                 <label htmlFor="discount-code" className="block text-sm font-medium text-gray-700 mb-1.5">Discount code</label>
                                 {appliedCode ? (
